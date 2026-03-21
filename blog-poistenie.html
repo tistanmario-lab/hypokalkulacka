@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Životné poistenie: kedy sa oplatí a kedy je to zbytočný výdavok | Mário Tišťan</title>
+<meta name="description" content="Rizikové vs. investičné poistenie, čo kryť a kedy poistenie vôbec nepotrebujete — praktický sprievodca životným poistením.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #003049;
+  --red: #AB0534;
+  --silver: #989FA7;
+  --sand: #ECEDED;
+  --white: #ffffff;
+  --dark-gray: #4D4D4D;
+  --muted: rgba(0,48,73,0.5);
+  --border: rgba(0,48,73,0.1);
+  --radius: 20px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--navy); line-height: 1.6; }
+
+.blog-header { background: var(--navy); padding: 20px 5%; }
+.header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+.header-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+.header-logo span { color: var(--red); }
+.header-back { font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; transition: color .2s; display: inline-flex; align-items: center; gap: 8px; }
+.header-back:hover { color: #fff; }
+.header-back svg { width: 16px; height: 16px; }
+
+.article-hero { background: var(--navy); padding: 40px 5% 60px; }
+.article-hero-inner { max-width: 760px; margin: 0 auto; }
+.article-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--white); background: var(--red); padding: 6px 14px; border-radius: 100px; margin-bottom: 20px; }
+.article-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 700; color: #fff; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 16px; }
+.article-meta { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+.article-wrap { max-width: 760px; margin: 0 auto; padding: 48px 5% 80px; }
+.article-wrap h2 { font-family: 'Playfair Display', serif; font-size: clamp(22px, 3vw, 30px); font-weight: 700; color: var(--navy); margin: 48px 0 16px; line-height: 1.2; }
+.article-wrap h2:first-child { margin-top: 0; }
+.article-wrap p { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 16px; }
+.article-wrap strong { font-weight: 600; color: var(--navy); }
+.article-wrap ul, .article-wrap ol { margin: 0 0 16px 24px; }
+.article-wrap li { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 8px; }
+
+.info-box { background: var(--sand); border-left: 4px solid var(--red); padding: 20px 24px; border-radius: 0 var(--radius) var(--radius) 0; margin: 24px 0; }
+.info-box p { font-size: 15px; font-weight: 400; color: var(--navy); margin-bottom: 0; }
+.info-box p + p { margin-top: 8px; }
+.info-box strong { color: var(--red); }
+
+.takeaway { background: var(--navy); color: #fff; padding: 24px 28px; border-radius: var(--radius); margin: 32px 0; }
+.takeaway-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+.takeaway p { color: rgba(255,255,255,0.85); font-size: 15px; font-weight: 400; margin-bottom: 0; }
+
+.article-cta { background: var(--sand); padding: 60px 5%; }
+.article-cta-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+.article-cta h2 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 3vw, 36px); font-weight: 700; color: var(--navy); margin-bottom: 16px; line-height: 1.2; }
+.article-cta p { font-size: 16px; font-weight: 300; color: var(--muted); margin-bottom: 28px; line-height: 1.7; max-width: 520px; margin-left: auto; margin-right: auto; }
+.btn-primary { background: var(--red); color: #fff; padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: background .2s; border-radius: var(--radius); }
+.btn-primary:hover { background: var(--navy); }
+
+footer { background: var(--navy); color: #fff; padding: 40px 5%; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; }
+.footer-logo span { color: var(--red); }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<header class="blog-header">
+  <div class="header-inner">
+    <a href="index.html" class="header-logo">Mário <span>Tišťan</span></a>
+    <a href="index.html#blog" class="header-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Späť na články
+    </a>
+  </div>
+</header>
+
+<div class="article-hero">
+  <div class="article-hero-inner">
+    <div class="article-tag">Poistenie</div>
+    <h1>Životné poistenie: kedy sa oplatí a kedy je to zbytočný výdavok</h1>
+    <div class="article-meta">Mário Tišťan · Finančný poradca Partners Group SK</div>
+  </div>
+</div>
+
+<article class="article-wrap">
+
+  <p>Životné poistenie patrí medzi najdiskutovanejšie finančné produkty. Niektorí ho považujú za nevyhnutnosť, iní za zbytočný výdavok. Pravda? Ako zvyčajne, niekde uprostred. Záleží na tom, v akej životnej situácii sa nachádzate, aké máte záväzky a aký majetok ste si už vybudovali. V tomto článku si rozoberieme, kedy poistenie naozaj potrebujete, na čo si dať pozor a kedy si ho môžete pokojne odpustiť.</p>
+
+  <h2>1. Pre koho je životné poistenie nevyhnutné</h2>
+
+  <p>Životné poistenie nie je o tom, že sa vám niečo „stane". Je o tom, čo sa stane s vašou rodinou a vašimi záväzkami, ak sa vám niečo stane. Položte si jednoduchú otázku: <strong>ak by ste zajtra nemohli pracovať — kto zaplatí hypotéku, škôlku, energie a potraviny?</strong></p>
+
+  <p>Poistenie je nevyhnutné predovšetkým pre:</p>
+  <ul>
+    <li><strong>Živiteľov rodiny</strong> — ak od vášho príjmu závisí celá domácnosť alebo jej podstatná časť</li>
+    <li><strong>Ľudí s hypotékou</strong> — banka splátku nepozastaví len preto, že ste ochoreli alebo mali úraz</li>
+    <li><strong>Rodičov malých detí</strong> — deti sú finančne závislé na vás ešte mnoho rokov</li>
+    <li><strong>Ľudí bez dostatočných úspor</strong> — ak nemáte rezervu, ktorá by pokryla 6 – 12 mesiacov výdavkov v prípade výpadku príjmu</li>
+  </ul>
+
+  <p>Jednoducho povedané: ak si nemôžete dovoliť byť vlastnou „poisťovňou" — ak nemáte dosť majetku na to, aby ste pokryli veľké riziká z vlastných zdrojov — poistenie potrebujete.</p>
+
+  <h2>2. Rizikové vs. investičné poistenie</h2>
+
+  <p>Toto je kľúčové rozlíšenie, ktoré mnohí klienti nepoznajú. Na trhu existujú dva zásadne odlišné typy životného poistenia:</p>
+
+  <p><strong>Rizikové životné poistenie</strong> je čisté poistenie. Platíte mesačnú sumu a v prípade poistnej udalosti (smrť, invalidita, vážna choroba, práceneschopnosť) dostanete dohodnuté plnenie. Ak sa nič nestane, peniaze „nedostanete späť" — ale to je v poriadku. Rovnako ako pri poistení auta: platíte za ochranu, nie za sporenie.</p>
+
+  <p><strong>Investičné životné poistenie (IŽP)</strong> kombinuje poistenie s investovaním. Časť vašej platby ide na poistné krytie, časť sa investuje do fondov. Znie to lákavo, ale v praxi to má zásadné nevýhody: vysoké poplatky (často 2 – 4 % ročne), nízka výkonnosť fondov v rámci poisťovne, neprehľadná poplatková štruktúra a dlhodobá viazanosť s pokutami za predčasné ukončenie.</p>
+
+  <div class="takeaway">
+    <div class="takeaway-label">Kľúčový poznatok</div>
+    <p>Dnes jednoznačne odporúčam oddelený prístup: rizikové poistenie na ochranu + samostatné investovanie (napríklad do ETF fondov) na budovanie majetku. Tento prístup je lacnejší, transparentnejší a dlhodobo výnosnejší. Viac o investovaní nájdete v článku <a href="blog-investicie.html" style="color:var(--red);font-weight:600">Prečo začať investovať čo najskôr</a>.</p>
+  </div>
+
+  <h2>3. Najväčšia chyba: lacná poistka bez kvalitného krytia</h2>
+
+  <p>Toto vidím u klientov veľmi často. Majú poistenie za 15 – 20 eur mesačne a myslia si, že sú chránení. Keď sa ale pozrieme na podmienky, zistíme, že krytie je úplne nedostatočné — invalidita poistená na 10 000 eur, kritické choroby vylúčené, denné odškodné za hospitalizáciu 5 eur.</p>
+
+  <p><strong>Lacné poistenie nie je dobré poistenie.</strong> Je to len falošný pocit bezpečia. Keď príde vážna choroba, úraz alebo invalidita, lacná poistka vám nezaplatí ani tri mesiace výpadku príjmu — nieto ešte niekoľkoročnú liečbu a rehabilitáciu.</p>
+
+  <div class="info-box">
+    <p><strong>Na čo si dať pozor v podmienkach:</strong></p>
+    <p>Výšku poistného plnenia — musí byť dostatočná na pokrytie reálnych nákladov, nie symbolická.</p>
+    <p>Výluky z poistenia — čo presne poisťovňa nekryje (a býva toho prekvapivo veľa).</p>
+    <p>Čakacie doby — pri niektorých diagnózach poisťovňa plní až po 3 – 6 mesiacoch od vzniku.</p>
+    <p>Definíciu poistnej udalosti — napríklad ako poisťovňa definuje „invaliditu" alebo „vážnu chorobu". Každá poisťovňa to má inak.</p>
+  </div>
+
+  <p>Kvalitné poistenie stojí viac — ale stojí za to. Je lepšie platiť 40 – 60 eur mesačne za poistenie, ktoré vás skutočne ochráni, než 15 eur za niečo, čo v rozhodujúcej chvíli zlyhá.</p>
+
+  <h2>4. Čo kryť: príjem, výdavky, životný štandard</h2>
+
+  <p>Správne nastavené poistenie by malo kompenzovať výpadok príjmu a pokryť kľúčové výdavky v prípade, že nemôžete pracovať. Ako na to?</p>
+
+  <p>Začneme tým, čo platí <strong>Sociálna poisťovňa</strong>. Áno, aj štát vám v prípade invalidity alebo dlhodobej práceneschopnosti vypláca dávky. Ale tieto dávky spravidla pokrývajú len <strong>40 – 60 % vášho predchádzajúceho príjmu</strong>. Zvyšok musíte doplniť z vlastných zdrojov — a práve tu nastupuje komerčné poistenie.</p>
+
+  <div class="info-box">
+    <p><strong>Príklad:</strong></p>
+    <p>Váš čistý príjem je 1 500 eur mesačne. V prípade invalidity by ste zo Sociálnej poisťovne dostávali zhruba 600 – 700 eur. Vaše mesačné výdavky (hypotéka, energie, rodina) sú 1 200 eur.</p>
+    <p>Chýba vám 500 – 600 eur mesačne. Komerčné poistenie by malo pokryť práve tento rozdiel — aby ste si udržali životný štandard a nemuseli siahať na úspory alebo sa zadlžovať.</p>
+  </div>
+
+  <p>Pri nastavovaní poistenia sa preto vždy pozeráme na váš <strong>skutočný životný štandard</strong>, nie na minimálne sumy. Kryjeme to, čo je pre vás dôležité: splátku hypotéky, náklady na deti, pravidelné výdavky. A k tomu pridávame ochranu pri najzávažnejších rizikách — vážne choroby (onkologické ochorenia, infarkty, mŕtvice) a trvalá invalidita.</p>
+
+  <h2>5. Kedy poistenie nepotrebujete</h2>
+
+  <p>Áno, existujú situácie, kedy životné poistenie skutočne nepotrebujete. A je dôležité to povedať otvorene, pretože dobrý poradca vám nepredá produkt, ktorý nepoužijete.</p>
+
+  <p><strong>Poistenie nepotrebujete, ak:</strong></p>
+  <ul>
+    <li>Máte dostatočný majetok na to, aby ste pokryli aj najhoršie scenáre — ste svojou vlastnou „poisťovňou"</li>
+    <li>Nemáte nikoho finančne závislého na vašom príjme (žiadne deti, žiadna hypotéka, partner má vlastný príjem)</li>
+    <li>Ste v dôchodkovom veku a vaše záväzky sú splatené</li>
+    <li>Máte dostatočne veľké investičné portfólio, ktoré by pokrylo viacročný výpadok príjmu</li>
+  </ul>
+
+  <p>Hranica nie je úplne presná a závisí od konkrétnej situácie. Ak máte napríklad investičný majetok v hodnote 200 000 – 300 000 eur, žiadnu hypotéku a dospelé deti, pravdepodobne nepotrebujete klasické životné poistenie. Vaše úspory vás ochránia.</p>
+
+  <div class="takeaway">
+    <div class="takeaway-label">Kľúčový poznatok</div>
+    <p>Poistenie je nástroj na prenos rizika. Ak si riziko viete pokryť sami (z majetku a úspor), platenie poistného je zbytočný výdavok. Ak nie — poistenie je investícia do pokoja a bezpečia vašej rodiny. Kľúč je v správnom posúdení, na ktorej strane sa nachádzate.</p>
+  </div>
+
+  <p>Ak si nie ste istí, kde presne stojíte, rád sa na to pozriem s vami. Spoločne prejdeme vaše príjmy, výdavky, záväzky a majetok — a urobíme rozhodnutie na základe faktov, nie pocitov alebo strachu.</p>
+
+</article>
+
+<section class="article-cta">
+  <div class="article-cta-inner">
+    <h2>Chcete si overiť, či máte správne nastavené poistenie?</h2>
+    <p>Bezplatne zanalyzujem vaše aktuálne poistenie a poradím, či je dostatočné alebo zbytočné. Bez záväzkov.</p>
+    <a href="index.html#kontakt" class="btn-primary">Dohodnúť konzultáciu</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Mário <span>Tišťan</span></div>
+    <div class="footer-copy">&copy; 2026 Mário Tišťan &middot; mariotistan.sk</div>
+    <div style="width:100%;text-align:center;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6">
+      Podriadený finančný agent Partners Group SK s.r.o. &middot; Registrácia NBS č. 221967 &middot; <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5);text-decoration:underline">Overenie v registri NBS</a> &middot; <a href="ochrana-udajov.html" style="color:rgba(255,255,255,0.5);text-decoration:underline">Ochrana osobných údajov</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

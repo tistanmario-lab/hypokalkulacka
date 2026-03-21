@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 vecí, ktoré musíte vedieť pred podpisom hypotéky | Mário Tišťan</title>
+<meta name="description" content="Fixácia, LTV, DSTI, predčasné splatenie a porovnanie bánk — 5 kľúčových vecí, ktoré musíte vedieť pred podpisom hypotéky.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #003049;
+  --red: #AB0534;
+  --silver: #989FA7;
+  --sand: #ECEDED;
+  --white: #ffffff;
+  --dark-gray: #4D4D4D;
+  --muted: rgba(0,48,73,0.5);
+  --border: rgba(0,48,73,0.1);
+  --radius: 20px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--navy); line-height: 1.6; }
+
+/* Header */
+.blog-header { background: var(--navy); padding: 20px 5%; }
+.header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+.header-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+.header-logo span { color: var(--red); }
+.header-back { font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; transition: color .2s; display: inline-flex; align-items: center; gap: 8px; }
+.header-back:hover { color: #fff; }
+.header-back svg { width: 16px; height: 16px; }
+
+/* Hero banner */
+.article-hero { background: var(--navy); padding: 40px 5% 60px; }
+.article-hero-inner { max-width: 760px; margin: 0 auto; }
+.article-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--white); background: var(--red); padding: 6px 14px; border-radius: 100px; margin-bottom: 20px; }
+.article-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 700; color: #fff; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 16px; }
+.article-meta { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+/* Article content */
+.article-wrap { max-width: 760px; margin: 0 auto; padding: 48px 5% 80px; }
+.article-wrap h2 { font-family: 'Playfair Display', serif; font-size: clamp(22px, 3vw, 30px); font-weight: 700; color: var(--navy); margin: 48px 0 16px; line-height: 1.2; }
+.article-wrap h2:first-child { margin-top: 0; }
+.article-wrap p { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 16px; }
+.article-wrap strong { font-weight: 600; color: var(--navy); }
+.article-wrap ul, .article-wrap ol { margin: 0 0 16px 24px; }
+.article-wrap li { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 8px; }
+
+/* Info box */
+.info-box { background: var(--sand); border-left: 4px solid var(--red); padding: 20px 24px; border-radius: 0 var(--radius) var(--radius) 0; margin: 24px 0; }
+.info-box p { font-size: 15px; font-weight: 400; color: var(--navy); margin-bottom: 0; }
+.info-box p + p { margin-top: 8px; }
+.info-box strong { color: var(--red); }
+
+/* Key takeaway */
+.takeaway { background: var(--navy); color: #fff; padding: 24px 28px; border-radius: var(--radius); margin: 32px 0; }
+.takeaway-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+.takeaway p { color: rgba(255,255,255,0.85); font-size: 15px; font-weight: 400; margin-bottom: 0; }
+
+/* CTA section */
+.article-cta { background: var(--sand); padding: 60px 5%; }
+.article-cta-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+.article-cta h2 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 3vw, 36px); font-weight: 700; color: var(--navy); margin-bottom: 16px; line-height: 1.2; }
+.article-cta p { font-size: 16px; font-weight: 300; color: var(--muted); margin-bottom: 28px; line-height: 1.7; max-width: 520px; margin-left: auto; margin-right: auto; }
+.cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-primary { background: var(--red); color: #fff; padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: background .2s; border-radius: var(--radius); }
+.btn-primary:hover { background: var(--navy); }
+.btn-secondary { border: 1.5px solid var(--navy); color: var(--navy); padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: all .2s; border-radius: var(--radius); }
+.btn-secondary:hover { background: var(--navy); color: #fff; }
+
+/* Footer */
+footer { background: var(--navy); color: #fff; padding: 40px 5%; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; }
+.footer-logo span { color: var(--red); }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<header class="blog-header">
+  <div class="header-inner">
+    <a href="index.html" class="header-logo">Mário <span>Tišťan</span></a>
+    <a href="index.html#blog" class="header-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Späť na články
+    </a>
+  </div>
+</header>
+
+<div class="article-hero">
+  <div class="article-hero-inner">
+    <div class="article-tag">Hypotéky</div>
+    <h1>5 vecí, ktoré musíte vedieť pred podpisom hypotéky</h1>
+    <div class="article-meta">Mário Tišťan · Finančný poradca Partners Group SK</div>
+  </div>
+</div>
+
+<article class="article-wrap">
+
+  <p>Hypotéka je pre väčšinu z nás najväčší finančný záväzok v živote. Podpisujete zmluvu na 20, 25 či dokonca 30 rokov a každá drobnosť, ktorú prehliadnete, vás môže stáť tisíce eur. Za roky praxe som videl desiatky prípadov, keď klienti zbytočne preplácali len preto, že nepoznali základné pravidlá hry. Pozrime sa na päť vecí, ktoré by ste mali vedieť ešte predtým, než zájdete do banky.</p>
+
+  <h2>1. Fixácia nie je navždy</h2>
+
+  <p>Keď vám banka ponúkne úrokovú sadzbu, je fixovaná na určité obdobie — zvyčajne 1, 3, 5 alebo 10 rokov. Počas fixácie sa vaša splátka nemení. No po jej skončení banka prehodnotí sadzbu podľa aktuálnych trhových podmienok. A tu môže prísť nepríjemné prekvapenie.</p>
+
+  <p>Predstavte si, že ste v roku 2021 získali sadzbu 0,7 % s fixáciou na 3 roky. Keď fixácia skončila v roku 2024, sadzby sa pohybovali okolo 4 %. Pri hypotéke 150 000 eur to znamenalo nárast splátky o niekoľko stoviek eur mesačne. Naopak, kto si zafixoval na 5 či 10 rokov, mal v tej istej situácii stále pôvodnú nízku sadzbu.</p>
+
+  <div class="info-box">
+    <p><strong>Aké fixácie existujú?</strong></p>
+    <p><strong>1-ročná:</strong> Najnižšia sadzba, ale každý rok sa mení. Vhodná len pre tých, kto aktívne sleduje trh alebo plánuje rýchle splatenie.</p>
+    <p><strong>3-ročná:</strong> Kompromis medzi cenou a stabilitou. Najčastejšia voľba na Slovensku.</p>
+    <p><strong>5-ročná:</strong> Dobrá rovnováha pre rodiny, ktoré chcú pokojne spať. Sadzba je o niečo vyššia, ale máte istotu na dlhšie obdobie.</p>
+    <p><strong>10-ročná:</strong> Maximálna stabilita. Ideálna, ak sú sadzby na trhu nízke a chcete si ich „zamknúť" na dlho.</p>
+  </div>
+
+  <p>Moja rada? Voľba fixácie závisí od vašej životnej situácie a od toho, kam sa podľa odborníkov budú sadzby uberať. Ak sa v tom nechcete orientovať sami, práve tu vám poradca ušetrí čas aj peniaze — porovná aktuálne ponuky a odporučí optimálne riešenie.</p>
+
+  <h2>2. LTV ovplyvňuje vašu sadzbu</h2>
+
+  <p>LTV (Loan-to-Value) je pomer medzi výškou úveru a hodnotou nehnuteľnosti. Jednoducho povedané: koľko percent z ceny nehnuteľnosti si požičiavate od banky.</p>
+
+  <p>Väčšina bánk na Slovensku financuje maximálne <strong>80 % hodnoty nehnuteľnosti</strong>. To znamená, že ak kupujete byt za 200 000 eur, potrebujete mať aspoň 40 000 eur vlastných zdrojov. Pre žiadateľov do 35 rokov existuje výnimka — niektoré banky umožňujú financovanie až do 90 % LTV, no za výrazne vyššiu sadzbu.</p>
+
+  <div class="takeaway">
+    <div class="takeaway-label">Kľúčový poznatok</div>
+    <p>Čím viac vlastných peňazí vložíte, tým lepšiu úrokovú sadzbu dostanete. Rozdiel medzi LTV 60 % a 80 % môže byť 0,2 – 0,5 % ročne — pri 30-ročnej hypotéke to predstavuje tisíce eur.</p>
+  </div>
+
+  <p>Preto sa oplatí zvážiť, či nevložíte do kúpy viac vlastných úspor, prípadne či nezapojíte financie od rodiny. Niekedy stačí znížiť LTV o pár percent a sadzba sa výrazne zlepší.</p>
+
+  <h2>3. DSTI — koľko si môžete dovoliť</h2>
+
+  <p>DSTI (Debt Service-to-Income) je ukazovateľ, ktorý určuje, aký podiel vášho príjmu smie ísť na splácanie všetkých úverov. Národná banka Slovenska stanovila limit na <strong>maximálne 60 % čistého príjmu</strong>, ale v praxi väčšina bánk počíta konzervatívnejšie — rozumná hranica je okolo <strong>40 %</strong>.</p>
+
+  <p>Prečo? Pretože okrem splátky hypotéky máte aj ďalšie výdavky: energie, potraviny, poistenie, auto, deti. Ak vaša splátka pohltí príliš veľkú časť príjmu, akákoľvek neočakávaná udalosť — strata práce, choroba, oprava auta — vás môže dostať do vážnych problémov.</p>
+
+  <div class="info-box">
+    <p><strong>Príklad:</strong> Ak váš čistý mesačný príjem je 1 800 eur, rozumná maximálna splátka hypotéky by nemala presiahnuť 700 – 720 eur. Ak k tomu máte ešte spotrebný úver so splátkou 150 eur, banka to zohľadní a schváli vám nižšiu hypotéku.</p>
+  </div>
+
+  <p>Banky si overujú nielen váš aktuálny príjem, ale aj všetky existujúce záväzky — kreditné karty, kontokorenty, lízingy. Aj nevyužitý kontokorent znižuje vašu bonitu, pretože banka ho počíta ako potenciálny dlh. Pred podaním žiadosti o hypotéku preto odporúčam zrušiť nepotrebné kreditné karty a kontokorenty.</p>
+
+  <h2>4. Predčasné splatenie má pravidlá</h2>
+
+  <p>Životné okolnosti sa menia. Možno zdedíte, dostanete bonus alebo predáte inú nehnuteľnosť a budete chcieť hypotéku splatiť skôr. Je to možné, ale má to pravidlá.</p>
+
+  <p><strong>Počas fixácie</strong> si banka môže účtovať poplatok za predčasné splatenie — zvyčajne do 1 % z predčasne splatenej sumy. To môže byť významná suma. Pri zostatku 100 000 eur je to 1 000 eur.</p>
+
+  <p><strong>Po skončení fixácie</strong> (v tzv. refixačnom období, spravidla 1 mesiac) môžete splatiť akúkoľvek čiastku bez poplatku. Toto je ideálny moment na mimoriadne splátky alebo refinancovanie do inej banky.</p>
+
+  <div class="takeaway">
+    <div class="takeaway-label">Kľúčový poznatok</div>
+    <p>Ak plánujete mimoriadnu splátku, naplánujte ju na koniec fixačného obdobia — ušetríte na poplatkoch. A nezabudnite: každý rok môžete bez poplatku predčasne splatiť 20 % z pôvodnej istiny (v niektorých bankách je to iná suma — treba si preveriť konkrétne podmienky).</p>
+  </div>
+
+  <p>Dobrý poradca vám pomôže presne spočítať, či sa predčasné splatenie oplatí, alebo či je lepšie voľné prostriedky investovať a hypotéku splácať ďalej. Niekedy je výhodnejšie peniaze nechať pracovať v investícii s vyšším výnosom, než je úrok na hypotéke.</p>
+
+  <h2>5. Porovnanie bánk vám ušetrí tisíce eur</h2>
+
+  <p>Tu je možno najdôležitejšia rada: <strong>nikdy nechoďte len do jednej banky</strong>. Každá banka má iné sadzby, iné podmienky, iné poplatky. Rozdiel medzi najlepšou a najhoršou ponukou na trhu môže byť 0,5 – 1 % ročne. Zní to málo? Pri hypotéke 150 000 eur na 30 rokov je to rozdiel <strong>15 000 až 30 000 eur</strong> na úrokoch za celú dobu splácania.</p>
+
+  <p>Problém je, že obísť 10 bánk, v každej vyplniť žiadosť, priniesť dokumenty a porovnať ponuky je časovo náročné a vyčerpávajúce. Práve tu prichádza na rad nezávislý finančný poradca.</p>
+
+  <div class="info-box">
+    <p><strong>Prečo využiť poradcu?</strong></p>
+    <p>Ako podriadený finančný agent Partners Group SK spolupracujem so všetkými relevantnými bankami na trhu. Stačí jedno stretnutie, jeden balík dokumentov — a ja porovnám ponuky za vás. Navyše, banky poradcom často ponúkajú rovnaké alebo dokonca lepšie sadzby ako priamym klientom, pretože poradca prináša kvalitne pripravené žiadosti.</p>
+    <p>Moja služba je pre vás <strong>bezplatná</strong> — odmenu dostávam od banky, nie od vás.</p>
+  </div>
+
+  <p>Nemusíte sa báť, že poradca bude tlačiť na konkrétnu banku. Kvalitný poradca vám ukáže všetky možnosti a vy sa rozhodnete sami. Ja len zabezpečím, aby ste mali kompletné informácie a najlepšie podmienky, aké trh ponúka.</p>
+
+</article>
+
+<section class="article-cta">
+  <div class="article-cta-inner">
+    <h2>Chcete vedieť, aká hypotéka je pre vás najvýhodnejšia?</h2>
+    <p>Bezplatne porovnám ponuky bánk a nájdem pre vás najlepšie podmienky. Stačí sa ozvať.</p>
+    <div class="cta-buttons">
+      <a href="index.html#kontakt" class="btn-primary">Dohodnúť konzultáciu</a>
+      <a href="hypokalkulacka.html" class="btn-secondary">HypoKalkulačka</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Mário <span>Tišťan</span></div>
+    <div class="footer-copy">&copy; 2026 Mário Tišťan &middot; mariotistan.sk</div>
+    <div style="width:100%;text-align:center;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6">
+      Podriadený finančný agent Partners Group SK s.r.o. &middot; Registrácia NBS č. 221967 &middot; <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5);text-decoration:underline">Overenie v registri NBS</a> &middot; <a href="ochrana-udajov.html" style="color:rgba(255,255,255,0.5);text-decoration:underline">Ochrana osobných údajov</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

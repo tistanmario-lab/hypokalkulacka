@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prečo začať investovať čo najskôr — aj s malou sumou | Mário Tišťan</title>
+<meta name="description" content="Zložené úročenie, ETF, FKI a rizikový profil — prečo je najdôležitejšie začať investovať čo najskôr, aj keď máte k dispozícii len malú sumu.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #003049;
+  --red: #AB0534;
+  --silver: #989FA7;
+  --sand: #ECEDED;
+  --white: #ffffff;
+  --dark-gray: #4D4D4D;
+  --muted: rgba(0,48,73,0.5);
+  --border: rgba(0,48,73,0.1);
+  --radius: 20px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--navy); line-height: 1.6; }
+
+.blog-header { background: var(--navy); padding: 20px 5%; }
+.header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+.header-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
+.header-logo span { color: var(--red); }
+.header-back { font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; transition: color .2s; display: inline-flex; align-items: center; gap: 8px; }
+.header-back:hover { color: #fff; }
+.header-back svg { width: 16px; height: 16px; }
+
+.article-hero { background: var(--navy); padding: 40px 5% 60px; }
+.article-hero-inner { max-width: 760px; margin: 0 auto; }
+.article-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--white); background: var(--red); padding: 6px 14px; border-radius: 100px; margin-bottom: 20px; }
+.article-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 700; color: #fff; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 16px; }
+.article-meta { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+.article-wrap { max-width: 760px; margin: 0 auto; padding: 48px 5% 80px; }
+.article-wrap h2 { font-family: 'Playfair Display', serif; font-size: clamp(22px, 3vw, 30px); font-weight: 700; color: var(--navy); margin: 48px 0 16px; line-height: 1.2; }
+.article-wrap h2:first-child { margin-top: 0; }
+.article-wrap p { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 16px; }
+.article-wrap strong { font-weight: 600; color: var(--navy); }
+.article-wrap ul, .article-wrap ol { margin: 0 0 16px 24px; }
+.article-wrap li { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 8px; }
+
+.info-box { background: var(--sand); border-left: 4px solid var(--red); padding: 20px 24px; border-radius: 0 var(--radius) var(--radius) 0; margin: 24px 0; }
+.info-box p { font-size: 15px; font-weight: 400; color: var(--navy); margin-bottom: 0; }
+.info-box p + p { margin-top: 8px; }
+.info-box strong { color: var(--red); }
+
+.takeaway { background: var(--navy); color: #fff; padding: 24px 28px; border-radius: var(--radius); margin: 32px 0; }
+.takeaway-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+.takeaway p { color: rgba(255,255,255,0.85); font-size: 15px; font-weight: 400; margin-bottom: 0; }
+
+.article-cta { background: var(--sand); padding: 60px 5%; }
+.article-cta-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+.article-cta h2 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 3vw, 36px); font-weight: 700; color: var(--navy); margin-bottom: 16px; line-height: 1.2; }
+.article-cta p { font-size: 16px; font-weight: 300; color: var(--muted); margin-bottom: 28px; line-height: 1.7; max-width: 520px; margin-left: auto; margin-right: auto; }
+.btn-primary { background: var(--red); color: #fff; padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: background .2s; border-radius: var(--radius); }
+.btn-primary:hover { background: var(--navy); }
+
+footer { background: var(--navy); color: #fff; padding: 40px 5%; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; }
+.footer-logo span { color: var(--red); }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<header class="blog-header">
+  <div class="header-inner">
+    <a href="index.html" class="header-logo">Mário <span>Tišťan</span></a>
+    <a href="index.html#blog" class="header-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Späť na články
+    </a>
+  </div>
+</header>
+
+<div class="article-hero">
+  <div class="article-hero-inner">
+    <div class="article-tag">Investície</div>
+    <h1>Prečo začať investovať čo najskôr — aj s malou sumou</h1>
+    <div class="article-meta">Mário Tišťan · Finančný poradca Partners Group SK</div>
+  </div>
+</div>
+
+<article class="article-wrap">
+
+  <p>Investovanie nie je len pre bohatých. Je pre každého, kto chce, aby jeho peniaze pracovali a nie len ležali na účte, kde ich inflácia pomaly znehodnocuje. Ak ešte neinvestujete, práve teraz je ten najlepší čas začať — a v tomto článku vám vysvetlím prečo.</p>
+
+  <h2>1. Zložené úročenie — ôsmy div sveta</h2>
+
+  <p>Albert Einstein údajne povedal, že zložené úročenie je ôsmym divom sveta. Či to naozaj povedal alebo nie, princíp je skutočne fascinujúci: <strong>vaše výnosy generujú ďalšie výnosy</strong>. Čím dlhšie investujete, tým rýchlejšie vaše peniaze rastú — nie lineárne, ale exponenciálne.</p>
+
+  <div class="info-box">
+    <p><strong>Príklad z praxe:</strong></p>
+    <p>Investujete 50 eur mesačne pri priemernom ročnom výnose 7 % (historický priemer svetových akciových trhov).</p>
+    <p>Po 10 rokoch: vložili ste 6 000 eur, hodnota portfólia je cca <strong>8 600 eur</strong>.</p>
+    <p>Po 20 rokoch: vložili ste 12 000 eur, hodnota portfólia je cca <strong>26 000 eur</strong>.</p>
+    <p>Po 30 rokoch: vložili ste 18 000 eur, hodnota portfólia je cca <strong>58 000 eur</strong>.</p>
+    <p>Za posledných 10 rokov váš majetok narástol o 32 000 eur — viac než za predchádzajúcich 20 rokov dokopy. To je sila zloženého úročenia.</p>
+  </div>
+
+  <p>Kľúčové slovo je <strong>čas</strong>. Kto začne o 10 rokov neskôr, musí investovať dvojnásobok, aby dosiahol rovnaký výsledok. Preto platí: najlepší čas začať investovať bol včera. Druhý najlepší čas je dnes.</p>
+
+  <h2>2. Začať môžete už od 30 eur mesačne</h2>
+
+  <p>Jednou z najčastejších výhovoriek je: „Nemám dosť peňazí na investovanie." Pravda je, že začať môžete s naozaj malou sumou. Pravidelné investovanie od <strong>30 eur mesačne</strong> je dnes bežne dostupné. Ak máte k dispozícii jednorazovú čiastku, vstupný prah býva od <strong>500 eur</strong>.</p>
+
+  <p>Pravidelné investovanie malých súm má navyše obrovskú výhodu — tzv. <strong>cost averaging</strong> (priemerovanie ceny). Keď trhy klesnú, za rovnakú sumu kúpite viac podielov. Keď rastú, vaše existujúce podiely zhodnocujú. Dlhodobo tak dosiahnete lepšiu priemernú nákupnú cenu, ako keby ste sa snažili trafiť ten „správny" moment.</p>
+
+  <div class="takeaway">
+    <div class="takeaway-label">Kľúčový poznatok</div>
+    <p>Nezáleží na tom, koľko investujete na začiatku. Dôležité je začať a byť konzistentný. Aj 50 eur mesačne vás za 20 – 30 rokov môže doviesť k zaujímavému majetku.</p>
+  </div>
+
+  <h2>3. ETF a FKI — moderné nástroje investovania</h2>
+
+  <p>Ak ste sa doteraz stretli len so sporiacimi účtami alebo termínovanými vkladmi, svet investícií vám môže pripádať komplikovaný. Nemusí byť. Dnes existujú jednoduché a transparentné nástroje pre každého.</p>
+
+  <p><strong>ETF (Exchange Traded Funds)</strong> sú fondy obchodované na burze, ktoré kopírujú vývoj celého trhu — napríklad 500 najväčších amerických firiem (S&P 500) alebo celý svetový akciový trh. Kúpou jedného ETF tak vlastníte kúsok stoviek firiem naraz. Výhody? Nízke poplatky (rádovo 0,1 – 0,5 % ročne), široká diverzifikácia a jednoduchosť.</p>
+
+  <p><strong>FKI (Fondy kvalifikovaných investorov)</strong> sú určené pre skúsenejších investorov s vyššou vstupnou investíciou (zvyčajne od 50 000 – 100 000 eur). Ponúkajú prístup k aktívam, ktoré bežný investor nemá k dispozícii — realitné projekty, private equity alebo špeciálne dlhopisové stratégie. Ak máte vyšší kapitál a dlhší investičný horizont, FKI môžu byť zaujímavým doplnkom portfólia.</p>
+
+  <div class="info-box">
+    <p><strong>Pre koho čo:</strong></p>
+    <p>Začiatočník s malou sumou: pravidelné investovanie do globálnych ETF fondov.</p>
+    <p>Pokročilejší investor s vyšším kapitálom: kombinácia ETF + FKI pre lepšiu diverzifikáciu.</p>
+    <p>V oboch prípadoch vám pomôžem vybrať to správne riešenie na mieru.</p>
+  </div>
+
+  <h2>4. Čas na trhu je dôležitejší než načasovanie trhu</h2>
+
+  <p>Jedna z najčastejších chýb investorov? Čakanie na „správny moment" na vstup. „Počkám, kým trhy klesnú." „Teraz je to príliš drahé." „Uvidíme po voľbách." Tieto vety počujem pravidelne — a za každou stojí zbytočne premrhaný čas.</p>
+
+  <p>Historické dáta hovoria jasne: <strong>čas strávený na trhu je oveľa dôležitejší než snaha o načasovanie</strong>. Aj keby ste mali to najhoršie šťastie a investovali vždy presne pred veľkým poklesom, po 15 – 20 rokoch by ste boli stále v pluse. Prečo? Pretože trhy dlhodobo rastú.</p>
+
+  <div class="takeaway">
+    <div class="takeaway-label">Kľúčový poznatok</div>
+    <p>Ak by ste vynechali len 10 najlepších dní na trhu za posledných 20 rokov, váš výnos by bol dramaticky nižší. A tieto najlepšie dni často prichádzajú hneď po najhorších — takže kto predá v panike, minie aj zotavenie.</p>
+  </div>
+
+  <p>Odkladanie investovania je najdrahšie rozhodnutie, aké môžete urobiť. Každý mesiac, kedy vaše peniaze len ležia na účte, je mesiac, kedy nepracujú a inflácia ich znehodnocuje. Pri súčasnej inflácii okolo 3 – 4 % ročne strácate reálnu hodnotu úspor každý deň.</p>
+
+  <h2>5. Riziko a výnos — dve strany jednej mince</h2>
+
+  <p>Investovanie nie je bez rizika — a to je v poriadku. Kľúč je v tom, aby <strong>miera rizika zodpovedala vášmu veku, cieľom a povahe</strong>.</p>
+
+  <p>Ak máte 25 rokov a investičný horizont 30+ rokov, môžete si dovoliť vyšší podiel akcií v portfóliu. Krátkodobé výkyvy vás nemusia trápiť — máte desaťročia na zotavenie. Ak máte 55 rokov a o pár rokov idete do dôchodku, portfólio by malo byť konzervatívnejšie — s väčším podielom dlhopisov a stabilnejších aktív.</p>
+
+  <p>Neexistuje univerzálne správne portfólio. Existuje len portfólio, ktoré je <strong>správne pre vás</strong> — a to závisí od vášho rizikového profilu, finančných cieľov a životnej situácie. Práve preto má zmysel poradiť sa s odborníkom, ktorý vám pomôže nastaviť investičnú stratégiu na mieru.</p>
+
+  <h2>6. Investovanie a poistenie — držte ich oddelene</h2>
+
+  <p>Na trhu stále existujú produkty, ktoré kombinujú investovanie a životné poistenie v jednom. Takzvané <strong>investičné životné poistenie</strong> (IŽP) sľubuje ochranu aj zhodnotenie. Realita je často iná: vysoké poplatky, nízka výkonnosť, neprehľadná štruktúra a dlhodobá viazanosť.</p>
+
+  <p>Moderný prístup je jednoduchý: <strong>investujte zvlášť a poisťujte sa zvlášť</strong>. Rizikové životné poistenie (bez investičnej zložky) je výrazne lacnejšie a poskytuje lepšie krytie. A investície v ETF fondoch majú nižšie poplatky a historicky vyššie výnosy než investičná zložka poisťovní.</p>
+
+  <div class="info-box">
+    <p><strong>Porovnanie:</strong></p>
+    <p>Investičné životné poistenie: poplatky 2 – 4 % ročne, obmedzený výber fondov, pokuta za predčasný výstup.</p>
+    <p>Rizikové poistenie + ETF investícia: poplatky 0,1 – 0,5 % ročne, plná flexibilita, žiadne pokuty.</p>
+    <p>Viac o tom, ako správne nastaviť poistenie, nájdete v článku <a href="blog-poistenie.html" style="color:var(--red);font-weight:600">Životné poistenie: kedy sa oplatí a kedy je to zbytočný výdavok</a>.</p>
+  </div>
+
+  <p>Ak máte existujúcu zmluvu IŽP, nemusíte hneď panicky vypovedať. Je dôležité posúdiť, či sa oplatí pokračovať alebo je lepšie prejsť na modernejšie riešenie. Rád vám s tým pomôžem — každý prípad je individuálny.</p>
+
+</article>
+
+<section class="article-cta">
+  <div class="article-cta-inner">
+    <h2>Chcete začať investovať?</h2>
+    <p>Pomôžem vám nastaviť investičnú stratégiu na mieru — od 30 eur mesačne. Prvá konzultácia je bezplatná.</p>
+    <a href="index.html#kontakt" class="btn-primary">Dohodnúť konzultáciu</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Mário <span>Tišťan</span></div>
+    <div class="footer-copy">&copy; 2026 Mário Tišťan &middot; mariotistan.sk</div>
+    <div style="width:100%;text-align:center;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6">
+      Podriadený finančný agent Partners Group SK s.r.o. &middot; Registrácia NBS č. 221967 &middot; <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5);text-decoration:underline">Overenie v registri NBS</a> &middot; <a href="ochrana-udajov.html" style="color:rgba(255,255,255,0.5);text-decoration:underline">Ochrana osobných údajov</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
