@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HypoKalkulačka+ | Partners Group SK</title>
+<meta name="description" content="Hypotekárna kalkulačka Partners Group SK — vypočítajte splátku, LTV, DSTI a porovnajte stratégie splácania.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F5F3EE;color:#002B49;min-height:100vh}
+header{background:#fff;border-bottom:1px solid rgba(0,43,73,0.08);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:0 1px 8px rgba(0,43,73,0.04)}
+.logo-badge{background:#002B49;color:#fff;font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;padding:6px 12px}
+.logo-title{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#002B49;margin-left:12px}
+.pg-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,43,73,0.3)}
+.main{max-width:1100px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:340px 1fr;gap:20px}
+@media(max-width:800px){.main{grid-template-columns:1fr}}
+.panel{background:#fff;border:1px solid rgba(0,43,73,0.08);padding:24px;margin-bottom:16px}
+.panel-tag{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;padding:3px 8px;background:#002B49;color:#fff;margin-bottom:14px}
+.panel-tag.gold{background:#C5A059}
+.panel-title{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#002B49;margin-bottom:20px}
+.field{margin-bottom:18px}
+.field-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.field-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,43,73,0.5)}
+input[type=range]{width:100%;height:3px;appearance:none;background:rgba(0,43,73,0.1);outline:none;cursor:pointer;accent-color:#00843D}
+input[type=range].blue-range{accent-color:#002B49}
+input[type=range].gold-range{accent-color:#C5A059}
+.num-input{width:110px;padding:4px 8px;text-align:right;font-size:11px;font-weight:800;color:#00843D;background:rgba(0,132,61,0.05);border:1px solid rgba(0,132,61,0.15);outline:none}
+.num-input.blue{color:#002B49;background:rgba(0,43,73,0.04);border-color:rgba(0,43,73,0.12)}
+.num-input:focus{border-color:#00843D}
+.info-row{background:rgba(0,43,73,0.04);border-left:3px solid rgba(0,43,73,0.2);padding:8px 12px;margin-bottom:16px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,43,73,0.5);display:flex;justify-content:space-between;align-items:center}
+.info-row span{color:#002B49;font-size:12px;font-weight:800}
+.splatka-card{background:#002B49;color:#fff;padding:24px;position:relative;overflow:hidden;margin-top:16px}
+.splatka-lbl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px}
+.splatka-val{font-size:38px;font-weight:800;letter-spacing:-.02em}
+.splatka-sub{font-size:9px;color:rgba(255,255,255,0.4);margin-top:6px}
+.glow{position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;background:rgba(0,132,61,0.3);border-radius:50%;filter:blur(40px)}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.metric{background:#fff;border:1px solid rgba(0,43,73,0.08);padding:14px}
+.metric-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,43,73,0.5);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:9px;font-weight:800;padding:2px 7px}
+.badge.green{background:rgba(0,132,61,0.1);color:#00843D}
+.badge.gold{background:rgba(197,160,89,0.15);color:#C5A059}
+.bar-track{height:4px;background:rgba(0,43,73,0.05);overflow:hidden;margin-top:4px}
+.bar-fill{height:100%;transition:width .4s}
+.bar-fill.green{background:#00843D}
+.bar-fill.gold{background:#C5A059}
+.metric-note{font-size:9px;color:rgba(0,43,73,0.35);font-weight:500;margin-top:6px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.cbox{background:#fff;border:1px solid rgba(0,43,73,0.08);padding:20px}
+.cbox-tag{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;display:inline-block;margin-bottom:10px}
+.cbox-tag.a{background:#C5A059;color:#fff}
+.cbox-tag.b{background:#002B49;color:#fff}
+.cbox-title{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.cbox-title.gold{color:#C5A059}
+.cbox-title.blue{color:#002B49}
+.cbox-stat-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,43,73,0.4);margin-bottom:3px}
+.cbox-stat-val{font-size:24px;font-weight:800;letter-spacing:-.02em;color:#002B49;margin-bottom:12px}
+.cbox-stat-val.green{color:#00843D}
+.chart-panel{background:#fff;border:1px solid rgba(0,43,73,0.08);padding:20px;margin-bottom:16px}
+.chart-title{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#002B49;margin-bottom:12px}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,43,73,0.5)}
+.legend-dot{width:10px;height:10px}
+.chart-wrap{position:relative;width:100%;height:220px}
+.pie-wrap{display:flex;flex-direction:column;align-items:center}
+.pie-legend{margin-top:12px;width:100%}
+.pie-leg-row{display:flex;justify-content:space-between;font-size:10px;font-weight:700;padding:4px 0;border-bottom:1px solid rgba(0,43,73,0.05)}
+.pie-leg-row:last-child{border-bottom:none}
+.pie-dot{width:10px;height:10px;display:inline-block;vertical-align:middle;margin-right:5px}
+.outcome-panel{background:#fff;border:1px solid rgba(0,43,73,0.08);padding:20px;margin-bottom:16px}
+.out-row{margin-bottom:16px}
+.out-head{display:flex;justify-content:space-between;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.out-bar{height:8px;background:rgba(0,43,73,0.05);display:flex;overflow:hidden;margin-bottom:4px}
+.out-bar-a{background:rgba(0,43,73,0.2)}
+.out-bar-b{background:#C5A059;opacity:.6}
+.out-bar-c{background:#002B49}
+.out-note{font-size:9px;color:rgba(0,43,73,0.4);font-weight:500}
+.toggle-btn{width:100%;padding:14px;background:#fff;border:1px solid rgba(0,43,73,0.1);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#002B49;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;transition:background .2s}
+.toggle-btn:hover{background:#F5F3EE}
+.table-wrap{background:#fff;border:1px solid rgba(0,43,73,0.08);overflow:hidden;margin-bottom:16px}
+.table-scroll{overflow-x:auto;max-height:400px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:10px}
+thead{background:#002B49;color:#fff;position:sticky;top:0}
+th{padding:10px 12px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;text-align:left;border-right:1px solid rgba(255,255,255,.1)}
+tbody tr{border-bottom:1px solid rgba(0,43,73,0.05)}
+tbody tr:hover{background:#F5F3EE}
+td{padding:8px 12px;font-weight:600;color:rgba(0,43,73,0.7)}
+td.green{color:#00843D;font-weight:800}
+td.blue{color:#002B49;font-weight:800}
+td.gold{color:#C5A059;font-weight:700}
+.fix-toggle{display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,43,73,0.6);user-select:none}
+.sw{width:36px;height:20px;background:rgba(0,43,73,0.15);border-radius:10px;position:relative;transition:background .2s;flex-shrink:0}
+.sw.on{background:#00843D}
+.sw-knob{width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .2s}
+.sw.on .sw-knob{left:18px}
+.freq-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.freq-btn{padding:8px;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(0,43,73,0.1);background:#fff;color:rgba(0,43,73,0.4);cursor:pointer;transition:all .2s}
+.freq-btn.active{background:#C5A059;border-color:#C5A059;color:#fff}
+.divider{height:1px;background:rgba(0,43,73,0.06);margin:16px 0}
+footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,43,73,0.3);border-top:1px solid rgba(0,43,73,0.07);max-width:1100px;margin:0 auto}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center">
+    <div class="logo-badge">PG</div>
+    <div class="logo-title">HypoKalkulačka+</div>
+  </div>
+  <div class="pg-label">Partners Group SK</div>
+</header>
+
+<div class="main">
+  <!-- LEFT COLUMN -->
+  <div>
+    <div class="panel">
+      <div class="panel-tag">Hypotéka</div>
+      <div class="panel-title">Parametre úveru</div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">Cena nehnuteľnosti</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input" id="loanAmount" type="number" value="200000">
+            <span style="font-size:11px;font-weight:800;color:#00843D">€</span>
+          </div>
+        </div>
+        <input type="range" min="10000" max="1000000" step="5000" value="200000" id="loanAmountR">
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">Výška úveru</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input" id="loanPrincipal" type="number" value="160000">
+            <span style="font-size:11px;font-weight:800;color:#00843D">€</span>
+          </div>
+        </div>
+        <input type="range" min="5000" max="1000000" step="5000" value="160000" id="loanPrincipalR">
+      </div>
+
+      <div class="info-row">
+        Vlastné prostriedky <span id="ownFundsInfo">40 000 €</span>
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">Úroková sadzba</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input" id="interestRate" type="number" value="3.5" step="0.05">
+            <span style="font-size:11px;font-weight:800;color:#00843D">%</span>
+          </div>
+        </div>
+        <input type="range" min="0.1" max="15" step="0.1" value="3.5" id="interestRateR">
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">Doba splácania</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input" id="loanTerm" type="number" value="30">
+            <span style="font-size:11px;font-weight:800;color:#00843D">r</span>
+          </div>
+        </div>
+        <input type="range" min="1" max="40" step="1" value="30" id="loanTermR">
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">Čistý mesačný príjem</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input blue" id="income" type="number" value="3000">
+            <span style="font-size:11px;font-weight:800;color:#002B49">€</span>
+          </div>
+        </div>
+        <input type="range" class="blue-range" min="500" max="20000" step="100" value="3000" id="incomeR">
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="fix-toggle" onclick="toggleFix()">
+        <div class="sw" id="fixSw"><div class="sw-knob"></div></div>
+        Simulovať zmenu fixácie
+      </div>
+      <div id="fixFields" style="display:none">
+        <div class="field">
+          <div class="field-row"><span class="field-lbl">Fixácia (rokov)</span><span style="font-size:11px;font-weight:800;color:#00843D" id="fixOut">5</span></div>
+          <input type="range" min="1" max="15" step="1" value="5" id="fixR" oninput="document.getElementById('fixOut').textContent=this.value;calc()">
+        </div>
+        <div class="field">
+          <div class="field-row"><span class="field-lbl">Sadzba po fixácii</span><span style="font-size:11px;font-weight:800;color:#00843D" id="futureOut">4.5 %</span></div>
+          <input type="range" min="0.5" max="12" step="0.1" value="4.5" id="futureR" oninput="document.getElementById('futureOut').textContent=parseFloat(this.value).toFixed(1)+' %';calc()">
+        </div>
+      </div>
+
+      <div class="splatka-card">
+        <div class="splatka-lbl">Mesačná splátka</div>
+        <div class="splatka-val" id="splatkaMain">—</div>
+        <div class="splatka-sub">Z úveru <span id="splatkaIstina">—</span></div>
+        <div class="glow"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-tag gold">Investícia</div>
+      <div class="panel-title">Stratégia s prebytkom</div>
+
+      <div class="field">
+        <div class="field-row"><span class="field-lbl">Suma navyše</span><span style="font-size:11px;font-weight:800;color:#C5A059" id="extraOut">200 €</span></div>
+        <input type="range" class="gold-range" min="0" max="5000" step="50" value="200" id="extraR" oninput="document.getElementById('extraOut').textContent=fmt(+this.value);calc()">
+      </div>
+
+      <div class="freq-btns">
+        <button class="freq-btn active" id="btnM" onclick="setFreq('monthly')">Mesačne</button>
+        <button class="freq-btn" id="btnA" onclick="setFreq('annually')">Ročne</button>
+      </div>
+
+      <div class="field">
+        <div class="field-row"><span class="field-lbl">Zhodnotenie investície</span><span style="font-size:11px;font-weight:800;color:#C5A059" id="investOut">7.0 %</span></div>
+        <input type="range" class="gold-range" min="1" max="15" step="0.5" value="7" id="investR" oninput="document.getElementById('investOut').textContent=parseFloat(this.value).toFixed(1)+' %';calc()">
+      </div>
+
+      <div class="field">
+        <div class="field-row"><span class="field-lbl">Jednorazová splátka</span><span style="font-size:11px;font-weight:800;color:#C5A059" id="oneTimeOut">0 €</span></div>
+        <input type="range" class="gold-range" min="0" max="50000" step="500" value="0" id="oneTimeR" oninput="document.getElementById('oneTimeOut').textContent=fmt(+this.value);calc()">
+      </div>
+
+      <div class="field">
+        <div class="field-row"><span class="field-lbl">V mesiaci č.</span><span style="font-size:11px;font-weight:800;color:#C5A059" id="oneTimeMonthOut">12</span></div>
+        <input type="range" class="gold-range" min="1" max="360" step="1" value="12" id="oneTimeMonthR" oninput="document.getElementById('oneTimeMonthOut').textContent=this.value;calc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div>
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-lbl">LTV (Výška úveru / Cena) <span class="badge green" id="ltvBadge">—</span></div>
+        <div class="bar-track"><div class="bar-fill green" id="ltvBar" style="width:0%"></div></div>
+        <div class="metric-note">Limit pre väčšinu bánk: 80% LTV</div>
+      </div>
+      <div class="metric">
+        <div class="metric-lbl">DSTI (Zaťaženie príjmu) <span class="badge green" id="dstiBadge">—</span></div>
+        <div class="bar-track"><div class="bar-fill green" id="dstiBar" style="width:0%"></div></div>
+        <div class="metric-note">Splátka by nemala presiahnuť 40%</div>
+      </div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="cbox">
+        <div class="cbox-tag a">Možnosť A</div>
+        <div class="cbox-title gold">Mimoriadne splátky</div>
+        <div class="cbox-stat-lbl">Splatíte skôr o</div>
+        <div class="cbox-stat-val" id="monthsSaved">—</div>
+        <div class="cbox-stat-lbl">Ušetríte na úrokoch</div>
+        <div class="cbox-stat-val green" id="interestSaved">—</div>
+      </div>
+      <div class="cbox">
+        <div class="cbox-tag b">Možnosť B</div>
+        <div class="cbox-title blue">Investovanie</div>
+        <div class="cbox-stat-lbl">Dlh vyrovnáte za</div>
+        <div class="cbox-stat-val" id="investPayoff">—</div>
+        <div class="cbox-stat-lbl">Portfólio po splatení</div>
+        <div class="cbox-stat-val blue" id="investVal">—</div>
+      </div>
+    </div>
+
+    <div class="chart-panel">
+      <div class="chart-title">Priebeh splácania — Dlh vs. Investícia</div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(0,43,73,0.2)"></div>Štandardný dlh</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#00843D"></div>Zrýchlené splácanie</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#002B49"></div>Hodnota investície</div>
+      </div>
+      <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="chart-panel" style="margin-bottom:0">
+        <div class="chart-title">Ročné splátky — istina vs. úroky</div>
+        <div class="chart-wrap" style="height:180px"><canvas id="barChart"></canvas></div>
+      </div>
+      <div class="chart-panel" style="margin-bottom:0">
+        <div class="chart-title">Rozdelenie celkových nákladov</div>
+        <div class="pie-wrap">
+          <canvas id="pieChart" width="150" height="150"></canvas>
+          <div class="pie-legend">
+            <div class="pie-leg-row"><span><span class="pie-dot" style="background:#002B49"></span>Istina</span><span id="piePrincipal" style="font-weight:800;color:#002B49">—</span></div>
+            <div class="pie-leg-row"><span><span class="pie-dot" style="background:#C5A059"></span>Celkový úrok</span><span id="pieInterest" style="font-weight:800;color:#C5A059">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="outcome-panel">
+      <div class="panel-tag" style="background:#002B49">Výsledok</div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#002B49;margin-bottom:16px">Finančný výsledok po <span id="termLabel">30</span> rokoch</div>
+      <div class="out-row">
+        <div class="out-head"><span>Len splácanie (základ)</span><span style="color:rgba(0,43,73,0.4)">Čistý majetok: 0 €</span></div>
+        <div class="out-bar"><div class="out-bar-a" style="width:60%"></div><div class="out-bar-b" style="width:40%"></div></div>
+        <div class="out-note" id="baselineNote">—</div>
+      </div>
+      <div class="out-row">
+        <div class="out-head"><span>Mimoriadne splátky</span><span style="color:#00843D">Úspora: <span id="savingLabel">—</span></span></div>
+        <div class="out-bar"><div class="out-bar-a" style="width:60%"></div><div class="out-bar-b" style="width:10%"></div></div>
+        <div class="out-note" id="extraNote">—</div>
+      </div>
+      <div class="out-row">
+        <div class="out-head"><span>Investovanie prebytku</span><span style="color:#002B49;font-weight:800">Majetok: <span id="investLabel">—</span></span></div>
+        <div class="out-bar"><div class="out-bar-a" style="width:60%"></div><div class="out-bar-b" style="width:15%"></div><div class="out-bar-c" style="width:30%"></div></div>
+        <div class="out-note" id="investNote">—</div>
+      </div>
+    </div>
+
+    <button class="toggle-btn" onclick="toggleTable()"><span id="tableBtnText">Zobraziť splátkový kalendár</span> ▼</button>
+
+    <div id="tableWrap" style="display:none">
+      <div class="table-wrap">
+        <div style="padding:12px 16px;background:#F5F3EE;border-bottom:1px solid rgba(0,43,73,0.08);display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#002B49">Detailný rozpis platieb</div>
+          <div style="display:flex;gap:6px">
+            <button onclick="setTV('annual')" id="btnTA" style="padding:5px 10px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:#002B49;color:#fff;border:none;cursor:pointer">Ročný</button>
+            <button onclick="setTV('monthly')" id="btnTM" style="padding:5px 10px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:#fff;color:rgba(0,43,73,0.4);border:1px solid rgba(0,43,73,0.1);cursor:pointer">Mesačný</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table><thead><tr><th>Mes.</th><th>Splátka</th><th>Mimor.</th><th>Istina</th><th>Úrok</th><th>Zostatok</th><th>Investícia</th></tr></thead>
+          <tbody id="tableBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 Partners Group SK · HypoKalkulačka+ · Všetky práva vyhradené · mariotistan.sk</footer>
+
+<script>
+let freq='monthly',showFix=false,tableView='annual';
+let mc=null,bc=null,pc=null,sched=[];
+
+function fmt(n){if(isNaN(n)||n===undefined)return'—';return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))+' €'}
+function fmtM(m){const y=Math.floor(m/12),mo=m%12;return y>0?(mo>0?y+'r '+mo+'m':y+'r'):(mo+'m')}
+function gmp(p,r,n){if(r===0)return p/n;return p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1)}
+
+function toggleFix(){showFix=!showFix;document.getElementById('fixSw').className='sw'+(showFix?' on':'');document.getElementById('fixFields').style.display=showFix?'block':'none';calc()}
+function setFreq(f){freq=f;document.getElementById('btnM').className='freq-btn'+(f==='monthly'?' active':'');document.getElementById('btnA').className='freq-btn'+(f==='annually'?' active':'');calc()}
+function toggleTable(){const w=document.getElementById('tableWrap');const v=w.style.display!=='none';w.style.display=v?'none':'block';document.getElementById('tableBtnText').textContent=v?'Zobraziť splátkový kalendár':'Skryť splátkový kalendár';if(!v)buildTable()}
+function setTV(v){tableView=v;document.getElementById('btnTA').style.cssText='padding:5px 10px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border:none;cursor:pointer;background:'+(v==='annual'?'#002B49':'#fff')+';color:'+(v==='annual'?'#fff':'rgba(0,43,73,0.4)');document.getElementById('btnTM').style.cssText='padding:5px 10px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:'+(v==='monthly'?'#002B49':'#fff')+';color:'+(v==='monthly'?'#fff':'rgba(0,43,73,0.4)')+';border:1px solid rgba(0,43,73,0.1)';buildTable()}
+
+function syncPair(nId,rId,min,max){
+  document.getElementById(nId).addEventListener('input',function(){let v=parseFloat(this.value)||0;v=Math.min(max,Math.max(min,v));document.getElementById(rId).value=v;calc()});
+  document.getElementById(rId).addEventListener('input',function(){document.getElementById(nId).value=this.value;calc()});
+}
+syncPair('loanAmount','loanAmountR',10000,1000000);
+syncPair('loanPrincipal','loanPrincipalR',5000,1000000);
+syncPair('interestRate','interestRateR',0.1,15);
+syncPair('loanTerm','loanTermR',1,40);
+syncPair('income','incomeR',500,20000);
+
+function calc(){
+  const loanAmount=parseFloat(document.getElementById('loanAmount').value)||200000;
+  const principal=parseFloat(document.getElementById('loanPrincipal').value)||160000;
+  const interestRate=parseFloat(document.getElementById('interestRate').value)||3.5;
+  const loanTerm=parseInt(document.getElementById('loanTerm').value)||30;
+  const income=parseFloat(document.getElementById('income').value)||3000;
+  const extraAmount=parseFloat(document.getElementById('extraR').value)||0;
+  const investReturn=parseFloat(document.getElementById('investR').value)||7;
+  const oneTime=parseFloat(document.getElementById('oneTimeR').value)||0;
+  const oneTimeMonth=parseInt(document.getElementById('oneTimeMonthR').value)||12;
+  const fixPeriod=parseInt(document.getElementById('fixR').value)||5;
+  const futureRate=parseFloat(document.getElementById('futureR').value)||4.5;
+
+  const ownFunds=loanAmount-principal;
+  document.getElementById('ownFundsInfo').textContent=fmt(ownFunds);
+
+  const mr=interestRate/100/12;
+  const fmr=futureRate/100/12;
+  const imr=investReturn/100/12;
+  const n=loanTerm*12;
+  const fixM=fixPeriod*12;
+  const basePayment=gmp(principal,mr,n);
+
+  const ltv=loanAmount>0?Math.round(principal/loanAmount*100):0;
+  const dsti=income>0?Math.round(basePayment/income*100):0;
+  const ltvOk=ltv<=80,dstiOk=dsti<=40;
+  document.getElementById('ltvBadge').textContent=ltv+'%';
+  document.getElementById('ltvBadge').className='badge '+(ltvOk?'green':'gold');
+  document.getElementById('ltvBar').style.width=Math.min(100,ltv)+'%';
+  document.getElementById('ltvBar').className='bar-fill '+(ltvOk?'green':'gold');
+  document.getElementById('dstiBadge').textContent=dsti+'%';
+  document.getElementById('dstiBadge').className='badge '+(dstiOk?'green':'gold');
+  document.getElementById('dstiBar').style.width=Math.min(100,dsti)+'%';
+  document.getElementById('dstiBar').className='bar-fill '+(dstiOk?'green':'gold');
+
+  document.getElementById('splatkaMain').textContent=fmt(basePayment);
+  document.getElementById('splatkaIstina').textContent=fmt(principal);
+  document.getElementById('termLabel').textContent=loanTerm;
+
+  const schedule=[];
+  let accBal=principal,stdBal=principal,investVal=0,totalInvested=0;
+  let accInt=0,payoffM=-1,investPayoffM=-1,curPay=basePayment;
+  let baseInt=0,bBal=principal,bPay=basePayment;
+
+  for(let i=1;i<=n;i++){
+    if(showFix&&i===fixM+1){bPay=gmp(bBal,fmr,n-fixM)}
+    const bRate=(showFix&&i>fixM)?fmr:mr;
+    const bI=bBal*bRate;bBal=Math.max(0,bBal-(bPay-bI));baseInt+=bI;
+    if(showFix&&i===fixM+1){curPay=gmp(stdBal,fmr,n-fixM)}
+    const rate=(showFix&&i>fixM)?fmr:mr;
+    const aInt=accBal>0?accBal*rate:0;
+    let aPrinc=accBal>0?Math.min(curPay-aInt,accBal):0;
+    let extra=0;
+    if(accBal>0){
+      if(freq==='monthly')extra+=extraAmount;
+      else if(i%12===0)extra+=extraAmount;
+      if(oneTime>0&&i===oneTimeMonth)extra+=oneTime;
+      extra=Math.min(extra,Math.max(0,accBal-aPrinc));
+    }
+    accBal=Math.max(0,accBal-(aPrinc+extra));accInt+=aInt;
+    if(accBal<=0&&payoffM===-1)payoffM=i;
+    const sInt=stdBal>0?stdBal*rate:0;
+    const sPrinc=stdBal>0?Math.min(curPay-sInt,stdBal):0;
+    stdBal=Math.max(0,stdBal-sPrinc);
+    investVal*=(1+imr);
+    let inv=0;
+    if(freq==='monthly')inv+=extraAmount;
+    else if(i%12===0)inv+=extraAmount;
+    if(oneTime>0&&i===oneTimeMonth)inv+=oneTime;
+    investVal+=inv;totalInvested+=inv;
+    if(investVal>=stdBal&&investPayoffM===-1&&stdBal>0)investPayoffM=i;
+    schedule.push({month:i,payment:curPay,extra,principal:aPrinc+extra,interest:aInt,balance:accBal,stdBal,investVal});
+  }
+  sched=schedule;
+
+  const mSaved=payoffM===-1?0:n-payoffM;
+  const iSaved=baseInt-accInt;
+  const baseTotal=principal+baseInt;
+
+  document.getElementById('monthsSaved').textContent=mSaved>0?fmtM(mSaved):'0m';
+  document.getElementById('interestSaved').textContent=fmt(iSaved);
+  document.getElementById('investPayoff').textContent=investPayoffM?fmtM(investPayoffM):'N/A';
+  document.getElementById('investVal').textContent=fmt(investVal);
+  document.getElementById('piePrincipal').textContent=fmt(principal);
+  document.getElementById('pieInterest').textContent=fmt(baseInt);
+  document.getElementById('baselineNote').textContent='Zaplatíte celkovo: '+fmt(baseTotal)+' (z toho úrok: '+fmt(baseInt)+')';
+  document.getElementById('savingLabel').textContent=fmt(iSaved);
+  document.getElementById('extraNote').textContent='Zaplatíte: '+fmt(principal+accInt)+' (z toho úrok: '+fmt(accInt)+')';
+  document.getElementById('investLabel').textContent=fmt(investVal);
+  document.getElementById('investNote').textContent='Zaplatíte úrok: '+fmt(baseInt)+' | Zisk z investície: '+fmt(investVal-totalInvested);
+
+  const step=Math.max(1,Math.floor(n/40));
+  const cd=schedule.filter((_,i)=>(i+1)%step===0||(i+1)===n);
+  const lbs=cd.map(d=>'R'+Math.floor(d.month/12));
+
+  if(mc)mc.destroy();
+  mc=new Chart(document.getElementById('mainChart'),{type:'line',data:{labels:lbs,datasets:[
+    {label:'Štandardný dlh',data:cd.map(d=>d.stdBal),borderColor:'rgba(0,43,73,0.2)',borderWidth:2,pointRadius:0,fill:false},
+    {label:'Zrýchlené',data:cd.map(d=>d.balance),borderColor:'#00843D',borderWidth:2.5,pointRadius:0,fill:false},
+    {label:'Investícia',data:cd.map(d=>d.investVal),borderColor:'#002B49',borderWidth:2.5,pointRadius:0,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+fmt(c.raw)}}},scales:{x:{ticks:{font:{size:9},autoSkip:true,maxTicksLimit:12},grid:{display:false}},y:{ticks:{font:{size:9},callback:v=>v>=1000?Math.round(v/1000)+'k €':v+'€'},grid:{color:'rgba(0,43,73,0.05)'}}}}});
+
+  const yStep=Math.max(1,Math.ceil(loanTerm/12));
+  const yd=[];
+  for(let y=yStep;y<=loanTerm;y+=yStep){
+    const e=Math.min(y*12,n)-1,s=Math.max((y-yStep)*12,0);
+    let ist=0,ur=0;
+    for(let m=s;m<=e&&m<schedule.length;m++){ur+=schedule[m].interest;ist+=schedule[m].principal;}
+    yd.push({y,ist,ur});
+  }
+  if(bc)bc.destroy();
+  bc=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:yd.map(d=>'R'+d.y),datasets:[
+    {label:'Istina',data:yd.map(d=>d.ist),backgroundColor:'#185FA5',stack:'a'},
+    {label:'Úroky',data:yd.map(d=>d.ur),backgroundColor:'#D85A30',stack:'a'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{stacked:true,ticks:{font:{size:9}},grid:{display:false}},y:{stacked:true,ticks:{font:{size:9},callback:v=>v>=1000?Math.round(v/1000)+'k':v},grid:{color:'rgba(0,43,73,0.05)'}}}}});
+
+  if(pc)pc.destroy();
+  pc=new Chart(document.getElementById('pieChart'),{type:'doughnut',data:{labels:['Istina','Úroky'],datasets:[{data:[Math.max(0,principal),Math.max(0,baseInt)],backgroundColor:['#002B49','#C5A059'],borderWidth:0,hoverOffset:4}]},options:{responsive:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+fmt(c.raw)}}},cutout:'65%'}});
+
+  if(document.getElementById('tableWrap').style.display!=='none')buildTable();
+}
+
+function buildTable(){
+  const body=document.getElementById('tableBody');body.innerHTML='';
+  const rows=tableView==='annual'?sched.filter((_,i)=>(i+1)%12===0||i===sched.length-1):sched;
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.month}.</td><td class="blue">${fmt(r.payment)}</td><td class="gold">${r.extra>0?fmt(r.extra):'-'}</td><td>${fmt(r.principal)}</td><td>${fmt(r.interest)}</td><td class="green">${fmt(r.balance)}</td><td class="blue">${fmt(r.investVal)}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+calc();
+</script>
+</body>
+</html>

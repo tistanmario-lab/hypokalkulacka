@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mário Tišťan | Finančný poradca | Partners Group SK</title>
+<meta name="description" content="Mário Tišťan — Senior Consultant Partners Group SK. Hypotéky, investície, poistenie a dôchodkové sporenie. Bratislava, Trnava, Žilina, Čadca, Bytča, Nitra.">
+<link rel="canonical" href="https://www.mariotistan.sk/">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:title" content="Mário Tišťan | Finančný poradca | Partners Group SK">
+<meta property="og:description" content="Hypotéky, investície, poistenie a dôchodkové sporenie. Individuálny prístup od roku 2016.">
+<meta property="og:image" content="https://www.mariotistan.sk/mario-foto.jpg">
+<meta property="og:url" content="https://www.mariotistan.sk/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sk_SK">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #003049;
+  --red: #AB0534;
+  --silver: #989FA7;
+  --sand: #ECEDED;
+  --white: #ffffff;
+  --dark-gray: #4D4D4D;
+  --light-red: #CD6D80;
+  --muted: rgba(0,48,73,0.5);
+  --border: rgba(0,48,73,0.1);
+  --radius: 20px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--navy); line-height: 1.6; }
+
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 0 5%; }
+.nav-inner { max-width: 1100px; margin: 0 auto; height: 68px; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); text-decoration: none; }
+.nav-logo span { color: var(--red); font-weight: 700; }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a { font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color .2s; }
+.nav-links a:hover { color: var(--navy); }
+.nav-cta { background: var(--red); color: #fff; padding: 10px 22px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; transition: background .2s; border-radius: var(--radius); }
+.nav-cta:hover { background: var(--navy); }
+.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--navy); margin: 5px 0; transition: all .3s; }
+@media (max-width: 768px) {
+  .nav-links { display: none; position: absolute; top: 68px; left: 0; right: 0; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); flex-direction: column; padding: 20px 5%; gap: 16px; border-bottom: 1px solid var(--border); }
+  .nav-links.open { display: flex; }
+  .hamburger { display: block; }
+  .nav-cta { display: none; }
+}
+
+.hero-wrap { max-width: 1100px; margin: 0 auto; padding: 0 5%; }
+.hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 100px 0 60px; gap: 60px; }
+@media (max-width: 768px) { .hero { grid-template-columns: 1fr; text-align: center; } }
+.hero-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 20px; }
+.hero-tag::before { content: ''; width: 24px; height: 2px; background: var(--red); }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 5vw, 68px); font-weight: 700; line-height: 1.05; letter-spacing: -.03em; color: var(--navy); margin-bottom: 24px; }
+.hero h1 em { font-style: normal; color: var(--red); }
+.hero-desc { font-size: 17px; font-weight: 300; color: var(--muted); line-height: 1.7; margin-bottom: 36px; max-width: 480px; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 768px) { .hero-btns { justify-content: center; } }
+.btn-primary { background: var(--red); color: #fff; padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: background .2s; border-radius: var(--radius); }
+.btn-primary:hover { background: var(--navy); }
+.btn-secondary { border: 1.5px solid var(--navy); color: var(--navy); padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: all .2s; border-radius: var(--radius); }
+.btn-secondary:hover { background: var(--navy); color: #fff; }
+.hero-stats { display: flex; gap: 32px; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+@media (max-width: 768px) { .hero-stats { justify-content: center; } }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--navy); line-height: 1; }
+.stat-lbl { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.hero-photo { position: relative; }
+.photo-frame { width: 100%; aspect-ratio: 4/5; background: var(--sand); position: relative; overflow: hidden; border-radius: var(--radius); }
+.photo-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.photo-badge { position: absolute; bottom: 24px; right: 24px; background: var(--white); padding: 14px 18px; border-left: 3px solid var(--red); border-radius: 12px; }
+.badge-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; }
+.badge-txt { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.photo-accent { position: absolute; top: -20px; left: -20px; width: 80px; height: 80px; border: 3px solid var(--red); border-radius: var(--radius); }
+
+section { padding: 80px 5%; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-tag { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.section-tag::before { content: ''; width: 20px; height: 2px; background: var(--red); }
+.section-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 700; color: var(--navy); letter-spacing: -.02em; line-height: 1.1; margin-bottom: 16px; }
+.section-sub { font-size: 16px; font-weight: 300; color: var(--muted); max-width: 560px; line-height: 1.7; }
+
+.services { background: var(--sand); }
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; background: transparent; margin-top: 48px; }
+.service-card { background: var(--white); padding: 36px 28px; transition: all .3s; position: relative; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--border); }
+.service-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--red); transform: scaleX(0); transition: transform .3s; }
+.service-card:hover::after { transform: scaleX(1); }
+.service-card:hover { background: var(--navy); }
+.service-card:hover .service-icon { background: var(--red); }
+.service-card:hover .service-title { color: #fff; }
+.service-card:hover .service-desc { color: rgba(255,255,255,0.6); }
+.service-icon { width: 48px; height: 48px; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 20px; transition: all .3s; border-radius: 12px; }
+.service-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 10px; transition: color .3s; }
+.service-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; transition: color .3s; }
+
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 48px; }
+@media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; } }
+.about-text p { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.7); line-height: 1.8; margin-bottom: 16px; }
+.about-values { margin-top: 32px; display: flex; flex-direction: column; gap: 16px; }
+.value-item { display: flex; align-items: flex-start; gap: 14px; }
+.value-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; margin-top: 8px; flex-shrink: 0; }
+.value-text { font-size: 14px; color: var(--muted); }
+.value-text strong { color: var(--navy); font-weight: 600; }
+.about-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.about-num { background: var(--white); padding: 32px; text-align: center; }
+.about-num:nth-child(1), .about-num:nth-child(2) { border-bottom: 1px solid var(--border); }
+.about-num-val { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 700; color: var(--navy); line-height: 1; }
+.about-num-lbl { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+.calc-section { background: var(--navy); color: #fff; }
+.calc-section .section-tag { color: var(--silver); }
+.calc-section .section-tag::before { background: var(--silver); }
+.calc-section .section-title { color: #fff; }
+.calc-section .section-sub { color: rgba(255,255,255,0.5); }
+.calc-frame { margin-top: 40px; background: #fff; border-radius: var(--radius); overflow: hidden; }
+.calc-mini-wrap { padding: 32px; }
+.calc-panel { background: #F5F3EE; padding: 24px; margin-bottom: 12px; }
+.calc-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.calc-row:last-child { margin-bottom: 0; }
+.calc-lbl { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(0,43,73,0.5); width: 160px; flex-shrink: 0; }
+input[type=range] { flex: 1; height: 3px; appearance: none; background: rgba(0,48,73,0.1); outline: none; cursor: pointer; accent-color: #AB0534; }
+.calc-val { font-size: 12px; font-weight: 700; color: #003049; min-width: 90px; text-align: right; }
+.calc-result { background: #003049; color: #fff; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
+.calc-result-lbl { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+.calc-result-val { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; }
+.calc-result-sub { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.7); }
+.calc-cta-link { display: inline-block; margin-top: 16px; font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #AB0534; text-decoration: none; border-bottom: 1px solid rgba(171,5,52,0.4); padding-bottom: 2px; }
+
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 48px; align-items: start; }
+@media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
+.contact-info { display: flex; flex-direction: column; gap: 16px; }
+.contact-item { display: flex; align-items: flex-start; gap: 16px; padding: 20px; border: 1px solid var(--border); transition: border-color .2s; border-radius: var(--radius); }
+.contact-item:hover { border-color: var(--navy); }
+.contact-item-icon { width: 40px; height: 40px; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; border-radius: 12px; }
+.contact-item-lbl { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.contact-item-val { font-size: 15px; font-weight: 500; color: var(--navy); }
+.contact-item-val a { color: var(--navy); text-decoration: none; }
+.contact-item-val a:hover { color: var(--red); }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-label { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.form-input { padding: 12px 16px; border: 1px solid var(--border); font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--navy); background: var(--white); outline: none; transition: border-color .2s; width: 100%; border-radius: 12px; }
+.form-input:focus { border-color: var(--navy); }
+textarea.form-input { resize: vertical; min-height: 120px; }
+.form-btn { background: var(--red); color: #fff; padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; border: none; cursor: pointer; transition: background .2s; margin-bottom: 12px; width: 100%; border-radius: var(--radius); }
+.form-btn:hover { background: var(--navy); }
+.form-note { font-size: 12px; color: var(--muted); }
+
+footer { background: var(--navy); color: #fff; padding: 40px 5%; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; }
+.footer-logo span { color: var(--red); }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+.footer-pg { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+
+.fade-up { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Mário <span>Tišťan</span></a>
+    <ul class="nav-links">
+      <li><a href="#sluzby">Služby</a></li>
+      <li><a href="#o-mne">O mne</a></li>
+      <li><a href="#kalkulacka">Kalkulačka</a></li>
+      <li><a href="#kontakt">Kontakt</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="#kontakt" class="nav-cta">Dohodnúť stretnutie</a>
+  </div>
+</nav>
+
+<div class="hero-wrap">
+  <div class="hero">
+    <div>
+      <div class="hero-tag">Partners Group SK</div>
+      <h1>Vaše financie<br>v <em>správnych</em><br>rukách.</h1>
+      <p class="hero-desc">Pomáham jednotlivcom a rodinám zorientovať sa vo svete hypoték, investičií a poistenia. Od roku 2016 s dôrazom na dlhodobé vzťahy a konkrétne výsledky.</p>
+      <div class="hero-btns">
+        <a href="#kontakt" class="btn-primary">Dohodnúť stretnutie</a>
+        <a href="#kalkulacka" class="btn-secondary">HypoKalkulačka</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-num">9+</div>
+          <div class="stat-lbl">Rokov praxe</div>
+        </div>
+        <div>
+          <div class="stat-num">6</div>
+          <div class="stat-lbl">Regióny SK</div>
+        </div>
+        <div>
+          <div class="stat-num">100%</div>
+          <div class="stat-lbl">Individuálny prístup</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-photo">
+      <div class="photo-accent"></div>
+      <div class="photo-frame">
+        <img src="mario-foto.jpg" alt="Mário Tišťan - Senior Consultant Partners Group SK">
+        <div class="photo-badge">
+          <div class="badge-num">2016</div>
+          <div class="badge-txt">Rok začiatku</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="services" id="sluzby">
+  <div class="section-inner">
+    <div class="section-tag fade-up">Čo pre vás robím</div>
+    <h2 class="section-title fade-up">Komplexné finančné<br>poradenstvo</h2>
+    <p class="section-sub fade-up">Či riešite prvú hypotéku, sporenie na dôchodok alebo ochranu rodiny — mám pre vás riešenie na mieru.</p>
+    <div class="services-grid fade-up">
+      <div class="service-card">
+        <div class="service-icon">🏠</div>
+        <div class="service-title">Hypotéky</div>
+        <p class="service-desc">Porovnanie bánk, výber najvýhodnejšej sadzby, sprevádzanie celým procesom od žiadosti po podpis.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📈</div>
+        <div class="service-title">Investície</div>
+        <p class="service-desc">Budovanie portfólia podľa vašich cieľov a rizikového profilu. Pravidelné investovanie aj jednorazové vklady.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🛡️</div>
+        <div class="service-title">Poistenie</div>
+        <p class="service-desc">Životné, úrazové a majetkové poistenie. Chránim vás a vašu rodinu pred neočakávanými situáciami.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🏦</div>
+        <div class="service-title">Dôchodkové sporenie</div>
+        <p class="service-desc">II. a III. pilier, optimalizácia daňových výhod. Staráme sa o vašu finančnú budúcnosť už dnes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="o-mne">
+  <div class="section-inner">
+    <div class="section-tag fade-up">O mne</div>
+    <h2 class="section-title fade-up">Váš partner<br>vo financiach</h2>
+    <div class="about-grid">
+      <div class="about-text fade-up">
+        <p>Som Mário Tišťan, Senior Consultant v Partners Group SK. Finančnému poradenstvu sa venujem od novembra 2016 — a za tú dobu som si uvedomil jedno: dobré finančné rozhodnutie potrebuje čas, dôveru a konkrétne čísla.</p>
+        <p>Pôsobím v Bratislave, Trnave, Žiline, Čadci, Bytči a Nitre. Stretnutia prebiehajú osobne alebo online — podľa toho, čo vám vyhovuje.</p>
+        <p>Nejde mi o rýchly predaj. Ide mi o to, aby ste o 10 rokov povedali, že to bolo správne rozhodnutie.</p>
+        <div class="about-values">
+          <div class="value-item">
+            <div class="value-dot"></div>
+            <div class="value-text"><strong>Transparentnosť</strong> — žiadne skryté poplatky, jasné podmienky</div>
+          </div>
+          <div class="value-item">
+            <div class="value-dot"></div>
+            <div class="value-text"><strong>Dlhodobý vzťah</strong> — som tu aj po podpise zmluvy</div>
+          </div>
+          <div class="value-item">
+            <div class="value-dot"></div>
+            <div class="value-text"><strong>Individuálny prístup</strong> — každý klient má iné potreby</div>
+          </div>
+        </div>
+      </div>
+      <div class="about-numbers fade-up">
+        <div class="about-num">
+          <div class="about-num-val">9+</div>
+          <div class="about-num-lbl">Rokov v odbore</div>
+        </div>
+        <div class="about-num">
+          <div class="about-num-val">6</div>
+          <div class="about-num-lbl">Mestá pôsobenia</div>
+        </div>
+        <div class="about-num">
+          <div class="about-num-val">SK</div>
+          <div class="about-num-lbl">Partners Group</div>
+        </div>
+        <div class="about-num">
+          <div class="about-num-val">360°</div>
+          <div class="about-num-lbl">Finančné poradenstvo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="calc-section" id="kalkulacka">
+  <div class="section-inner">
+    <div class="section-tag fade-up">Nástroj zadarmo</div>
+    <h2 class="section-title fade-up">HypoKalkulačka+</h2>
+    <p class="section-sub fade-up">Vypočítajte si splátku, LTV, DSTI a porovnajte stratégie — mimoriadne splátky vs. investovanie prebytku.</p>
+    <div class="calc-frame fade-up">
+      <div class="calc-mini-wrap">
+        <div class="calc-panel">
+          <div class="calc-row">
+            <span class="calc-lbl">Výška úveru</span>
+            <input type="range" min="10000" max="500000" step="5000" value="150000" id="r1">
+            <span class="calc-val" id="o1">150 000 €</span>
+          </div>
+          <div class="calc-row">
+            <span class="calc-lbl">Úroková sadzba</span>
+            <input type="range" min="0.5" max="8" step="0.05" value="3.5" id="r2">
+            <span class="calc-val" id="o2">3.50 %</span>
+          </div>
+          <div class="calc-row">
+            <span class="calc-lbl">Doba splácania</span>
+            <input type="range" min="5" max="30" step="1" value="20" id="r3">
+            <span class="calc-val" id="o3">20 rokov</span>
+          </div>
+        </div>
+        <div class="calc-result">
+          <div>
+            <div class="calc-result-lbl">Mesačná splátka</div>
+            <div class="calc-result-val" id="res1">876 €</div>
+          </div>
+          <div style="text-align:right">
+            <div class="calc-result-lbl">Celkové úroky</div>
+            <div class="calc-result-sub" id="res2">60 298 €</div>
+          </div>
+        </div>
+        <a href="hypokalkulacka.html" class="calc-cta-link" target="_blank">Otvoriť plnú kalkulačku →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="kontakt">
+  <div class="section-inner">
+    <div class="section-tag fade-up">Spojme sa</div>
+    <h2 class="section-title fade-up">Dohodnite si<br>bezplatné stretnutie</h2>
+    <p class="section-sub fade-up">Prvá konzultácia je vždy zadarmo. Stačí mi napísať alebo zavolať — zvyšok zariadim ja.</p>
+    <div class="contact-grid">
+      <div class="contact-info fade-up">
+        <div class="contact-item">
+          <div class="contact-item-icon">📱</div>
+          <div>
+            <div class="contact-item-lbl">Telefón</div>
+            <div class="contact-item-val"><a href="tel:+421902130096">+421 902 130 096</a></div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">✉️</div>
+          <div>
+            <div class="contact-item-lbl">E-mail</div>
+            <div class="contact-item-val" id="em"></div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">📍</div>
+          <div>
+            <div class="contact-item-lbl">Pôsobnosť</div>
+            <div class="contact-item-val">Bratislava · Trnava · Žilina · Čadca · Bytča · Nitra</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">🏢</div>
+          <div>
+            <div class="contact-item-lbl">Spoločnosť</div>
+            <div class="contact-item-val">Partners Group SK</div>
+          </div>
+        </div>
+      </div>
+      <div class="fade-up">
+        <form action="https://formspree.io/f/mdawjqak" method="POST">
+          <div class="form-group">
+            <label class="form-label" for="f-meno">Vaše meno</label>
+            <input type="text" name="meno" id="f-meno" class="form-input" placeholder="Ján Novák" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-kontakt">Telefón alebo e-mail</label>
+            <input type="text" name="kontakt" id="f-kontakt" class="form-input" placeholder="+421 9xx xxx xxx" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-tema">Čo riešite?</label>
+            <select name="tema" id="f-tema" class="form-input">
+              <option value="">— Vyberte tému —</option>
+              <option value="hypoteka">Hypotéka</option>
+              <option value="investicie">Investície</option>
+              <option value="poistenie-zivot">Poistenie života a zdravia</option>
+              <option value="poistenie-vozidla">Poistenie vozidiel</option>
+              <option value="poistenie-nehnutelnost">Poistenie nehnuteľnosti / domácnosti</option>
+              <option value="cestovne-poistenie">Cestovné poistenie</option>
+              <option value="dochodok">Dôchodkové sporenie</option>
+              <option value="komplexne">Komplexné poradenstvo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-sprava">Správa (nepovinne)</label>
+            <textarea name="sprava" id="f-sprava" class="form-input" placeholder="Krátky popis vašej situácie..."></textarea>
+          </div>
+          <button type="submit" class="form-btn">Odoslať správu</button>
+          <p class="form-note">Odpoviem do 24 hodín. Prvá konzultácia je bezplatná.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Mário <span>Tišťan</span></div>
+    <div class="footer-copy">© 2026 Mário Tišťan · mariotistan.sk</div>
+    <div class="footer-pg">Partners Group SK</div>
+  </div>
+</footer>
+
+<script>
+var u='mario.tistan';var d='partnersgroup.sk';var e=u+'@'+d;
+document.getElementById('em').innerHTML='<a href="mailto:'+e+'">'+e+'</a>';
+
+function fmt(n){return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))+' €';}
+function calc(){
+  var P=+document.getElementById('r1').value;
+  var r=+document.getElementById('r2').value/100/12;
+  var n=+document.getElementById('r3').value*12;
+  var M=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+  document.getElementById('res1').textContent=fmt(Math.round(M));
+  document.getElementById('res2').textContent=fmt(Math.round((M*n)-P));
+}
+document.getElementById('r1').addEventListener('input',function(){document.getElementById('o1').textContent=fmt(+this.value);calc();});
+document.getElementById('r2').addEventListener('input',function(){document.getElementById('o2').textContent=parseFloat(this.value).toFixed(2)+' %';calc();});
+document.getElementById('r3').addEventListener('input',function(){document.getElementById('o3').textContent=this.value+' rokov';calc();});
+calc();
+var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
+</script>
+</body>
+</html>
