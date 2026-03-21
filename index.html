@@ -157,6 +157,47 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
 
 .fade-up { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+/* Ako to funguje - 3 kroky */
+.steps { background: var(--white); }
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; position: relative; }
+@media (max-width: 768px) { .steps-grid { grid-template-columns: 1fr; } }
+.step-card { text-align: center; position: relative; padding: 0 16px; }
+.step-num { width: 56px; height: 56px; background: var(--red); color: #fff; font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+.step-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+.step-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; }
+.step-line { display: none; }
+@media (min-width: 769px) {
+  .step-line { display: block; position: absolute; top: 28px; left: calc(33.33% + 28px); width: calc(33.33% - 56px); height: 2px; background: var(--border); }
+  .step-line.l2 { left: calc(66.66% + 28px); }
+}
+
+/* Blog / Články */
+.blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px; }
+.blog-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all .3s; }
+.blog-card:hover { border-color: var(--navy); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,48,73,0.08); }
+.blog-body { padding: 24px; }
+.blog-tag { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+.blog-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.3; }
+.blog-excerpt { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
+.blog-link { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--red); text-decoration: none; border-bottom: 1px solid rgba(171,5,52,0.3); padding-bottom: 2px; transition: color .2s; }
+.blog-link:hover { color: var(--navy); border-color: var(--navy); }
+.blog-img { width: 100%; height: 180px; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+
+/* Floating WhatsApp button */
+.float-wa { position: fixed; bottom: 24px; right: 24px; z-index: 90; display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
+.float-btn { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; box-shadow: 0 4px 16px rgba(0,0,0,0.2); transition: transform .2s, box-shadow .2s; }
+.float-btn:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(0,0,0,0.25); }
+.float-wa-btn { background: #25D366; }
+.float-call-btn { background: var(--red); }
+
+/* Cookie banner */
+.cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: var(--navy); color: #fff; padding: 16px 5%; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; font-size: 13px; transform: translateY(100%); transition: transform .4s ease; }
+.cookie-banner.show { transform: translateY(0); }
+.cookie-banner p { max-width: 600px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+.cookie-banner a { color: rgba(255,255,255,0.9); text-decoration: underline; }
+.cookie-accept { background: var(--red); color: #fff; border: none; padding: 10px 24px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; border-radius: var(--radius); transition: background .2s; flex-shrink: 0; }
+.cookie-accept:hover { background: #fff; color: var(--navy); }
 </style>
 </head>
 <body>
@@ -168,6 +209,7 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
       <li><a href="#sluzby">Služby</a></li>
       <li><a href="#o-mne">O mne</a></li>
       <li><a href="#kalkulacka">Kalkulačka</a></li>
+      <li><a href="#blog">Blog</a></li>
       <li><a href="#kontakt">Kontakt</a></li>
     </ul>
     <button class="hamburger" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
@@ -240,6 +282,33 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
         <div class="service-icon">🏦</div>
         <div class="service-title">Dôchodkové sporenie</div>
         <p class="service-desc">II. a III. pilier, optimalizácia daňových výhod. Staráme sa o vašu finančnú budúcnosť už dnes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="steps" id="ako-to-funguje">
+  <div class="section-inner">
+    <div class="section-tag fade-up">Jednoduchý proces</div>
+    <h2 class="section-title fade-up">Ako to funguje</h2>
+    <p class="section-sub fade-up">Od prvého kontaktu po realizáciu — tri jednoduché kroky k lepším financiám.</p>
+    <div class="steps-grid fade-up">
+      <div class="step-line"></div>
+      <div class="step-line l2"></div>
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-title">Bezplatná konzultácia</div>
+        <p class="step-desc">Stretneme sa osobne alebo online. Zistím vašu aktuálnu situáciu, ciele a možnosti. Bez záväzkov, bez poplatkov.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-title">Návrh riešenia</div>
+        <p class="step-desc">Pripravím konkrétny finančný plán na mieru — porovnám ponuky bánk a poisťovní a vysvetlím všetky možnosti.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-title">Realizácia a servis</div>
+        <p class="step-desc">Zariadim všetko za vás — od papierovačiek po podpis. A potom? Pravidelný servis a úpravy podľa vášho života.</p>
       </div>
     </div>
   </div>
@@ -326,6 +395,43 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
           </div>
         </div>
         <a href="hypokalkulacka.html" class="calc-cta-link">Otvoriť plnú kalkulačku →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="blog">
+  <div class="section-inner">
+    <div class="section-tag fade-up">Užitočné tipy</div>
+    <h2 class="section-title fade-up">Články a rady</h2>
+    <p class="section-sub fade-up">Praktické informácie, ktoré vám pomôžu robiť lepšie finančné rozhodnutia.</p>
+    <div class="blog-grid fade-up">
+      <div class="blog-card">
+        <div class="blog-img">🏠</div>
+        <div class="blog-body">
+          <div class="blog-tag">Hypotéky</div>
+          <div class="blog-title">5 vecí, ktoré musíte vedieť pred podpisom hypotéky</div>
+          <p class="blog-excerpt">Fixácia, LTV, DSTI, poplatky a predčasné splatenie — na čo si dať pozor, aby ste nepredplácali tisíce eur zbytočne.</p>
+          <a href="#kontakt" class="blog-link">Chcem vedieť viac →</a>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-img">📈</div>
+        <div class="blog-body">
+          <div class="blog-tag">Investície</div>
+          <div class="blog-title">Prečo začať investovať čo najskôr — aj s malou sumou</div>
+          <p class="blog-excerpt">Zložené úročenie je najsilnejší nástroj budovania majetku. Ukážem vám, čo dokáže 50 € mesačne za 20 rokov.</p>
+          <a href="#kontakt" class="blog-link">Chcem vedieť viac →</a>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-img">🛡️</div>
+        <div class="blog-body">
+          <div class="blog-tag">Poistenie</div>
+          <div class="blog-title">Životné poistenie: kedy sa oplatí a kedy je to zbytočný výdavok</div>
+          <p class="blog-excerpt">Nie každý potrebuje životné poistenie. Ale ak máte rodinu, hypotéku alebo záväzky — môže vám zachrániť budúcnosť.</p>
+          <a href="#kontakt" class="blog-link">Chcem vedieť viac →</a>
+        </div>
       </div>
     </div>
   </div>
@@ -428,10 +534,26 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
     <div class="footer-logo">Mário <span>Tišťan</span></div>
     <div class="footer-copy">© 2026 Mário Tišťan · mariotistan.sk</div>
     <div style="width:100%;text-align:center;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6">
-      Podriadený finančný agent Partners Group SK s.r.o. · Registrácia NBS č. 221967 · <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5);text-decoration:underline">Overenie v registri NBS</a>
+      Podriadený finančný agent Partners Group SK s.r.o. · Registrácia NBS č. 221967 · <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5);text-decoration:underline">Overenie v registri NBS</a> · <a href="ochrana-udajov.html" style="color:rgba(255,255,255,0.5);text-decoration:underline">Ochrana osobných údajov</a>
     </div>
   </div>
 </footer>
+
+<!-- Floating WhatsApp + Telefón -->
+<div class="float-wa">
+  <a href="tel:+421902130096" class="float-btn float-call-btn" title="Zavolať">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+  </a>
+  <a href="https://wa.me/421902130096?text=Dobrý%20deň%2C%20mám%20záujem%20o%20konzultáciu." class="float-btn float-wa-btn" target="_blank" rel="noopener" title="WhatsApp">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+  </a>
+</div>
+
+<!-- Cookie Banner -->
+<div class="cookie-banner" id="cookieBanner">
+  <p>Táto stránka používa cookies na zlepšenie vášho zážitku. <a href="ochrana-udajov.html">Viac informácií</a></p>
+  <button class="cookie-accept" onclick="acceptCookies()">Súhlasím</button>
+</div>
 
 <script>
 var u='mario.tistan';var d='partnersgroup.sk';var e=u+'@'+d;
@@ -452,6 +574,96 @@ document.getElementById('r3').addEventListener('input',function(){document.getEl
 calc();
 var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
 document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
+
+// Animované počítadlo
+function animateCount(el, target, suffix, duration) {
+  var start = 0, startTime = null;
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    var progress = Math.min((ts - startTime) / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    var current = Math.round(eased * target);
+    el.textContent = current + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+var counterData = [
+  { selector: '.hero-stats .stat-num', values: [{target:9,suffix:'+'},{target:3.5,suffix:'M+€',decimal:true},{target:100,suffix:'%'}] },
+];
+
+var countersAnimated = false;
+var counterObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting && !countersAnimated) {
+      countersAnimated = true;
+      var heroNums = document.querySelectorAll('.hero-stats .stat-num');
+      if (heroNums[0]) animateCount(heroNums[0], 9, '+', 1200);
+      if (heroNums[1]) {
+        var el = heroNums[1], startTime = null;
+        function stepDecimal(ts) {
+          if (!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / 1500, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = (eased * 3.5).toFixed(1).replace('.',',') + 'M+€';
+          if (progress < 1) requestAnimationFrame(stepDecimal);
+        }
+        requestAnimationFrame(stepDecimal);
+      }
+      if (heroNums[2]) animateCount(heroNums[2], 100, '%', 1800);
+    }
+  });
+}, {threshold: 0.3});
+
+var heroStats = document.querySelector('.hero-stats');
+if (heroStats) counterObs.observe(heroStats);
+
+var aboutAnimated = false;
+var aboutObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting && !aboutAnimated) {
+      aboutAnimated = true;
+      var aboutNums = document.querySelectorAll('.about-num-val');
+      if (aboutNums[0]) animateCount(aboutNums[0], 9, '+', 1200);
+      if (aboutNums[1]) {
+        var el = aboutNums[1], startTime = null;
+        function stepAbout(ts) {
+          if (!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / 1500, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = (eased * 3.5).toFixed(1).replace('.',',') + 'M+';
+          if (progress < 1) requestAnimationFrame(stepAbout);
+        }
+        requestAnimationFrame(stepAbout);
+      }
+      if (aboutNums[2]) animateCount(aboutNums[2], 6, '', 1000);
+      if (aboutNums[3]) {
+        var el3 = aboutNums[3], st3 = null;
+        function step360(ts) {
+          if (!st3) st3 = ts;
+          var p = Math.min((ts - st3) / 1400, 1);
+          var e = 1 - Math.pow(1 - p, 3);
+          el3.textContent = Math.round(e * 360) + '°';
+          if (p < 1) requestAnimationFrame(step360);
+        }
+        requestAnimationFrame(step360);
+      }
+    }
+  });
+}, {threshold: 0.3});
+
+var aboutNumbers = document.querySelector('.about-numbers');
+if (aboutNumbers) aboutObs.observe(aboutNumbers);
+
+// Cookie banner
+function acceptCookies() {
+  localStorage.setItem('cookiesAccepted', 'true');
+  document.getElementById('cookieBanner').classList.remove('show');
+}
+if (!localStorage.getItem('cookiesAccepted')) {
+  setTimeout(function() { document.getElementById('cookieBanner').classList.add('show'); }, 1500);
+}
 </script>
 </body>
 </html>
