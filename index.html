@@ -55,19 +55,17 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 @media (max-width: 768px) { .hero { grid-template-columns: 1fr; text-align: center; } }
 .hero-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 20px; }
 .hero-tag::before { content: ''; width: 24px; height: 2px; background: var(--red); }
-.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 5vw, 68px); font-weight: 700; line-height: 1.05; letter-spacing: -.03em; color: var(--navy); margin-bottom: 24px; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 5vw, 68px); font-weight: 700; line-height: 1.05; letter-spacing: -.03em; color: var(--navy); margin-bottom: 10px; }
 .hero h1 em { font-style: normal; color: var(--red); }
+.hero-accent { font-size: clamp(18px, 2.5vw, 22px); font-weight: 500; color: var(--red); margin-bottom: 24px; font-family: 'DM Sans', sans-serif; }
 .hero-desc { font-size: 17px; font-weight: 300; color: var(--muted); line-height: 1.7; margin-bottom: 36px; max-width: 480px; }
+@media (max-width: 768px) { .hero-desc { margin-left: auto; margin-right: auto; } }
 .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
 @media (max-width: 768px) { .hero-btns { justify-content: center; } }
 .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: background .2s; border-radius: var(--radius); }
 .btn-primary:hover { background: var(--navy); }
 .btn-secondary { border: 1.5px solid var(--navy); color: var(--navy); padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: all .2s; border-radius: var(--radius); }
 .btn-secondary:hover { background: var(--navy); color: #fff; }
-.hero-stats { display: flex; gap: 32px; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
-@media (max-width: 768px) { .hero-stats { justify-content: center; } }
-.stat-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--navy); line-height: 1; }
-.stat-lbl { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
 .hero-photo { position: relative; }
 .photo-frame { width: 100%; aspect-ratio: 4/5; background: var(--sand); position: relative; overflow: hidden; border-radius: var(--radius); }
 .photo-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
@@ -76,6 +74,18 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .badge-txt { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .photo-accent { position: absolute; top: -20px; left: -20px; width: 80px; height: 80px; border: 3px solid var(--red); border-radius: var(--radius); }
 
+/* Social Proof Bar */
+.social-proof { background: var(--navy); padding: 48px 5%; }
+.proof-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+@media (max-width: 768px) { .proof-inner { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+@media (max-width: 480px) { .proof-inner { grid-template-columns: 1fr; text-align: center; } }
+.proof-item { display: flex; align-items: flex-start; gap: 16px; }
+@media (max-width: 480px) { .proof-item { flex-direction: column; align-items: center; } }
+.proof-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; border-radius: 12px; flex-shrink: 0; }
+.proof-icon svg { width: 22px; height: 22px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.proof-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #fff; line-height: 1.1; }
+.proof-lbl { font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
 section { padding: 80px 5%; }
 .section-inner { max-width: 1100px; margin: 0 auto; }
 .section-tag { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
@@ -83,39 +93,66 @@ section { padding: 80px 5%; }
 .section-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 700; color: var(--navy); letter-spacing: -.02em; line-height: 1.1; margin-bottom: 16px; }
 .section-sub { font-size: 16px; font-weight: 300; color: var(--muted); max-width: 560px; line-height: 1.7; }
 
+/* Services — large cards with scenarios */
 .services { background: var(--sand); }
-.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; background: transparent; margin-top: 48px; }
-.service-card { background: var(--white); padding: 36px 28px; transition: all .3s; position: relative; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--border); }
-.service-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--red); transform: scaleX(0); transition: transform .3s; }
-.service-card:hover::after { transform: scaleX(1); }
-.service-card:hover { background: var(--navy); }
-.service-card:hover .service-icon { background: var(--red); }
-.service-card:hover .service-title { color: #fff; }
-.service-card:hover .service-desc { color: rgba(255,255,255,0.6); }
-.service-icon { width: 48px; height: 48px; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 20px; transition: all .3s; border-radius: 12px; }
-.service-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 10px; transition: color .3s; }
-.service-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; transition: color .3s; }
+.services-grid { display: grid; grid-template-columns: 1fr; gap: 32px; margin-top: 48px; }
+.service-card-large { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: box-shadow .3s; }
+.service-card-large:hover { box-shadow: 0 12px 40px rgba(0,48,73,0.08); }
+.service-card-header { padding: 36px 36px 24px; border-bottom: 1px solid var(--border); }
+.service-card-header-top { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+.service-icon-lg { width: 56px; height: 56px; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 26px; border-radius: 14px; flex-shrink: 0; }
+.service-title-lg { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--navy); }
+.service-subtitle-lg { font-size: 15px; font-weight: 400; color: var(--muted); margin-left: 72px; }
+.scenarios { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+@media (max-width: 768px) { .scenarios { grid-template-columns: 1fr; } }
+.scenario { padding: 32px 36px; }
+.scenario:first-child { border-right: 1px solid var(--border); }
+@media (max-width: 768px) { .scenario:first-child { border-right: none; border-bottom: 1px solid var(--border); } }
+.scenario-q { font-size: 15px; font-style: italic; color: var(--navy); font-weight: 500; margin-bottom: 14px; line-height: 1.6; padding-left: 16px; border-left: 3px solid var(--red); }
+.scenario-a { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.75; }
 
-.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 48px; }
+/* Steps */
+.steps { background: var(--white); }
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; position: relative; }
+@media (max-width: 768px) { .steps-grid { grid-template-columns: 1fr; } }
+.step-card { text-align: center; position: relative; padding: 0 16px; }
+.step-num { width: 56px; height: 56px; background: var(--red); color: #fff; font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+.step-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+.step-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; }
+.step-line { display: none; }
+@media (min-width: 769px) {
+  .step-line { display: block; position: absolute; top: 28px; left: calc(33.33% + 28px); width: calc(33.33% - 56px); height: 2px; background: var(--border); }
+  .step-line.l2 { left: calc(66.66% + 28px); }
+}
+
+/* About section */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; margin-top: 48px; }
 @media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; } }
 .about-text p { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.7); line-height: 1.8; margin-bottom: 16px; }
-.about-values { margin-top: 32px; display: flex; flex-direction: column; gap: 16px; }
-.value-item { display: flex; align-items: flex-start; gap: 14px; }
-.value-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; margin-top: 8px; flex-shrink: 0; }
-.value-text { font-size: 14px; color: var(--muted); }
-.value-text strong { color: var(--navy); font-weight: 600; }
-.about-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.about-num { background: var(--white); padding: 32px; text-align: center; }
-.about-num:nth-child(1), .about-num:nth-child(2) { border-bottom: 1px solid var(--border); }
-.about-num-val { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 700; color: var(--navy); line-height: 1; }
-.about-num-lbl { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.about-text h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-top: 28px; margin-bottom: 12px; }
+.about-highlight { background: var(--sand); border-left: 4px solid var(--red); padding: 24px 28px; border-radius: 0 var(--radius) var(--radius) 0; margin: 20px 0; }
+.about-highlight p { font-size: 15px; font-weight: 400; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 0; }
+.about-photos { position: relative; min-height: 420px; }
+.about-photo-main { width: 80%; border-radius: var(--radius); overflow: hidden; box-shadow: 0 16px 48px rgba(0,48,73,0.12); position: relative; z-index: 2; }
+.about-photo-main img { width: 100%; height: auto; display: block; }
+.about-photo-secondary { width: 55%; border-radius: var(--radius); overflow: hidden; box-shadow: 0 12px 36px rgba(0,48,73,0.15); position: absolute; bottom: -20px; right: 0; z-index: 3; transform: rotate(2deg); border: 4px solid var(--white); }
+.about-photo-secondary img, .about-photo-placeholder { width: 100%; height: auto; display: block; }
+.about-photo-placeholder { aspect-ratio: 4/3; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 48px; color: var(--silver); }
+@media (max-width: 768px) {
+  .about-photos { min-height: 320px; margin-bottom: 40px; }
+  .about-photo-main { width: 75%; }
+  .about-photo-secondary { width: 50%; }
+}
 
-.calc-section { background: var(--navy); color: #fff; }
-.calc-section .section-tag { color: var(--silver); }
-.calc-section .section-tag::before { background: var(--silver); }
-.calc-section .section-title { color: #fff; }
-.calc-section .section-sub { color: rgba(255,255,255,0.5); }
-.calc-frame { margin-top: 40px; background: #fff; border-radius: var(--radius); overflow: hidden; }
+/* Tools & Blog section */
+.tools-section { background: var(--navy); color: #fff; }
+.tools-section .section-tag { color: var(--silver); }
+.tools-section .section-tag::before { background: var(--silver); }
+.tools-section .section-title { color: #fff; }
+.tools-section .section-sub { color: rgba(255,255,255,0.5); }
+.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 48px; align-items: start; }
+@media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
+.calc-frame { background: #fff; border-radius: var(--radius); overflow: hidden; }
 .calc-mini-wrap { padding: 32px; }
 .calc-panel { background: #F5F3EE; padding: 24px; margin-bottom: 12px; }
 .calc-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -128,7 +165,21 @@ input[type=range] { flex: 1; height: 3px; appearance: none; background: rgba(0,4
 .calc-result-val { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; }
 .calc-result-sub { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.7); }
 .calc-cta-link { display: inline-block; margin-top: 16px; font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #AB0534; text-decoration: none; border-bottom: 1px solid rgba(171,5,52,0.4); padding-bottom: 2px; }
+.calc-intro { font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 24px; }
+.blog-intro { font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 24px; }
 
+/* Blog cards */
+.blog-grid-side { display: flex; flex-direction: column; gap: 16px; }
+.blog-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all .3s; text-decoration: none; color: inherit; display: block; }
+.blog-card:hover { border-color: var(--navy); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,48,73,0.08); }
+.blog-body { padding: 20px 24px; }
+.blog-tag { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
+.blog-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 6px; line-height: 1.3; }
+.blog-excerpt { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+.blog-link { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--red); text-decoration: none; border-bottom: 1px solid rgba(171,5,52,0.3); padding-bottom: 2px; transition: color .2s; }
+.blog-link:hover { color: var(--navy); border-color: var(--navy); }
+
+/* Contact */
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 48px; align-items: start; }
 @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
 .contact-info { display: flex; flex-direction: column; gap: 16px; }
@@ -153,36 +204,9 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
 .footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; }
 .footer-logo span { color: var(--red); }
 .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
-.footer-pg { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
 
 .fade-up { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
-
-/* Ako to funguje - 3 kroky */
-.steps { background: var(--white); }
-.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; position: relative; }
-@media (max-width: 768px) { .steps-grid { grid-template-columns: 1fr; } }
-.step-card { text-align: center; position: relative; padding: 0 16px; }
-.step-num { width: 56px; height: 56px; background: var(--red); color: #fff; font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-.step-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
-.step-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; }
-.step-line { display: none; }
-@media (min-width: 769px) {
-  .step-line { display: block; position: absolute; top: 28px; left: calc(33.33% + 28px); width: calc(33.33% - 56px); height: 2px; background: var(--border); }
-  .step-line.l2 { left: calc(66.66% + 28px); }
-}
-
-/* Blog / Články */
-.blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px; }
-.blog-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all .3s; }
-.blog-card:hover { border-color: var(--navy); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,48,73,0.08); }
-.blog-body { padding: 24px; }
-.blog-tag { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
-.blog-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.3; }
-.blog-excerpt { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
-.blog-link { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--red); text-decoration: none; border-bottom: 1px solid rgba(171,5,52,0.3); padding-bottom: 2px; transition: color .2s; }
-.blog-link:hover { color: var(--navy); border-color: var(--navy); }
-.blog-img { width: 100%; height: 180px; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 48px; }
 
 /* Floating WhatsApp button */
 .float-wa { position: fixed; bottom: 24px; right: 24px; z-index: 90; display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
@@ -206,48 +230,35 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
   <div class="nav-inner">
     <a href="#" class="nav-logo">Mário <span>Tišťan</span></a>
     <ul class="nav-links">
-      <li><a href="#sluzby">Služby</a></li>
+      <li><a href="#s-cim-pomaham">S čím pomáham</a></li>
       <li><a href="#o-mne">O mne</a></li>
-      <li><a href="#kalkulacka">Kalkulačka</a></li>
-      <li><a href="#blog">Blog</a></li>
+      <li><a href="#nastroje">Nástroje a blog</a></li>
       <li><a href="#kontakt">Kontakt</a></li>
     </ul>
     <button class="hamburger" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
       <span></span><span></span><span></span>
     </button>
-    <a href="#kontakt" class="nav-cta">Dohodnúť stretnutie</a>
+    <a href="#kontakt" class="nav-cta">Dohodnúť kávu</a>
   </div>
 </nav>
 
+<!-- HERO -->
 <div class="hero-wrap">
   <div class="hero">
     <div>
       <div class="hero-tag">Partners Group SK</div>
-      <h1>Vaše financie.<br>Jasný <em>plán</em>.<br>Konkrétne výsledky.</h1>
-      <p class="hero-desc">Pomáham jednotlivcom a rodinám robiť múdre finančné rozhodnutia — od hypotéky cez investície až po ochranu majetku. Od roku 2016 s individuálnym prístupom a merateľnými výsledkami.</p>
+      <h1>Postavme tvoje financie na <em>pevné základy</em>.</h1>
+      <div class="hero-accent">Zrozumiteľne, ľudsky a na dlhé roky.</div>
+      <p class="hero-desc">Pomáham (nielen) mladým rodinám šikovne vyriešiť bývanie, pripraviť deťom štartovný kapitál a budovať majetok tak, aby ste mali pokojný spánok.</p>
       <div class="hero-btns">
-        <a href="#kontakt" class="btn-primary">Dohodnúť stretnutie</a>
-        <a href="#kalkulacka" class="btn-secondary">HypoKalkulačka</a>
-      </div>
-      <div class="hero-stats">
-        <div>
-          <div class="stat-num">9+</div>
-          <div class="stat-lbl">Rokov praxe</div>
-        </div>
-        <div>
-          <div class="stat-num">3,5M+€</div>
-          <div class="stat-lbl">Pod správou</div>
-        </div>
-        <div>
-          <div class="stat-num">100%</div>
-          <div class="stat-lbl">Individuálny prístup</div>
-        </div>
+        <a href="#kontakt" class="btn-primary">Dajme si kávu a preberme to</a>
+        <a href="#nastroje" class="btn-secondary">HypoKalkulačka</a>
       </div>
     </div>
     <div class="hero-photo">
       <div class="photo-accent"></div>
       <div class="photo-frame">
-        <img src="mario-foto.jpg" alt="Mário Tišťan - Senior Consultant Partners Group SK">
+        <img src="hero-mario.jpg" alt="Mário Tišťan - Senior Consultant Partners Group SK">
         <div class="photo-badge">
           <div class="badge-num">2016</div>
           <div class="badge-txt">Rok začiatku</div>
@@ -257,48 +268,135 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
   </div>
 </div>
 
-<section class="services" id="sluzby">
+<!-- SOCIAL PROOF BAR -->
+<div class="social-proof" id="social-proof">
+  <div class="proof-inner fade-up">
+    <div class="proof-item">
+      <div class="proof-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div>
+        <div class="proof-num" data-counter="year">Od roku 2016</div>
+        <div class="proof-lbl">Skúsenosti na trhu</div>
+      </div>
+    </div>
+    <div class="proof-item">
+      <div class="proof-icon">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div>
+        <div class="proof-num" data-counter="value">3,5 milióna €+</div>
+        <div class="proof-lbl">Hodnota majetku pod správou</div>
+      </div>
+    </div>
+    <div class="proof-item">
+      <div class="proof-icon">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <div>
+        <div class="proof-num" data-counter="partner"><span class="counter-val">100</span> %</div>
+        <div class="proof-lbl">Dlhodobé partnerstvo</div>
+      </div>
+    </div>
+    <div class="proof-item">
+      <div class="proof-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div>
+        <div class="proof-num" data-counter="cities"><span class="counter-val">6</span> miest</div>
+        <div class="proof-lbl">Bratislava, Trnava, Žilina, Čadca, Bytča, Nitra + Online</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="s-cim-pomaham">
   <div class="section-inner">
-    <div class="section-tag fade-up">Čo pre vás robím</div>
-    <h2 class="section-title fade-up">Čo pre vás<br>môžeme urobiť</h2>
-    <p class="section-sub fade-up">Či riešite prvú hypotéku, sporenie na dôchodok alebo ochranu rodiny — máme pre vás riešenie na mieru. Všetko pod jednou strechou — bez skrytých poplatkov.</p>
-    <div class="services-grid fade-up">
-      <div class="service-card">
-        <div class="service-icon">🏠</div>
-        <div class="service-title">Hypotéky</div>
-        <p class="service-desc">Porovnanie bánk, výber najvýhodnejšej sadzby, sprevádzanie celým procesom od žiadosti po podpis.</p>
+    <div class="section-tag fade-up">Riešenia</div>
+    <h2 class="section-title fade-up">S čím za mnou ľudia chodia najčastejšie?</h2>
+    <p class="section-sub fade-up">A s čím viem pomôcť aj tebe</p>
+    <div class="services-grid">
+
+      <!-- Box 1: Bývanie a Hypotéky -->
+      <div class="service-card-large fade-up">
+        <div class="service-card-header">
+          <div class="service-card-header-top">
+            <div class="service-icon-lg">🏠</div>
+            <div class="service-title-lg">Bývanie a Hypotéky</div>
+          </div>
+          <div class="service-subtitle-lg">Bez stresu a preplácania</div>
+        </div>
+        <div class="scenarios">
+          <div class="scenario">
+            <div class="scenario-q">„Chceme vlastné bývanie, ale nevieme, na čo reálne máme."</div>
+            <p class="scenario-a">Zistíme tvoje možnosti, prepočítame, čo ti prejde v banke a nastavíme to tak, aby ťa splátka v noci nebudila zo sna.</p>
+          </div>
+          <div class="scenario">
+            <div class="scenario-q">„Končí mi fixácia a banka mi poslala list s vysokým úrokom."</div>
+            <p class="scenario-a">Pozrieme sa na to, či sa s tvojou súčasnou bankou dá vyjednávať, alebo ti nájdeme výhodnejšiu ponuku inde a refinancujeme to.</p>
+          </div>
+        </div>
       </div>
-      <div class="service-card">
-        <div class="service-icon">📈</div>
-        <div class="service-title">Investície</div>
-        <p class="service-desc">Spravujeme investičné portfóliá v celkovom objeme cez 3,5 milióna €. Pravidelné investovanie aj jednorazové vklady prispôsobené vašim cieľom.</p>
+
+      <!-- Box 2: Investovanie a Dôchodok -->
+      <div class="service-card-large fade-up">
+        <div class="service-card-header">
+          <div class="service-card-header-top">
+            <div class="service-icon-lg">📈</div>
+            <div class="service-title-lg">Investovanie a Dôchodok</div>
+          </div>
+          <div class="service-subtitle-lg">Nech peniaze pracujú za teba</div>
+        </div>
+        <div class="scenarios">
+          <div class="scenario">
+            <div class="scenario-q">„Mám voľné peniaze a hľadám bezpečné miesto, kde ich zhodnotiť."</div>
+            <p class="scenario-a">Peniaze na bežnom účte požiera inflácia. Pripravím ti investičné portfólio na mieru, ktoré zodpovedá tvojmu vzťahu k riziku.</p>
+          </div>
+          <div class="scenario">
+            <div class="scenario-q">„Chcem sa efektívne pripraviť na dôchodok."</div>
+            <p class="scenario-a">Spoliehať sa len na štát sa dnes už nevypláca. Nastavíme tvoje mesačné prebytky tak, aby si mal v budúcnosti dôstojnú jeseň života.</p>
+          </div>
+        </div>
       </div>
-      <div class="service-card">
-        <div class="service-icon">🛡️</div>
-        <div class="service-title">Poistenie</div>
-        <p class="service-desc">Životné, úrazové a majetkové poistenie. Chránim vás a vašu rodinu pred neočakávanými situáciami.</p>
+
+      <!-- Box 3: Rodina a Bezpečnosť -->
+      <div class="service-card-large fade-up">
+        <div class="service-card-header">
+          <div class="service-card-header-top">
+            <div class="service-icon-lg">🛡️</div>
+            <div class="service-title-lg">Rodina a Bezpečnosť</div>
+          </div>
+          <div class="service-subtitle-lg">Lebo stať sa môže čokoľvek</div>
+        </div>
+        <div class="scenarios">
+          <div class="scenario">
+            <div class="scenario-q">„Čo ak prasiatko prestane sypať? (strata práce, choroba)"</div>
+            <p class="scenario-a">Skontrolujeme a nastavíme tvoje poistenie tak, aby reálne chránilo tvoju rodinu a krylo hypotéku, keď to budeš najviac potrebovať.</p>
+          </div>
+          <div class="scenario">
+            <div class="scenario-q">„Chceme deťom nasporiť na štart do života a štúdium."</div>
+            <p class="scenario-a">Ukážem ti, ako aj s menšími pravidelnými sumami dokážeš deťom vybudovať slušný kapitál na ich prvý byt či vysokú školu.</p>
+          </div>
+        </div>
       </div>
-      <div class="service-card">
-        <div class="service-icon">🏦</div>
-        <div class="service-title">Dôchodkové sporenie</div>
-        <p class="service-desc">II. a III. pilier, optimalizácia daňových výhod. Staráme sa o vašu finančnú budúcnosť už dnes.</p>
-      </div>
+
     </div>
   </div>
 </section>
 
+<!-- HOW IT WORKS -->
 <section class="steps" id="ako-to-funguje">
   <div class="section-inner">
     <div class="section-tag fade-up">Jednoduchý proces</div>
     <h2 class="section-title fade-up">Ako to funguje</h2>
-    <p class="section-sub fade-up">Od prvého kontaktu po realizáciu — tri jednoduché kroky k lepším financiám.</p>
     <div class="steps-grid fade-up">
       <div class="step-line"></div>
       <div class="step-line l2"></div>
       <div class="step-card">
         <div class="step-num">1</div>
         <div class="step-title">Bezplatná konzultácia</div>
-        <p class="step-desc">Stretneme sa osobne alebo online. Zistím vašu aktuálnu situáciu, ciele a možnosti. Bez záväzkov, bez poplatkov.</p>
+        <p class="step-desc">Stretneme sa osobne alebo online. Zistím tvoju aktuálnu situáciu, ciele a možnosti. Bez záväzkov, bez poplatkov.</p>
       </div>
       <div class="step-card">
         <div class="step-num">2</div>
@@ -308,140 +406,130 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
       <div class="step-card">
         <div class="step-num">3</div>
         <div class="step-title">Realizácia a servis</div>
-        <p class="step-desc">Zariadim všetko za vás — od papierovačiek po podpis. A potom? Pravidelný servis a úpravy podľa vášho života.</p>
+        <p class="step-desc">Zariadim všetko za teba — od papierovačiek po podpis. A potom? Pravidelný servis a úpravy podľa tvojho života.</p>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ABOUT ME -->
 <section id="o-mne">
   <div class="section-inner">
     <div class="section-tag fade-up">O mne</div>
-    <h2 class="section-title fade-up">Váš partner<br>vo financiach</h2>
+    <h2 class="section-title fade-up">Kto vlastne som?</h2>
+    <p class="section-sub fade-up">A prečo to robím inak</p>
     <div class="about-grid">
       <div class="about-text fade-up">
-        <p>Som Mário Tišťan, Senior Consultant v Partners Group SK. Finančnému poradenstvu sa venujem od novembra 2016 — a za tú dobu som si uvedomil jedno: dobré finančné rozhodnutie potrebuje čas, dôveru a konkrétne čísla. Dnes spravujem klientske portfóliá v hodnote viac ako 3,5 milióna €.</p>
-        <p>Pôsobím v Bratislave, Trnave, Žiline, Čadci, Bytči a Nitre. Stretnutia prebiehajú osobne alebo online — podľa toho, čo vám vyhovuje.</p>
-        <p>Nejde mi o jednorazový obchod. Ide mi o to, aby ste o 10 rokov povedali: bolo to správne rozhodnutie.</p>
-        <div class="about-values">
-          <div class="value-item">
-            <div class="value-dot"></div>
-            <div class="value-text"><strong>Transparentnosť</strong> — žiadne skryté poplatky, jasné podmienky</div>
-          </div>
-          <div class="value-item">
-            <div class="value-dot"></div>
-            <div class="value-text"><strong>Dlhodobý vzťah</strong> — pravidelný servis a starostlivosť aj roky po podpise finančného plánu</div>
-          </div>
-          <div class="value-item">
-            <div class="value-dot"></div>
-            <div class="value-text"><strong>Individuálny prístup</strong> — každý klient má iné potreby</div>
-          </div>
+        <p>Som Mário. Vo financiách sa hýbem od roku 2016. Pôvodne som do tohto biznisu išiel kvôli slobode — a to nielen tej časovej, ale aj finančnej. Na začiatku bolo mojím cieľom mať dostatok prostriedkov na to, aby som sa mohol naplno venovať kulturistike, nebol závislý od sponzorov a aby peniaze jednoducho nerozhodovali o tom, čo si v živote môžem dovoliť a čo nie. Zostal som však pre niečo úplne iné — pre reálny dopad na životy ľudí.</p>
+
+        <p>Zďaleka to pre mňa nie je len o číslach a grafoch. Najväčšiu radosť mi robí, keď s klientom vybojujeme hypotéku na prvé vlastné bývanie a pomôžem mu osamostatniť sa, hoci sa to na začiatku zdalo neriešiteľné. Alebo keď mi klient po piatich rokoch spolupráce pri káve povie: „Mário, som rád, že sme do toho vtedy išli. Bez teba by sme takéto finančné rezervy dnes nemali."</p>
+
+        <div class="about-highlight">
+          <p>Sú však aj momenty, kedy ide do tuhého, a vtedy sa ukazuje skutočný význam mojej práce. Keď môj klient dostal infarkt, z plnenia kritických chorôb si dokázal vykryť nielen liečbu, ale aj dlhodobý výpadok príjmu. Alebo moja 56-ročná klientka, ktorej diagnostikovali rakovinu — vďaka správne nastavenému poisteniu si mohla dovoliť kvalitnejšiu liečbu v Nemecku a dostala sa z toho. To sú chvíle, kedy viem, že to, čo robím, má obrovský zmysel.</p>
         </div>
+
+        <h3>Nie som v tom sám</h3>
+        <p>Na rozdiel od klasického zamestnania, kde sa šéf málokedy úprimne zaujíma o tvoje ciele, ja mám okolo seba skvelé, prajné prostredie. Baví ma, že môžem pozitívne ovplyvňovať nielen klientov, ale aj mojich kolegov, s ktorými spoločne rastieme.</p>
+
+        <h3>Keď práve neriešim financie...</h3>
+        <p>Som aktívny športovec. Rád si dám do tela vo fitku, behám, zbehnem na airsoft alebo turistiku a dokonalý reset je pre mňa sauna. Som nadšenec do technológií, umelej inteligencie a biohackingu. A úplne najradšej zo všetkého trávim čas s mojou priateľkou — je nám jedno, či sme doma, alebo niekde na cestách, hlavne, že sme spolu.</p>
       </div>
-      <div class="about-numbers fade-up">
-        <div class="about-num">
-          <div class="about-num-val">9+</div>
-          <div class="about-num-lbl">Rokov v odbore</div>
+      <div class="about-photos fade-up">
+        <div class="about-photo-main">
+          <img src="mario-priatelka.jpg" alt="Mário s priateľkou">
         </div>
-        <div class="about-num">
-          <div class="about-num-val">3,5M+</div>
-          <div class="about-num-lbl">€ Pod správou</div>
-        </div>
-        <div class="about-num">
-          <div class="about-num-val">6</div>
-          <div class="about-num-lbl">Mestá pôsobenia</div>
-        </div>
-        <div class="about-num">
-          <div class="about-num-val">360°</div>
-          <div class="about-num-lbl">Finančné poradenstvo</div>
+        <div class="about-photo-secondary">
+          <div class="about-photo-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--silver)"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="calc-section" id="kalkulacka">
+<!-- TOOLS & BLOG -->
+<section class="tools-section" id="nastroje">
   <div class="section-inner">
-    <div class="section-tag fade-up">Bezplatný nástroj</div>
-    <h2 class="section-title fade-up">HypoKalkulačka+</h2>
-    <p class="section-sub fade-up">Vypočítajte si splátku, LTV, DSTI a porovnajte stratégie — mimoriadne splátky vs. investovanie prebytku.</p>
-    <div class="calc-frame fade-up">
-      <div class="calc-mini-wrap">
-        <div class="calc-panel">
-          <div class="calc-row">
-            <span class="calc-lbl">Výška úveru</span>
-            <input type="range" min="10000" max="500000" step="5000" value="150000" id="r1">
-            <span class="calc-val" id="o1">150 000 €</span>
-          </div>
-          <div class="calc-row">
-            <span class="calc-lbl">Úroková sadzba</span>
-            <input type="range" min="0.5" max="8" step="0.05" value="3.5" id="r2">
-            <span class="calc-val" id="o2">3.50 %</span>
-          </div>
-          <div class="calc-row">
-            <span class="calc-lbl">Doba splácania</span>
-            <input type="range" min="5" max="30" step="1" value="20" id="r3">
-            <span class="calc-val" id="o3">20 rokov</span>
+    <div class="section-tag fade-up">Nástroje a vzdelávanie</div>
+    <h2 class="section-title fade-up">Počítaj a vzdelávaj sa</h2>
+    <div class="tools-grid">
+      <!-- Left: Calculator -->
+      <div class="fade-up">
+        <p class="calc-intro">Vyskúšaj moju HypoKalkulačku+. Vypočítaj si splátku, zisti svoje možnosti a porovnaj rôzne stratégie, ako pristupovať k úveru.</p>
+        <div class="calc-frame">
+          <div class="calc-mini-wrap">
+            <div class="calc-panel">
+              <div class="calc-row">
+                <span class="calc-lbl">Výška úveru</span>
+                <input type="range" min="10000" max="500000" step="5000" value="150000" id="r1">
+                <span class="calc-val" id="o1">150 000 €</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-lbl">Úroková sadzba</span>
+                <input type="range" min="0.5" max="8" step="0.05" value="3.5" id="r2">
+                <span class="calc-val" id="o2">3.50 %</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-lbl">Doba splácania</span>
+                <input type="range" min="5" max="30" step="1" value="20" id="r3">
+                <span class="calc-val" id="o3">20 rokov</span>
+              </div>
+            </div>
+            <div class="calc-result">
+              <div>
+                <div class="calc-result-lbl">Mesačná splátka</div>
+                <div class="calc-result-val" id="res1">876 €</div>
+              </div>
+              <div style="text-align:right">
+                <div class="calc-result-lbl">Celkové úroky</div>
+                <div class="calc-result-sub" id="res2">60 298 €</div>
+              </div>
+            </div>
+            <a href="hypokalkulacka.html" class="calc-cta-link">Otvoriť kalkulačku →</a>
           </div>
         </div>
-        <div class="calc-result">
-          <div>
-            <div class="calc-result-lbl">Mesačná splátka</div>
-            <div class="calc-result-val" id="res1">876 €</div>
-          </div>
-          <div style="text-align:right">
-            <div class="calc-result-lbl">Celkové úroky</div>
-            <div class="calc-result-sub" id="res2">60 298 €</div>
-          </div>
+      </div>
+      <!-- Right: Blog -->
+      <div class="fade-up">
+        <p class="blog-intro">Najnovšie články a moje osobné pohľady na aktuálne dianie na trhu.</p>
+        <div class="blog-grid-side">
+          <a href="blog-hypoteky.html" class="blog-card">
+            <div class="blog-body">
+              <div class="blog-tag">Hypotéky</div>
+              <div class="blog-title">5 vecí, ktoré musíš vedieť pred podpisom hypotéky</div>
+              <p class="blog-excerpt">Fixácia, LTV, DSTI, poplatky a predčasné splatenie — na čo si dať pozor.</p>
+              <span class="blog-link">Čítať článok →</span>
+            </div>
+          </a>
+          <a href="blog-investicie.html" class="blog-card">
+            <div class="blog-body">
+              <div class="blog-tag">Investície</div>
+              <div class="blog-title">Prečo začať investovať čo najskôr — aj s malou sumou</div>
+              <p class="blog-excerpt">Zložené úročenie je najsilnejší nástroj budovania majetku.</p>
+              <span class="blog-link">Čítať článok →</span>
+            </div>
+          </a>
+          <a href="blog-poistenie.html" class="blog-card">
+            <div class="blog-body">
+              <div class="blog-tag">Poistenie</div>
+              <div class="blog-title">Životné poistenie: kedy sa oplatí a kedy je to zbytočný výdavok</div>
+              <p class="blog-excerpt">Ak máš rodinu, hypotéku alebo záväzky — môže ti zachrániť budúcnosť.</p>
+              <span class="blog-link">Čítať článok →</span>
+            </div>
+          </a>
         </div>
-        <a href="hypokalkulacka.html" class="calc-cta-link">Otvoriť plnú kalkulačku →</a>
       </div>
     </div>
   </div>
 </section>
 
-<section class="services" id="blog">
-  <div class="section-inner">
-    <div class="section-tag fade-up">Užitočné tipy</div>
-    <h2 class="section-title fade-up">Články a rady</h2>
-    <p class="section-sub fade-up">Praktické informácie, ktoré vám pomôžu robiť lepšie finančné rozhodnutia.</p>
-    <div class="blog-grid fade-up">
-      <a href="blog-hypoteky.html" class="blog-card" style="text-decoration:none;color:inherit">
-        <div class="blog-img">🏠</div>
-        <div class="blog-body">
-          <div class="blog-tag">Hypotéky</div>
-          <div class="blog-title">5 vecí, ktoré musíte vedieť pred podpisom hypotéky</div>
-          <p class="blog-excerpt">Fixácia, LTV, DSTI, poplatky a predčasné splatenie — na čo si dať pozor, aby ste nepredplácali tisíce eur zbytočne.</p>
-          <span class="blog-link">Čítať článok →</span>
-        </div>
-      </a>
-      <a href="blog-investicie.html" class="blog-card" style="text-decoration:none;color:inherit">
-        <div class="blog-img">📈</div>
-        <div class="blog-body">
-          <div class="blog-tag">Investície</div>
-          <div class="blog-title">Prečo začať investovať čo najskôr — aj s malou sumou</div>
-          <p class="blog-excerpt">Zložené úročenie je najsilnejší nástroj budovania majetku. Ukážem vám, čo dokáže 50 € mesačne za 20 rokov.</p>
-          <span class="blog-link">Čítať článok →</span>
-        </div>
-      </a>
-      <a href="blog-poistenie.html" class="blog-card" style="text-decoration:none;color:inherit">
-        <div class="blog-img">🛡️</div>
-        <div class="blog-body">
-          <div class="blog-tag">Poistenie</div>
-          <div class="blog-title">Životné poistenie: kedy sa oplatí a kedy je to zbytočný výdavok</div>
-          <p class="blog-excerpt">Nie každý potrebuje životné poistenie. Ale ak máte rodinu, hypotéku alebo záväzky — môže vám zachrániť budúcnosť.</p>
-          <span class="blog-link">Čítať článok →</span>
-        </div>
-      </a>
-    </div>
-  </div>
-</section>
-
+<!-- CONTACT -->
 <section id="kontakt">
   <div class="section-inner">
-    <div class="section-tag fade-up">Spojme sa</div>
-    <h2 class="section-title fade-up">Dohodnite si<br>bezplatné stretnutie</h2>
-    <p class="section-sub fade-up">Prvá konzultácia je vždy zadarmo. Stačí mi napísať alebo zavolať — o zvyšok sa postarám.</p>
+    <div class="section-tag fade-up">Kontakt</div>
+    <h2 class="section-title fade-up">Dajme si kávu a pozrime sa na tvoje financie</h2>
+    <p class="section-sub fade-up">Prvé stretnutie je vždy bezplatné. Môžeme sa stretnúť osobne v Bratislave, Trnave, Žiline, Čadci, Bytči, Nitre, alebo sa spojíme online odkiaľkoľvek.</p>
     <div class="contact-grid">
       <div class="contact-info fade-up">
         <div class="contact-item">
@@ -456,20 +544,6 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
           <div>
             <div class="contact-item-lbl">E-mail</div>
             <div class="contact-item-val" id="em"></div>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="contact-item-icon">📍</div>
-          <div>
-            <div class="contact-item-lbl">Pôsobnosť</div>
-            <div class="contact-item-val">Bratislava · Trnava · Žilina · Čadca · Bytča · Nitra</div>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="contact-item-icon">🏢</div>
-          <div>
-            <div class="contact-item-lbl">Spoločnosť</div>
-            <div class="contact-item-val">Partners Group SK</div>
           </div>
         </div>
         <div class="contact-item">
@@ -496,33 +570,29 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
       <div class="fade-up">
         <form action="https://formspree.io/f/mdawjqak" method="POST">
           <div class="form-group">
-            <label class="form-label" for="f-meno">Vaše meno</label>
+            <label class="form-label" for="f-meno">Meno</label>
             <input type="text" name="meno" id="f-meno" class="form-input" placeholder="Ján Novák" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="f-kontakt">Telefón alebo e-mail</label>
+            <label class="form-label" for="f-kontakt">Telefón/E-mail</label>
             <input type="text" name="kontakt" id="f-kontakt" class="form-input" placeholder="+421 9xx xxx xxx" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="f-tema">Čo riešite?</label>
+            <label class="form-label" for="f-tema">S čím potrebuješ pomôcť?</label>
             <select name="tema" id="f-tema" class="form-input">
-              <option value="">— Vyberte tému —</option>
-              <option value="hypoteka">Hypotéka</option>
+              <option value="">— Vyber tému —</option>
+              <option value="byvanie">Bývanie</option>
               <option value="investicie">Investície</option>
-              <option value="poistenie-zivot">Poistenie života a zdravia</option>
-              <option value="poistenie-vozidla">Poistenie vozidiel</option>
-              <option value="poistenie-nehnutelnost">Poistenie nehnuteľnosti / domácnosti</option>
-              <option value="cestovne-poistenie">Cestovné poistenie</option>
-              <option value="dochodok">Dôchodkové sporenie</option>
-              <option value="komplexne">Komplexné poradenstvo</option>
+              <option value="poistenie">Poistenie</option>
+              <option value="poradit">Chcem len poradiť...</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label" for="f-sprava">Správa (nepovinne)</label>
-            <textarea name="sprava" id="f-sprava" class="form-input" placeholder="Krátky popis vašej situácie..."></textarea>
+            <label class="form-label" for="f-sprava">Správa</label>
+            <textarea name="sprava" id="f-sprava" class="form-input" placeholder="Krátky popis tvojej situácie..."></textarea>
           </div>
           <button type="submit" class="form-btn">Odoslať správu</button>
-          <p class="form-note">Odpoviem do 24 hodín. Prvá konzultácia je bezplatná.<br>Vaše údaje sú v bezpečí a slúžia výhradne na dohodnutie konzultácie.</p>
+          <p class="form-note">Vaše údaje sú v bezpečí a slúžia výhradne na dohodnutie konzultácie.</p>
         </form>
       </div>
     </div>
@@ -551,15 +621,17 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
 
 <!-- Cookie Banner -->
 <div class="cookie-banner" id="cookieBanner">
-  <p>Táto stránka používa cookies na zlepšenie vášho zážitku. <a href="ochrana-udajov.html">Viac informácií</a></p>
+  <p>Táto stránka používa cookies na zlepšenie tvojho zážitku. <a href="ochrana-udajov.html">Viac informácií</a></p>
   <button class="cookie-accept" onclick="acceptCookies()">Súhlasím</button>
 </div>
 
 <script>
+// Email obfuscation
 var u='mario.tistan';var d='partnersgroup.sk';var e=u+'@'+d;
 document.getElementById('em').innerHTML='<a href="mailto:'+e+'">'+e+'</a>';
 
-function fmt(n){return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))+' €';}
+// Calculator
+function fmt(n){return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))+' €';}
 function calc(){
   var P=+document.getElementById('r1').value;
   var r=+document.getElementById('r2').value/100/12;
@@ -572,10 +644,12 @@ document.getElementById('r1').addEventListener('input',function(){document.getEl
 document.getElementById('r2').addEventListener('input',function(){document.getElementById('o2').textContent=parseFloat(this.value).toFixed(2)+' %';calc();});
 document.getElementById('r3').addEventListener('input',function(){document.getElementById('o3').textContent=this.value+' rokov';calc();});
 calc();
+
+// Fade-up IntersectionObserver
 var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
 document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
 
-// Animované počítadlo
+// Animated counter helper
 function animateCount(el, target, suffix, duration) {
   var start = 0, startTime = null;
   function step(ts) {
@@ -589,72 +663,53 @@ function animateCount(el, target, suffix, duration) {
   requestAnimationFrame(step);
 }
 
-var counterData = [
-  { selector: '.hero-stats .stat-num', values: [{target:9,suffix:'+'},{target:3.5,suffix:'M+€',decimal:true},{target:100,suffix:'%'}] },
-];
-
-var countersAnimated = false;
-var counterObs = new IntersectionObserver(function(entries) {
+// Social proof counters
+var proofAnimated = false;
+var proofObs = new IntersectionObserver(function(entries) {
   entries.forEach(function(entry) {
-    if (entry.isIntersecting && !countersAnimated) {
-      countersAnimated = true;
-      var heroNums = document.querySelectorAll('.hero-stats .stat-num');
-      if (heroNums[0]) animateCount(heroNums[0], 9, '+', 1200);
-      if (heroNums[1]) {
-        var el = heroNums[1], startTime = null;
-        function stepDecimal(ts) {
-          if (!startTime) startTime = ts;
-          var progress = Math.min((ts - startTime) / 1500, 1);
-          var eased = 1 - Math.pow(1 - progress, 3);
-          el.textContent = (eased * 3.5).toFixed(1).replace('.',',') + 'M+€';
-          if (progress < 1) requestAnimationFrame(stepDecimal);
+    if (entry.isIntersecting && !proofAnimated) {
+      proofAnimated = true;
+      var items = document.querySelectorAll('.proof-num');
+      // "Od roku 2016" - animate from 2000 to 2016
+      if (items[0]) {
+        var el0 = items[0], st0 = null;
+        function stepYear(ts) {
+          if (!st0) st0 = ts;
+          var p = Math.min((ts - st0) / 1200, 1);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el0.textContent = 'Od roku ' + Math.round(2000 + eased * 16);
+          if (p < 1) requestAnimationFrame(stepYear);
         }
-        requestAnimationFrame(stepDecimal);
+        requestAnimationFrame(stepYear);
       }
-      if (heroNums[2]) animateCount(heroNums[2], 100, '%', 1800);
-    }
-  });
-}, {threshold: 0.3});
-
-var heroStats = document.querySelector('.hero-stats');
-if (heroStats) counterObs.observe(heroStats);
-
-var aboutAnimated = false;
-var aboutObs = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry) {
-    if (entry.isIntersecting && !aboutAnimated) {
-      aboutAnimated = true;
-      var aboutNums = document.querySelectorAll('.about-num-val');
-      if (aboutNums[0]) animateCount(aboutNums[0], 9, '+', 1200);
-      if (aboutNums[1]) {
-        var el = aboutNums[1], startTime = null;
-        function stepAbout(ts) {
-          if (!startTime) startTime = ts;
-          var progress = Math.min((ts - startTime) / 1500, 1);
-          var eased = 1 - Math.pow(1 - progress, 3);
-          el.textContent = (eased * 3.5).toFixed(1).replace('.',',') + 'M+';
-          if (progress < 1) requestAnimationFrame(stepAbout);
+      // "3,5 milióna €+"
+      if (items[1]) {
+        var el1 = items[1], st1 = null;
+        function stepVal(ts) {
+          if (!st1) st1 = ts;
+          var p = Math.min((ts - st1) / 1500, 1);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el1.textContent = (eased * 3.5).toFixed(1).replace('.',',') + ' milióna €+';
+          if (p < 1) requestAnimationFrame(stepVal);
         }
-        requestAnimationFrame(stepAbout);
+        requestAnimationFrame(stepVal);
       }
-      if (aboutNums[2]) animateCount(aboutNums[2], 6, '', 1000);
-      if (aboutNums[3]) {
-        var el3 = aboutNums[3], st3 = null;
-        function step360(ts) {
-          if (!st3) st3 = ts;
-          var p = Math.min((ts - st3) / 1400, 1);
-          var e = 1 - Math.pow(1 - p, 3);
-          el3.textContent = Math.round(e * 360) + '°';
-          if (p < 1) requestAnimationFrame(step360);
-        }
-        requestAnimationFrame(step360);
+      // "100 %"
+      if (items[2]) {
+        var cVal = items[2].querySelector('.counter-val');
+        if (cVal) animateCount(cVal, 100, '', 1800);
+      }
+      // "6 miest"
+      if (items[3]) {
+        var cVal3 = items[3].querySelector('.counter-val');
+        if (cVal3) animateCount(cVal3, 6, '', 1000);
       }
     }
   });
 }, {threshold: 0.3});
 
-var aboutNumbers = document.querySelector('.about-numbers');
-if (aboutNumbers) aboutObs.observe(aboutNumbers);
+var proofBar = document.querySelector('.social-proof');
+if (proofBar) proofObs.observe(proofBar);
 
 // Cookie banner
 function acceptCookies() {
