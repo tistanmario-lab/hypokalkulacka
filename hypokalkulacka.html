@@ -180,6 +180,7 @@ td{padding:6px;font-size:9px}
     <div class="logo-title">HypoKalkulačka+</div>
   </div>
   <div style="display:flex;align-items:center;gap:12px">
+    <a href="dochodkova-kalkulacka.html" style="font-size:10px;font-weight:600;color:#AB0534;text-decoration:none;letter-spacing:.04em;transition:opacity .2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Vyskúšaj aj DôchodKalkulačku+ →</a>
     <div class="pg-label">Partners Group SK</div>
   </div>
 </header>
@@ -214,7 +215,7 @@ td{padding:6px;font-size:9px}
       </div>
 
       <div class="info-row">
-        Vlastné prostriedky <span id="ownFundsInfo">40 000 €</span>
+        Vlastné prostriedky <span id="ownFundsInfo">30 000 €</span>
       </div>
 
       <div class="field">
@@ -460,12 +461,44 @@ function syncPair(nId,rId,min,max){
   document.getElementById(nId).addEventListener('input',function(){let v=parseFloat(this.value)||0;v=Math.min(max,Math.max(min,v));document.getElementById(rId).value=v;calc()});
   document.getElementById(rId).addEventListener('input',function(){document.getElementById(nId).value=this.value;calc()});
 }
-syncPair('loanAmount','loanAmountR',10000,1000000);
-syncPair('loanPrincipal','loanPrincipalR',5000,1000000);
 syncPair('interestRate','interestRateR',0.1,15);
 syncPair('loanTerm','loanTermR',1,40);
 syncPair('income','incomeR',0,20000);
 syncPair('income2','income2R',0,20000);
+
+// Keď sa zmení cena nehnuteľnosti, automaticky prepočítaj výšku úveru na 80%
+function updatePrincipalFromAmount(){
+  var la=parseFloat(document.getElementById('loanAmount').value)||0;
+  var newPrincipal=Math.round(la*0.8);
+  var maxPrincipal=la;
+  document.getElementById('loanPrincipalR').max=maxPrincipal;
+  if(newPrincipal<5000)newPrincipal=5000;
+  if(newPrincipal>maxPrincipal)newPrincipal=maxPrincipal;
+  document.getElementById('loanPrincipal').value=newPrincipal;
+  document.getElementById('loanPrincipalR').value=newPrincipal;
+  calc();
+}
+document.getElementById('loanAmount').addEventListener('input',updatePrincipalFromAmount);
+document.getElementById('loanAmountR').addEventListener('input',function(){
+  document.getElementById('loanAmount').value=this.value;
+  updatePrincipalFromAmount();
+});
+
+// Keď sa zmení výška úveru, obmedz na max = cena nehnuteľnosti
+document.getElementById('loanPrincipal').addEventListener('input',function(){
+  var la=parseFloat(document.getElementById('loanAmount').value)||0;
+  var val=parseFloat(this.value)||0;
+  if(val>la){this.value=la;val=la;}
+  document.getElementById('loanPrincipalR').value=val;
+  calc();
+});
+document.getElementById('loanPrincipalR').addEventListener('input',function(){
+  var la=parseFloat(document.getElementById('loanAmount').value)||0;
+  var val=parseFloat(this.value)||0;
+  if(val>la){this.value=la;val=la;}
+  document.getElementById('loanPrincipal').value=val;
+  calc();
+});
 
 function calc(){
   const loanAmount=parseFloat(document.getElementById('loanAmount').value)||150000;

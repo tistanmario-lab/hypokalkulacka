@@ -29,6 +29,7 @@ input[type=range].blue-range{accent-color:#003049}
 input[type=range].gold-range{accent-color:#989FA7}
 .num-input{width:110px;padding:4px 8px;text-align:right;font-size:11px;font-weight:800;color:#AB0534;background:rgba(171,5,52,0.05);border:1px solid rgba(171,5,52,0.15);outline:none;border-radius:8px}
 .num-input.blue{color:#003049;background:rgba(0,48,73,0.04);border-color:rgba(0,48,73,0.12)}
+.num-input.gold{color:#989FA7;background:rgba(152,159,167,0.06);border-color:rgba(152,159,167,0.2)}
 .num-input:focus{border-color:#AB0534}
 .info-row{background:rgba(0,48,73,0.04);border-left:3px solid rgba(0,48,73,0.2);padding:8px 12px;margin-bottom:16px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,48,73,0.5);display:flex;justify-content:space-between;align-items:center;border-radius:0 12px 12px 0}
 .info-row span{color:#003049;font-size:12px;font-weight:800}
@@ -176,6 +177,7 @@ header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding
     <div class="logo-title">D&#244;chodKalkula&#269;ka+</div>
   </div>
   <div style="display:flex;align-items:center;gap:12px">
+    <a href="hypokalkulacka.html" style="font-size:10px;font-weight:600;color:#AB0534;text-decoration:none;letter-spacing:.04em;transition:opacity .2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Vyskúšaj aj HypoKalkulačku+ →</a>
     <div class="pg-label">Partners Group SK</div>
   </div>
 </header>
@@ -296,6 +298,20 @@ header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding
 
       <div class="field">
         <div class="field-row">
+          <span class="field-lbl">3. pilier (tvoj + zamestn&#225;vate&#318;)</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input gold" id="pillar3" type="number" value="0">
+            <span style="font-size:11px;font-weight:800;color:#989FA7">&#8364;</span>
+          </div>
+        </div>
+        <input type="range" class="gold-range" min="0" max="500" step="5" value="0" id="pillar3R">
+      </div>
+      <div class="info-row" style="border-left-color:#989FA7">
+        Da&#328;ov&#253; bonus: max 180 &#8364;/rok. Zamestn&#225;vate&#318; &#269;asto prispieva rovnak&#250; sumu.
+      </div>
+
+      <div class="field">
+        <div class="field-row">
           <span class="field-lbl">O&#269;ak&#225;van&#233; zhodnotenie</span>
           <div style="display:flex;align-items:center;gap:4px">
             <input class="num-input blue" id="returnRate" type="number" value="7" step="0.5">
@@ -303,6 +319,17 @@ header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding
           </div>
         </div>
         <input type="range" class="blue-range" min="1" max="15" step="0.5" value="7" id="returnRateR">
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">O&#269;ak&#225;van&#225; infl&#225;cia</span>
+          <span style="font-size:11px;font-weight:800;color:#989FA7" id="inflationOut">3.0 %</span>
+        </div>
+        <input type="range" class="gold-range" min="0" max="10" step="0.5" value="3" id="inflationR" oninput="document.getElementById('inflationOut').textContent=parseFloat(this.value).toFixed(1)+' %';calc()">
+      </div>
+      <div class="info-row" style="border-left-color:#AB0534" id="inflationInfo">
+        Tvoje dne&#353;n&#233; pr&#237;jmy 1 500 &#8364; bud&#250; ma&#357; o 35 rokov k&#250;pnu silu len XXX &#8364;
       </div>
     </div>
   </div>
@@ -494,6 +521,7 @@ document.getElementById('incomeR').addEventListener('input',updatePensionFromInc
 syncPair('savings','savingsR',0,200000);
 syncPair('monthlyInvest','monthlyInvestR',0,1000);
 syncPair('returnRate','returnRateR',1,15);
+syncPair('pillar3','pillar3R',0,500);
 
 var rentaType='20';
 function setRentaType(t){
@@ -529,7 +557,10 @@ function calc(){
   var desiredIncome=parseFloat(document.getElementById('desiredIncome').value)||1200;
   var savings=parseFloat(document.getElementById('savings').value)||0;
   var monthlyInvest=parseFloat(document.getElementById('monthlyInvest').value)||0;
+  var pillar3=parseFloat(document.getElementById('pillar3').value)||0;
+  var totalMonthlyInvest=monthlyInvest+pillar3;
   var returnRate=parseFloat(document.getElementById('returnRate').value)||7;
+  var inflation=parseFloat(document.getElementById('inflationR').value)||3;
 
   // Ensure retireAge > age
   if(retireAge<=age)retireAge=age+1;
@@ -539,6 +570,12 @@ function calc(){
   if(retirementYears<1)retirementYears=1;
   var monthsToRetire=yearsToRetire*12;
   var monthlyRate=returnRate/100/12;
+  var realReturnRate=returnRate-inflation;
+  if(realReturnRate<0)realReturnRate=0;
+
+  // Inflation info
+  var realPurchasingPower=income/Math.pow(1+inflation/100,yearsToRetire);
+  document.getElementById('inflationInfo').textContent='Tvoje dnešné príjmy '+fmt(income)+' budú mať o '+yearsToRetire+' rokov kúpnu silu len '+fmt(realPurchasingPower);
 
   // Info rows
   document.getElementById('yearsLeftInfo').textContent=yearsToRetire+' rokov';
@@ -561,7 +598,7 @@ function calc(){
   document.getElementById('gapLblGap').textContent=fmt(gap);
 
   // Current portfolio at retirement
-  var currentPortfolio=futureValue(savings,monthlyInvest,monthlyRate,monthsToRetire);
+  var currentPortfolio=futureValue(savings,totalMonthlyInvest,monthlyRate,monthsToRetire);
 
   // Monthly income from portfolio (4% rule / 12)
   var currentMonthlyFromPortfolio=currentPortfolio*0.04/12;
@@ -587,17 +624,16 @@ function calc(){
   document.getElementById('currentMonthlyIncome').textContent=fmt(currentMonthlyFromPortfolio);
   document.getElementById('currentCoverYears').textContent=coverYears>=retirementYears?retirementYears+'+':coverYears.toFixed(1)+' rokov';
 
-  // Needed portfolio
+  // Needed portfolio (using real return rate = nominal - inflation)
   var neededPortfolio=0;
   if(gap>0){
     if(rentaType==='inf'){
       // Nekonečná renta: portfólio × ročný výnos = ročná medzera
-      // Portfólio = ročná medzera / ročný výnos
-      var drawdownRateAnnual=returnRate*0.7/100;
+      var drawdownRateAnnual=realReturnRate*0.7/100;
       neededPortfolio=drawdownRateAnnual>0?(gap*12)/drawdownRateAnnual:gap*12*50;
     } else {
       // 20-ročná renta: PV anuity
-      var drawdownRate2=returnRate*0.7/100/12;
+      var drawdownRate2=realReturnRate*0.7/100/12;
       if(drawdownRate2>0){
         var n2=retirementYears*12;
         neededPortfolio=gap*(1-Math.pow(1+drawdownRate2,-n2))/drawdownRate2;
@@ -650,7 +686,7 @@ function calc(){
   document.getElementById('outRecommendNote').textContent=gap>0?'Investícia '+fmt(neededMonthly)+'/mesiac → plná medzera '+fmt(gap)+' pokrytá na '+retirementYears+' rokov':'Niet medzery — štátny dôchodok postačuje';
 
   // Chart
-  buildChart(age,retireAge,savings,monthlyInvest,neededMonthly,monthlyRate,neededPortfolio);
+  buildChart(age,retireAge,savings,totalMonthlyInvest,neededMonthly,monthlyRate,neededPortfolio);
 }
 
 function buildChart(age,retireAge,savings,monthlyInvest,neededMonthly,monthlyRate,neededPortfolio){
