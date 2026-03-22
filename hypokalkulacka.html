@@ -176,14 +176,10 @@ td{padding:6px;font-size:9px}
 <header>
   <div style="display:flex;align-items:center">
     <a href="index.html" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:#003049;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-right:16px;padding:6px 14px;border:1px solid rgba(0,48,73,0.15);border-radius:12px;transition:background .2s" onmouseover="this.style.background='#ECEDED'" onmouseout="this.style.background='transparent'">← Späť</a>
-    <div class="logo-badge">PG</div>
+    <div class="logo-badge">MT</div>
     <div class="logo-title">HypoKalkulačka+</div>
   </div>
   <div style="display:flex;align-items:center;gap:12px">
-    <div class="currency-btns" style="margin-bottom:0;display:flex;gap:4px">
-      <button class="currency-btn active" id="btnEUR" onclick="setCurrency('EUR')">€ EUR</button>
-      <button class="currency-btn" id="btnCZK" onclick="setCurrency('CZK')">Kč CZK</button>
-    </div>
     <div class="pg-label">Partners Group SK</div>
   </div>
 </header>
@@ -199,22 +195,22 @@ td{padding:6px;font-size:9px}
         <div class="field-row">
           <span class="field-lbl">Cena nehnuteľnosti</span>
           <div style="display:flex;align-items:center;gap:4px">
-            <input class="num-input" id="loanAmount" type="number" value="200000">
+            <input class="num-input" id="loanAmount" type="number" value="150000">
             <span style="font-size:11px;font-weight:800;color:#AB0534" class="cur-sym">€</span>
           </div>
         </div>
-        <input type="range" min="10000" max="1000000" step="5000" value="200000" id="loanAmountR">
+        <input type="range" min="10000" max="1000000" step="5000" value="150000" id="loanAmountR">
       </div>
 
       <div class="field">
         <div class="field-row">
           <span class="field-lbl">Výška úveru</span>
           <div style="display:flex;align-items:center;gap:4px">
-            <input class="num-input" id="loanPrincipal" type="number" value="160000">
+            <input class="num-input" id="loanPrincipal" type="number" value="120000">
             <span style="font-size:11px;font-weight:800;color:#AB0534" class="cur-sym">€</span>
           </div>
         </div>
-        <input type="range" min="5000" max="1000000" step="5000" value="160000" id="loanPrincipalR">
+        <input type="range" min="5000" max="1000000" step="5000" value="120000" id="loanPrincipalR">
       </div>
 
       <div class="info-row">
@@ -245,13 +241,28 @@ td{padding:6px;font-size:9px}
 
       <div class="field">
         <div class="field-row">
-          <span class="field-lbl">Čistý mesačný príjem</span>
+          <span class="field-lbl">Príjem — hlavný žiadateľ</span>
           <div style="display:flex;align-items:center;gap:4px">
-            <input class="num-input blue" id="income" type="number" value="3000">
+            <input class="num-input blue" id="income" type="number" value="2000">
             <span style="font-size:11px;font-weight:800;color:#003049" class="cur-sym">€</span>
           </div>
         </div>
-        <input type="range" class="blue-range" min="500" max="20000" step="100" value="3000" id="incomeR">
+        <input type="range" class="blue-range" min="0" max="20000" step="100" value="2000" id="incomeR">
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">Príjem — spolužiadateľ</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input blue" id="income2" type="number" value="0">
+            <span style="font-size:11px;font-weight:800;color:#003049" class="cur-sym">€</span>
+          </div>
+        </div>
+        <input type="range" class="blue-range" min="0" max="20000" step="100" value="0" id="income2R">
+      </div>
+
+      <div class="info-row">
+        Celkový príjem <span id="totalIncomeInfo">2 000 €</span>
       </div>
 
       <div class="divider"></div>
@@ -337,9 +348,12 @@ td{padding:6px;font-size:9px}
       <div class="cbox">
         <div class="cbox-tag b">Možnosť B</div>
         <div class="cbox-title blue">Investovanie</div>
-        <div class="cbox-stat-lbl">Dlh vyrovnáte za</div>
+        <div class="cbox-stat-lbl">Úver splatíte v roku</div>
         <div class="cbox-stat-val" id="investPayoff">—</div>
-        <div class="cbox-stat-lbl">Portfólio po splatení</div>
+        <div class="cbox-stat-lbl">Majetok pri splatení</div>
+        <div class="cbox-stat-val green" id="investValAtPayoff">—</div>
+        <div style="height:1px;background:rgba(0,48,73,0.08);margin:12px 0"></div>
+        <div class="cbox-stat-lbl">Portfólio na konci (rok <span id="investEndYear">30</span>)</div>
         <div class="cbox-stat-val blue" id="investVal">—</div>
       </div>
     </div>
@@ -421,12 +435,11 @@ td{padding:6px;font-size:9px}
 <footer>© 2026 Partners Group SK · HypoKalkulačka+ · Všetky práva vyhradené · mariotistan.sk</footer>
 
 <script>
-let freq='monthly',showFix=false,tableView='annual',currency='EUR';
+let freq='monthly',showFix=false,tableView='annual';
 let mc=null,bc=null,pc=null,sched=[];
 
-function currSymbol(){return currency==='EUR'?'€':'Kč'}
-function fmt(n){if(isNaN(n)||n===undefined)return'—';return new Intl.NumberFormat(currency==='EUR'?'sk-SK':'cs-CZ',{maximumFractionDigits:0}).format(Math.round(n))+' '+currSymbol()}
-function setCurrency(c){currency=c;document.getElementById('btnEUR').className='currency-btn'+(c==='EUR'?' active':'');document.getElementById('btnCZK').className='currency-btn'+(c==='CZK'?' active':'');document.querySelectorAll('.cur-sym').forEach(function(el){el.textContent=currSymbol()});calc()}
+function currSymbol(){return '€'}
+function fmt(n){if(isNaN(n)||n===undefined)return'—';return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))+' €'}
 function fmtM(m){const y=Math.floor(m/12),mo=m%12;return y>0?(mo>0?y+'r '+mo+'m':y+'r'):(mo+'m')}
 function gmp(p,r,n){if(r===0)return p/n;return p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1)}
 
@@ -443,14 +456,18 @@ syncPair('loanAmount','loanAmountR',10000,1000000);
 syncPair('loanPrincipal','loanPrincipalR',5000,1000000);
 syncPair('interestRate','interestRateR',0.1,15);
 syncPair('loanTerm','loanTermR',1,40);
-syncPair('income','incomeR',500,20000);
+syncPair('income','incomeR',0,20000);
+syncPair('income2','income2R',0,20000);
 
 function calc(){
-  const loanAmount=parseFloat(document.getElementById('loanAmount').value)||200000;
-  const principal=parseFloat(document.getElementById('loanPrincipal').value)||160000;
+  const loanAmount=parseFloat(document.getElementById('loanAmount').value)||150000;
+  const principal=parseFloat(document.getElementById('loanPrincipal').value)||120000;
   const interestRate=parseFloat(document.getElementById('interestRate').value)||3.5;
   const loanTerm=parseInt(document.getElementById('loanTerm').value)||30;
-  const income=parseFloat(document.getElementById('income').value)||3000;
+  const income1=parseFloat(document.getElementById('income').value)||0;
+  const income2=parseFloat(document.getElementById('income2').value)||0;
+  const income=income1+income2;
+  document.getElementById('totalIncomeInfo').textContent=fmt(income);
   const extraAmount=parseFloat(document.getElementById('extraR').value)||0;
   const investReturn=parseFloat(document.getElementById('investR').value)||7;
   const oneTime=parseFloat(document.getElementById('oneTimeR').value)||0;
@@ -526,7 +543,11 @@ function calc(){
 
   document.getElementById('monthsSaved').textContent=mSaved>0?fmtM(mSaved):'0m';
   document.getElementById('interestSaved').textContent=fmt(iSaved);
-  document.getElementById('investPayoff').textContent=investPayoffM?fmtM(investPayoffM):'N/A';
+  var investPayoffYear=investPayoffM>0?Math.ceil(investPayoffM/12):0;
+  document.getElementById('investPayoff').textContent=investPayoffM>0?investPayoffYear+'. rok ('+fmtM(investPayoffM)+')':'N/A';
+  var investValAtPayoffNum=investPayoffM>0&&investPayoffM<=schedule.length?schedule[investPayoffM-1].investVal:0;
+  document.getElementById('investValAtPayoff').textContent=investPayoffM>0?fmt(investValAtPayoffNum):'—';
+  document.getElementById('investEndYear').textContent=loanTerm;
   document.getElementById('investVal').textContent=fmt(investVal);
   document.getElementById('piePrincipal').textContent=fmt(principal);
   document.getElementById('pieInterest').textContent=fmt(baseInt);
@@ -534,7 +555,7 @@ function calc(){
   document.getElementById('savingLabel').textContent=fmt(iSaved);
   document.getElementById('extraNote').textContent='Zaplatíte: '+fmt(principal+accInt)+' (z toho úrok: '+fmt(accInt)+')';
   document.getElementById('investLabel').textContent=fmt(investVal);
-  document.getElementById('investNote').textContent='Zaplatíte úrok: '+fmt(baseInt)+' | Zisk z investície: '+fmt(investVal-totalInvested);
+  document.getElementById('investNote').textContent='Zaplatíte úrok: '+fmt(baseInt)+' | Portfólio na konci: '+fmt(investVal)+' (zisk: '+fmt(investVal-totalInvested)+')';
 
   const step=Math.max(1,Math.floor(n/40));
   const cd=schedule.filter((_,i)=>(i+1)%step===0||(i+1)===n);
@@ -601,14 +622,15 @@ function submitPdfForm(){
   submitBtn.disabled=true;
   submitBtn.textContent='Generujem PDF...';
 
-  var la=parseFloat(document.getElementById('loanAmount').value)||200000;
-  var lp=parseFloat(document.getElementById('loanPrincipal').value)||160000;
+  var la=parseFloat(document.getElementById('loanAmount').value)||150000;
+  var lp=parseFloat(document.getElementById('loanPrincipal').value)||120000;
   var ir=parseFloat(document.getElementById('interestRate').value)||3.5;
   var lt=parseInt(document.getElementById('loanTerm').value)||30;
-  var inc=parseFloat(document.getElementById('income').value)||3000;
+  var inc1=parseFloat(document.getElementById('income').value)||0;
+  var inc2=parseFloat(document.getElementById('income2').value)||0;
+  var inc=inc1+inc2;
   var extra=parseFloat(document.getElementById('extraR').value)||0;
   var investRt=parseFloat(document.getElementById('investR').value)||7;
-  var cur=currSymbol();
   var mr=ir/100/12,n=lt*12;
   var payment=mr===0?lp/n:lp*mr*Math.pow(1+mr,n)/(Math.pow(1+mr,n)-1);
   var totalPaid=payment*n;
@@ -618,9 +640,9 @@ function submitPdfForm(){
   var mSaved=document.getElementById('monthsSaved').textContent;
   var iSaved=document.getElementById('interestSaved').textContent;
   var investPayoff=document.getElementById('investPayoff').textContent;
+  var investValAtPayoffTxt=document.getElementById('investValAtPayoff').textContent;
   var investValTxt=document.getElementById('investVal').textContent;
   var dateStr=new Date().toLocaleDateString('sk-SK');
-  var curLabel=currency==='EUR'?'EUR (€)':'CZK (Kč)';
 
   // Build hidden HTML div for pdf rendering
   var div=document.createElement('div');
@@ -631,7 +653,7 @@ function submitPdfForm(){
       '<div style="font-size:12px;font-weight:500;opacity:0.7;">Partners Group SK · Mário Tišťan · mariotistan.sk</div>'+
       '<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:11px;opacity:0.5;">'+
         '<span>Vygenerované: '+dateStr+'</span>'+
-        '<span>Mena: '+curLabel+'</span>'+
+        '<span>Mena: EUR (€)</span>'+
       '</div>'+
     '</div>'+
     '<div style="padding:28px 36px;">'+
@@ -642,7 +664,9 @@ function submitPdfForm(){
         '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Vlastné prostriedky</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(la-lp)+'</td></tr>'+
         '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Úroková sadzba</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+ir.toFixed(2)+' %</td></tr>'+
         '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Doba splácania</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+lt+' rokov</td></tr>'+
-        '<tr><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Čistý mesačný príjem</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(inc)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Príjem — hlavný žiadateľ</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(inc1)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Príjem — spolužiadateľ</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(inc2)+'</td></tr>'+
+        '<tr><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Celkový príjem</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(inc)+'</td></tr>'+
       '</table>'+
       '<div style="background:#003049;border-radius:14px;padding:20px 28px;margin:20px 0;display:flex;justify-content:space-between;align-items:center;color:#fff;">'+
         '<div><div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5;margin-bottom:4px;">Mesačná splátka</div><div style="font-size:28px;font-weight:800;">'+fmt(payment)+'</div></div>'+
@@ -666,9 +690,12 @@ function submitPdfForm(){
         '</div>'+
         '<div style="flex:1;background:rgba(0,48,73,0.04);border-radius:14px;padding:18px 20px;">'+
           '<div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#003049;margin-bottom:12px;">Investovanie prebytku</div>'+
-          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Dlh vyrovnáte za</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Úver splatíte v</div>'+
           '<div style="font-size:22px;font-weight:800;margin-bottom:10px;">'+investPayoff+'</div>'+
-          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Portfólio po splatení</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Majetok pri splatení</div>'+
+          '<div style="font-size:18px;font-weight:800;color:#AB0534;margin-bottom:10px;">'+investValAtPayoffTxt+'</div>'+
+          '<div style="height:1px;background:rgba(0,48,73,0.1);margin:8px 0;"></div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Portfólio na konci (rok '+lt+')</div>'+
           '<div style="font-size:22px;font-weight:800;color:#003049;">'+investValTxt+'</div>'+
         '</div>'+
       '</div>'+
@@ -710,11 +737,16 @@ function submitPdfForm(){
       'Cena nehnuteľnosti: '+fmt(la)+'\n'+
       'Úroková sadzba: '+ir.toFixed(2)+' %\n'+
       'Doba splácania: '+lt+' rokov\n'+
+      'Príjem hlavný žiadateľ: '+fmt(inc1)+'\n'+
+      'Príjem spolužiadateľ: '+fmt(inc2)+'\n'+
+      'Celkový príjem: '+fmt(inc)+'\n'+
       'LTV: '+ltv+' %\n'+
       'DSTI: '+dsti+' %\n'+
       'Celkové úroky: '+fmt(totalInt)+'\n'+
       'Ušetrené na úrokoch (mimor. splátky): '+iSaved+'\n'+
-      'Hodnota investície: '+investValTxt+'\n'+
+      'Úver splatený investíciou: '+investPayoff+'\n'+
+      'Majetok pri splatení: '+investValAtPayoffTxt+'\n'+
+      'Portfólio na konci: '+investValTxt+'\n'+
       '\nEmail klienta: '+email
     );
     fetch('https://formspree.io/f/mdawjqak',{method:'POST',body:formData,headers:{'Accept':'application/json'}}).catch(function(err){console.error('Formspree error:',err)});
