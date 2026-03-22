@@ -83,6 +83,9 @@ input[type=range].gold-range{accent-color:#989FA7}
 .out-bar-red{background:#AB0534}
 .out-note{font-size:9px;color:rgba(0,48,73,0.4);font-weight:500}
 .divider{height:1px;background:rgba(0,48,73,0.06);margin:16px 0}
+.freq-btns{display:flex;gap:4px}
+.freq-btn{flex:1;padding:10px 8px;border:1px solid rgba(0,48,73,0.12);border-radius:12px;background:#fff;color:#003049;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.freq-btn.active{background:#003049;color:#fff;border-color:#003049}
 .pdf-btn{width:100%;padding:14px;background:#AB0534;border:none;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;transition:background .2s;border-radius:20px}
 .pdf-btn:hover{background:#003049}
 .pdf-btn svg{width:18px;height:18px;fill:currentColor}
@@ -251,13 +254,23 @@ header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding
         <input type="range" min="300" max="5000" step="50" value="1200" id="desiredIncomeR">
       </div>
       <div class="info-row">
-        Odpor&#250;&#269;anie: 70-80% aktu&#225;lneho pr&#237;jmu <span id="recommendedIncome">1 050 &#8211; 1 200 &#8364;</span>
+        Odporúčanie: 70-80% aktuálneho príjmu <span id="recommendedIncome">1 050 – 1 200 €</span>
+      </div>
+
+      <div class="divider" style="margin:16px 0"></div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,48,73,0.5);margin-bottom:8px">Typ renty</div>
+      <div class="freq-btns">
+        <button class="freq-btn active" id="btnRenta20" onclick="setRentaType('20')">20-ročná renta</button>
+        <button class="freq-btn" id="btnRentaInf" onclick="setRentaType('inf')">Nekonečná renta</button>
+      </div>
+      <div class="info-row" id="rentaInfo" style="margin-top:8px;font-size:10px">
+        Portfólio sa vyčerpá za 20 rokov na dôchodku.
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-tag gold">Strat&#233;gia</div>
-      <div class="panel-title">Tvoja pr&#237;prava</div>
+      <div class="panel-tag gold">Stratégia</div>
+      <div class="panel-title">Tvoja príprava</div>
 
       <div class="field">
         <div class="field-row">
@@ -482,6 +495,15 @@ syncPair('savings','savingsR',0,200000);
 syncPair('monthlyInvest','monthlyInvestR',0,1000);
 syncPair('returnRate','returnRateR',1,15);
 
+var rentaType='20';
+function setRentaType(t){
+  rentaType=t;
+  document.getElementById('btnRenta20').className='freq-btn'+(t==='20'?' active':'');
+  document.getElementById('btnRentaInf').className='freq-btn'+(t==='inf'?' active':'');
+  document.getElementById('rentaInfo').textContent=t==='20'?'Portfólio sa vyčerpá za 20 rokov na dôchodku.':'Žiješ z výnosov, istina sa nikdy neminie.';
+  calc();
+}
+
 // FV of current savings + monthly contributions
 function futureValue(pv,pmt,r,n){
   if(n<=0)return pv;
@@ -565,17 +587,23 @@ function calc(){
   document.getElementById('currentMonthlyIncome').textContent=fmt(currentMonthlyFromPortfolio);
   document.getElementById('currentCoverYears').textContent=coverYears>=retirementYears?retirementYears+'+':coverYears.toFixed(1)+' rokov';
 
-  // Needed portfolio: enough to cover gap for retirement years
-  // Using drawdown: need portfolio that can sustain gap withdrawal for retirementYears
+  // Needed portfolio
   var neededPortfolio=0;
   if(gap>0){
-    var drawdownRate2=returnRate*0.7/100/12;
-    if(drawdownRate2>0){
-      // PV of annuity: PV = PMT * (1 - (1+r)^-n) / r
-      var n2=retirementYears*12;
-      neededPortfolio=gap*(1-Math.pow(1+drawdownRate2,-n2))/drawdownRate2;
+    if(rentaType==='inf'){
+      // Nekonečná renta: portfólio × ročný výnos = ročná medzera
+      // Portfólio = ročná medzera / ročný výnos
+      var drawdownRateAnnual=returnRate*0.7/100;
+      neededPortfolio=drawdownRateAnnual>0?(gap*12)/drawdownRateAnnual:gap*12*50;
     } else {
-      neededPortfolio=gap*12*retirementYears;
+      // 20-ročná renta: PV anuity
+      var drawdownRate2=returnRate*0.7/100/12;
+      if(drawdownRate2>0){
+        var n2=retirementYears*12;
+        neededPortfolio=gap*(1-Math.pow(1+drawdownRate2,-n2))/drawdownRate2;
+      } else {
+        neededPortfolio=gap*12*retirementYears;
+      }
     }
   }
 
@@ -736,13 +764,20 @@ function submitPdfForm(){
   var retirementYears=LIFE_EXPECTANCY-retireAge;
   var monthlyRate=returnRate/100/12;
   var currentPortfolio=futureValue(savings,monthlyInvest,monthlyRate,yearsToRetire*12);
-  var drawdownRate2=returnRate*0.7/100/12;
   var neededPortfolio=0;
-  if(gap>0&&drawdownRate2>0){
-    var n2=retirementYears*12;
-    neededPortfolio=gap*(1-Math.pow(1+drawdownRate2,-n2))/drawdownRate2;
-  } else if(gap>0){
-    neededPortfolio=gap*12*retirementYears;
+  if(gap>0){
+    if(rentaType==='inf'){
+      var drawdownRateAnnual=returnRate*0.7/100;
+      neededPortfolio=drawdownRateAnnual>0?(gap*12)/drawdownRateAnnual:gap*12*50;
+    } else {
+      var drawdownRate2=returnRate*0.7/100/12;
+      if(drawdownRate2>0){
+        var n2=retirementYears*12;
+        neededPortfolio=gap*(1-Math.pow(1+drawdownRate2,-n2))/drawdownRate2;
+      } else {
+        neededPortfolio=gap*12*retirementYears;
+      }
+    }
   }
   var neededMonthly=pmtNeeded(neededPortfolio,savings,monthlyRate,yearsToRetire*12);
   var dateStr=new Date().toLocaleDateString('sk-SK');
