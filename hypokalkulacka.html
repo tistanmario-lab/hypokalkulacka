@@ -6,6 +6,8 @@
 <title>HypoKalkulačka+ | Partners Group SK</title>
 <meta name="description" content="Hypotekárna kalkulačka Partners Group SK — vypočítajte splátku, LTV, DSTI a porovnajte stratégie splácania.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#ECEDED;color:#003049;min-height:100vh}
@@ -98,6 +100,12 @@ td.gold{color:#989FA7;font-weight:700}
 .freq-btn{padding:8px;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(0,48,73,0.1);background:#fff;color:rgba(0,48,73,0.4);cursor:pointer;transition:all .2s;border-radius:12px}
 .freq-btn.active{background:#989FA7;border-color:#989FA7;color:#fff}
 .divider{height:1px;background:rgba(0,48,73,0.06);margin:16px 0}
+.currency-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.currency-btn{padding:8px;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(0,48,73,0.1);background:#fff;color:rgba(0,48,73,0.4);cursor:pointer;transition:all .2s;border-radius:12px}
+.currency-btn.active{background:#003049;border-color:#003049;color:#fff}
+.pdf-btn{width:100%;padding:14px;background:#AB0534;border:none;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;transition:background .2s;border-radius:20px}
+.pdf-btn:hover{background:#003049}
+.pdf-btn svg{width:18px;height:18px;fill:currentColor}
 footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,48,73,0.3);border-top:1px solid rgba(0,48,73,0.07);max-width:1100px;margin:0 auto}
 </style>
 </head>
@@ -109,7 +117,13 @@ footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spaci
     <div class="logo-badge">PG</div>
     <div class="logo-title">HypoKalkulačka+</div>
   </div>
-  <div class="pg-label">Partners Group SK</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="currency-btns" style="margin-bottom:0;display:flex;gap:4px">
+      <button class="currency-btn active" id="btnEUR" onclick="setCurrency('EUR')">€ EUR</button>
+      <button class="currency-btn" id="btnCZK" onclick="setCurrency('CZK')">Kč CZK</button>
+    </div>
+    <div class="pg-label">Partners Group SK</div>
+  </div>
 </header>
 
 <div class="main">
@@ -124,7 +138,7 @@ footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spaci
           <span class="field-lbl">Cena nehnuteľnosti</span>
           <div style="display:flex;align-items:center;gap:4px">
             <input class="num-input" id="loanAmount" type="number" value="200000">
-            <span style="font-size:11px;font-weight:800;color:#AB0534">€</span>
+            <span style="font-size:11px;font-weight:800;color:#AB0534" class="cur-sym">€</span>
           </div>
         </div>
         <input type="range" min="10000" max="1000000" step="5000" value="200000" id="loanAmountR">
@@ -135,7 +149,7 @@ footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spaci
           <span class="field-lbl">Výška úveru</span>
           <div style="display:flex;align-items:center;gap:4px">
             <input class="num-input" id="loanPrincipal" type="number" value="160000">
-            <span style="font-size:11px;font-weight:800;color:#AB0534">€</span>
+            <span style="font-size:11px;font-weight:800;color:#AB0534" class="cur-sym">€</span>
           </div>
         </div>
         <input type="range" min="5000" max="1000000" step="5000" value="160000" id="loanPrincipalR">
@@ -172,7 +186,7 @@ footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spaci
           <span class="field-lbl">Čistý mesačný príjem</span>
           <div style="display:flex;align-items:center;gap:4px">
             <input class="num-input blue" id="income" type="number" value="3000">
-            <span style="font-size:11px;font-weight:800;color:#003049">€</span>
+            <span style="font-size:11px;font-weight:800;color:#003049" class="cur-sym">€</span>
           </div>
         </div>
         <input type="range" class="blue-range" min="500" max="20000" step="100" value="3000" id="incomeR">
@@ -335,13 +349,22 @@ footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spaci
   </div>
 </div>
 
+<div style="max-width:1100px;margin:0 auto;padding:0 16px 16px">
+  <button class="pdf-btn" onclick="generatePDF()">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+    Stiahnuť PDF s výpočtom
+  </button>
+</div>
+
 <footer>© 2026 Partners Group SK · HypoKalkulačka+ · Všetky práva vyhradené · mariotistan.sk</footer>
 
 <script>
-let freq='monthly',showFix=false,tableView='annual';
+let freq='monthly',showFix=false,tableView='annual',currency='EUR';
 let mc=null,bc=null,pc=null,sched=[];
 
-function fmt(n){if(isNaN(n)||n===undefined)return'—';return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))+' €'}
+function currSymbol(){return currency==='EUR'?'€':'Kč'}
+function fmt(n){if(isNaN(n)||n===undefined)return'—';return new Intl.NumberFormat(currency==='EUR'?'sk-SK':'cs-CZ',{maximumFractionDigits:0}).format(Math.round(n))+' '+currSymbol()}
+function setCurrency(c){currency=c;document.getElementById('btnEUR').className='currency-btn'+(c==='EUR'?' active':'');document.getElementById('btnCZK').className='currency-btn'+(c==='CZK'?' active':'');document.querySelectorAll('.cur-sym').forEach(function(el){el.textContent=currSymbol()});calc()}
 function fmtM(m){const y=Math.floor(m/12),mo=m%12;return y>0?(mo>0?y+'r '+mo+'m':y+'r'):(mo+'m')}
 function gmp(p,r,n){if(r===0)return p/n;return p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1)}
 
@@ -493,6 +516,157 @@ function buildTable(){
 }
 
 calc();
+
+function generatePDF(){
+  var btn=document.querySelector('.pdf-btn');
+  btn.textContent='Generujem PDF...';btn.disabled=true;
+  var la=parseFloat(document.getElementById('loanAmount').value)||200000;
+  var lp=parseFloat(document.getElementById('loanPrincipal').value)||160000;
+  var ir=parseFloat(document.getElementById('interestRate').value)||3.5;
+  var lt=parseInt(document.getElementById('loanTerm').value)||30;
+  var inc=parseFloat(document.getElementById('income').value)||3000;
+  var extra=parseFloat(document.getElementById('extraR').value)||0;
+  var investR=parseFloat(document.getElementById('investR').value)||7;
+  var cur=currSymbol();
+  var mr=ir/100/12,n=lt*12;
+  var payment=mr===0?lp/n:lp*mr*Math.pow(1+mr,n)/(Math.pow(1+mr,n)-1);
+  var totalPaid=payment*n;
+  var totalInt=totalPaid-lp;
+  var ltv=la>0?Math.round(lp/la*100):0;
+  var dsti=inc>0?Math.round(payment/inc*100):0;
+  var mSaved=document.getElementById('monthsSaved').textContent;
+  var iSaved=document.getElementById('interestSaved').textContent;
+  var investPayoff=document.getElementById('investPayoff').textContent;
+  var investVal=document.getElementById('investVal').textContent;
+
+  try{
+    var jsPDF=window.jspdf.jsPDF;
+    var doc=new jsPDF('p','mm','a4');
+    var w=doc.internal.pageSize.getWidth();
+    var y=20;
+
+    // Header
+    doc.setFillColor(0,48,73);
+    doc.rect(0,0,w,40,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(22);
+    doc.text('HypoKalkulačka+',15,18);
+    doc.setFontSize(10);
+    doc.text('Partners Group SK · Mário Tišťan · mariotistan.sk',15,28);
+    doc.setFontSize(8);
+    doc.text('Vygenerované: '+new Date().toLocaleDateString('sk-SK'),15,35);
+    doc.text('Mena: '+(currency==='EUR'?'EUR (€)':'CZK (Kč)'),w-50,35);
+
+    y=52;
+
+    // Parametre
+    doc.setTextColor(171,5,52);
+    doc.setFontSize(12);
+    doc.text('PARAMETRE ÚVERU',15,y);
+    y+=8;
+    doc.setTextColor(0,48,73);
+    doc.setFontSize(10);
+    var params=[
+      ['Cena nehnuteľnosti',fmt(la)],
+      ['Výška úveru',fmt(lp)],
+      ['Vlastné prostriedky',fmt(la-lp)],
+      ['Úroková sadzba',ir.toFixed(2)+' %'],
+      ['Doba splácania',lt+' rokov'],
+      ['Čistý mesačný príjem',fmt(inc)]
+    ];
+    params.forEach(function(p){
+      doc.setFont(undefined,'normal');
+      doc.text(p[0],15,y);
+      doc.setFont(undefined,'bold');
+      doc.text(p[1],w-15,y,{align:'right'});
+      y+=7;
+    });
+
+    y+=5;
+    // Výsledky
+    doc.setFillColor(0,48,73);
+    doc.rect(10,y,w-20,28,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(9);
+    doc.text('MESAČNÁ SPLÁTKA',15,y+8);
+    doc.setFontSize(18);
+    doc.text(fmt(payment),15,y+20);
+    doc.setFontSize(9);
+    doc.text('CELKOVÉ ÚROKY',w-15,y+8,{align:'right'});
+    doc.setFontSize(14);
+    doc.text(fmt(totalInt),w-15,y+20,{align:'right'});
+
+    y+=38;
+    // Metriky
+    doc.setTextColor(171,5,52);
+    doc.setFontSize(12);
+    doc.text('KĽÚČOVÉ METRIKY',15,y);
+    y+=8;
+    doc.setTextColor(0,48,73);
+    doc.setFontSize(10);
+    var metrics=[
+      ['LTV (pomer úveru k hodnote)',ltv+' %',ltv<=80?'OK':'Vysoko'],
+      ['DSTI (zaťaženie príjmu)',dsti+' %',dsti<=40?'OK':'Vysoko'],
+      ['Celkovo zaplatíte',fmt(totalPaid),''],
+      ['Z toho úroky',fmt(totalInt),'']
+    ];
+    metrics.forEach(function(m){
+      doc.setFont(undefined,'normal');
+      doc.text(m[0],15,y);
+      doc.setFont(undefined,'bold');
+      doc.text(m[1]+(m[2]?' ('+m[2]+')':''),w-15,y,{align:'right'});
+      y+=7;
+    });
+
+    y+=5;
+    // Porovnanie
+    doc.setTextColor(171,5,52);
+    doc.setFontSize(12);
+    doc.text('POROVNANIE STRATÉGIÍ',15,y);
+    y+=8;
+    doc.setTextColor(0,48,73);
+    doc.setFontSize(10);
+    var compare=[
+      ['MIMORIADNE SPLÁTKY',''],
+      ['Splatíte skôr o',mSaved],
+      ['Ušetríte na úrokoch',iSaved],
+      ['',''],
+      ['INVESTOVANIE PREBYTKU',''],
+      ['Dlh vyrovnáte za',investPayoff],
+      ['Portfólio po splatení',investVal]
+    ];
+    compare.forEach(function(c){
+      if(c[0]===''&&c[1]===''){y+=3;return;}
+      if(c[1]===''){doc.setFont(undefined,'bold');doc.setFontSize(10);doc.text(c[0],15,y);y+=7;return;}
+      doc.setFont(undefined,'normal');
+      doc.text(c[0],15,y);
+      doc.setFont(undefined,'bold');
+      doc.text(c[1],w-15,y,{align:'right'});
+      y+=7;
+    });
+
+    // Footer
+    y+=10;
+    doc.setDrawColor(200,200,200);
+    doc.line(15,y,w-15,y);
+    y+=8;
+    doc.setFontSize(8);
+    doc.setFont(undefined,'normal');
+    doc.setTextColor(150,150,150);
+    doc.text('Tento výpočet je orientačný a nenahrádza individuálnu konzultáciu.',15,y);
+    y+=5;
+    doc.text('Kontakt: mario.tistan@partnersgroup.sk | +421 902 130 096 | mariotistan.sk',15,y);
+    y+=5;
+    doc.text('Podriadený finančný agent Partners Group SK s.r.o. · Registrácia NBS č. 221967',15,y);
+
+    doc.save('hypokalkulacka-vypocet.pdf');
+  }catch(e){
+    alert('Chyba pri generovaní PDF. Skúste to znova.');
+    console.error(e);
+  }
+  btn.innerHTML='<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg> Stiahnuť PDF s výpočtom';
+  btn.disabled=false;
+}
 </script>
 </body>
 </html>
