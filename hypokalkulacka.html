@@ -340,8 +340,11 @@ td{padding:6px;font-size:9px}
       <div class="cbox">
         <div class="cbox-tag a">Možnosť A</div>
         <div class="cbox-title gold">Mimoriadne splátky</div>
-        <div class="cbox-stat-lbl">Splatíte skôr o</div>
-        <div class="cbox-stat-val" id="monthsSaved">—</div>
+        <div class="cbox-stat-lbl">Úver splatíte v roku</div>
+        <div class="cbox-stat-val" id="extraPayoffYear">—</div>
+        <div class="cbox-stat-lbl">Skôr o</div>
+        <div class="cbox-stat-val" id="monthsSaved" style="font-size:18px">—</div>
+        <div style="height:1px;background:rgba(0,48,73,0.08);margin:12px 0"></div>
         <div class="cbox-stat-lbl">Ušetríte na úrokoch</div>
         <div class="cbox-stat-val green" id="interestSaved">—</div>
       </div>
@@ -541,7 +544,9 @@ function calc(){
   const iSaved=baseInt-accInt;
   const baseTotal=principal+baseInt;
 
-  document.getElementById('monthsSaved').textContent=mSaved>0?fmtM(mSaved):'0m';
+  var extraPayoffYear=payoffM>0?Math.ceil(payoffM/12):loanTerm;
+  document.getElementById('extraPayoffYear').textContent=payoffM>0?extraPayoffYear+'. rok ('+fmtM(payoffM)+')':loanTerm+'. rok';
+  document.getElementById('monthsSaved').textContent=mSaved>0?fmtM(mSaved):'—';
   document.getElementById('interestSaved').textContent=fmt(iSaved);
   var investPayoffYear=investPayoffM>0?Math.ceil(investPayoffM/12):0;
   document.getElementById('investPayoff').textContent=investPayoffM>0?investPayoffYear+'. rok ('+fmtM(investPayoffM)+')':'N/A';
