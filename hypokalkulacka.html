@@ -16,7 +16,50 @@ header{background:#fff;border-bottom:1px solid rgba(0,48,73,0.08);padding:0 24px
 .logo-title{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin-left:12px}
 .pg-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,48,73,0.3)}
 .main{max-width:1100px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:340px 1fr;gap:20px}
-@media(max-width:800px){.main{grid-template-columns:1fr}}
+@media(max-width:800px){
+.main{grid-template-columns:1fr;padding:16px 10px}
+.metrics{grid-template-columns:1fr}
+.compare-grid{grid-template-columns:1fr}
+.charts-duo{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+html,body{overflow-x:hidden}
+header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding-top:8px;padding-bottom:8px}
+header>div:first-child{order:1}
+header>div:last-child{order:2}
+.logo-title{font-size:11px;margin-left:8px}
+.pg-label{display:none}
+.currency-btns{gap:2px}
+.currency-btn{padding:6px 8px;font-size:8px;letter-spacing:.08em}
+.main{padding:12px 8px;gap:12px}
+.panel{padding:16px 12px}
+.field-row{flex-wrap:wrap;gap:4px}
+.field-lbl{font-size:9px}
+.num-input{width:90px;font-size:10px;padding:4px 6px}
+.info-row{font-size:9px;padding:6px 10px;flex-wrap:wrap;gap:4px}
+.splatka-card{padding:16px}
+.splatka-val{font-size:28px}
+.splatka-sub{font-size:8px}
+.cbox{padding:14px}
+.cbox-stat-val{font-size:20px}
+.chart-wrap{height:180px}
+.chart-panel{padding:14px}
+.chart-legend{gap:8px}
+.legend-item{font-size:8px}
+.outcome-panel{padding:14px}
+.out-head{font-size:8px;flex-wrap:wrap;gap:2px}
+.toggle-btn{font-size:9px;padding:10px}
+.pdf-btn{font-size:9px;padding:10px}
+footer{font-size:8px;padding:16px 10px}
+.pdf-modal{padding:24px 18px}
+.pdf-modal h3{font-size:18px}
+.pdf-modal p{font-size:13px}
+.pdf-modal-input{font-size:14px;padding:10px 12px}
+.pdf-modal-btn{font-size:11px;padding:12px}
+table{font-size:9px}
+th{padding:8px 6px;font-size:8px;letter-spacing:.06em}
+td{padding:6px;font-size:9px}
+}
 .panel{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:24px;margin-bottom:16px;border-radius:20px}
 .panel-tag{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;padding:3px 8px;background:#003049;color:#fff;margin-bottom:14px;border-radius:6px}
 .panel-tag.gold{background:#989FA7}
@@ -122,6 +165,7 @@ footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spaci
 .pdf-modal-btn:hover{background:#003049}
 .pdf-modal-btn:disabled{background:#989FA7;cursor:not-allowed}
 .pdf-modal-success{text-align:center;padding:20px 0;font-size:16px;font-weight:600;color:#003049}
+.charts-duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -307,7 +351,7 @@ footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spaci
       <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="charts-duo" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
       <div class="chart-panel" style="margin-bottom:0">
         <div class="chart-title">Ročné splátky — istina vs. úroky</div>
         <div class="chart-wrap" style="height:180px"><canvas id="barChart"></canvas></div>
