@@ -107,6 +107,21 @@ td.gold{color:#989FA7;font-weight:700}
 .pdf-btn:hover{background:#003049}
 .pdf-btn svg{width:18px;height:18px;fill:currentColor}
 footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,48,73,0.3);border-top:1px solid rgba(0,48,73,0.07);max-width:1100px;margin:0 auto}
+.pdf-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,48,73,0.6);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.pdf-modal-overlay.show{display:flex}
+.pdf-modal{background:#fff;border-radius:20px;padding:36px;max-width:420px;width:100%;position:relative;box-shadow:0 24px 64px rgba(0,0,0,0.2)}
+.pdf-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:rgba(0,48,73,0.4);padding:4px}
+.pdf-modal h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#003049;margin-bottom:8px}
+.pdf-modal p{font-size:14px;color:rgba(0,48,73,0.5);margin-bottom:20px}
+.pdf-modal-input{width:100%;padding:12px 16px;border:1px solid rgba(0,48,73,0.15);border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:16px;box-sizing:border-box}
+.pdf-modal-input:focus{border-color:#003049}
+.pdf-modal-check{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;font-size:12px;color:rgba(0,48,73,0.6);line-height:1.5}
+.pdf-modal-check input{margin-top:3px;flex-shrink:0}
+.pdf-modal-check a{color:#AB0534}
+.pdf-modal-btn{width:100%;padding:14px;background:#AB0534;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.pdf-modal-btn:hover{background:#003049}
+.pdf-modal-btn:disabled{background:#989FA7;cursor:not-allowed}
+.pdf-modal-success{text-align:center;padding:20px 0;font-size:16px;font-weight:600;color:#003049}
 </style>
 </head>
 <body>
@@ -350,7 +365,7 @@ footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spaci
 </div>
 
 <div style="max-width:1100px;margin:0 auto;padding:0 16px 16px">
-  <button class="pdf-btn" onclick="generatePDF()">
+  <button class="pdf-btn" onclick="openPdfModal()">
     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
     Stiahnuť PDF s výpočtom
   </button>
@@ -517,16 +532,35 @@ function buildTable(){
 
 calc();
 
-function generatePDF(){
-  var btn=document.querySelector('.pdf-btn');
-  btn.textContent='Generujem PDF...';btn.disabled=true;
+function openPdfModal(){
+  document.getElementById('pdfModal').classList.add('show');
+  document.getElementById('pdfModalForm').style.display='block';
+  document.getElementById('pdfModalSuccess').style.display='none';
+  document.getElementById('pdfEmail').value='';
+  document.getElementById('pdfGdpr').checked=false;
+}
+
+function closePdfModal(){
+  document.getElementById('pdfModal').classList.remove('show');
+}
+
+function submitPdfForm(){
+  var email=document.getElementById('pdfEmail').value.trim();
+  var gdpr=document.getElementById('pdfGdpr').checked;
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Zadajte platnú emailovú adresu.');return;}
+  if(!gdpr){alert('Prosím, súhlaste so spracovaním osobných údajov.');return;}
+
+  var submitBtn=document.getElementById('pdfSubmitBtn');
+  submitBtn.disabled=true;
+  submitBtn.textContent='Generujem PDF...';
+
   var la=parseFloat(document.getElementById('loanAmount').value)||200000;
   var lp=parseFloat(document.getElementById('loanPrincipal').value)||160000;
   var ir=parseFloat(document.getElementById('interestRate').value)||3.5;
   var lt=parseInt(document.getElementById('loanTerm').value)||30;
   var inc=parseFloat(document.getElementById('income').value)||3000;
   var extra=parseFloat(document.getElementById('extraR').value)||0;
-  var investR=parseFloat(document.getElementById('investR').value)||7;
+  var investRt=parseFloat(document.getElementById('investR').value)||7;
   var cur=currSymbol();
   var mr=ir/100/12,n=lt*12;
   var payment=mr===0?lp/n:lp*mr*Math.pow(1+mr,n)/(Math.pow(1+mr,n)-1);
@@ -537,136 +571,139 @@ function generatePDF(){
   var mSaved=document.getElementById('monthsSaved').textContent;
   var iSaved=document.getElementById('interestSaved').textContent;
   var investPayoff=document.getElementById('investPayoff').textContent;
-  var investVal=document.getElementById('investVal').textContent;
+  var investValTxt=document.getElementById('investVal').textContent;
+  var dateStr=new Date().toLocaleDateString('sk-SK');
+  var curLabel=currency==='EUR'?'EUR (€)':'CZK (Kč)';
 
-  try{
+  // Build hidden HTML div for pdf rendering
+  var div=document.createElement('div');
+  div.style.cssText='position:absolute;left:-9999px;top:0;width:794px;font-family:"DM Sans",sans-serif;background:#fff;color:#003049;';
+  div.innerHTML=
+    '<div style="background:#003049;padding:28px 36px 20px;color:#fff;">'+
+      '<div style="font-size:26px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;">HypoKalkulačka+</div>'+
+      '<div style="font-size:12px;font-weight:500;opacity:0.7;">Partners Group SK · Mário Tišťan · mariotistan.sk</div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:11px;opacity:0.5;">'+
+        '<span>Vygenerované: '+dateStr+'</span>'+
+        '<span>Mena: '+curLabel+'</span>'+
+      '</div>'+
+    '</div>'+
+    '<div style="padding:28px 36px;">'+
+      '<div style="font-size:13px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#AB0534;margin-bottom:14px;">PARAMETRE ÚVERU</div>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:13px;">'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Cena nehnuteľnosti</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(la)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Výška úveru</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(lp)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Vlastné prostriedky</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(la-lp)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Úroková sadzba</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+ir.toFixed(2)+' %</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Doba splácania</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+lt+' rokov</td></tr>'+
+        '<tr><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Čistý mesačný príjem</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(inc)+'</td></tr>'+
+      '</table>'+
+      '<div style="background:#003049;border-radius:14px;padding:20px 28px;margin:20px 0;display:flex;justify-content:space-between;align-items:center;color:#fff;">'+
+        '<div><div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5;margin-bottom:4px;">Mesačná splátka</div><div style="font-size:28px;font-weight:800;">'+fmt(payment)+'</div></div>'+
+        '<div style="text-align:right;"><div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5;margin-bottom:4px;">Celkové úroky</div><div style="font-size:22px;font-weight:800;">'+fmt(totalInt)+'</div></div>'+
+      '</div>'+
+      '<div style="font-size:13px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#AB0534;margin-bottom:14px;">KĽÚČOVÉ METRIKY</div>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:13px;">'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">LTV (pomer úveru k hodnote)</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+ltv+' % '+(ltv<=80?'(OK)':'(Vysoko)')+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">DSTI (zaťaženie príjmu)</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+dsti+' % '+(dsti<=40?'(OK)':'(Vysoko)')+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Celkovo zaplatíte</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(totalPaid)+'</td></tr>'+
+        '<tr><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Z toho úroky</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(totalInt)+'</td></tr>'+
+      '</table>'+
+      '<div style="font-size:13px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#AB0534;margin:20px 0 14px;">POROVNANIE STRATÉGIÍ</div>'+
+      '<div style="display:flex;gap:16px;margin-bottom:20px;">'+
+        '<div style="flex:1;background:rgba(152,159,167,0.08);border-radius:14px;padding:18px 20px;">'+
+          '<div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#989FA7;margin-bottom:12px;">Mimoriadne splátky</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Splatíte skôr o</div>'+
+          '<div style="font-size:22px;font-weight:800;margin-bottom:10px;">'+mSaved+'</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Ušetríte na úrokoch</div>'+
+          '<div style="font-size:22px;font-weight:800;color:#AB0534;">'+iSaved+'</div>'+
+        '</div>'+
+        '<div style="flex:1;background:rgba(0,48,73,0.04);border-radius:14px;padding:18px 20px;">'+
+          '<div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#003049;margin-bottom:12px;">Investovanie prebytku</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Dlh vyrovnáte za</div>'+
+          '<div style="font-size:22px;font-weight:800;margin-bottom:10px;">'+investPayoff+'</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Portfólio po splatení</div>'+
+          '<div style="font-size:22px;font-weight:800;color:#003049;">'+investValTxt+'</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:rgba(0,48,73,0.03);padding:20px 36px;font-size:10px;color:rgba(0,48,73,0.4);line-height:1.6;">'+
+      '<div>Tento výpočet je orientačný a nenahrádza individuálnu konzultáciu.</div>'+
+      '<div>Kontakt: mario.tistan@partnersgroup.sk | +421 902 130 096 | mariotistan.sk</div>'+
+      '<div>Podriadený finančný agent Partners Group SK s.r.o. · Registrácia NBS č. 221967</div>'+
+    '</div>';
+
+  document.body.appendChild(div);
+
+  html2canvas(div,{scale:2,useCORS:true,logging:false}).then(function(canvas){
+    document.body.removeChild(div);
+    var imgData=canvas.toDataURL('image/png');
     var jsPDF=window.jspdf.jsPDF;
+    var pdfW=210; // A4 width in mm
+    var pdfH=297; // A4 height in mm
+    var imgW=pdfW;
+    var imgH=canvas.height*pdfW/canvas.width;
     var doc=new jsPDF('p','mm','a4');
-    var w=doc.internal.pageSize.getWidth();
-    var y=20;
-
-    // Header
-    doc.setFillColor(0,48,73);
-    doc.rect(0,0,w,40,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(22);
-    doc.text('HypoKalkulačka+',15,18);
-    doc.setFontSize(10);
-    doc.text('Partners Group SK · Mário Tišťan · mariotistan.sk',15,28);
-    doc.setFontSize(8);
-    doc.text('Vygenerované: '+new Date().toLocaleDateString('sk-SK'),15,35);
-    doc.text('Mena: '+(currency==='EUR'?'EUR (€)':'CZK (Kč)'),w-50,35);
-
-    y=52;
-
-    // Parametre
-    doc.setTextColor(171,5,52);
-    doc.setFontSize(12);
-    doc.text('PARAMETRE ÚVERU',15,y);
-    y+=8;
-    doc.setTextColor(0,48,73);
-    doc.setFontSize(10);
-    var params=[
-      ['Cena nehnuteľnosti',fmt(la)],
-      ['Výška úveru',fmt(lp)],
-      ['Vlastné prostriedky',fmt(la-lp)],
-      ['Úroková sadzba',ir.toFixed(2)+' %'],
-      ['Doba splácania',lt+' rokov'],
-      ['Čistý mesačný príjem',fmt(inc)]
-    ];
-    params.forEach(function(p){
-      doc.setFont(undefined,'normal');
-      doc.text(p[0],15,y);
-      doc.setFont(undefined,'bold');
-      doc.text(p[1],w-15,y,{align:'right'});
-      y+=7;
-    });
-
-    y+=5;
-    // Výsledky
-    doc.setFillColor(0,48,73);
-    doc.rect(10,y,w-20,28,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(9);
-    doc.text('MESAČNÁ SPLÁTKA',15,y+8);
-    doc.setFontSize(18);
-    doc.text(fmt(payment),15,y+20);
-    doc.setFontSize(9);
-    doc.text('CELKOVÉ ÚROKY',w-15,y+8,{align:'right'});
-    doc.setFontSize(14);
-    doc.text(fmt(totalInt),w-15,y+20,{align:'right'});
-
-    y+=38;
-    // Metriky
-    doc.setTextColor(171,5,52);
-    doc.setFontSize(12);
-    doc.text('KĽÚČOVÉ METRIKY',15,y);
-    y+=8;
-    doc.setTextColor(0,48,73);
-    doc.setFontSize(10);
-    var metrics=[
-      ['LTV (pomer úveru k hodnote)',ltv+' %',ltv<=80?'OK':'Vysoko'],
-      ['DSTI (zaťaženie príjmu)',dsti+' %',dsti<=40?'OK':'Vysoko'],
-      ['Celkovo zaplatíte',fmt(totalPaid),''],
-      ['Z toho úroky',fmt(totalInt),'']
-    ];
-    metrics.forEach(function(m){
-      doc.setFont(undefined,'normal');
-      doc.text(m[0],15,y);
-      doc.setFont(undefined,'bold');
-      doc.text(m[1]+(m[2]?' ('+m[2]+')':''),w-15,y,{align:'right'});
-      y+=7;
-    });
-
-    y+=5;
-    // Porovnanie
-    doc.setTextColor(171,5,52);
-    doc.setFontSize(12);
-    doc.text('POROVNANIE STRATÉGIÍ',15,y);
-    y+=8;
-    doc.setTextColor(0,48,73);
-    doc.setFontSize(10);
-    var compare=[
-      ['MIMORIADNE SPLÁTKY',''],
-      ['Splatíte skôr o',mSaved],
-      ['Ušetríte na úrokoch',iSaved],
-      ['',''],
-      ['INVESTOVANIE PREBYTKU',''],
-      ['Dlh vyrovnáte za',investPayoff],
-      ['Portfólio po splatení',investVal]
-    ];
-    compare.forEach(function(c){
-      if(c[0]===''&&c[1]===''){y+=3;return;}
-      if(c[1]===''){doc.setFont(undefined,'bold');doc.setFontSize(10);doc.text(c[0],15,y);y+=7;return;}
-      doc.setFont(undefined,'normal');
-      doc.text(c[0],15,y);
-      doc.setFont(undefined,'bold');
-      doc.text(c[1],w-15,y,{align:'right'});
-      y+=7;
-    });
-
-    // Footer
-    y+=10;
-    doc.setDrawColor(200,200,200);
-    doc.line(15,y,w-15,y);
-    y+=8;
-    doc.setFontSize(8);
-    doc.setFont(undefined,'normal');
-    doc.setTextColor(150,150,150);
-    doc.text('Tento výpočet je orientačný a nenahrádza individuálnu konzultáciu.',15,y);
-    y+=5;
-    doc.text('Kontakt: mario.tistan@partnersgroup.sk | +421 902 130 096 | mariotistan.sk',15,y);
-    y+=5;
-    doc.text('Podriadený finančný agent Partners Group SK s.r.o. · Registrácia NBS č. 221967',15,y);
-
+    if(imgH>pdfH){
+      imgH=pdfH;
+      imgW=canvas.width*pdfH/canvas.height;
+    }
+    doc.addImage(imgData,'PNG',0,0,imgW,imgH);
     doc.save('hypokalkulacka-vypocet.pdf');
-  }catch(e){
+
+    // Send to Formspree
+    var formData=new FormData();
+    formData.append('email',email);
+    formData.append('_replyto',email);
+    formData.append('subject','HypoKalkulačka+ — nový výpočet');
+    formData.append('_cc','mario.tistan@partnersgroup.sk');
+    formData.append('message',
+      'Nový výpočet z HypoKalkulačky+\n\n'+
+      'Mesačná splátka: '+fmt(payment)+'\n'+
+      'Výška úveru: '+fmt(lp)+'\n'+
+      'Cena nehnuteľnosti: '+fmt(la)+'\n'+
+      'Úroková sadzba: '+ir.toFixed(2)+' %\n'+
+      'Doba splácania: '+lt+' rokov\n'+
+      'LTV: '+ltv+' %\n'+
+      'DSTI: '+dsti+' %\n'+
+      'Celkové úroky: '+fmt(totalInt)+'\n'+
+      'Ušetrené na úrokoch (mimor. splátky): '+iSaved+'\n'+
+      'Hodnota investície: '+investValTxt+'\n'+
+      '\nEmail klienta: '+email
+    );
+    fetch('https://formspree.io/f/mdawjqak',{method:'POST',body:formData,headers:{'Accept':'application/json'}}).catch(function(err){console.error('Formspree error:',err)});
+
+    // Show success
+    document.getElementById('pdfModalForm').style.display='none';
+    document.getElementById('pdfModalSuccess').style.display='block';
+    setTimeout(function(){closePdfModal();submitBtn.disabled=false;submitBtn.textContent='ODOSLAŤ A STIAHNUŤ PDF';},2000);
+  }).catch(function(e){
+    document.body.removeChild(div);
     alert('Chyba pri generovaní PDF. Skúste to znova.');
     console.error(e);
-  }
-  btn.innerHTML='<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg> Stiahnuť PDF s výpočtom';
-  btn.disabled=false;
+    submitBtn.disabled=false;
+    submitBtn.textContent='ODOSLAŤ A STIAHNUŤ PDF';
+  });
 }
 </script>
+
+<div class="pdf-modal-overlay" id="pdfModal" onclick="if(event.target===this)closePdfModal()">
+  <div class="pdf-modal">
+    <button class="pdf-modal-close" onclick="closePdfModal()">&times;</button>
+    <h3>Získaj výpočet na email</h3>
+    <p>Zadaj svoju emailovú adresu a pošleme ti PDF s výpočtom.</p>
+    <div id="pdfModalForm">
+      <input type="email" class="pdf-modal-input" id="pdfEmail" placeholder="tvoj@email.sk" required>
+      <label class="pdf-modal-check">
+        <input type="checkbox" id="pdfGdpr">
+        Súhlasím so spracovaním osobných údajov za účelom zaslania výpočtu. <a href="ochrana-udajov.html" target="_blank">Viac informácií</a>
+      </label>
+      <button class="pdf-modal-btn" id="pdfSubmitBtn" onclick="submitPdfForm()">Odoslať a stiahnuť PDF</button>
+    </div>
+    <div id="pdfModalSuccess" style="display:none" class="pdf-modal-success">
+      ✓ PDF bol stiahnutý.<br>Ďakujeme!
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
