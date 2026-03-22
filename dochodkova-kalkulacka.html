@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DôchodKalkulačka+ | Partners Group SK</title>
+<meta name="description" content="Dôchodková kalkulačka Partners Group SK — zistite, koľko potrebujete investovať na dôchodok a aká bude medzera vo vašom príjme.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#ECEDED;color:#003049;min-height:100vh}
+header{background:#fff;border-bottom:1px solid rgba(0,48,73,0.08);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:0 1px 8px rgba(0,48,73,0.04)}
+.logo-badge{background:#003049;color:#fff;font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;padding:6px 12px}
+.logo-title{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin-left:12px}
+.pg-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,48,73,0.3)}
+.main{max-width:1100px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:340px 1fr;gap:20px}
+.panel{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:24px;margin-bottom:16px;border-radius:20px}
+.panel-tag{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;padding:3px 8px;background:#003049;color:#fff;margin-bottom:14px;border-radius:6px}
+.panel-tag.gold{background:#989FA7}
+.panel-tag.red{background:#AB0534}
+.panel-title{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin-bottom:20px}
+.field{margin-bottom:18px}
+.field-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.field-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,48,73,0.5)}
+input[type=range]{width:100%;height:3px;appearance:none;background:rgba(0,48,73,0.1);outline:none;cursor:pointer;accent-color:#AB0534}
+input[type=range].blue-range{accent-color:#003049}
+input[type=range].gold-range{accent-color:#989FA7}
+.num-input{width:110px;padding:4px 8px;text-align:right;font-size:11px;font-weight:800;color:#AB0534;background:rgba(171,5,52,0.05);border:1px solid rgba(171,5,52,0.15);outline:none;border-radius:8px}
+.num-input.blue{color:#003049;background:rgba(0,48,73,0.04);border-color:rgba(0,48,73,0.12)}
+.num-input:focus{border-color:#AB0534}
+.info-row{background:rgba(0,48,73,0.04);border-left:3px solid rgba(0,48,73,0.2);padding:8px 12px;margin-bottom:16px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,48,73,0.5);display:flex;justify-content:space-between;align-items:center;border-radius:0 12px 12px 0}
+.info-row span{color:#003049;font-size:12px;font-weight:800}
+.info-row.warn{border-left-color:#AB0534;background:rgba(171,5,52,0.04)}
+.info-row.warn span{color:#AB0534}
+.splatka-card{background:#003049;color:#fff;padding:24px;position:relative;overflow:hidden;margin-top:16px;border-radius:20px}
+.splatka-card.red-card{background:#AB0534}
+.splatka-lbl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px}
+.splatka-val{font-size:38px;font-weight:800;letter-spacing:-.02em}
+.splatka-sub{font-size:9px;color:rgba(255,255,255,0.4);margin-top:6px}
+.glow{position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;background:rgba(171,5,52,0.3);border-radius:50%;filter:blur(40px)}
+.glow-white{position:absolute;right:0;bottom:0;width:120px;height:120px;background:rgba(255,255,255,0.15);border-radius:50%;filter:blur(40px);pointer-events:none}
+.gap-bar-wrap{margin-bottom:16px}
+.gap-bar{height:24px;background:rgba(0,48,73,0.05);border-radius:12px;overflow:hidden;display:flex;position:relative}
+.gap-fill-pension{background:#003049;height:100%;transition:width .4s}
+.gap-fill-gap{background:#AB0534;height:100%;transition:width .4s}
+.gap-labels{display:flex;justify-content:space-between;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,48,73,0.5);margin-top:6px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.cbox{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:20px;border-radius:20px}
+.cbox-tag{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;display:inline-block;margin-bottom:10px;border-radius:6px}
+.cbox-tag.red{background:#AB0534;color:#fff}
+.cbox-tag.gold{background:#989FA7;color:#fff}
+.cbox-tag.navy{background:#003049;color:#fff}
+.cbox-title{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.cbox-title.red{color:#AB0534}
+.cbox-title.gold{color:#989FA7}
+.cbox-title.navy{color:#003049}
+.cbox-stat-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,48,73,0.4);margin-bottom:3px}
+.cbox-stat-val{font-size:24px;font-weight:800;letter-spacing:-.02em;color:#003049;margin-bottom:12px}
+.cbox-stat-val.green{color:#AB0534}
+.cbox-stat-val.red{color:#AB0534}
+.cbox-stat-val.navy{color:#003049}
+.chart-panel{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:20px;margin-bottom:16px;border-radius:20px}
+.chart-title{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin-bottom:12px}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,48,73,0.5)}
+.legend-dot{width:10px;height:10px}
+.chart-wrap{position:relative;width:100%;height:220px}
+.delay-panel{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:20px;margin-bottom:16px;border-radius:20px}
+.delay-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,48,73,0.05)}
+.delay-item:last-child{border-bottom:none}
+.delay-label{font-size:10px;font-weight:700;color:rgba(0,48,73,0.6)}
+.delay-value{font-size:14px;font-weight:800;color:#003049}
+.delay-value.warn{color:#AB0534}
+.outcome-panel{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:20px;margin-bottom:16px;border-radius:20px}
+.out-row{margin-bottom:16px}
+.out-head{display:flex;justify-content:space-between;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.out-bar{height:8px;background:rgba(0,48,73,0.05);display:flex;overflow:hidden;margin-bottom:4px;border-radius:4px}
+.out-bar-a{background:rgba(0,48,73,0.2)}
+.out-bar-b{background:#989FA7;opacity:.6}
+.out-bar-c{background:#003049}
+.out-bar-red{background:#AB0534}
+.out-note{font-size:9px;color:rgba(0,48,73,0.4);font-weight:500}
+.divider{height:1px;background:rgba(0,48,73,0.06);margin:16px 0}
+.pdf-btn{width:100%;padding:14px;background:#AB0534;border:none;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;transition:background .2s;border-radius:20px}
+.pdf-btn:hover{background:#003049}
+.pdf-btn svg{width:18px;height:18px;fill:currentColor}
+footer{text-align:center;padding:24px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,48,73,0.3);border-top:1px solid rgba(0,48,73,0.07);max-width:1100px;margin:0 auto}
+.pdf-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,48,73,0.6);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.pdf-modal-overlay.show{display:flex}
+.pdf-modal{background:#fff;border-radius:20px;padding:36px;max-width:420px;width:100%;position:relative;box-shadow:0 24px 64px rgba(0,0,0,0.2)}
+.pdf-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:rgba(0,48,73,0.4);padding:4px}
+.pdf-modal h3{font-size:22px;font-weight:700;color:#003049;margin-bottom:8px}
+.pdf-modal p{font-size:14px;color:rgba(0,48,73,0.5);margin-bottom:20px}
+.pdf-modal-input{width:100%;padding:12px 16px;border:1px solid rgba(0,48,73,0.15);border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:16px;box-sizing:border-box}
+.pdf-modal-input:focus{border-color:#003049}
+.pdf-modal-check{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;font-size:12px;color:rgba(0,48,73,0.6);line-height:1.5}
+.pdf-modal-check input{margin-top:3px;flex-shrink:0}
+.pdf-modal-check a{color:#AB0534}
+.pdf-modal-btn{width:100%;padding:14px;background:#AB0534;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.pdf-modal-btn:hover{background:#003049}
+.pdf-modal-btn:disabled{background:#989FA7;cursor:not-allowed}
+.pdf-modal-success{text-align:center;padding:20px 0;font-size:16px;font-weight:600;color:#003049}
+@media(max-width:800px){
+.main{grid-template-columns:1fr;padding:16px 10px}
+.compare-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+*{box-sizing:border-box}
+html,body{overflow-x:hidden;max-width:100vw}
+header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding-top:8px;padding-bottom:8px}
+header>div:first-child{order:1}
+header>div:last-child{order:2}
+.logo-title{font-size:11px;margin-left:8px}
+.pg-label{display:none}
+.main{padding:12px 8px;gap:12px}
+.panel{padding:16px 12px}
+.field-row{flex-wrap:wrap;gap:4px}
+.field-lbl{font-size:9px}
+.num-input{width:90px;font-size:10px;padding:4px 6px}
+.info-row{font-size:9px;padding:6px 10px;flex-wrap:wrap;gap:4px}
+.splatka-card{padding:16px}
+.splatka-val{font-size:28px}
+.splatka-sub{font-size:8px}
+.compare-grid{grid-template-columns:1fr}
+.cbox{padding:14px}
+.cbox-stat-val{font-size:20px}
+.chart-wrap{height:180px}
+.chart-panel{padding:14px}
+.chart-legend{gap:8px}
+.legend-item{font-size:8px}
+.outcome-panel{padding:14px;overflow:hidden}
+.out-head{font-size:8px;flex-wrap:wrap;gap:2px}
+.out-val{font-size:10px;word-break:break-word}
+.out-note{font-size:9px}
+.pdf-btn{font-size:9px;padding:10px}
+footer{font-size:8px;padding:16px 10px}
+.pdf-modal{padding:24px 18px}
+.pdf-modal h3{font-size:18px}
+.pdf-modal p{font-size:13px}
+.pdf-modal-input{font-size:14px;padding:10px 12px}
+.pdf-modal-btn{font-size:11px;padding:12px}
+.delay-label{font-size:9px;max-width:55%}
+.delay-value{font-size:11px;text-align:right}
+.delay-panel{padding:12px;overflow:hidden}
+.delay-item{flex-wrap:nowrap;gap:4px}
+.main{padding:8px 10px;gap:10px}
+.panel,.delay-panel,.compare-grid,.outcome-panel,.splatka-card{max-width:100%;overflow:hidden}
+.field-row{flex-wrap:wrap;gap:4px}
+.field-lbl{font-size:9px}
+.num-input{width:80px;font-size:10px;padding:4px 6px}
+.info-row{font-size:9px;padding:6px 10px;flex-wrap:wrap;gap:4px}
+.gap-card{padding:16px 12px;margin:0;box-sizing:border-box;max-width:100%}
+.gap-amount{font-size:28px}
+.gap-sub{font-size:9px}
+.gap-bar-container{flex-wrap:wrap;gap:4px}
+.gap-bar-label{font-size:7px}
+.splatka-card{padding:16px 12px;box-sizing:border-box;max-width:100%}
+header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding-top:8px;padding-bottom:8px}
+.logo-title{font-size:11px;margin-left:8px}
+.pg-label{display:none}
+.panel{padding:16px 12px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center">
+    <a href="index.html" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:#003049;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-right:16px;padding:6px 14px;border:1px solid rgba(0,48,73,0.15);border-radius:12px;transition:background .2s" onmouseover="this.style.background='#ECEDED'" onmouseout="this.style.background='transparent'">&#8592; Sp&#228;&#357;</a>
+    <div class="logo-badge">MT</div>
+    <div class="logo-title">D&#244;chodKalkula&#269;ka+</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="pg-label">Partners Group SK</div>
+  </div>
+</header>
+
+<div class="main" id="calcArea">
+  <!-- LEFT COLUMN -->
+  <div>
+    <div class="panel">
+      <div class="panel-tag">O tebe</div>
+      <div class="panel-title">Tvoje &#250;daje</div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">Tvoj vek</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input blue" id="age" type="number" value="30">
+            <span style="font-size:11px;font-weight:800;color:#003049">r</span>
+          </div>
+        </div>
+        <input type="range" class="blue-range" min="18" max="60" step="1" value="30" id="ageR">
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">Vek odchodu do d&#244;chodku</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input blue" id="retireAge" type="number" value="64">
+            <span style="font-size:11px;font-weight:800;color:#003049">r</span>
+          </div>
+        </div>
+        <input type="range" class="blue-range" min="55" max="70" step="1" value="64" id="retireAgeR">
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">&#268;ist&#253; mesa&#269;n&#253; pr&#237;jem</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input" id="income" type="number" value="1500">
+            <span style="font-size:11px;font-weight:800;color:#AB0534">&#8364;</span>
+          </div>
+        </div>
+        <input type="range" min="500" max="10000" step="50" value="1500" id="incomeR">
+      </div>
+
+      <div class="info-row">
+        Do d&#244;chodku ti zost&#225;va <span id="yearsLeftInfo">34 rokov</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-tag">D&#244;chodok</div>
+      <div class="panel-title">O&#269;ak&#225;vania</div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">O&#269;ak&#225;van&#253; &#353;t&#225;tny d&#244;chodok</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input blue" id="statePension" type="number" value="600">
+            <span style="font-size:11px;font-weight:800;color:#003049">&#8364;</span>
+          </div>
+        </div>
+        <input type="range" class="blue-range" min="200" max="1500" step="10" value="600" id="statePensionR">
+      </div>
+      <div class="info-row">
+        Priemern&#253; d&#244;chodok na Slovensku je cca <span>650 &#8364;</span>
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">&#381;elan&#253; mesa&#269;n&#253; pr&#237;jem na d&#244;chodku</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input" id="desiredIncome" type="number" value="1200">
+            <span style="font-size:11px;font-weight:800;color:#AB0534">&#8364;</span>
+          </div>
+        </div>
+        <input type="range" min="300" max="5000" step="50" value="1200" id="desiredIncomeR">
+      </div>
+      <div class="info-row">
+        Odpor&#250;&#269;anie: 70-80% aktu&#225;lneho pr&#237;jmu <span id="recommendedIncome">1 050 &#8211; 1 200 &#8364;</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-tag gold">Strat&#233;gia</div>
+      <div class="panel-title">Tvoja pr&#237;prava</div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">U&#382; m&#225;m nasporen&#233;</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input" id="savings" type="number" value="0">
+            <span style="font-size:11px;font-weight:800;color:#AB0534">&#8364;</span>
+          </div>
+        </div>
+        <input type="range" min="0" max="200000" step="500" value="0" id="savingsR">
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">Aktu&#225;lne mesa&#269;ne investujem</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input" id="monthlyInvest" type="number" value="0">
+            <span style="font-size:11px;font-weight:800;color:#AB0534">&#8364;</span>
+          </div>
+        </div>
+        <input type="range" min="0" max="1000" step="10" value="0" id="monthlyInvestR">
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <span class="field-lbl">O&#269;ak&#225;van&#233; zhodnotenie</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input class="num-input blue" id="returnRate" type="number" value="7" step="0.5">
+            <span style="font-size:11px;font-weight:800;color:#003049">%</span>
+          </div>
+        </div>
+        <input type="range" class="blue-range" min="1" max="15" step="0.5" value="7" id="returnRateR">
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div>
+    <!-- GAP CARD -->
+    <div class="splatka-card red-card">
+      <div class="splatka-lbl">Medzera v pr&#237;jme</div>
+      <div class="splatka-val" id="gapVal">600 &#8364;</div>
+      <div class="splatka-sub">Ka&#382;d&#253; mesiac ti bude ch&#253;ba&#357; t&#225;to suma</div>
+      <div class="glow-white"></div>
+    </div>
+
+    <div style="margin-top:16px"></div>
+
+    <div class="gap-bar-wrap">
+      <div class="gap-bar">
+        <div class="gap-fill-pension" id="gapBarPension" style="width:50%"></div>
+        <div class="gap-fill-gap" id="gapBarGap" style="width:50%"></div>
+      </div>
+      <div class="gap-labels">
+        <span>&#352;t&#225;tny d&#244;chodok: <strong id="gapLblPension">600 &#8364;</strong></span>
+        <span>Medzera: <strong id="gapLblGap" style="color:#AB0534">600 &#8364;</strong></span>
+      </div>
+    </div>
+
+    <div class="info-row warn">
+      Ro&#269;ne ti bude ch&#253;ba&#357; <span id="gapYearly">7 200 &#8364;</span>
+    </div>
+
+    <!-- COMPARE -->
+    <div class="compare-grid">
+      <div class="cbox">
+        <div class="cbox-tag red">Tvoja situ&#225;cia</div>
+        <div class="cbox-title red">Aktu&#225;lna pr&#237;prava</div>
+        <div class="cbox-stat-lbl">Portf&#243;lio pri d&#244;chodku</div>
+        <div class="cbox-stat-val" id="currentPortfolio">0 &#8364;</div>
+        <div class="cbox-stat-lbl">Mesa&#269;n&#253; pr&#237;jem z portf&#243;lia</div>
+        <div class="cbox-stat-val" id="currentMonthlyIncome" style="font-size:18px">0 &#8364;</div>
+        <div style="height:1px;background:rgba(0,48,73,0.08);margin:12px 0"></div>
+        <div class="cbox-stat-lbl">Pokryje medzeru na</div>
+        <div class="cbox-stat-val red" id="currentCoverYears">0 rokov</div>
+      </div>
+      <div class="cbox">
+        <div class="cbox-tag navy">Odpor&#250;&#269;anie</div>
+        <div class="cbox-title navy">Odporúčaná príprava</div>
+        <div class="cbox-stat-lbl">Potrebn&#233; portf&#243;lio</div>
+        <div class="cbox-stat-val navy" id="neededPortfolio">0 &#8364;</div>
+        <div class="cbox-stat-lbl">Mesa&#269;ne investova&#357;</div>
+        <div class="cbox-stat-val green" id="neededMonthly">0 &#8364;</div>
+        <div style="height:1px;background:rgba(0,48,73,0.08);margin:12px 0"></div>
+        <div class="cbox-stat-lbl">To je z tvojho pr&#237;jmu</div>
+        <div class="cbox-stat-val" id="neededPercent" style="font-size:18px">0 %</div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-panel">
+      <div class="chart-title">Rast portf&#243;lia v &#269;ase</div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(152,159,167,0.5)"></div>Aktu&#225;lna pr&#237;prava</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#AB0534"></div>Odpor&#250;&#269;an&#225; pr&#237;prava</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#003049;height:2px;width:20px;border-top:2px dashed #003049;background:none"></div>Potrebn&#233; portf&#243;lio</div>
+      </div>
+      <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+    </div>
+
+    <!-- DELAY PANEL -->
+    <div class="delay-panel">
+      <div class="panel-tag" style="background:#003049">Časovanie</div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin-bottom:16px">Keby si začal skôr...</div>
+      <div class="delay-item">
+        <span class="delay-label">Pred 10 rokmi stačilo by</span>
+        <span class="delay-value" style="color:#2a9d8f" id="delay10ago">0 €/mesiac</span>
+      </div>
+      <div class="delay-item">
+        <span class="delay-label">Pred 5 rokmi stačilo by</span>
+        <span class="delay-value" style="color:#2a9d8f" id="delay5ago">0 €/mesiac</span>
+      </div>
+      <div class="delay-item" style="background:rgba(171,5,52,0.04);padding:10px 8px;border-radius:10px">
+        <span class="delay-label" style="font-weight:800;color:#003049">DNES — odporúčanie</span>
+        <span class="delay-value" id="delayToday">0 €/mesiac</span>
+      </div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#AB0534;margin:16px 0 8px">Čo ak budeš čakať...</div>
+      <div class="delay-item">
+        <span class="delay-label">O 5 rokov to bude</span>
+        <span class="delay-value warn" id="delay5future">0 €/mesiac</span>
+      </div>
+      <div class="delay-item">
+        <span class="delay-label">O 10 rokov to bude</span>
+        <span class="delay-value warn" id="delay10future">0 €/mesiac</span>
+      </div>
+      <div class="info-row" style="border-left-color:#AB0534;margin-top:12px;font-size:10px">
+        Každý rok čakania ťa stojí viac. Čas je tvoj najväčší spojenec pri investovaní.
+      </div>
+    </div>
+
+    <!-- OUTCOME -->
+    <div class="outcome-panel">
+      <div class="panel-tag" style="background:#003049">V&#253;sledok</div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin-bottom:16px">Zhrnutie tvojej situ&#225;cie</div>
+
+      <div class="out-row">
+        <div class="out-head"><span>Bez pr&#237;pravy</span><span style="color:rgba(0,48,73,0.4)" id="outNoPrepVal">&#353;t&#225;tny d&#244;chodok 600 &#8364;</span></div>
+        <div class="out-bar"><div class="out-bar-a" id="outNoPrepBar" style="width:50%"></div></div>
+        <div class="out-note" id="outNoPrepNote">&#352;t&#225;tny d&#244;chodok pokryje 50% &#382;elan&#233;ho pr&#237;jmu</div>
+      </div>
+
+      <div class="out-row">
+        <div class="out-head"><span>Aktu&#225;lna pr&#237;prava</span><span style="color:#989FA7" id="outCurrentVal">portf&#243;lio 0 &#8364;</span></div>
+        <div class="out-bar"><div class="out-bar-a" id="outCurrentBarPension" style="width:50%"></div><div class="out-bar-b" id="outCurrentBarInvest" style="width:0%"></div></div>
+        <div class="out-note" id="outCurrentNote">&#8212;</div>
+      </div>
+
+      <div class="out-row">
+        <div class="out-head"><span>Odpor&#250;&#269;anie</span><span style="color:#003049;font-weight:800" id="outRecommendVal">investova&#357; 0 &#8364;/mesiac</span></div>
+        <div class="out-bar"><div class="out-bar-a" id="outRecommendBarPension" style="width:50%"></div><div class="out-bar-c" id="outRecommendBarInvest" style="width:50%"></div></div>
+        <div class="out-note" id="outRecommendNote">Pln&#225; medzera pokryt&#225;</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1100px;margin:0 auto;padding:0 16px 16px">
+  <button class="pdf-btn" onclick="openPdfModal()">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+    Stiahnu&#357; PDF s v&#253;po&#269;tom
+  </button>
+</div>
+
+<footer>&#169; 2026 Partners Group SK &#183; D&#244;chodKalkula&#269;ka+ &#183; V&#353;etky pr&#225;va vyhraden&#233; &#183; mariotistan.sk</footer>
+
+<!-- PDF MODAL -->
+<div class="pdf-modal-overlay" id="pdfModal">
+  <div class="pdf-modal">
+    <button class="pdf-modal-close" onclick="closePdfModal()">&#10005;</button>
+    <div id="pdfModalForm">
+      <h3>V&#225;&#353; d&#244;chodkov&#253; pl&#225;n</h3>
+      <p>Zadajte email a po&#353;leme v&#225;m PDF s detailn&#253;m v&#253;po&#269;tom.</p>
+      <input class="pdf-modal-input" type="email" id="pdfEmail" placeholder="vas@email.sk">
+      <div class="pdf-modal-check">
+        <input type="checkbox" id="pdfGdpr">
+        <label for="pdfGdpr">S&#250;hlas&#237;m so spracovan&#237;m osobn&#253;ch &#250;dajov pod&#318;a <a href="#">GDPR</a> za &#250;&#269;elom zaslania v&#253;po&#269;tu a pr&#237;padnej konzult&#225;cie.</label>
+      </div>
+      <button class="pdf-modal-btn" id="pdfSubmitBtn" onclick="submitPdfForm()">Odosla&#357; a stiahnu&#357; PDF</button>
+    </div>
+    <div class="pdf-modal-success" id="pdfModalSuccess" style="display:none">
+      <div style="font-size:32px;margin-bottom:12px">&#10004;</div>
+      <div>PDF bolo stiahnut&#233; a odoslan&#233; na v&#225;&#353; email.</div>
+      <div style="margin-top:8px;font-size:13px;color:rgba(0,48,73,0.5)">Ozv&#225;m sa v&#225;m &#269;o najsk&#244;r.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let mc=null;
+const LIFE_EXPECTANCY=85;
+
+function fmt(n){if(isNaN(n)||n===undefined||n===null)return'—';return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))+' €'}
+function fmtN(n){if(isNaN(n)||n===undefined||n===null)return'—';return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))}
+function fmtPct(n){if(isNaN(n)||n===undefined||n===null)return'—';return Math.round(n)+' %'}
+
+function syncPair(nId,rId,min,max){
+  document.getElementById(nId).addEventListener('input',function(){let v=parseFloat(this.value)||0;v=Math.min(max,Math.max(min,v));document.getElementById(rId).value=v;calc()});
+  document.getElementById(rId).addEventListener('input',function(){document.getElementById(nId).value=this.value;calc()});
+}
+syncPair('age','ageR',18,60);
+syncPair('retireAge','retireAgeR',55,70);
+syncPair('income','incomeR',500,10000);
+syncPair('statePension','statePensionR',200,1500);
+syncPair('desiredIncome','desiredIncomeR',300,5000);
+syncPair('savings','savingsR',0,200000);
+syncPair('monthlyInvest','monthlyInvestR',0,1000);
+syncPair('returnRate','returnRateR',1,15);
+
+// FV of current savings + monthly contributions
+function futureValue(pv,pmt,r,n){
+  if(n<=0)return pv;
+  if(r===0)return pv+pmt*n;
+  return pv*Math.pow(1+r,n)+pmt*((Math.pow(1+r,n)-1)/r);
+}
+
+// PMT needed to reach FV given PV
+function pmtNeeded(fv,pv,r,n){
+  if(n<=0)return 0;
+  if(r===0){var need=fv-pv;return need>0?need/n:0;}
+  var fvPv=pv*Math.pow(1+r,n);
+  var need=fv-fvPv;
+  if(need<=0)return 0;
+  return need/((Math.pow(1+r,n)-1)/r);
+}
+
+function calc(){
+  var age=parseInt(document.getElementById('age').value)||30;
+  var retireAge=parseInt(document.getElementById('retireAge').value)||64;
+  var income=parseFloat(document.getElementById('income').value)||1500;
+  var statePension=parseFloat(document.getElementById('statePension').value)||600;
+  var desiredIncome=parseFloat(document.getElementById('desiredIncome').value)||1200;
+  var savings=parseFloat(document.getElementById('savings').value)||0;
+  var monthlyInvest=parseFloat(document.getElementById('monthlyInvest').value)||0;
+  var returnRate=parseFloat(document.getElementById('returnRate').value)||7;
+
+  // Ensure retireAge > age
+  if(retireAge<=age)retireAge=age+1;
+
+  var yearsToRetire=retireAge-age;
+  var retirementYears=LIFE_EXPECTANCY-retireAge;
+  if(retirementYears<1)retirementYears=1;
+  var monthsToRetire=yearsToRetire*12;
+  var monthlyRate=returnRate/100/12;
+
+  // Info rows
+  document.getElementById('yearsLeftInfo').textContent=yearsToRetire+' rokov';
+  var rec70=Math.round(income*0.7);
+  var rec80=Math.round(income*0.8);
+  document.getElementById('recommendedIncome').textContent=fmtN(rec70)+' – '+fmtN(rec80)+' €';
+
+  // Gap
+  var gap=Math.max(0,desiredIncome-statePension);
+  document.getElementById('gapVal').textContent=fmt(gap);
+  document.getElementById('gapYearly').textContent=fmt(gap*12);
+
+  // Gap bar
+  var totalDesired=desiredIncome>0?desiredIncome:1;
+  var pensionPct=Math.min(100,statePension/totalDesired*100);
+  var gapPct=Math.max(0,100-pensionPct);
+  document.getElementById('gapBarPension').style.width=pensionPct+'%';
+  document.getElementById('gapBarGap').style.width=gapPct+'%';
+  document.getElementById('gapLblPension').textContent=fmt(statePension);
+  document.getElementById('gapLblGap').textContent=fmt(gap);
+
+  // Current portfolio at retirement
+  var currentPortfolio=futureValue(savings,monthlyInvest,monthlyRate,monthsToRetire);
+
+  // Monthly income from portfolio (4% rule / 12)
+  var currentMonthlyFromPortfolio=currentPortfolio*0.04/12;
+
+  // How many years current portfolio covers the gap
+  var coverYears=0;
+  if(gap>0){
+    // Drawdown simulation: portfolio earning returns while withdrawing gap monthly
+    var tempPortfolio=currentPortfolio;
+    var drawdownMonths=0;
+    var drawdownRate=monthlyRate*0.7; // more conservative in retirement
+    while(tempPortfolio>0&&drawdownMonths<retirementYears*12){
+      tempPortfolio=tempPortfolio*(1+drawdownRate)-gap;
+      drawdownMonths++;
+      if(tempPortfolio<0)break;
+    }
+    coverYears=Math.round(drawdownMonths/12*10)/10;
+  } else {
+    coverYears=retirementYears;
+  }
+
+  document.getElementById('currentPortfolio').textContent=fmt(currentPortfolio);
+  document.getElementById('currentMonthlyIncome').textContent=fmt(currentMonthlyFromPortfolio);
+  document.getElementById('currentCoverYears').textContent=coverYears>=retirementYears?retirementYears+'+':coverYears.toFixed(1)+' rokov';
+
+  // Needed portfolio: enough to cover gap for retirement years
+  // Using drawdown: need portfolio that can sustain gap withdrawal for retirementYears
+  var neededPortfolio=0;
+  if(gap>0){
+    var drawdownRate2=returnRate*0.7/100/12;
+    if(drawdownRate2>0){
+      // PV of annuity: PV = PMT * (1 - (1+r)^-n) / r
+      var n2=retirementYears*12;
+      neededPortfolio=gap*(1-Math.pow(1+drawdownRate2,-n2))/drawdownRate2;
+    } else {
+      neededPortfolio=gap*12*retirementYears;
+    }
+  }
+
+  // Monthly investment needed to reach neededPortfolio
+  var neededMonthly=pmtNeeded(neededPortfolio,savings,monthlyRate,monthsToRetire);
+  var neededPct=income>0?neededMonthly/income*100:0;
+
+  document.getElementById('neededPortfolio').textContent=fmt(neededPortfolio);
+  document.getElementById('neededMonthly').textContent=fmt(neededMonthly);
+  document.getElementById('neededPercent').textContent=fmtPct(neededPct);
+
+  // "Keby si začal skôr / čo ak budeš čakať" calculations
+  var pmt5ago=pmtNeeded(neededPortfolio,savings,monthlyRate,(yearsToRetire+5)*12);
+  var pmt10ago=pmtNeeded(neededPortfolio,savings,monthlyRate,(yearsToRetire+10)*12);
+  var pmt5future=yearsToRetire>5?pmtNeeded(neededPortfolio,savings,monthlyRate,(yearsToRetire-5)*12):0;
+  var pmt10future=yearsToRetire>10?pmtNeeded(neededPortfolio,savings,monthlyRate,(yearsToRetire-10)*12):0;
+  if(yearsToRetire<=5)pmt5future=neededPortfolio;
+  if(yearsToRetire<=10)pmt10future=neededPortfolio;
+
+  var pm='/mes.';
+  document.getElementById('delay10ago').textContent=fmt(pmt10ago)+pm;
+  document.getElementById('delay5ago').textContent=fmt(pmt5ago)+pm;
+  document.getElementById('delayToday').textContent=fmt(neededMonthly)+pm;
+  document.getElementById('delay5future').textContent=fmt(pmt5future)+pm;
+  document.getElementById('delay10future').textContent=fmt(pmt10future)+pm;
+
+  // Outcome panel
+  var pensionPctOfDesired=desiredIncome>0?Math.round(statePension/desiredIncome*100):0;
+  document.getElementById('outNoPrepVal').textContent='štátny dôchodok '+fmt(statePension);
+  document.getElementById('outNoPrepBar').style.width=Math.min(100,pensionPctOfDesired)+'%';
+  document.getElementById('outNoPrepNote').textContent='Štátny dôchodok pokryje '+pensionPctOfDesired+'% želaného príjmu';
+
+  var currentTotalMonthly=statePension+currentMonthlyFromPortfolio;
+  var currentPctOfDesired=desiredIncome>0?Math.round(currentTotalMonthly/desiredIncome*100):0;
+  document.getElementById('outCurrentVal').textContent='portfólio '+fmt(currentPortfolio)+', mesačne +'+fmt(currentMonthlyFromPortfolio);
+  document.getElementById('outCurrentBarPension').style.width=Math.min(100,pensionPctOfDesired)+'%';
+  var investPctBar=Math.min(100-Math.min(100,pensionPctOfDesired),Math.max(0,currentPctOfDesired-pensionPctOfDesired));
+  document.getElementById('outCurrentBarInvest').style.width=investPctBar+'%';
+  document.getElementById('outCurrentNote').textContent='Celkovo '+fmt(currentTotalMonthly)+'/mesiac ('+currentPctOfDesired+'% želaného príjmu) — pokryje medzeru na '+coverYears.toFixed(1)+' rokov';
+
+  document.getElementById('outRecommendVal').textContent='investovať '+fmt(neededMonthly)+'/mesiac';
+  document.getElementById('outRecommendBarPension').style.width=Math.min(50,pensionPctOfDesired/2)+'%';
+  document.getElementById('outRecommendBarInvest').style.width=Math.min(50,50)+'%';
+  document.getElementById('outRecommendNote').textContent=gap>0?'Investícia '+fmt(neededMonthly)+'/mesiac → plná medzera '+fmt(gap)+' pokrytá na '+retirementYears+' rokov':'Niet medzery — štátny dôchodok postačuje';
+
+  // Chart
+  buildChart(age,retireAge,savings,monthlyInvest,neededMonthly,monthlyRate,neededPortfolio);
+}
+
+function buildChart(age,retireAge,savings,monthlyInvest,neededMonthly,monthlyRate,neededPortfolio){
+  var years=retireAge-age;
+  var labels=[];
+  var currentData=[];
+  var recommendedData=[];
+  var targetLine=[];
+
+  for(var y=0;y<=years;y++){
+    labels.push(age+y);
+    var months=y*12;
+    var currentVal=futureValue(savings,monthlyInvest,monthlyRate,months);
+    var recommendedVal=futureValue(savings,neededMonthly,monthlyRate,months);
+    currentData.push(Math.round(currentVal));
+    recommendedData.push(Math.round(recommendedVal));
+    targetLine.push(Math.round(neededPortfolio));
+  }
+
+  if(mc)mc.destroy();
+  mc=new Chart(document.getElementById('mainChart'),{
+    type:'line',
+    data:{
+      labels:labels,
+      datasets:[
+        {
+          label:'Aktuálna príprava',
+          data:currentData,
+          borderColor:'rgba(152,159,167,0.7)',
+          backgroundColor:'rgba(152,159,167,0.1)',
+          borderWidth:2,
+          pointRadius:0,
+          fill:true
+        },
+        {
+          label:'Odporúčaná príprava',
+          data:recommendedData,
+          borderColor:'#AB0534',
+          backgroundColor:'rgba(171,5,52,0.08)',
+          borderWidth:2.5,
+          pointRadius:0,
+          fill:true
+        },
+        {
+          label:'Potrebné portfólio',
+          data:targetLine,
+          borderColor:'#003049',
+          borderWidth:2,
+          borderDash:[6,4],
+          pointRadius:0,
+          fill:false
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          mode:'index',
+          intersect:false,
+          callbacks:{
+            title:function(items){return 'Vek: '+items[0].label},
+            label:function(c){return c.dataset.label+': '+fmt(c.raw)}
+          }
+        }
+      },
+      scales:{
+        x:{ticks:{font:{size:9},autoSkip:true,maxTicksLimit:12},grid:{display:false}},
+        y:{ticks:{font:{size:9},callback:function(v){return v>=1000?Math.round(v/1000)+'k €':v+'€'}},grid:{color:'rgba(0,48,73,0.05)'}}
+      }
+    }
+  });
+}
+
+calc();
+
+function openPdfModal(){
+  document.getElementById('pdfModal').classList.add('show');
+  document.getElementById('pdfModalForm').style.display='block';
+  document.getElementById('pdfModalSuccess').style.display='none';
+  document.getElementById('pdfEmail').value='';
+  document.getElementById('pdfGdpr').checked=false;
+}
+
+function closePdfModal(){
+  document.getElementById('pdfModal').classList.remove('show');
+}
+
+function submitPdfForm(){
+  var email=document.getElementById('pdfEmail').value.trim();
+  var gdpr=document.getElementById('pdfGdpr').checked;
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Zadajte platnú emailovú adresu.');return;}
+  if(!gdpr){alert('Prosím, súhlaste so spracovaním osobných údajov.');return;}
+
+  var submitBtn=document.getElementById('pdfSubmitBtn');
+  submitBtn.disabled=true;
+  submitBtn.textContent='Generujem PDF...';
+
+  var age=parseInt(document.getElementById('age').value)||30;
+  var retireAge=parseInt(document.getElementById('retireAge').value)||64;
+  var income=parseFloat(document.getElementById('income').value)||1500;
+  var statePension=parseFloat(document.getElementById('statePension').value)||600;
+  var desiredIncome=parseFloat(document.getElementById('desiredIncome').value)||1200;
+  var savings=parseFloat(document.getElementById('savings').value)||0;
+  var monthlyInvest=parseFloat(document.getElementById('monthlyInvest').value)||0;
+  var returnRate=parseFloat(document.getElementById('returnRate').value)||7;
+  var gap=Math.max(0,desiredIncome-statePension);
+  var yearsToRetire=retireAge-age;
+  var retirementYears=LIFE_EXPECTANCY-retireAge;
+  var monthlyRate=returnRate/100/12;
+  var currentPortfolio=futureValue(savings,monthlyInvest,monthlyRate,yearsToRetire*12);
+  var drawdownRate2=returnRate*0.7/100/12;
+  var neededPortfolio=0;
+  if(gap>0&&drawdownRate2>0){
+    var n2=retirementYears*12;
+    neededPortfolio=gap*(1-Math.pow(1+drawdownRate2,-n2))/drawdownRate2;
+  } else if(gap>0){
+    neededPortfolio=gap*12*retirementYears;
+  }
+  var neededMonthly=pmtNeeded(neededPortfolio,savings,monthlyRate,yearsToRetire*12);
+  var dateStr=new Date().toLocaleDateString('sk-SK');
+
+  var div=document.createElement('div');
+  div.style.cssText='position:absolute;left:-9999px;top:0;width:794px;font-family:"DM Sans",sans-serif;background:#fff;color:#003049;';
+  div.innerHTML=
+    '<div style="background:#003049;padding:28px 36px 20px;color:#fff;">'+
+      '<div style="font-size:26px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;">DôchodKalkulačka+</div>'+
+      '<div style="font-size:12px;font-weight:500;opacity:0.7;">Partners Group SK · Mário Tišťan · mariotistan.sk</div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:11px;opacity:0.5;">'+
+        '<span>Vygenerované: '+dateStr+'</span>'+
+        '<span>Mena: EUR (€)</span>'+
+      '</div>'+
+    '</div>'+
+    '<div style="padding:28px 36px;">'+
+      '<div style="font-size:13px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#AB0534;margin-bottom:14px;">VAŠE ÚDAJE</div>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:13px;">'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Vek</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+age+' rokov</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Vek odchodu do dôchodku</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+retireAge+' rokov</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Čistý mesačný príjem</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(income)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Očakávaný štátny dôchodok</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(statePension)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Želaný príjem na dôchodku</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(desiredIncome)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Už nasporené</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(savings)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Mesačne investujem</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(monthlyInvest)+'</td></tr>'+
+        '<tr><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Očakávané zhodnotenie</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+returnRate+' %</td></tr>'+
+      '</table>'+
+      '<div style="background:#AB0534;border-radius:14px;padding:20px 28px;margin:20px 0;display:flex;justify-content:space-between;align-items:center;color:#fff;">'+
+        '<div><div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5;margin-bottom:4px;">Medzera v príjme</div><div style="font-size:28px;font-weight:800;">'+fmt(gap)+'/mesiac</div></div>'+
+        '<div style="text-align:right;"><div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5;margin-bottom:4px;">Ročne</div><div style="font-size:22px;font-weight:800;">'+fmt(gap*12)+'</div></div>'+
+      '</div>'+
+      '<div style="font-size:13px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#AB0534;margin:20px 0 14px;">ODPORÚČANIE</div>'+
+      '<div style="display:flex;gap:16px;margin-bottom:20px;">'+
+        '<div style="flex:1;background:rgba(171,5,52,0.05);border-radius:14px;padding:18px 20px;">'+
+          '<div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#AB0534;margin-bottom:12px;">Aktuálna príprava</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Portfólio pri dôchodku</div>'+
+          '<div style="font-size:20px;font-weight:800;margin-bottom:8px;">'+fmt(currentPortfolio)+'</div>'+
+        '</div>'+
+        '<div style="flex:1;background:rgba(0,48,73,0.05);border-radius:14px;padding:18px 20px;">'+
+          '<div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#003049;margin-bottom:12px;">Odporúčanie</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Potrebné portfólio</div>'+
+          '<div style="font-size:20px;font-weight:800;margin-bottom:8px;">'+fmt(neededPortfolio)+'</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Mesačne investovať</div>'+
+          '<div style="font-size:20px;font-weight:800;color:#AB0534;">'+fmt(neededMonthly)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="text-align:center;padding:16px 0;font-size:11px;color:rgba(0,48,73,0.4);">Kontakt: mario.tistan@partnersgroup.sk · mariotistan.sk</div>'+
+    '</div>';
+
+  document.body.appendChild(div);
+
+  html2canvas(div,{scale:2,useCORS:true,backgroundColor:'#fff'}).then(function(canvas){
+    document.body.removeChild(div);
+    var imgData=canvas.toDataURL('image/png');
+    var pdf=new jspdf.jsPDF('p','mm','a4');
+    var pdfW=pdf.internal.pageSize.getWidth();
+    var pdfH=canvas.height*pdfW/canvas.width;
+    pdf.addImage(imgData,'PNG',0,0,pdfW,pdfH);
+    pdf.save('dochodkovy-plan-MT.pdf');
+
+    // Send via Formspree
+    var formData=new FormData();
+    formData.append('email',email);
+    formData.append('_cc','mario.tistan@partnersgroup.sk');
+    formData.append('_subject','DôchodKalkulačka+ — nový výpočet');
+    formData.append('vek',age);
+    formData.append('vek_dochodku',retireAge);
+    formData.append('prijem',fmt(income));
+    formData.append('statny_dochodok',fmt(statePension));
+    formData.append('zelany_prijem',fmt(desiredIncome));
+    formData.append('nasporene',fmt(savings));
+    formData.append('mesacne_investujem',fmt(monthlyInvest));
+    formData.append('zhodnotenie',returnRate+'%');
+    formData.append('medzera',fmt(gap));
+    formData.append('potrebne_portfolio',fmt(neededPortfolio));
+    formData.append('odporucana_investicia',fmt(neededMonthly));
+
+    fetch('https://formspree.io/f/mdawjqak',{method:'POST',body:formData,headers:{'Accept':'application/json'}}).then(function(){
+      document.getElementById('pdfModalForm').style.display='none';
+      document.getElementById('pdfModalSuccess').style.display='block';
+      submitBtn.disabled=false;
+      submitBtn.textContent='Odoslať a stiahnuť PDF';
+    }).catch(function(){
+      document.getElementById('pdfModalForm').style.display='none';
+      document.getElementById('pdfModalSuccess').style.display='block';
+      submitBtn.disabled=false;
+      submitBtn.textContent='Odoslať a stiahnuť PDF';
+    });
+  });
+}
+</script>
+</body>
+</html>
