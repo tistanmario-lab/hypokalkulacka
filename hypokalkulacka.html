@@ -291,32 +291,28 @@ td{padding:6px;font-size:9px}
     </div>
 
     <div class="panel">
-      <div class="panel-tag gold">Investícia</div>
-      <div class="panel-title">Stratégia s prebytkom</div>
+      <div class="panel-tag gold">Stratégia</div>
+      <div class="panel-title">Mimoriadne splátky / Investícia</div>
 
       <div class="field">
-        <div class="field-row"><span class="field-lbl">Suma navyše</span><span style="font-size:11px;font-weight:800;color:#989FA7" id="extraOut">200 €</span></div>
-        <input type="range" class="gold-range" min="0" max="5000" step="50" value="200" id="extraR" oninput="document.getElementById('extraOut').textContent=fmt(+this.value);calc()">
+        <div class="field-row"><span class="field-lbl">Mesačne navyše</span><span style="font-size:11px;font-weight:800;color:#989FA7" id="extraMonthlyOut">100 €</span></div>
+        <input type="range" class="gold-range" min="0" max="2000" step="10" value="100" id="extraMonthlyR" oninput="document.getElementById('extraMonthlyOut').textContent=fmt(+this.value);calc()">
       </div>
 
-      <div class="freq-btns">
-        <button class="freq-btn active" id="btnM" onclick="setFreq('monthly')">Mesačne</button>
-        <button class="freq-btn" id="btnA" onclick="setFreq('annually')">Ročne</button>
+      <div class="field">
+        <div class="field-row"><span class="field-lbl">Ročne navyše (napr. bonus, 13. plat)</span><span style="font-size:11px;font-weight:800;color:#989FA7" id="extraAnnualOut">0 €</span></div>
+        <input type="range" class="gold-range" min="0" max="20000" step="100" value="0" id="extraAnnualR" oninput="document.getElementById('extraAnnualOut').textContent=fmt(+this.value);calc()">
       </div>
+
+      <div class="info-row" style="border-left-color:#989FA7">
+        Celkovo ročne navyše <span id="totalExtraInfo">1 200 €</span>
+      </div>
+
+      <div class="divider"></div>
 
       <div class="field">
         <div class="field-row"><span class="field-lbl">Zhodnotenie investície</span><span style="font-size:11px;font-weight:800;color:#989FA7" id="investOut">7.0 %</span></div>
         <input type="range" class="gold-range" min="1" max="15" step="0.5" value="7" id="investR" oninput="document.getElementById('investOut').textContent=parseFloat(this.value).toFixed(1)+' %';calc()">
-      </div>
-
-      <div class="field">
-        <div class="field-row"><span class="field-lbl">Jednorazová splátka</span><span style="font-size:11px;font-weight:800;color:#989FA7" id="oneTimeOut">0 €</span></div>
-        <input type="range" class="gold-range" min="0" max="50000" step="500" value="0" id="oneTimeR" oninput="document.getElementById('oneTimeOut').textContent=fmt(+this.value);calc()">
-      </div>
-
-      <div class="field">
-        <div class="field-row"><span class="field-lbl">V mesiaci č.</span><span style="font-size:11px;font-weight:800;color:#989FA7" id="oneTimeMonthOut">12</span></div>
-        <input type="range" class="gold-range" min="1" max="360" step="1" value="12" id="oneTimeMonthR" oninput="document.getElementById('oneTimeMonthOut').textContent=this.value;calc()">
       </div>
     </div>
   </div>
@@ -438,7 +434,7 @@ td{padding:6px;font-size:9px}
 <footer>© 2026 Partners Group SK · HypoKalkulačka+ · Všetky práva vyhradené · mariotistan.sk</footer>
 
 <script>
-let freq='monthly',showFix=false,tableView='annual';
+let showFix=false,tableView='annual';
 let mc=null,bc=null,pc=null,sched=[];
 
 function currSymbol(){return '€'}
@@ -447,7 +443,6 @@ function fmtM(m){const y=Math.floor(m/12),mo=m%12;return y>0?(mo>0?y+'r '+mo+'m'
 function gmp(p,r,n){if(r===0)return p/n;return p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1)}
 
 function toggleFix(){showFix=!showFix;document.getElementById('fixSw').className='sw'+(showFix?' on':'');document.getElementById('fixFields').style.display=showFix?'block':'none';calc()}
-function setFreq(f){freq=f;document.getElementById('btnM').className='freq-btn'+(f==='monthly'?' active':'');document.getElementById('btnA').className='freq-btn'+(f==='annually'?' active':'');calc()}
 function toggleTable(){const w=document.getElementById('tableWrap');const v=w.style.display!=='none';w.style.display=v?'none':'block';document.getElementById('tableBtnText').textContent=v?'Zobraziť splátkový kalendár':'Skryť splátkový kalendár';if(!v)buildTable()}
 function setTV(v){tableView=v;document.getElementById('btnTA').style.cssText='padding:5px 10px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border:none;cursor:pointer;background:'+(v==='annual'?'#003049':'#fff')+';color:'+(v==='annual'?'#fff':'rgba(0,48,73,0.4)');document.getElementById('btnTM').style.cssText='padding:5px 10px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;background:'+(v==='monthly'?'#003049':'#fff')+';color:'+(v==='monthly'?'#fff':'rgba(0,48,73,0.4)')+';border:1px solid rgba(0,48,73,0.1)';buildTable()}
 
@@ -471,10 +466,11 @@ function calc(){
   const income2=parseFloat(document.getElementById('income2').value)||0;
   const income=income1+income2;
   document.getElementById('totalIncomeInfo').textContent=fmt(income);
-  const extraAmount=parseFloat(document.getElementById('extraR').value)||0;
+  const extraMonthly=parseFloat(document.getElementById('extraMonthlyR').value)||0;
+  const extraAnnual=parseFloat(document.getElementById('extraAnnualR').value)||0;
   const investReturn=parseFloat(document.getElementById('investR').value)||7;
-  const oneTime=parseFloat(document.getElementById('oneTimeR').value)||0;
-  const oneTimeMonth=parseInt(document.getElementById('oneTimeMonthR').value)||12;
+  const totalExtraYear=extraMonthly*12+extraAnnual;
+  document.getElementById('totalExtraInfo').textContent=fmt(totalExtraYear);
   const fixPeriod=parseInt(document.getElementById('fixR').value)||5;
   const futureRate=parseFloat(document.getElementById('futureR').value)||4.5;
 
@@ -519,9 +515,8 @@ function calc(){
     let aPrinc=accBal>0?Math.min(curPay-aInt,accBal):0;
     let extra=0;
     if(accBal>0){
-      if(freq==='monthly')extra+=extraAmount;
-      else if(i%12===0)extra+=extraAmount;
-      if(oneTime>0&&i===oneTimeMonth)extra+=oneTime;
+      extra+=extraMonthly;
+      if(i%12===0)extra+=extraAnnual;
       extra=Math.min(extra,Math.max(0,accBal-aPrinc));
     }
     accBal=Math.max(0,accBal-(aPrinc+extra));accInt+=aInt;
@@ -530,10 +525,8 @@ function calc(){
     const sPrinc=stdBal>0?Math.min(curPay-sInt,stdBal):0;
     stdBal=Math.max(0,stdBal-sPrinc);
     investVal*=(1+imr);
-    let inv=0;
-    if(freq==='monthly')inv+=extraAmount;
-    else if(i%12===0)inv+=extraAmount;
-    if(oneTime>0&&i===oneTimeMonth)inv+=oneTime;
+    let inv=extraMonthly;
+    if(i%12===0)inv+=extraAnnual;
     investVal+=inv;totalInvested+=inv;
     if(investVal>=stdBal&&investPayoffM===-1&&stdBal>0)investPayoffM=i;
     schedule.push({month:i,payment:curPay,extra,principal:aPrinc+extra,interest:aInt,balance:accBal,stdBal,investVal});
@@ -634,7 +627,8 @@ function submitPdfForm(){
   var inc1=parseFloat(document.getElementById('income').value)||0;
   var inc2=parseFloat(document.getElementById('income2').value)||0;
   var inc=inc1+inc2;
-  var extra=parseFloat(document.getElementById('extraR').value)||0;
+  var extraM=parseFloat(document.getElementById('extraMonthlyR').value)||0;
+  var extraA=parseFloat(document.getElementById('extraAnnualR').value)||0;
   var investRt=parseFloat(document.getElementById('investR').value)||7;
   var mr=ir/100/12,n=lt*12;
   var payment=mr===0?lp/n:lp*mr*Math.pow(1+mr,n)/(Math.pow(1+mr,n)-1);
@@ -747,6 +741,8 @@ function submitPdfForm(){
       'Celkový príjem: '+fmt(inc)+'\n'+
       'LTV: '+ltv+' %\n'+
       'DSTI: '+dsti+' %\n'+
+      'Mesačne navyše: '+fmt(extraM)+'\n'+
+      'Ročne navyše: '+fmt(extraA)+'\n'+
       'Celkové úroky: '+fmt(totalInt)+'\n'+
       'Ušetrené na úrokoch (mimor. splátky): '+iSaved+'\n'+
       'Úver splatený investíciou: '+investPayoff+'\n'+
