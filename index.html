@@ -69,22 +69,24 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .hero-photo { position: relative; }
 .photo-frame { width: 100%; aspect-ratio: 4/5; background: var(--sand); position: relative; overflow: hidden; border-radius: var(--radius); }
 .photo-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.photo-badge { position: absolute; bottom: 24px; right: 24px; background: var(--white); padding: 14px 18px; border-left: 3px solid var(--red); border-radius: 12px; }
+.photo-badge { position: absolute; bottom: 24px; right: 24px; background: var(--white); padding: 14px 18px; border-left: 3px solid var(--red); border-radius: 12px; max-width: calc(100% - 48px); }
+@media (max-width: 768px) { .photo-badge { bottom: 16px; right: 16px; } }
 .badge-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; }
 .badge-txt { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .photo-accent { position: absolute; top: -20px; left: -20px; width: 80px; height: 80px; border: 3px solid var(--red); border-radius: var(--radius); }
 
 /* Social Proof Bar */
-.social-proof { background: var(--navy); padding: 48px 5%; }
-.proof-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
-@media (max-width: 768px) { .proof-inner { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+.social-proof { background: var(--navy); padding: 48px 5%; overflow: hidden; }
+.proof-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; overflow: hidden; }
+@media (max-width: 900px) { .proof-inner { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
 @media (max-width: 480px) { .proof-inner { grid-template-columns: 1fr; text-align: center; } }
 .proof-item { display: flex; align-items: flex-start; gap: 16px; }
 @media (max-width: 480px) { .proof-item { flex-direction: column; align-items: center; } }
 .proof-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; border-radius: 12px; flex-shrink: 0; }
 .proof-icon svg { width: 22px; height: 22px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .proof-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #fff; line-height: 1.1; }
-.proof-lbl { font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.5); margin-top: 2px; }
+@media (max-width: 900px) { .proof-num { font-size: 22px; } }
+.proof-lbl { font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.5); margin-top: 2px; word-break: break-word; }
 
 section { padding: 80px 5%; }
 .section-inner { max-width: 1100px; margin: 0 auto; }
@@ -304,7 +306,7 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
       </div>
       <div>
         <div class="proof-num" data-counter="cities"><span class="counter-val">6</span> miest</div>
-        <div class="proof-lbl">Bratislava, Trnava, Žilina, Čadca, Bytča, Nitra + Online</div>
+        <div class="proof-lbl">BA, TT, ZA, CA, BY, NR + Online</div>
       </div>
     </div>
   </div>
