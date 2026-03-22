@@ -304,8 +304,18 @@ td{padding:6px;font-size:9px}
         <input type="range" class="gold-range" min="0" max="20000" step="100" value="0" id="extraAnnualR" oninput="document.getElementById('extraAnnualOut').textContent=fmt(+this.value);calc()">
       </div>
 
+      <div class="field">
+        <div class="field-row"><span class="field-lbl">Jednorazový vklad (dedičstvo, predaj...)</span><span style="font-size:11px;font-weight:800;color:#989FA7" id="oneTimeOut">0 €</span></div>
+        <input type="range" class="gold-range" min="0" max="50000" step="500" value="0" id="oneTimeR" oninput="document.getElementById('oneTimeOut').textContent=fmt(+this.value);calc()">
+      </div>
+
+      <div class="field">
+        <div class="field-row"><span class="field-lbl">V ktorom roku</span><span style="font-size:11px;font-weight:800;color:#989FA7" id="oneTimeYearOut">3. rok</span></div>
+        <input type="range" class="gold-range" min="1" max="30" step="1" value="3" id="oneTimeYearR" oninput="document.getElementById('oneTimeYearOut').textContent=this.value+'. rok';calc()">
+      </div>
+
       <div class="info-row" style="border-left-color:#989FA7">
-        Celkovo ročne navyše <span id="totalExtraInfo">1 200 €</span>
+        Celkovo ročne navyše <span id="totalExtraInfo">1 200 €</span> <span style="opacity:0.5;font-size:10px">(bez jednorazového)</span>
       </div>
 
       <div class="divider"></div>
@@ -468,6 +478,9 @@ function calc(){
   document.getElementById('totalIncomeInfo').textContent=fmt(income);
   const extraMonthly=parseFloat(document.getElementById('extraMonthlyR').value)||0;
   const extraAnnual=parseFloat(document.getElementById('extraAnnualR').value)||0;
+  const oneTime=parseFloat(document.getElementById('oneTimeR').value)||0;
+  const oneTimeYear=parseInt(document.getElementById('oneTimeYearR').value)||3;
+  const oneTimeMonth=oneTimeYear*12;
   const investReturn=parseFloat(document.getElementById('investR').value)||7;
   const totalExtraYear=extraMonthly*12+extraAnnual;
   document.getElementById('totalExtraInfo').textContent=fmt(totalExtraYear);
@@ -517,6 +530,7 @@ function calc(){
     if(accBal>0){
       extra+=extraMonthly;
       if(i%12===0)extra+=extraAnnual;
+      if(oneTime>0&&i===oneTimeMonth)extra+=oneTime;
       extra=Math.min(extra,Math.max(0,accBal-aPrinc));
     }
     accBal=Math.max(0,accBal-(aPrinc+extra));accInt+=aInt;
@@ -527,6 +541,7 @@ function calc(){
     investVal*=(1+imr);
     let inv=extraMonthly;
     if(i%12===0)inv+=extraAnnual;
+    if(oneTime>0&&i===oneTimeMonth)inv+=oneTime;
     investVal+=inv;totalInvested+=inv;
     if(investVal>=stdBal&&investPayoffM===-1&&stdBal>0)investPayoffM=i;
     schedule.push({month:i,payment:curPay,extra,principal:aPrinc+extra,interest:aInt,balance:accBal,stdBal,investVal});
@@ -743,6 +758,7 @@ function submitPdfForm(){
       'DSTI: '+dsti+' %\n'+
       'Mesačne navyše: '+fmt(extraM)+'\n'+
       'Ročne navyše: '+fmt(extraA)+'\n'+
+      'Jednorazový vklad: '+fmt(parseFloat(document.getElementById('oneTimeR').value)||0)+' v '+document.getElementById('oneTimeYearOut').textContent+'\n'+
       'Celkové úroky: '+fmt(totalInt)+'\n'+
       'Ušetrené na úrokoch (mimor. splátky): '+iSaved+'\n'+
       'Úver splatený investíciou: '+investPayoff+'\n'+
