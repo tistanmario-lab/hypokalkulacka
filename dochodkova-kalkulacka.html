@@ -230,11 +230,11 @@ header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding
         <div class="field-row">
           <span class="field-lbl">O&#269;ak&#225;van&#253; &#353;t&#225;tny d&#244;chodok</span>
           <div style="display:flex;align-items:center;gap:4px">
-            <input class="num-input blue" id="statePension" type="number" value="600">
+            <input class="num-input blue" id="statePension" type="number" value="750">
             <span style="font-size:11px;font-weight:800;color:#003049">&#8364;</span>
           </div>
         </div>
-        <input type="range" class="blue-range" min="200" max="1500" step="10" value="600" id="statePensionR">
+        <input type="range" class="blue-range" min="200" max="1500" step="10" value="750" id="statePensionR">
       </div>
       <div class="info-row">
         Priemern&#253; d&#244;chodok na Slovensku je cca <span>650 &#8364;</span>
@@ -462,6 +462,22 @@ syncPair('retireAge','retireAgeR',55,70);
 syncPair('income','incomeR',500,10000);
 syncPair('statePension','statePensionR',200,1500);
 syncPair('desiredIncome','desiredIncomeR',300,5000);
+
+// Auto-update: štátny dôchodok = 50% príjmu, želaný = 80% príjmu
+function updatePensionFromIncome(){
+  var inc=parseFloat(document.getElementById('income').value)||1500;
+  var pension=Math.round(inc*0.5/10)*10;
+  pension=Math.max(200,Math.min(1500,pension));
+  document.getElementById('statePension').value=pension;
+  document.getElementById('statePensionR').value=pension;
+  var desired=Math.round(inc*0.8/50)*50;
+  desired=Math.max(300,Math.min(5000,desired));
+  document.getElementById('desiredIncome').value=desired;
+  document.getElementById('desiredIncomeR').value=desired;
+  calc();
+}
+document.getElementById('income').addEventListener('input',updatePensionFromIncome);
+document.getElementById('incomeR').addEventListener('input',updatePensionFromIncome);
 syncPair('savings','savingsR',0,200000);
 syncPair('monthlyInvest','monthlyInvestR',0,1000);
 syncPair('returnRate','returnRateR',1,15);
