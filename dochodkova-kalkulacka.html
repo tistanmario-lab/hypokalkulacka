@@ -470,7 +470,7 @@ function updatePensionFromIncome(){
   pension=Math.max(200,Math.min(1500,pension));
   document.getElementById('statePension').value=pension;
   document.getElementById('statePensionR').value=pension;
-  var desired=Math.round(inc*0.8/50)*50;
+  var desired=Math.round(inc/50)*50;
   desired=Math.max(300,Math.min(5000,desired));
   document.getElementById('desiredIncome').value=desired;
   document.getElementById('desiredIncomeR').value=desired;
