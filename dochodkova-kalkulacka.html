@@ -199,11 +199,11 @@ header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding
         <div class="field-row">
           <span class="field-lbl">Vek odchodu do d&#244;chodku</span>
           <div style="display:flex;align-items:center;gap:4px">
-            <input class="num-input blue" id="retireAge" type="number" value="64">
+            <input class="num-input blue" id="retireAge" type="number" value="65">
             <span style="font-size:11px;font-weight:800;color:#003049">r</span>
           </div>
         </div>
-        <input type="range" class="blue-range" min="55" max="70" step="1" value="64" id="retireAgeR">
+        <input type="range" class="blue-range" min="55" max="70" step="1" value="65" id="retireAgeR">
       </div>
 
       <div class="field">
@@ -501,7 +501,7 @@ function pmtNeeded(fv,pv,r,n){
 
 function calc(){
   var age=parseInt(document.getElementById('age').value)||30;
-  var retireAge=parseInt(document.getElementById('retireAge').value)||64;
+  var retireAge=parseInt(document.getElementById('retireAge').value)||65;
   var income=parseFloat(document.getElementById('income').value)||1500;
   var statePension=parseFloat(document.getElementById('statePension').value)||600;
   var desiredIncome=parseFloat(document.getElementById('desiredIncome').value)||1200;
@@ -724,7 +724,7 @@ function submitPdfForm(){
   submitBtn.textContent='Generujem PDF...';
 
   var age=parseInt(document.getElementById('age').value)||30;
-  var retireAge=parseInt(document.getElementById('retireAge').value)||64;
+  var retireAge=parseInt(document.getElementById('retireAge').value)||65;
   var income=parseFloat(document.getElementById('income').value)||1500;
   var statePension=parseFloat(document.getElementById('statePension').value)||600;
   var desiredIncome=parseFloat(document.getElementById('desiredIncome').value)||1200;
