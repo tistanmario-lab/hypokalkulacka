@@ -157,6 +157,29 @@ section { padding: 80px 5%; }
   .about-photo-secondary { width: 50%; }
 }
 
+/* Team section */
+.team-section { background: var(--sand); }
+.team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; }
+@media (max-width: 768px) { .team-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; } }
+.team-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; text-align: center; transition: box-shadow .3s, transform .3s; }
+.team-card:hover { box-shadow: 0 12px 40px rgba(0,48,73,0.1); transform: translateY(-4px); }
+.team-card.featured { border-color: var(--red); border-width: 2px; }
+.team-photo { width: 100%; aspect-ratio: 1/1; background: var(--sand); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.team-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.team-photo-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.team-photo-placeholder svg { width: 64px; height: 64px; color: var(--silver); }
+.team-info { padding: 28px 24px 32px; }
+@media (max-width: 480px) { .team-info { padding: 20px 16px 24px; } }
+.team-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.team-role { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
+.team-location { font-size: 11px; font-weight: 500; color: var(--silver); margin-bottom: 16px; }
+.team-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+.team-cta { display: inline-block; padding: 12px 24px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; border-radius: var(--radius); transition: all .2s; }
+.team-cta-primary { background: var(--red); color: #fff; }
+.team-cta-primary:hover { background: var(--navy); }
+.team-cta-secondary { border: 1.5px solid var(--navy); color: var(--navy); }
+.team-cta-secondary:hover { background: var(--navy); color: #fff; }
+
 /* Tools & Blog section */
 .tools-section { background: var(--navy); color: #fff; }
 .tools-section .section-tag { color: var(--silver); }
@@ -268,6 +291,7 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
     <ul class="nav-links">
       <li><a href="#s-cim-pomaham">S čím pomáham</a></li>
       <li><a href="#o-mne">O mne</a></li>
+      <li><a href="#nas-tim">Tím</a></li>
       <li class="nav-dropdown">
         <a href="#nastroje">Nástroje</a>
         <div class="nav-dropdown-panel">
@@ -498,6 +522,7 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
 
         <h3>Nie som v tom sám</h3>
         <p>Na rozdiel od klasického zamestnania, kde sa šéf málokedy úprimne zaujíma o tvoje ciele, ja mám okolo seba skvelé, prajné prostredie. Baví ma, že môžem pozitívne ovplyvňovať nielen klientov, ale aj mojich kolegov, s ktorými spoločne rastieme.</p>
+        <p>Verím, že kvalitné finančné plánovanie si vyžaduje nielen odbornosť, ale aj stopercentnú pozornosť. Preto som obklopený profesionálmi, ktorí mi pomáhajú doručovať vám ten najlepší servis. <a href="#nas-tim" style="color:var(--red);font-weight:600">Spoznajte náš tím →</a></p>
 
         <h3>Keď práve neriešim financie...</h3>
         <p>Som aktívny športovec. Rád si dám do tela vo fitku, behám, zbehnem na airsoft alebo turistiku a dokonalý reset je pre mňa sauna. Som nadšenec do technológií, umelej inteligencie a biohackingu. A úplne najradšej zo všetkého trávim čas s mojou priateľkou — je nám jedno, či sme doma, alebo niekde na cestách, hlavne, že sme spolu.</p>
@@ -512,6 +537,62 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team-section" id="nas-tim">
+  <div class="section-inner">
+    <div class="section-tag fade-up">Náš tím</div>
+    <h2 class="section-title fade-up">Váš tím pre finančnú slobodu</h2>
+    <p class="section-sub fade-up">Staviame na odbornosti, zastupiteľnosti a lokálnej dostupnosti.</p>
+    <div class="team-grid">
+
+      <!-- Mário -->
+      <div class="team-card featured fade-up">
+        <div class="team-photo">
+          <img src="mario-foto.jpg" alt="Mário Tišťan — Senior Consultant Partners Group SK">
+        </div>
+        <div class="team-info">
+          <div class="team-name">Mário Tišťan</div>
+          <div class="team-role">Senior Consultant</div>
+          <div class="team-location">Bratislava · Žilina · Čadca · Bytča · Online</div>
+          <p class="team-desc">Strategické plánovanie a investície. Zastrešujem dlhodobú víziu vášho majetku a hľadám cesty k vašim cieľom.</p>
+          <a href="#kontakt" class="team-cta team-cta-primary">Dohodnúť stratégiu</a>
+        </div>
+      </div>
+
+      <!-- Monika -->
+      <div class="team-card fade-up">
+        <div class="team-photo">
+          <img src="monika-foto.jpg" alt="Monika Čupková — Team Manažér Partners Group SK">
+        </div>
+        <div class="team-info">
+          <div class="team-name">Monika Čupková</div>
+          <div class="team-role">Team Manažér</div>
+          <div class="team-location">Trnava · Nitra</div>
+          <p class="team-desc">Riadenie tímu a odborný servis. Zabezpečuje vysokú kvalitu poradenstva a osobný prístup ku klientom v trnavskom regióne.</p>
+          <a href="https://wa.me/421915865958?text=Dobr%C3%BD%20de%C5%88%2C%20chcela%20by%20som%20sa%20poradi%C5%A5%20o%20financiách%20v%20Trnave." class="team-cta team-cta-secondary" target="_blank" rel="noopener">Kontaktovať pobočku Trnava</a>
+        </div>
+      </div>
+
+      <!-- Lenka -->
+      <div class="team-card fade-up">
+        <div class="team-photo">
+          <div class="team-photo-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Lenka Štoderová</div>
+          <div class="team-role">Asistentka · Klientska podpora</div>
+          <div class="team-location">Online</div>
+          <p class="team-desc">Administratíva a operatíva. Postará sa o to, aby vaše zmluvy a požiadavky boli vybavené rýchlo a bez chýb.</p>
+          <a href="mailto:asistent.cupka2@partnersgroup.sk?subject=Servis%20k%20zmluvám" class="team-cta team-cta-secondary">Servis k zmluvám</a>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
