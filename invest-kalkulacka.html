@@ -322,12 +322,12 @@ function buildStratChecks(){
   var c = document.getElementById('stratChecks');
   var html = '';
   strategies.forEach(function(s){
-    html += '<div class="strat-check-row" style="border-left-color:'+s.color+'" onclick="toggleStrat(\''+s.id+'\',this)">';
-    html += '<input type="checkbox" id="chk_'+s.id+'" checked onchange="event.stopPropagation();checkedStrategies[\''+s.id+'\']=this.checked;calc()">';
+    html += '<label class="strat-check-row" style="border-left-color:'+s.color+'" for="chk_'+s.id+'">';
+    html += '<input type="checkbox" id="chk_'+s.id+'" checked onchange="checkedStrategies[\''+s.id+'\']=this.checked;calc()">';
     html += '<span class="strat-dot" style="width:10px;height:10px;border-radius:50%;background:'+s.color+';display:inline-block;margin-right:8px;flex-shrink:0"></span>';
     html += '<span class="strat-check-name">'+s.name+'</span>';
     html += '<span class="strat-check-rate">'+s.rate+' %</span>';
-    html += '</div>';
+    html += '</label>';
   });
   c.innerHTML = html;
 }
