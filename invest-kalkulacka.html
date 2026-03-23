@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>InvestKalkulačka+ | Partners Group SK</title>
 <meta name="description" content="Investičná kalkulačka Partners Group SK — porovnajte stratégie investovania a sledujte rast portfólia v čase.">
+<link rel="canonical" href="https://www.mariotistan.sk/invest-kalkulacka.html">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:title" content="InvestKalkulačka+ | Mário Tišťan — Partners Group SK">
+<meta property="og:description" content="Porovnajte 7 investičných stratégií a sledujte rast portfólia v čase. Bezplatný online nástroj.">
+<meta property="og:image" content="https://www.mariotistan.sk/mario-foto.jpg">
+<meta property="og:url" content="https://www.mariotistan.sk/invest-kalkulacka.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sk_SK">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -240,11 +248,11 @@ td{padding:6px;font-size:9px}
       <div class="splatka-val" id="hlDeposits">—</div>
       <div class="splatka-row">
         <div>
-          <div class="splatka-mini-lbl">Pri dynamickej stratégii budeš mať</div>
+          <div class="splatka-mini-lbl" id="hlDynLabel">Pri dynamickej stratégii budeš mať</div>
           <div class="splatka-mini-val" id="hlDynamic">—</div>
         </div>
         <div style="text-align:right">
-          <div class="splatka-mini-lbl">Peniaze zarobili za teba</div>
+          <div class="splatka-mini-lbl" id="hlGainsLabel">Peniaze zarobili za teba</div>
           <div class="splatka-mini-val" id="hlGains">—</div>
         </div>
       </div>
@@ -446,6 +454,16 @@ function calc(){
   document.getElementById('hlDynamic').textContent = fmt(dynResult.fv);
   document.getElementById('hlGains').textContent = fmt(dynResult.gains);
 
+  // Update highlight labels based on value mode
+  var hlDynLabel = document.getElementById('hlDynLabel');
+  if(hlDynLabel){
+    hlDynLabel.textContent = valueMode==='real' ? 'Reálna hodnota pri dynamickej stratégii' : 'Pri dynamickej stratégii budeš mať';
+  }
+  var hlGainsLabel = document.getElementById('hlGainsLabel');
+  if(hlGainsLabel){
+    hlGainsLabel.textContent = valueMode==='real' ? 'Reálny zisk (po inflácii)' : 'Peniaze zarobili za teba';
+  }
+
   // Build chart
   buildChart(results, horizon, totalDeposits, lumpSum, monthlyInvest, annualBonus);
 
@@ -562,8 +580,10 @@ function buildCompTable(results, totalDeposits){
     html += '<td>'+displayRate+' %</td>';
     html += '<td class="green" style="font-weight:800">'+fmt(row.fv)+'</td>';
     html += '<td>'+fmt(row.deposits)+'</td>';
-    html += '<td style="color:#003049;font-weight:700">'+fmt(row.gains)+'</td>';
-    html += '<td style="color:'+row.s.color+';font-weight:800">'+fmtPct(row.gainsPct)+'</td>';
+    var gainsColor = row.gains < 0 ? '#e74c3c' : '#003049';
+    html += '<td style="color:'+gainsColor+';font-weight:700">'+fmt(row.gains)+'</td>';
+    var pctColor = row.gainsPct < 0 ? '#e74c3c' : row.s.color;
+    html += '<td style="color:'+pctColor+';font-weight:800">'+fmtPct(row.gainsPct)+'</td>';
     html += '</tr>';
   });
   document.getElementById('compTableBody').innerHTML = html;

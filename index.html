@@ -185,6 +185,7 @@ input[type=range] { flex: 1; height: 3px; appearance: none; background: rgba(0,4
 .calc-result-sub { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.7); }
 @media (max-width: 480px) { .calc-result-sub { font-size: 16px; } }
 .calc-cta-link { display: inline-block; margin-top: 16px; font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #AB0534; text-decoration: none; border-bottom: 1px solid rgba(171,5,52,0.4); padding-bottom: 2px; }
+.tools-calc-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,48,73,0.12); border-color: var(--red) !important; }
 .calc-intro { font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 24px; word-break: break-word; }
 .blog-intro { font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 24px; }
 
@@ -521,41 +522,34 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
     <div class="section-tag fade-up">Nástroje a vzdelávanie</div>
     <h2 class="section-title fade-up">Počítaj a vzdelávaj sa</h2>
     <div class="tools-grid">
-      <!-- Left: Calculator -->
+      <!-- Left: Calculator Cards -->
       <div class="fade-up">
-        <p class="calc-intro">Vyskúšaj moju HypoKalkulačku+. Vypočítaj si splátku, zisti svoje možnosti a porovnaj rôzne stratégie, ako pristupovať k úveru.</p>
-        <div class="calc-frame">
-          <div class="calc-mini-wrap">
-            <div class="calc-panel">
-              <div class="calc-row">
-                <span class="calc-lbl">Výška úveru</span>
-                <input type="range" min="10000" max="500000" step="5000" value="150000" id="r1">
-                <span class="calc-val" id="o1">150 000 €</span>
-              </div>
-              <div class="calc-row">
-                <span class="calc-lbl">Úroková sadzba</span>
-                <input type="range" min="0.5" max="8" step="0.05" value="3.5" id="r2">
-                <span class="calc-val" id="o2">3.50 %</span>
-              </div>
-              <div class="calc-row">
-                <span class="calc-lbl">Doba splácania</span>
-                <input type="range" min="5" max="30" step="1" value="20" id="r3">
-                <span class="calc-val" id="o3">20 rokov</span>
-              </div>
+        <p class="calc-intro">Vyskúšaj moje bezplatné kalkulačky — prepočítaj si hypotéku, dôchodok aj investície.</p>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <a href="hypokalkulacka.html" class="tools-calc-card" style="text-decoration:none;display:flex;align-items:center;gap:20px;background:#fff;border-radius:var(--radius);padding:24px;border:1px solid var(--border);transition:all .3s;color:var(--navy)">
+            <div style="font-size:36px;flex-shrink:0">🏠</div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;color:var(--navy)">HypoKalkulačka+</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.5">Vypočítaj splátku, porovnaj stratégie a zisti, koľko ušetríš na úrokoch.</div>
+              <span style="font-size:12px;font-weight:700;color:var(--red);margin-top:8px;display:inline-block;letter-spacing:.04em;text-transform:uppercase">Otvoriť kalkulačku →</span>
             </div>
-            <div class="calc-result">
-              <div>
-                <div class="calc-result-lbl">Mesačná splátka</div>
-                <div class="calc-result-val" id="res1">876 €</div>
-              </div>
-              <div style="text-align:right">
-                <div class="calc-result-lbl">Celkové úroky</div>
-                <div class="calc-result-sub" id="res2">60 298 €</div>
-              </div>
+          </a>
+          <a href="dochodkova-kalkulacka.html" class="tools-calc-card" style="text-decoration:none;display:flex;align-items:center;gap:20px;background:#fff;border-radius:var(--radius);padding:24px;border:1px solid var(--border);transition:all .3s;color:var(--navy)">
+            <div style="font-size:36px;flex-shrink:0">📊</div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;color:var(--navy)">DôchodKalkulačka+</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.5">Koľko ti bude chýbať na dôchodku? Zisti medzeru a koľko investovať.</div>
+              <span style="font-size:12px;font-weight:700;color:var(--red);margin-top:8px;display:inline-block;letter-spacing:.04em;text-transform:uppercase">Otvoriť kalkulačku →</span>
             </div>
-            <a href="hypokalkulacka.html" class="calc-cta-link">Otvoriť podrobnú kalkulačku →</a>
-            <a href="dochodkova-kalkulacka.html" class="calc-cta-link" style="margin-top:8px;background:rgba(171,5,52,0.08);color:#AB0534">DôchodKalkulačka+ — koľko ti bude chýbať? →</a>
-          </div>
+          </a>
+          <a href="invest-kalkulacka.html" class="tools-calc-card" style="text-decoration:none;display:flex;align-items:center;gap:20px;background:#fff;border-radius:var(--radius);padding:24px;border:1px solid var(--border);transition:all .3s;color:var(--navy)">
+            <div style="font-size:36px;flex-shrink:0">💰</div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;color:var(--navy)">InvestKalkulačka+</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.5">Porovnaj 7 investičných stratégií a sleduj silu zloženého úročenia.</div>
+              <span style="font-size:12px;font-weight:700;color:var(--red);margin-top:8px;display:inline-block;letter-spacing:.04em;text-transform:uppercase">Otvoriť kalkulačku →</span>
+            </div>
+          </a>
         </div>
       </div>
       <!-- Right: Blog -->
@@ -698,20 +692,7 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
 var u='mario.tistan';var d='partnersgroup.sk';var e=u+'@'+d;
 document.getElementById('em').innerHTML='<a href="mailto:'+e+'">'+e+'</a>';
 
-// Calculator
-function fmt(n){return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))+' €';}
-function calc(){
-  var P=+document.getElementById('r1').value;
-  var r=+document.getElementById('r2').value/100/12;
-  var n=+document.getElementById('r3').value*12;
-  var M=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
-  document.getElementById('res1').textContent=fmt(Math.round(M));
-  document.getElementById('res2').textContent=fmt(Math.round((M*n)-P));
-}
-document.getElementById('r1').addEventListener('input',function(){document.getElementById('o1').textContent=fmt(+this.value);calc();});
-document.getElementById('r2').addEventListener('input',function(){document.getElementById('o2').textContent=parseFloat(this.value).toFixed(2)+' %';calc();});
-document.getElementById('r3').addEventListener('input',function(){document.getElementById('o3').textContent=this.value+' rokov';calc();});
-calc();
+// (Mini calculator removed — replaced with calculator cards)
 
 // Fade-up IntersectionObserver
 var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
