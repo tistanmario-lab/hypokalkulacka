@@ -213,6 +213,19 @@ td{padding:6px;font-size:9px}
     </div>
 
     <div class="panel">
+      <div class="panel-tag gold">Zobrazenie</div>
+      <div class="panel-title">Nominálna vs. reálna hodnota</div>
+
+      <div class="freq-btns" style="margin-bottom:12px">
+        <button class="freq-btn active" id="btnNominal" onclick="setValueMode('nominal')">Nominálna</button>
+        <button class="freq-btn" id="btnReal" onclick="setValueMode('real')">Reálna (po inflácii)</button>
+      </div>
+      <div class="info-row" id="valueModeInfo" style="border-left-color:rgba(0,48,73,0.15);font-size:10px">
+        Zobrazuje sa nominálna hodnota — bez zohľadnenia inflácie.
+      </div>
+    </div>
+
+    <div class="panel">
       <div class="panel-tag gold">Stratégie</div>
       <div class="panel-title">Porovnanie stratégií</div>
 
@@ -306,6 +319,17 @@ var strategies = [
 
 var checkedStrategies = {};
 strategies.forEach(function(s){ checkedStrategies[s.id] = true; });
+var INFLATION = 3;
+var valueMode = 'nominal';
+function setValueMode(mode){
+  valueMode = mode;
+  document.getElementById('btnNominal').className = 'freq-btn' + (mode==='nominal'?' active':'');
+  document.getElementById('btnReal').className = 'freq-btn' + (mode==='real'?' active':'');
+  document.getElementById('valueModeInfo').innerHTML = mode==='nominal'
+    ? 'Zobrazuje sa nominálna hodnota — bez zohľadnenia inflácie.'
+    : 'Zobrazuje sa <strong>reálna kúpna sila</strong> — po odpočítaní inflácie '+INFLATION+'% ročne.';
+  calc();
+}
 
 var mainChart = null;
 
@@ -354,7 +378,8 @@ function syncPair(nId, rId, min, max){
 }
 
 function calcStrategy(s, lumpSum, monthlyInvest, annualBonus, horizon){
-  var monthlyRate = s.rate / 100 / 12;
+  var effectiveRate = s.isInflation ? s.rate : (valueMode==='real' ? s.rate - INFLATION : s.rate);
+  var monthlyRate = effectiveRate / 100 / 12;
   var months = horizon * 12;
   var totalDeposits = lumpSum + monthlyInvest * months + annualBonus * horizon;
 
@@ -533,7 +558,8 @@ function buildCompTable(results, totalDeposits){
     var isDyn = row.s.id === 'dynam';
     html += '<tr'+(isDyn?' class="hl-row"':'')+'>';
     html += '<td style="font-weight:700;color:#003049"><span class="strat-dot" style="background:'+row.s.color+'"></span>'+row.s.name+'</td>';
-    html += '<td>'+row.s.rate+' %</td>';
+    var displayRate = row.s.isInflation ? row.s.rate : (valueMode==='real' ? row.s.rate - INFLATION : row.s.rate);
+    html += '<td>'+displayRate+' %</td>';
     html += '<td class="green" style="font-weight:800">'+fmt(row.fv)+'</td>';
     html += '<td>'+fmt(row.deposits)+'</td>';
     html += '<td style="color:#003049;font-weight:700">'+fmt(row.gains)+'</td>';
