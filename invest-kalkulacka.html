@@ -294,7 +294,7 @@ td{padding:6px;font-size:9px}
 
 <script>
 var strategies = [
-  {id:'inflacia', name:'Inflácia (strata hodnoty)', rate:3, color:'#e76f51', dash:[4,4]},
+  {id:'inflacia', name:'Inflácia (strata hodnoty)', rate:-3, color:'#e76f51', dash:[4,4], isInflation:true},
   {id:'termin', name:'Termínovaný vklad', rate:1.5, color:'#989FA7', dash:[5,5]},
   {id:'pfki', name:'PFKI', rate:2, color:'#6c757d', dash:[]},
   {id:'konzerv', name:'Konzervatívna', rate:4, color:'#2a9d8f', dash:[]},
@@ -359,7 +359,7 @@ function calcStrategy(s, lumpSum, monthlyInvest, annualBonus, horizon){
   var totalDeposits = lumpSum + monthlyInvest * months + annualBonus * horizon;
 
   var fv = lumpSum * Math.pow(1+monthlyRate, months);
-  if(monthlyRate > 0){
+  if(monthlyRate !== 0){
     fv += monthlyInvest * (Math.pow(1+monthlyRate, months) - 1) / monthlyRate;
   } else {
     fv += monthlyInvest * months;
@@ -375,7 +375,7 @@ function calcStrategy(s, lumpSum, monthlyInvest, annualBonus, horizon){
   for(var yr = 1; yr <= horizon; yr++){
     var m = yr * 12;
     var val = lumpSum * Math.pow(1+monthlyRate, m);
-    if(monthlyRate > 0){
+    if(monthlyRate !== 0){
       val += monthlyInvest * (Math.pow(1+monthlyRate, m) - 1) / monthlyRate;
     } else {
       val += monthlyInvest * m;
