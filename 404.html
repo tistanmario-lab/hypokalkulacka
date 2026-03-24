@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stránka nenájdená | Mário Tišťan</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #003049;
+  --red: #AB0534;
+  --silver: #989FA7;
+  --sand: #ECEDED;
+  --white: #ffffff;
+  --muted: rgba(0,48,73,0.5);
+  --radius: 20px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--navy); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+.logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); text-decoration: none; margin-bottom: 60px; }
+.logo span { color: var(--red); }
+.code { font-family: 'Playfair Display', serif; font-size: clamp(80px, 15vw, 140px); font-weight: 700; color: var(--sand); line-height: 1; }
+h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: var(--navy); margin: 16px 0 12px; }
+p { font-size: 16px; font-weight: 300; color: var(--muted); max-width: 440px; line-height: 1.7; margin-bottom: 36px; }
+.btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.btn { padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: all .2s; border-radius: var(--radius); }
+.btn-primary { background: var(--red); color: #fff; }
+.btn-primary:hover { background: var(--navy); }
+.btn-secondary { border: 1.5px solid var(--navy); color: var(--navy); }
+.btn-secondary:hover { background: var(--navy); color: #fff; }
+</style>
+</head>
+<body>
+<a href="/" class="logo">Mário <span>Tišťan</span></a>
+<div class="code">404</div>
+<h1>Táto stránka neexistuje</h1>
+<p>Možno bol odkaz nesprávny, alebo bola stránka presunutá. Nevadí — vráťte sa na úvodnú stránku alebo vyskúšajte naše kalkulačky.</p>
+<div class="btns">
+  <a href="/" class="btn btn-primary">Späť na úvod</a>
+  <a href="hypokalkulacka.html" class="btn btn-secondary">HypoKalkulačka</a>
+</div>
+</body>
+</html>
