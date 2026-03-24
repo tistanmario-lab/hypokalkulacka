@@ -361,11 +361,32 @@ textarea.form-input { resize: vertical; min-height: 120px; }
 .form-btn:hover { background: var(--navy); }
 .form-note { font-size: 12px; color: var(--muted); }
 
-footer { background: var(--navy); color: #fff; padding: 40px 5%; }
-.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
-.footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; }
+footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
+.footer-inner { max-width: 1100px; margin: 0 auto; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+@media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; } }
+@media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 12px; }
 .footer-logo span { color: var(--red); }
+.footer-desc { font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 20px; }
+.footer-socials { display: flex; gap: 12px; }
+.footer-socials a { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; transition: background .2s; }
+.footer-socials a:hover { background: var(--red); }
+.footer-socials svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.footer-heading { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 16px; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-links a { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.6); text-decoration: none; transition: color .2s; }
+.footer-links a:hover { color: #fff; }
+.footer-contact-item { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 10px; line-height: 1.5; }
+.footer-contact-item a { color: rgba(255,255,255,0.6); text-decoration: none; transition: color .2s; }
+.footer-contact-item a:hover { color: #fff; }
+.footer-contact-label { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 2px; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+@media (max-width: 480px) { .footer-bottom { flex-direction: column; text-align: center; } }
 .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+.footer-legal { font-size: 11px; color: rgba(255,255,255,0.25); line-height: 1.6; text-align: right; }
+@media (max-width: 480px) { .footer-legal { text-align: center; } }
+.footer-legal a { color: rgba(255,255,255,0.4); text-decoration: underline; }
 
 .fade-up { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
@@ -865,10 +886,75 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-logo">Mário <span>Tišťan</span></div>
-    <div class="footer-copy">© 2026 Mário Tišťan · mariotistan.sk</div>
-    <div style="width:100%;text-align:center;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6">
-      Podriadený finančný agent Partners Group SK s.r.o. · Registrácia NBS č. 221967 · <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5);text-decoration:underline">Overenie v registri NBS</a> · <a href="ochrana-udajov.html" style="color:rgba(255,255,255,0.5);text-decoration:underline">Ochrana osobných údajov</a>
+    <div class="footer-grid">
+      <!-- Col 1: Brand -->
+      <div>
+        <div class="footer-logo">Mário <span>Tišťan</span></div>
+        <p class="footer-desc">Finančný poradca v Partners Group SK. Pomáham s hypotékami, investíciami, poistením a dôchodkovým sporením od roku 2016.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/mario.tistan/" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="https://www.facebook.com/mario.tistan" target="_blank" rel="noopener" title="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/m%C3%A1rio-ti%C5%A1%C5%A5an-9b533313b" target="_blank" rel="noopener" title="LinkedIn">
+            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+        </div>
+      </div>
+      <!-- Col 2: Navigácia -->
+      <div>
+        <div class="footer-heading">Navigácia</div>
+        <ul class="footer-links">
+          <li><a href="#s-cim-pomaham">S čím pomáham</a></li>
+          <li><a href="#o-mne">O mne</a></li>
+          <li><a href="#nas-tim">Náš tím</a></li>
+          <li><a href="#nastroje">Nástroje a blog</a></li>
+          <li><a href="#kontakt">Kontakt</a></li>
+        </ul>
+      </div>
+      <!-- Col 3: Kalkulačky -->
+      <div>
+        <div class="footer-heading">Kalkulačky</div>
+        <ul class="footer-links">
+          <li><a href="hypokalkulacka.html">HypoKalkulačka+</a></li>
+          <li><a href="dochodkova-kalkulacka.html">DôchodKalkulačka+</a></li>
+          <li><a href="invest-kalkulacka.html">InvestKalkulačka+</a></li>
+        </ul>
+        <div class="footer-heading" style="margin-top:20px">Blog</div>
+        <ul class="footer-links">
+          <li><a href="blog-hypoteky.html">Hypotéky</a></li>
+          <li><a href="blog-investicie.html">Investície</a></li>
+          <li><a href="blog-poistenie.html">Poistenie</a></li>
+        </ul>
+      </div>
+      <!-- Col 4: Kontakt -->
+      <div>
+        <div class="footer-heading">Kontakt</div>
+        <div class="footer-contact-item">
+          <div class="footer-contact-label">Telefón</div>
+          <a href="tel:+421902130096">+421 902 130 096</a>
+        </div>
+        <div class="footer-contact-item">
+          <div class="footer-contact-label">E-mail</div>
+          <a href="mailto:mario.tistan@partnersgroup.sk">mario.tistan@partnersgroup.sk</a>
+        </div>
+        <div class="footer-contact-item">
+          <div class="footer-contact-label">Dostupnosť</div>
+          BA · TT · ZA · CA · BY · NR · Online
+        </div>
+        <div class="footer-contact-item" style="margin-top:12px">
+          <a href="https://www.partnersgroup.sk" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.4);font-size:12px">www.partnersgroup.sk</a>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom bar -->
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Mário Tišťan · mariotistan.sk</div>
+      <div class="footer-legal">
+        Podriadený finančný agent Partners Group SK s.r.o. · NBS č. 221967 · <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener">Register NBS</a> · <a href="ochrana-udajov.html">Ochrana údajov</a>
+      </div>
     </div>
   </div>
 </footer>
