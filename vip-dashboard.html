@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP Zóna | Dashboard | Mário Tišťan</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #003049;
+  --red: #AB0534;
+  --silver: #989FA7;
+  --sand: #ECEDED;
+  --white: #ffffff;
+  --dark-gray: #4D4D4D;
+  --muted: rgba(0,48,73,0.5);
+  --border: rgba(0,48,73,0.1);
+  --radius: 20px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(--navy); line-height: 1.6; min-height: 100vh; }
+
+/* Top bar */
+.vip-topbar {
+  background: var(--navy);
+  padding: 0 5%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.vip-topbar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.vip-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+}
+.vip-logo span { color: var(--red); }
+.vip-badge {
+  background: var(--red);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+.vip-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.vip-user {
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+}
+.vip-user strong { color: #fff; }
+.vip-logout {
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  transition: color .2s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+.vip-logout:hover { color: var(--red); }
+
+/* Main content */
+.vip-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 5% 80px;
+}
+
+.vip-welcome {
+  margin-bottom: 40px;
+}
+.vip-welcome h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.vip-welcome p {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* Tool cards grid */
+.vip-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
+@media (max-width: 900px) { .vip-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .vip-grid { grid-template-columns: 1fr; } }
+
+.vip-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  border: 1px solid var(--border);
+  transition: all .3s;
+  text-decoration: none;
+  color: var(--navy);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.vip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(0,48,73,0.10);
+  border-color: var(--red);
+}
+.vip-card-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+.vip-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.vip-card p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  flex: 1;
+}
+.vip-card-status {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.status-active { background: #e8f5e9; color: #2e7d32; }
+.status-soon { background: #fff3e0; color: #e65100; }
+.status-planned { background: var(--sand); color: var(--silver); }
+
+/* Section headers */
+.vip-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+/* Quick stats */
+.vip-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+@media (max-width: 768px) { .vip-stats { grid-template-columns: repeat(2, 1fr); } }
+
+.vip-stat {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.vip-stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.vip-stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-top: 4px;
+}
+
+/* Footer */
+.vip-footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 12px;
+  color: var(--silver);
+  border-top: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- Auth check -->
+<script>
+if (sessionStorage.getItem('vip_auth') !== 'true') {
+  window.location.href = 'vip-login.html';
+}
+</script>
+
+<!-- Top bar -->
+<div class="vip-topbar">
+  <div class="vip-topbar-inner">
+    <div>
+      <a href="index.html" class="vip-logo">Mário <span>Tišťan</span></a>
+      <span class="vip-badge">VIP Zóna</span>
+    </div>
+    <div class="vip-topbar-right">
+      <span class="vip-user">Prihlásený: <strong id="vipUserName"></strong></span>
+      <button class="vip-logout" onclick="doLogout()">Odhlásiť sa</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="vip-main">
+
+  <!-- Welcome -->
+  <div class="vip-welcome">
+    <h1>Vitaj v tvojej VIP Zóne</h1>
+    <p>Interné nástroje pre finančné plánovanie a analýzu.</p>
+  </div>
+
+  <!-- Quick stats -->
+  <div class="vip-stats">
+    <div class="vip-stat">
+      <div class="vip-stat-value" id="statTools">3</div>
+      <div class="vip-stat-label">Kalkulačky</div>
+    </div>
+    <div class="vip-stat">
+      <div class="vip-stat-value" id="statClients">—</div>
+      <div class="vip-stat-label">Klienti</div>
+    </div>
+    <div class="vip-stat">
+      <div class="vip-stat-value" id="statPlans">—</div>
+      <div class="vip-stat-label">Fin. plány</div>
+    </div>
+    <div class="vip-stat">
+      <div class="vip-stat-value" id="statRevenue">—</div>
+      <div class="vip-stat-label">Tento mesiac</div>
+    </div>
+  </div>
+
+  <!-- Nástroje -->
+  <h2 class="vip-section-title">Nástroje</h2>
+  <div class="vip-grid">
+
+    <!-- Analýza osobných financií -->
+    <a href="#" class="vip-card" onclick="alert('Nástroj sa pripravuje. Čoskoro bude dostupný!');return false;">
+      <div class="vip-card-icon">📋</div>
+      <h3>Analýza osobných financií</h3>
+      <p>Komplexný prehľad príjmov, výdavkov, majetku a záväzkov klienta. Základ pre finančný plán.</p>
+      <span class="vip-card-status status-soon">Pripravuje sa</span>
+    </a>
+
+    <!-- Generátor finančného plánu -->
+    <a href="#" class="vip-card" onclick="alert('Nástroj sa pripravuje. Čoskoro bude dostupný!');return false;">
+      <div class="vip-card-icon">📊</div>
+      <h3>Generátor finančného plánu</h3>
+      <p>Na základe analýzy vytvorí personalizovaný finančný plán s odporúčaniami a akčnými krokmi.</p>
+      <span class="vip-card-status status-soon">Pripravuje sa</span>
+    </a>
+
+    <!-- Porovnávač produktov -->
+    <a href="#" class="vip-card" onclick="alert('Nástroj sa pripravuje. Čoskoro bude dostupný!');return false;">
+      <div class="vip-card-icon">🔍</div>
+      <h3>Porovnávač produktov</h3>
+      <p>Porovnanie hypotekárnych, investičných a poistných produktov naprieč partnermi.</p>
+      <span class="vip-card-status status-planned">Plánované</span>
+    </a>
+
+    <!-- Existujúce kalkulačky -->
+    <a href="hypokalkulacka.html" class="vip-card">
+      <div class="vip-card-icon">🏠</div>
+      <h3>HypoKalkulačka+</h3>
+      <p>Výpočet splátky, porovnanie stratégií a úspora na úrokoch mimoriadnymi splátkami.</p>
+      <span class="vip-card-status status-active">Aktívne</span>
+    </a>
+
+    <a href="dochodkova-kalkulacka.html" class="vip-card">
+      <div class="vip-card-icon">🎯</div>
+      <h3>DôchodKalkulačka+</h3>
+      <p>Výpočet dôchodkovej medzery a potrebnej mesačnej investície pre klienta.</p>
+      <span class="vip-card-status status-active">Aktívne</span>
+    </a>
+
+    <a href="invest-kalkulacka.html" class="vip-card">
+      <div class="vip-card-icon">💰</div>
+      <h3>InvestKalkulačka+</h3>
+      <p>Porovnanie 7 investičných stratégií vrátane inflácie a reálnych hodnôt.</p>
+      <span class="vip-card-status status-active">Aktívne</span>
+    </a>
+
+  </div>
+
+  <!-- Rýchle linky -->
+  <h2 class="vip-section-title">Rýchle linky</h2>
+  <div class="vip-grid">
+    <a href="index.html" class="vip-card">
+      <div class="vip-card-icon">🌐</div>
+      <h3>Webová stránka</h3>
+      <p>Hlavná stránka mariotistan.sk — verejná prezentácia.</p>
+    </a>
+
+    <a href="https://www.partnersgroup.sk" target="_blank" class="vip-card">
+      <div class="vip-card-icon">🏢</div>
+      <h3>Partners Group SK</h3>
+      <p>Firemná stránka Partners Group SK.</p>
+    </a>
+
+    <a href="https://analytics.google.com" target="_blank" class="vip-card">
+      <div class="vip-card-icon">📈</div>
+      <h3>Google Analytics</h3>
+      <p>Štatistiky návštevnosti webu a správanie návštevníkov.</p>
+    </a>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="vip-footer">
+  Mário Tišťan &middot; VIP Zóna &middot; &copy; 2026
+</div>
+
+<script>
+// Display username
+var userName = sessionStorage.getItem('vip_user') || 'Používateľ';
+document.getElementById('vipUserName').textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
+
+// Logout
+function doLogout() {
+  sessionStorage.removeItem('vip_auth');
+  sessionStorage.removeItem('vip_user');
+  window.location.href = 'vip-login.html';
+}
+</script>
+
+</body>
+</html>
