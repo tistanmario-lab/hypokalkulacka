@@ -122,15 +122,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);l
 .radio-option{display:flex;align-items:center;gap:6px;font-size:14px;}
 .radio-option input{accent-color:var(--navy);}
 
-/* Timeline */
-.timeline{position:relative;padding:20px 0;margin:20px 0;}
-.timeline-line{position:absolute;top:50%;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy),var(--red));border-radius:2px;transform:translateY(-50%);}
-.timeline-items{display:flex;justify-content:space-between;position:relative;z-index:1;overflow-x:auto;gap:16px;padding:10px 0;}
-.timeline-item{display:flex;flex-direction:column;align-items:center;min-width:120px;text-align:center;}
-.timeline-dot{width:16px;height:16px;border-radius:50%;background:var(--navy);border:3px solid var(--white);box-shadow:0 0 0 2px var(--navy);margin-bottom:8px;}
-.timeline-label{font-size:11px;font-weight:600;max-width:120px;}
-.timeline-date{font-size:10px;color:var(--muted);}
-.timeline-amount{font-size:12px;font-weight:700;color:var(--red);}
+/* Timeline — vertical */
+.timeline-v{position:relative;padding:0 0 0 32px;margin:20px 0;}
+.timeline-v::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--navy),var(--red));border-radius:2px;}
+.timeline-v-item{position:relative;padding:0 0 28px 24px;}
+.timeline-v-item:last-child{padding-bottom:0;}
+.timeline-v-dot{position:absolute;left:-25px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--navy);border:3px solid var(--white);box-shadow:0 0 0 2px var(--navy);}
+.timeline-v-item.milestone .timeline-v-dot{background:var(--red);box-shadow:0 0 0 2px var(--red);width:18px;height:18px;left:-27px;top:2px;}
+.timeline-v-header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+.timeline-v-year{font-size:12px;font-weight:700;color:var(--white);background:var(--navy);padding:2px 10px;border-radius:8px;min-width:44px;text-align:center;}
+.timeline-v-item.milestone .timeline-v-year{background:var(--red);}
+.timeline-v-name{font-size:14px;font-weight:600;color:var(--navy);}
+.timeline-v-detail{font-size:13px;color:var(--muted);margin-top:4px;}
+.timeline-v-amount{font-weight:700;color:var(--red);}
+.timeline-v-badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:6px;margin-left:8px;}
+.timeline-v-badge.green{background:rgba(46,125,50,0.1);color:var(--green);}
+.timeline-v-badge.navy{background:rgba(0,48,73,0.08);color:var(--navy);}
+.timeline-v-badge.red{background:rgba(171,5,52,0.08);color:var(--red);}
 
 /* Summary cards */
 .summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
@@ -1218,29 +1226,64 @@ function buildTimeline(){
   const goals = collectGoals();
   const container = document.getElementById('timelineContainer');
 
-  if(goals.length === 0){
+  // Separate time-based goals from non-time-based
+  const timeGoals = goals.filter(g => g.date && g.date !== '—' && g.category !== 'zabezpecenie');
+  const protectionGoals = goals.filter(g => g.category === 'zabezpecenie');
+
+  if(timeGoals.length === 0 && protectionGoals.length === 0){
     container.innerHTML = '<div class="info-box">Zatiaľ nemáte zaradené žiadne ciele do finančného plánu. Vráťte sa do predchádzajúcich krokov a zaškrtnite "Zaradiť do finančného plánu".</div>';
     return;
   }
 
-  goals.sort((a,b)=>new Date(a.date)-new Date(b.date));
-
   const age = parseInt(document.getElementById('k_vek').value)||30;
   const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
+  const thisYear = new Date().getFullYear();
 
-  let html = '<div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:13px;font-weight:600;">';
-  html += '<span>Aktuálny vek: '+age+'</span>';
-  html += '<span>Dôchodkový vek: '+dochVek+'</span></div>';
-  html += '<div class="timeline"><div class="timeline-line"></div><div class="timeline-items">';
-  goals.forEach(g=>{
-    html += `<div class="timeline-item">
-      <div class="timeline-dot"></div>
-      <div class="timeline-label">${g.name}</div>
-      <div class="timeline-amount">${formatEUR(g.suma)}</div>
-      <div class="timeline-date">${g.date||'—'}</div>
+  // Sort by date
+  timeGoals.sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  // Add START marker
+  let html = '<div class="timeline-v">';
+  html += `<div class="timeline-v-item">
+    <div class="timeline-v-dot"></div>
+    <div class="timeline-v-header">
+      <span class="timeline-v-year">${thisYear}</span>
+      <span class="timeline-v-name">Dnes — vek ${age} rokov</span>
+      <span class="timeline-v-badge navy">Štart</span>
+    </div>
+  </div>`;
+
+  // Time-based goals
+  timeGoals.forEach(g=>{
+    const targetDate = new Date(g.date);
+    const targetYear = targetDate.getFullYear();
+    const yearsFromNow = targetYear - thisYear;
+    const ageAtGoal = age + yearsFromNow;
+    const isMilestone = g.name === 'Dôchodok';
+    html += `<div class="timeline-v-item${isMilestone ? ' milestone' : ''}">
+      <div class="timeline-v-dot"></div>
+      <div class="timeline-v-header">
+        <span class="timeline-v-year">${targetYear}</span>
+        <span class="timeline-v-name">${g.name}</span>
+        <span class="timeline-v-badge ${isMilestone ? 'red' : 'green'}">za ${yearsFromNow} r. (vek ${ageAtGoal})</span>
+      </div>
+      <div class="timeline-v-detail">Cieľová suma: <span class="timeline-v-amount">${formatEUR(g.suma)}</span></div>
     </div>`;
   });
-  html += '</div></div>';
+
+  html += '</div>';
+
+  // Protection goals (separate section)
+  if(protectionGoals.length > 0){
+    html += '<div style="margin-top:24px;padding:16px 20px;background:rgba(171,5,52,0.04);border-left:4px solid var(--red);border-radius:0 12px 12px 0;">';
+    html += '<strong style="font-size:13px;">Priebežné zabezpečenie príjmu:</strong>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">';
+    protectionGoals.forEach(g=>{
+      html += `<span style="font-size:12px;background:var(--white);padding:6px 12px;border-radius:8px;border:1px solid var(--border);">${g.name.replace('Zabezpečenie: ','')} <strong style="color:var(--red);">${formatEUR(g.suma)}/mes</strong></span>`;
+    });
+    html += '</div></div>';
+  }
+
   container.innerHTML = html;
 }
 
@@ -1304,9 +1347,10 @@ function collectGoals(){
     });
   }
 
-  // Step 8: Zabezpečenie
+  // Step 8: Zabezpečenie (priebežné, bez dátumu)
   document.querySelectorAll('.fp-zab-k:checked').forEach(cb=>{
-    goals.push({name:'Zabezpečenie: '+cb.dataset.name, suma:parseFloat(cb.dataset.suma)||0, date:'—'});
+    const s = parseFloat(cb.dataset.suma)||0;
+    if(s > 0) goals.push({name:'Zabezpečenie: '+cb.dataset.name, suma:s, date:'—', category:'zabezpecenie'});
   });
 
   return goals;
@@ -1435,22 +1479,11 @@ function buildSummary(){
     strategieBody.appendChild(tr);
   });
 
-  // Timeline in summary
-  const timelineGoals = [...goals].sort((a,b)=>new Date(a.date)-new Date(b.date));
-  let tlHtml = '';
-  if(timelineGoals.length > 0){
-    const age2 = parseInt(document.getElementById('k_vek').value)||30;
-    const dv = parseInt(document.getElementById('doch_vek').value)||65;
-    tlHtml = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;font-weight:600;"><span>Vek: '+age2+'</span><span>Dôchodok: '+dv+'</span></div>';
-    tlHtml += '<div class="timeline"><div class="timeline-line"></div><div class="timeline-items">';
-    timelineGoals.forEach(g=>{
-      tlHtml += `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-label">${g.name}</div><div class="timeline-amount">${formatEUR(g.suma)}</div><div class="timeline-date">${g.date||'—'}</div></div>`;
-    });
-    tlHtml += '</div></div>';
-  } else {
-    tlHtml = '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
-  }
-  document.getElementById('summTimeline').innerHTML = tlHtml;
+  // Timeline in summary — reuse buildTimeline logic
+  const tempContainer = document.createElement('div');
+  const origContainer = document.getElementById('timelineContainer');
+  const origHTML = origContainer.innerHTML;
+  document.getElementById('summTimeline').innerHTML = origHTML || '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
 }
 
 // ============================================================
