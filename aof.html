@@ -660,11 +660,14 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <div class="card">
       <table class="dyn-table" id="cieleTable">
         <thead>
-          <tr><th>Názov cieľa</th><th>Suma (€)</th><th>Termín</th><th>Priorita</th><th></th></tr>
+          <tr><th>Typ cieľa</th><th>Suma (€)</th><th>Termín</th><th>Priorita</th><th></th></tr>
         </thead>
         <tbody id="cieleBody"></tbody>
       </table>
-      <button class="btn-add" onclick="addCiel()" style="margin-top:12px;">+ Pridať cieľ</button>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <button class="btn-add" onclick="addCiel()">+ Pridať cieľ</button>
+        <button class="btn-add" onclick="addCielHypoteka()" style="border-color:var(--red);color:var(--red);">+ Rýchlejšie splatenie hypotéky</button>
+      </div>
       <div class="check-row" style="margin-top:16px;"><input type="checkbox" id="fp_ciele"> Zaradiť do finančného plánu</div>
     </div>
 
@@ -1227,6 +1230,23 @@ function addCiel(){
     <td><select><option>Vysoká</option><option>Stredná</option><option>Nízka</option></select></td>
     <td><button class="remove-row" onclick="this.closest('tr').remove()">&times;</button></td>`;
   tbody.appendChild(tr);
+}
+
+function addCielHypoteka(){
+  const zostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
+  const tbody = document.getElementById('cieleBody');
+  const tr = document.createElement('tr');
+  tr.style.background = 'rgba(171,5,52,0.03)';
+  tr.innerHTML = `
+    <td><input type="text" value="Rýchlejšie splatenie hypotéky" style="color:var(--red);font-weight:600;"></td>
+    <td><input type="number" value="${zostatok}" min="0"></td>
+    <td><input type="date"></td>
+    <td><select><option selected>Vysoká</option><option>Stredná</option><option>Nízka</option></select></td>
+    <td><button class="remove-row" onclick="this.closest('tr').remove()">&times;</button></td>`;
+  tbody.appendChild(tr);
+  if(zostatok === 0){
+    alert('Zostatok na hypotéke nie je vyplnený. Vráťte sa do kroku 2 (Nové bývanie → Optimalizácia) a vyplňte zostatok.');
+  }
 }
 
 // ============================================================
