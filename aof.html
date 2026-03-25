@@ -300,6 +300,11 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       <button class="btn-add" onclick="addFamilyMember()" style="margin-top:12px;">+ Pridať člena rodiny</button>
     </div>
 
+    <div class="card">
+      <div class="card-title">Poznámky</div>
+      <div class="form-group"><textarea id="pozn_step1" rows="3" placeholder="Vaše poznámky k tomuto programu..."></textarea></div>
+    </div>
+
     <div class="step-nav">
       <div></div>
       <button class="btn btn-primary" onclick="goToStep(2)">Ďalej &rarr;</button>
@@ -336,7 +341,40 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
             <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_kupaByt"> Kúpa bytu</label>
             <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_kupaDom"> Kúpa domu/výstavba</label>
             <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_rekon"> Rekonštrukcia</label>
-            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_optim"> Optimalizácia</label>
+            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_optim" onchange="toggleOptimalizacia()"> Optimalizácia</label>
+          </div>
+        </div>
+
+        <!-- Optimalizácia detail section -->
+        <div id="optimSection" style="display:none;margin:16px 0;padding:16px;background:var(--sand);border-radius:12px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Spôsob financovania aktuálneho bývania:</div>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" name="optim_fin" value="hotovost" onchange="toggleOptimUver()"> Hotovosť</label>
+            <label class="radio-option"><input type="radio" name="optim_fin" value="uver" onchange="toggleOptimUver()"> Úver</label>
+          </div>
+          <div id="optimUverSection" style="display:none;margin-top:12px;">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Banka</label>
+                <select id="optim_banka"><option value="">-- Vyberte --</option><option value="SLSP">SLSP</option><option value="VUB">VÚB</option><option value="Prima">Prima Banka</option><option value="CSOB">ČSOB</option><option value="Unicredit">Unicredit Banka</option><option value="MBank">MBank</option></select>
+              </div>
+              <div class="form-group">
+                <label>Typ úveru</label>
+                <select id="optim_typ_uveru"><option value="hypoteka">Hypotéka</option><option value="spotrebny">Spotrebný úver</option><option value="stavebny">Stavebný úver</option></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Zostatok na hypotéke (€)</label><input type="number" id="optim_zostatok" value="0" min="0"></div>
+              <div class="form-group"><label>Aktuálna úroková sadzba (%)</label><input type="number" id="optim_urok" value="0" min="0" step="0.01"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Fixácia</label>
+                <select id="optim_fixacia"><option value="1">1 rok</option><option value="2">2 roky</option><option value="3">3 roky</option><option value="5" selected>5 rokov</option><option value="10">10 rokov</option></select>
+              </div>
+              <div class="form-group"><label>Zostávajúca doba splácania (rokov)</label><input type="number" id="optim_doba" value="0" min="0"></div>
+              <div class="form-group"><label>Mesačná splátka (€)</label><input type="number" id="optim_splatka" value="0" min="0"></div>
+            </div>
           </div>
         </div>
 
@@ -359,6 +397,11 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
         </div>
         <div class="info-box">Hypotéky riešime cez: <strong>SLSP, VÚB, Prima Banka, ČSOB, Unicredit Banka, MBank</strong></div>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Poznámky</div>
+      <div class="form-group"><textarea id="pozn_step2" rows="3" placeholder="Vaše poznámky k tomuto programu..."></textarea></div>
     </div>
 
     <div class="step-nav">
@@ -394,16 +437,23 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     </div>
 
     <div class="card">
-      <div class="card-title">Rizikový profil</div>
-      <div class="radio-group">
-        <label class="radio-option"><input type="radio" name="riziko" value="konz"> Konzervatívny</label>
-        <label class="radio-option"><input type="radio" name="riziko" value="vyv" checked> Vyvážený</label>
-        <label class="radio-option"><input type="radio" name="riziko" value="dyn"> Dynamický</label>
+      <div class="card-title">Plán doplnenia rezervy</div>
+      <div class="info-box success">
+        <strong>Odporúčanie:</strong> Partners Asset Management — Fond krátkodobých rezerv, cieľ: do 5 rokov vytvoriť pohotovostnú rezervu vo výške 6&times; čistý príjem (predpokladané zhodnotenie ~2 % p.a.)
       </div>
-      <div class="info-box" style="margin-top:16px;">
-        <strong>Odporúčanie:</strong> Partners Asset Management — krátkodobý fond, cieľ: do 5 rokov vytvoriť pohotovostnú rezervu vo výške 6&times; čistý príjem.
+      <div style="margin-top:16px;">
+        <div class="form-row">
+          <div class="form-group"><label>Chýbajúca suma (€)</label><input type="number" id="rez_chybajuca" class="computed" readonly></div>
+          <div class="form-group"><label>Odporúčaná mesačná investícia (€)</label><input type="number" id="rez_mesacna" class="computed" readonly></div>
+        </div>
+        <div class="info-box" id="rez_plan_info"></div>
       </div>
       <div class="check-row"><input type="checkbox" id="fp_rezervy"> Zaradiť do finančného plánu</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Poznámky</div>
+      <div class="form-group"><textarea id="pozn_step3" rows="3" placeholder="Vaše poznámky k tomuto programu..."></textarea></div>
     </div>
 
     <div class="step-nav">
@@ -425,41 +475,76 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       </div>
       <div class="form-row">
         <div class="form-group"><label>Očakávaný štátny dôchodok (€/mes)</label><input type="number" id="doch_statny" value="0" min="0" oninput="calcDochodok()"></div>
-        <div class="form-group"><label>Potrebný mesačný dôchodok (€)</label><input type="number" id="doch_potrebny" value="0" min="0" oninput="calcDochodok()"></div>
+        <div class="form-group"><label>Želaný mesačný dôchodok (€)</label><input type="number" id="doch_potrebny" value="0" min="0" oninput="calcDochodok()"></div>
         <div class="form-group"><label>Koľko Vám bude chýbať (€/mes)</label><input type="number" id="doch_medzera" class="computed" readonly></div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">Čo ste pre to urobili doteraz?</div>
+
+      <!-- II. pilier -->
       <div class="form-row">
         <div class="form-group">
           <label>II. pilier</label>
-          <select id="doch_pilier2"><option value="nie">Nie</option><option value="ano">Áno</option></select>
+          <select id="doch_pilier2" onchange="togglePilier2()"><option value="nie">Nie</option><option value="ano">Áno</option></select>
         </div>
+      </div>
+      <div id="pilier2Group" style="display:none;">
+        <div class="form-row">
+          <div class="form-group"><label>Dôchodková správcovská spoločnosť</label><input type="text" id="doch_p2_spolocnost" placeholder="napr. DSSPB, Allianz..."></div>
+          <div class="form-group"><label>Nasporená suma (€)</label><input type="number" id="doch_p2_suma" value="0" min="0"></div>
+          <div class="form-group">
+            <label>Fond</label>
+            <select id="doch_p2_fond"><option value="dlhopisovy">Dlhopisový fond</option><option value="zmiesany">Zmiešaný fond</option><option value="akciovy">Akciový fond</option><option value="indexovy">Indexový fond</option></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- III. pilier DDS -->
+      <div class="form-row">
         <div class="form-group">
           <label>III. pilier (DDS)</label>
           <select id="doch_pilier3" onchange="toggleDDS()"><option value="nie">Nie</option><option value="ano">Áno</option></select>
         </div>
-        <div class="form-group" id="ddsGroup" style="display:none;"><label>Mesačná suma DDS (€)</label><input type="number" id="doch_dds_suma" value="0" min="0"></div>
       </div>
+      <div id="ddsGroup" style="display:none;">
+        <div class="form-row">
+          <div class="form-group"><label>DDS spoločnosť</label><input type="text" id="doch_dds_spolocnost" placeholder="napr. NN, Partners..."></div>
+          <div class="form-group"><label>Nasporená suma (€)</label><input type="number" id="doch_dds_nasporena" value="0" min="0"></div>
+          <div class="form-group">
+            <label>Fond</label>
+            <select id="doch_dds_fond"><option value="dlhopisovy">Dlhopisový fond</option><option value="zmiesany">Zmiešaný fond</option><option value="akciovy">Akciový fond</option><option value="indexovy">Indexový fond</option></select>
+          </div>
+          <div class="form-group"><label>Mesačná suma DDS (€)</label><input type="number" id="doch_dds_suma" value="0" min="0"></div>
+        </div>
+      </div>
+
+      <!-- Investície -->
       <div class="form-row">
         <div class="form-group">
           <label>Investície</label>
           <select id="doch_investicie" onchange="toggleInvest()"><option value="nie">Nie</option><option value="ano">Áno</option></select>
         </div>
-        <div class="form-group" id="investGroup" style="display:none;"><label>Mesačná suma investícií (€)</label><input type="number" id="doch_invest_suma" value="0" min="0"></div>
+      </div>
+      <div id="investGroup" style="display:none;">
+        <div class="form-row">
+          <div class="form-group"><label>Spoločnosť</label><input type="text" id="doch_invest_spolocnost" placeholder="napr. Partners Investments..."></div>
+          <div class="form-group"><label>Nasporená suma (€)</label><input type="number" id="doch_invest_nasporena" value="0" min="0"></div>
+          <div class="form-group"><label>Mesačná suma investícií (€)</label><input type="number" id="doch_invest_suma" value="0" min="0"></div>
+        </div>
       </div>
 
       <div class="info-box">
         <strong>Sociálna poisťovňa:</strong> Orientačná výška dôchodku sa počíta ako cca 50 % z hrubého príjmu. Pre presné informácie navštívte portál Sociálnej poisťovne.
       </div>
+
+      <div class="check-row"><input type="checkbox" id="fp_dochodok"> Zaradiť do finančného plánu</div>
     </div>
 
     <div class="card">
-      <div class="card-title">Odporúčaná investičná stratégia</div>
-      <div id="dochStrategia" class="info-box success"></div>
-      <div class="check-row"><input type="checkbox" id="fp_dochodok"> Zaradiť do finančného plánu</div>
+      <div class="card-title">Poznámky</div>
+      <div class="form-group"><textarea id="pozn_step4" rows="3" placeholder="Vaše poznámky k tomuto programu..."></textarea></div>
     </div>
 
     <div class="step-nav">
@@ -483,6 +568,11 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <div id="detiSection">
       <div id="detiContainer"></div>
       <button class="btn-add" onclick="addChild()" style="margin:12px 0;">+ Pridať dieťa</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Poznámky</div>
+      <div class="form-group"><textarea id="pozn_step5" rows="3" placeholder="Vaše poznámky k tomuto programu..."></textarea></div>
     </div>
 
     <div class="step-nav">
@@ -521,6 +611,11 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       <div class="check-row"><input type="checkbox" id="fp_majetok"> Zaradiť do finančného plánu</div>
     </div>
 
+    <div class="card">
+      <div class="card-title">Poznámky</div>
+      <div class="form-group"><textarea id="pozn_step6" rows="3" placeholder="Vaše poznámky k tomuto programu..."></textarea></div>
+    </div>
+
     <div class="step-nav">
       <button class="btn btn-outline" onclick="goToStep(5)">&larr; Späť</button>
       <button class="btn btn-primary" onclick="goToStep(7)">Ďalej &rarr;</button>
@@ -541,6 +636,11 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       </table>
       <button class="btn-add" onclick="addCiel()" style="margin-top:12px;">+ Pridať cieľ</button>
       <div class="check-row" style="margin-top:16px;"><input type="checkbox" id="fp_ciele"> Zaradiť do finančného plánu</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Poznámky</div>
+      <div class="form-group"><textarea id="pozn_step7" rows="3" placeholder="Vaše poznámky k tomuto programu..."></textarea></div>
     </div>
 
     <div class="step-nav">
@@ -566,9 +666,18 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     </div>
 
     <div class="card">
+      <div class="form-row">
+        <div class="form-group"><label>Mesačné výdavky na život (€)</label><input type="number" id="zab_vydavky" value="0" min="0" oninput="updateZabezpecenie()"></div>
+      </div>
+      <div class="info-box">
+        <strong>Princíp krytia:</strong> Minimálne na vykrytie mesačných výdavkov na život, optimálne na výšku čistého príjmu.
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card-title">Klient — Zabezpečenie príjmu</div>
       <table class="zab-table" id="zabTableKlient">
-        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€)</th><th>Bude chýbať (€)</th><th>Zaradiť</th></tr></thead>
+        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€)</th><th>Min. krytie (€)</th><th>Bude chýbať (€)</th><th>Zaradiť</th></tr></thead>
         <tbody id="zabBodyKlient"></tbody>
       </table>
     </div>
@@ -576,7 +685,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <div class="card" id="zabPartnerCard" style="display:none;">
       <div class="card-title">Partner — Zabezpečenie príjmu</div>
       <table class="zab-table" id="zabTablePartner">
-        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€)</th><th>Bude chýbať (€)</th><th>Zaradiť</th></tr></thead>
+        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€)</th><th>Min. krytie (€)</th><th>Bude chýbať (€)</th><th>Zaradiť</th></tr></thead>
         <tbody id="zabBodyPartner"></tbody>
       </table>
     </div>
@@ -584,6 +693,11 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <div class="info-box">
       <strong>Princíp:</strong> Minimálne na vykrytie mesačných výdavkov, optimálne na výšku čistého príjmu.<br>
       Poistenie riešime cez: <strong>Partners Poisťovňa, NN, Allianz, MetLife, Generali</strong>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Poznámky</div>
+      <div class="form-group"><textarea id="pozn_step8" rows="3" placeholder="Vaše poznámky k tomuto programu..."></textarea></div>
     </div>
 
     <div class="step-nav">
@@ -829,6 +943,16 @@ function calcFinancovanie(){
   document.getElementById('byv_financovanie').value = Math.max(0, h-c);
 }
 
+function toggleOptimalizacia(){
+  const checked = document.getElementById('ch_optim').checked;
+  document.getElementById('optimSection').style.display = checked ? 'block' : 'none';
+}
+
+function toggleOptimUver(){
+  const val = document.querySelector('input[name="optim_fin"]:checked');
+  document.getElementById('optimUverSection').style.display = (val && val.value === 'uver') ? 'block' : 'none';
+}
+
 // ============================================================
 // STEP 3: Rezervy
 // ============================================================
@@ -869,7 +993,11 @@ function calcRezervy(){
   const box = document.getElementById('rezervyDiffBox');
   if(diff > 0){
     box.style.display = 'block';
+    box.className = 'info-box warning';
     box.textContent = 'Chýba vám '+formatEUR(diff)+' do optimálnej rezervy';
+    box.style.margin = '0';
+    box.style.flex = '1';
+    box.style.minWidth = '200px';
   } else {
     box.style.display = 'block';
     box.className = 'info-box success';
@@ -877,6 +1005,26 @@ function calcRezervy(){
     box.style.margin = '0';
     box.style.flex = '1';
     box.style.minWidth = '200px';
+  }
+
+  // Plán doplnenia rezervy calculations
+  const deficit = Math.max(0, diff);
+  document.getElementById('rez_chybajuca').value = Math.round(deficit);
+
+  const planInfo = document.getElementById('rez_plan_info');
+  if(deficit <= 0){
+    document.getElementById('rez_mesacna').value = 0;
+    planInfo.innerHTML = '<strong>Vaša rezerva je dostatočná!</strong>';
+    planInfo.className = 'info-box success';
+  } else {
+    // PMT formula: PMT = FV * r / ((1+r)^n - 1)
+    const r = 0.02 / 12; // 2% p.a. monthly
+    const n = 60; // 5 years in months
+    const pmt = deficit * r / (Math.pow(1 + r, n) - 1);
+    const mesacna = Math.round(pmt);
+    document.getElementById('rez_mesacna').value = mesacna;
+    planInfo.innerHTML = 'Pri mesačnej investícii <strong>' + formatEUR(mesacna) + '</strong> cez Partners Fond krátkodobých rezerv dosiahnete cieľovú rezervu <strong>' + formatEUR(Math.round(zelezna)) + '</strong> za 5 rokov.';
+    planInfo.className = 'info-box';
   }
 }
 
@@ -912,20 +1060,18 @@ function calcDochodok(){
   const medzera = potrebny - statny;
   document.getElementById('doch_medzera').value = Math.max(0, medzera);
 
-  // Strategy
-  let strat = '';
-  if(roky >= 15) strat = 'Dynamická stratégia (Partners Investments) — dlhý horizont, vyšší výnosový potenciál';
-  else if(roky >= 10) strat = 'Dynamická stratégia (Partners Investments) — stredne dlhý horizont';
-  else if(roky >= 5) strat = 'Vyvážená stratégia (Partners Investments) — stredný horizont';
-  else strat = 'Konzervatívna stratégia (Partners Investments) — krátky horizont, ochrana kapitálu';
-  document.getElementById('dochStrategia').innerHTML = '<strong>Odporúčanie:</strong> '+strat+' ('+roky+' rokov do dôchodku)';
+  // Strategy calculation (used in summary)
+  // Removed inline strategy card — strategy is shown in summary only
 }
 
+function togglePilier2(){
+  document.getElementById('pilier2Group').style.display = document.getElementById('doch_pilier2').value==='ano'?'block':'none';
+}
 function toggleDDS(){
-  document.getElementById('ddsGroup').style.display = document.getElementById('doch_pilier3').value==='ano'?'flex':'none';
+  document.getElementById('ddsGroup').style.display = document.getElementById('doch_pilier3').value==='ano'?'block':'none';
 }
 function toggleInvest(){
-  document.getElementById('investGroup').style.display = document.getElementById('doch_investicie').value==='ano'?'flex':'none';
+  document.getElementById('investGroup').style.display = document.getElementById('doch_investicie').value==='ano'?'block':'none';
 }
 
 // ============================================================
@@ -1039,6 +1185,7 @@ function updateZabezpecenie(){
 function buildZabTable(prefix, bodyId){
   const hruby = parseFloat(document.getElementById(prefix+'_hruby').value)||0;
   const cisty = parseFloat(document.getElementById(prefix+'_cisty').value)||0;
+  const vydavky = parseFloat(document.getElementById('zab_vydavky').value)||0;
 
   const rows = [
     {name:'Výpoveď', davka: Math.round(hruby*0.5)},
@@ -1057,6 +1204,7 @@ function buildZabTable(prefix, bodyId){
     tr.innerHTML = `
       <td>${r.name}</td>
       <td>${formatEUR(r.davka)}</td>
+      <td>${formatEUR(vydavky)}</td>
       <td class="${cls}">${formatEUR(chyba)}</td>
       <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${Math.max(0,chyba)}" ${chyba>0?'checked':''}></td>`;
     tbody.appendChild(tr);
@@ -1114,7 +1262,7 @@ function collectGoals(){
       sum += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
     });
     const diff = cisty*6 - sum;
-    if(diff>0) goals.push({name:'Železná rezerva', suma:diff, date:getDateIn(2)});
+    if(diff>0) goals.push({name:'Železná rezerva', suma:diff, date:getDateIn(5)});
   }
 
   // Step 4: Dôchodok
@@ -1122,7 +1270,7 @@ function collectGoals(){
     const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
     const age = parseInt(document.getElementById('k_vek').value)||30;
     const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
-    goals.push({name:'Dôchodok', suma:medzera*12, date:getDateInYears(dochVek-age)});
+    goals.push({name:'Dôchodok', suma:medzera*12*20, date:getDateInYears(dochVek-age)});
   }
 
   // Step 5: Deti
@@ -1259,10 +1407,10 @@ function buildSummary(){
   document.getElementById('summDeti').innerHTML = detiHtml;
 
   // Zabezpečenie
-  let zabHtml = '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Sociálna dávka</th><th>Bude chýbať</th></tr></thead><tbody>';
+  let zabHtml = '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Sociálna dávka</th><th>Min. krytie</th><th>Bude chýbať</th></tr></thead><tbody>';
   document.querySelectorAll('#zabBodyKlient tr').forEach(tr=>{
     const tds = tr.querySelectorAll('td');
-    zabHtml += `<tr><td>${tds[0].textContent}</td><td>${tds[1].textContent}</td><td class="${tds[2].className}">${tds[2].textContent}</td></tr>`;
+    zabHtml += `<tr><td>${tds[0].textContent}</td><td>${tds[1].textContent}</td><td>${tds[2].textContent}</td><td class="${tds[3].className}">${tds[3].textContent}</td></tr>`;
   });
   zabHtml += '</tbody></table>';
   document.getElementById('summZabezpecenie').innerHTML = zabHtml;
