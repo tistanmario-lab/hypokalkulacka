@@ -180,7 +180,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);l
 
 <!-- Session Check -->
 <script>
-if(!sessionStorage.getItem('vipAuth')){window.location.href='vip-login.html';}
+if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.html';}
 </script>
 
 <!-- Top Bar -->
@@ -189,7 +189,7 @@ if(!sessionStorage.getItem('vipAuth')){window.location.href='vip-login.html';}
     <a href="vip-dashboard.html" class="vip-logo">Mário Tišťan<span>.</span><span class="vip-badge">VIP</span></a>
     <div class="vip-topbar-right">
       <span class="vip-user">Vitajte, <strong id="topUsername">Klient</strong></span>
-      <button class="vip-logout" onclick="sessionStorage.removeItem('vipAuth');location.href='vip-login.html'">Odhlásiť</button>
+      <button class="vip-logout" onclick="sessionStorage.removeItem('vip_auth');sessionStorage.removeItem('vip_user');location.href='vip-login.html'">Odhlásiť</button>
     </div>
   </div>
 </header>
@@ -1589,7 +1589,7 @@ document.addEventListener('DOMContentLoaded', function(){
   updateZabezpecenie();
 
   // Set username from session
-  const user = sessionStorage.getItem('vipUser');
+  const user = sessionStorage.getItem('vip_user');
   if(user) document.getElementById('topUsername').textContent = user;
 });
 </script>
