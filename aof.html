@@ -1191,13 +1191,17 @@ function updateZabezpecenie(){
 }
 
 function buildZabTable(prefix, bodyId){
-  const hruby = parseFloat(document.getElementById(prefix+'_hruby').value)||0;
+  const praca = document.getElementById(prefix+'_praca').value;
+  // SZČO: sociálne dávky sa počítajú z min. vymeriavacieho základu (915 € v 2026)
+  const hrubyReal = parseFloat(document.getElementById(prefix+'_hruby').value)||0;
+  const hruby = praca === 'szco' ? 915 : hrubyReal;
   const cisty = parseFloat(document.getElementById(prefix+'_cisty').value)||0;
   const vydavky = parseFloat(document.getElementById('zab_vydavky').value)||0;
 
+  const isSzco = praca === 'szco';
   const rows = [
-    {name:'Výpoveď', davka: Math.round(hruby*0.5)},
-    {name:'Materská dovolenka', davka: 370},
+    {name:'Výpoveď', davka: isSzco ? 0 : Math.round(hruby*0.5)},
+    {name:'Materská dovolenka', davka: isSzco ? Math.round(915*0.75) : 370},
     {name:'PN (práceneschopnosť)', davka: Math.round(hruby*0.55)},
     {name:'Invalidita', davka: Math.round(hruby*0.375)},
     {name:'Úmrtie', davka: Math.round(hruby*0.6)},
@@ -1205,6 +1209,14 @@ function buildZabTable(prefix, bodyId){
 
   const tbody = document.getElementById(bodyId);
   tbody.innerHTML = '';
+
+  // SZČO info row
+  if(isSzco){
+    const infoTr = document.createElement('tr');
+    infoTr.innerHTML = `<td colspan="5" style="background:rgba(171,5,52,0.04);font-size:12px;color:var(--red);padding:10px;"><strong>SZČO:</strong> Dávky sa počítajú z min. vymeriavacieho základu 915 €/mes. Výpoveď = 0 € (SZČO nemá nárok na odstupné).</td>`;
+    tbody.appendChild(infoTr);
+  }
+
   rows.forEach((r,i)=>{
     const chyba = Math.max(0, vydavky - r.davka);
     const cls = chyba > 0 ? 'negative' : '';
