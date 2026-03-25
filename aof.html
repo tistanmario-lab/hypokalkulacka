@@ -327,11 +327,16 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <div class="card">
       <div class="card-title">Aktuálna situácia</div>
       <div class="radio-group">
-        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="prenajom"> Prenájom</label>
-        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="podnajom"> Podnájom</label>
-        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="rodicia"> U rodičov</label>
-        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="vlastna" checked> Vlastná nehnuteľnosť</label>
-        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="hypoteka"> Hypotéka/úver</label>
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="prenajom" onchange="toggleNajom()"> Prenájom</label>
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="podnajom" onchange="toggleNajom()"> Podnájom</label>
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="rodicia" onchange="toggleNajom()"> U rodičov</label>
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="vlastna" checked onchange="toggleNajom()"> Vlastná nehnuteľnosť</label>
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="hypoteka" onchange="toggleNajom()"> Hypotéka/úver</label>
+      </div>
+      <div id="najomSection" style="display:none;margin-top:12px;">
+        <div class="form-row">
+          <div class="form-group"><label id="najomLabel">Mesačný nájom (€)</label><input type="number" id="byv_najom" value="0" min="0"></div>
+        </div>
       </div>
     </div>
 
@@ -380,6 +385,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
                 <label>Fixácia</label>
                 <select id="optim_fixacia"><option value="1">1 rok</option><option value="2">2 roky</option><option value="3">3 roky</option><option value="5" selected>5 rokov</option><option value="10">10 rokov</option></select>
               </div>
+              <div class="form-group"><label>Koniec fixácie (dátum)</label><input type="date" id="optim_fixacia_datum"></div>
               <div class="form-group"><label>Zostávajúca doba splácania (rokov)</label><input type="number" id="optim_doba" value="0" min="0"></div>
               <div class="form-group"><label>Mesačná splátka (€)</label><input type="number" id="optim_splatka" value="0" min="0"></div>
             </div>
@@ -426,7 +432,13 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <div class="card">
       <div class="card-title">Železná rezerva</div>
       <div class="info-box success">
-        Optimálna výška vašej rezervy (6&times; čistý mesačný príjem): <strong id="zeleznaRezervaTxt">0 €</strong>
+        Odporúčaná výška rezervy (6&times; čistý mesačný príjem): <strong id="zeleznaRezervaTxt">0 €</strong>
+      </div>
+      <div class="form-row" style="margin-top:12px;">
+        <div class="form-group">
+          <label>Vlastná cieľová výška rezervy (€) <span style="font-weight:400;color:var(--muted);">— nechajte 0 pre odporúčanú</span></label>
+          <input type="number" id="rez_vlastna_cielova" value="0" min="0" oninput="calcRezervy()">
+        </div>
       </div>
 
       <div class="card-title" style="margin-top:20px;">Aktuálne rezervy</div>
@@ -525,6 +537,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
             <select id="doch_dds_fond"><option value="dlhopisovy">Dlhopisový fond</option><option value="zmiesany">Zmiešaný fond</option><option value="akciovy">Akciový fond</option><option value="indexovy">Indexový fond</option></select>
           </div>
           <div class="form-group"><label>Mesačná suma DDS (€)</label><input type="number" id="doch_dds_suma" value="0" min="0"></div>
+          <div class="form-group"><label>Príspevok zamestnávateľa (€/mes)</label><input type="number" id="doch_dds_zamestnavatel" value="0" min="0"></div>
         </div>
       </div>
 
@@ -606,12 +619,21 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     </div>
 
     <div class="card">
-      <div class="card-title">Zabezpečenie majetku</div>
-      <div class="form-group" style="margin-bottom:16px;">
-        <label>Ako máte zabezpečený váš majetok?</label>
-        <textarea id="majetok_zabezpecenie" placeholder="Popíšte aktuálne poistenie, zabezpečenie..."></textarea>
+      <div class="card-title">Poistenie nehnuteľnosti a domácnosti</div>
+      <div class="check-row"><input type="checkbox" id="ch_poistenie_nehnut" onchange="togglePoistMajetok()"> Má poistenie nehnuteľnosti / domácnosti</div>
+      <div id="poistMajetokSection" style="display:none;margin-top:12px;">
+        <div class="form-row">
+          <div class="form-group"><label>Poistná suma — nehnuteľnosť (€)</label><input type="number" id="majetok_ps_nehnut" value="0" min="0"></div>
+          <div class="form-group"><label>Poistná suma — domácnosť (€)</label><input type="number" id="majetok_ps_domacnost" value="0" min="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Ročné poistné (€)</label><input type="number" id="majetok_rocne_poistne" value="0" min="0"></div>
+          <div class="form-group"><label>Poisťovňa</label>
+            <select id="majetok_poistovna"><option value="">-- Vyberte --</option><option>Uniqa</option><option>Colonnade</option><option>ČSOB poisťovňa</option><option>Allianz</option><option>Iná</option></select>
+          </div>
+        </div>
       </div>
-      <div class="form-group" style="margin-bottom:16px;">
+      <div class="form-group" style="margin-top:16px;margin-bottom:16px;">
         <label>Kedy ste naposledy aktualizovali výšku zabezpečenia?</label>
         <input type="text" id="majetok_aktualizacia" placeholder="dátum alebo Neviem">
       </div>
@@ -960,6 +982,21 @@ function calcFinancovanie(){
   document.getElementById('byv_financovanie').value = Math.max(0, h-c);
 }
 
+function toggleNajom(){
+  const val = document.querySelector('input[name="byvanie_aktualne"]:checked');
+  const sec = document.getElementById('najomSection');
+  const label = document.getElementById('najomLabel');
+  if(val && (val.value === 'prenajom' || val.value === 'podnajom')){
+    sec.style.display = 'block';
+    label.textContent = 'Mesačný nájom (€)';
+  } else if(val && val.value === 'rodicia'){
+    sec.style.display = 'block';
+    label.textContent = 'Mesačný príspevok rodičom (€)';
+  } else {
+    sec.style.display = 'none';
+  }
+}
+
 function toggleOptimalizacia(){
   const checked = document.getElementById('ch_optim').checked;
   document.getElementById('optimSection').style.display = checked ? 'block' : 'none';
@@ -968,6 +1005,10 @@ function toggleOptimalizacia(){
 function toggleOptimUver(){
   const val = document.querySelector('input[name="optim_fin"]:checked');
   document.getElementById('optimUverSection').style.display = (val && val.value === 'uver') ? 'block' : 'none';
+}
+
+function togglePoistMajetok(){
+  document.getElementById('poistMajetokSection').style.display = document.getElementById('ch_poistenie_nehnut').checked ? 'block' : 'none';
 }
 
 // ============================================================
@@ -996,8 +1037,10 @@ function addRezerva(){
 function calcRezervy(){
   const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
   const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
-  const zelezna = (cisty + pCisty) * 6;
-  document.getElementById('zeleznaRezervaTxt').textContent = formatEUR(zelezna);
+  const odporucana = (cisty + pCisty) * 6;
+  const vlastna = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
+  const zelezna = vlastna > 0 ? vlastna : odporucana;
+  document.getElementById('zeleznaRezervaTxt').textContent = formatEUR(odporucana) + (vlastna > 0 ? ' (vlastný cieľ: '+formatEUR(vlastna)+')' : '');
 
   let sum = 0;
   document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
