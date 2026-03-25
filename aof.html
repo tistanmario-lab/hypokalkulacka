@@ -258,7 +258,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
         </div>
         <div class="form-group">
           <label>Pracovné zaradenie</label>
-          <select id="k_praca"><option value="zamestnanec">Zamestnanec</option><option value="szco">SZČO</option><option value="materska">Materská dovolenka</option><option value="ine">Iné</option></select>
+          <select id="k_praca" onchange="onPracaChange('k')"><option value="zamestnanec">Zamestnanec</option><option value="szco">SZČO</option><option value="materska">Materská dovolenka</option><option value="ine">Iné</option></select>
         </div>
       </div>
       <div class="form-row">
@@ -287,7 +287,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
         </div>
         <div class="form-group">
           <label>Pracovné zaradenie</label>
-          <select id="p_praca"><option value="zamestnanec">Zamestnanec</option><option value="szco">SZČO</option><option value="materska">Materská dovolenka</option><option value="ine">Iné</option></select>
+          <select id="p_praca" onchange="onPracaChange('p')"><option value="zamestnanec">Zamestnanec</option><option value="szco">SZČO</option><option value="materska">Materská dovolenka</option><option value="ine">Iné</option></select>
         </div>
       </div>
       <div class="form-row">
@@ -904,6 +904,15 @@ function calcNet(prefix){
 function updateAll(){
   // Called whenever key values change
   updateTopUsername();
+}
+
+function onPracaChange(prefix){
+  const praca = document.getElementById(prefix+'_praca').value;
+  if(praca === 'szco'){
+    // SZČO: predvyplniť hrubý príjem na min. vymeriavací základ 915 €
+    document.getElementById(prefix+'_hruby').value = 915;
+    calcNet(prefix);
+  }
 }
 
 function updateTopUsername(){
