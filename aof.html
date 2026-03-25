@@ -1205,8 +1205,13 @@ function buildZabTable(prefix, bodyId){
     {name:'PN (práceneschopnosť)', davka: Math.round(hruby*0.55)},
     {name:'Čiastočná invalidita (41–70 %)', davka: Math.round(hruby*0.25)},
     {name:'Plná invalidita (71 %+)', davka: Math.round(hruby*0.375)},
-    {name:'Úmrtie', davka: Math.round(hruby*0.6)},
+    {name:'Úmrtie', davka: 0, isUmrtie: true},
   ];
+
+  // Úmrtie: špeciálny výpočet — zostatok úveru + 2× ročný čistý príjem
+  const optimZostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
+  const umrtieNeed = optimZostatok + (cisty * 24);
+  rows[rows.length-1].umrtieNeed = umrtieNeed;
 
   const tbody = document.getElementById(bodyId);
   tbody.innerHTML = '';
@@ -1219,16 +1224,30 @@ function buildZabTable(prefix, bodyId){
   }
 
   rows.forEach((r,i)=>{
-    const chyba = Math.max(0, vydavky - r.davka);
-    const cls = chyba > 0 ? 'negative' : '';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${r.name}</td>
-      <td>${formatEUR(r.davka)}</td>
-      <td>${formatEUR(vydavky)}</td>
-      <td class="${cls}">${chyba > 0 ? formatEUR(chyba) : '0 € ✓'}</td>
-      <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${chyba}" ${chyba>0?'checked':''}></td>`;
-    tbody.appendChild(tr);
+    if(r.isUmrtie){
+      // Úmrtie: jednorázová suma = zostatok úveru + 2× ročný čistý príjem
+      const need = r.umrtieNeed;
+      const cls = need > 0 ? 'negative' : '';
+      const tr = document.createElement('tr');
+      tr.style.background = 'rgba(0,48,73,0.03)';
+      tr.innerHTML = `
+        <td><strong>${r.name}</strong></td>
+        <td colspan="2" style="font-size:12px;color:var(--muted);">Zostatok úveru: ${formatEUR(optimZostatok)} + 2× ročný príjem: ${formatEUR(cisty*24)}</td>
+        <td class="${cls}"><strong>${formatEUR(need)}</strong></td>
+        <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${need}" ${need>0?'checked':''}></td>`;
+      tbody.appendChild(tr);
+    } else {
+      const chyba = Math.max(0, vydavky - r.davka);
+      const cls = chyba > 0 ? 'negative' : '';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.name}</td>
+        <td>${formatEUR(r.davka)}</td>
+        <td>${formatEUR(vydavky)}</td>
+        <td class="${cls}">${chyba > 0 ? formatEUR(chyba) : '0 € ✓'}</td>
+        <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${chyba}" ${chyba>0?'checked':''}></td>`;
+      tbody.appendChild(tr);
+    }
   });
 }
 
