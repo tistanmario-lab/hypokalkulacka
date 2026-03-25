@@ -1198,15 +1198,15 @@ function buildZabTable(prefix, bodyId){
   const tbody = document.getElementById(bodyId);
   tbody.innerHTML = '';
   rows.forEach((r,i)=>{
-    const chyba = cisty - r.davka;
+    const chyba = Math.max(0, vydavky - r.davka);
     const cls = chyba > 0 ? 'negative' : '';
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${r.name}</td>
       <td>${formatEUR(r.davka)}</td>
       <td>${formatEUR(vydavky)}</td>
-      <td class="${cls}">${formatEUR(chyba)}</td>
-      <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${Math.max(0,chyba)}" ${chyba>0?'checked':''}></td>`;
+      <td class="${cls}">${chyba > 0 ? formatEUR(chyba) : '0 € ✓'}</td>
+      <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${chyba}" ${chyba>0?'checked':''}></td>`;
     tbody.appendChild(tr);
   });
 }
