@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YF1E1SN7J8"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YF1E1SN7J8');</script>
+<title>Analýza osobných financií | VIP Zóna | Mário Tišťan</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --navy: #003049;
+  --red: #AB0534;
+  --silver: #989FA7;
+  --sand: #ECEDED;
+  --white: #ffffff;
+  --dark-gray: #4D4D4D;
+  --muted: rgba(0,48,73,0.5);
+  --border: rgba(0,48,73,0.1);
+  --radius: 20px;
+  --green: #2e7d32;
+  --orange: #e65100;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);line-height:1.6;min-height:100vh;}
+
+/* Top bar */
+.vip-topbar{background:var(--navy);padding:0 5%;position:sticky;top:0;z-index:100;}
+.vip-topbar-inner{max-width:1100px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.vip-logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#fff;text-decoration:none;}
+.vip-logo span{color:var(--red);}
+.vip-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:12px;margin-left:10px;vertical-align:middle;}
+.vip-topbar-right{display:flex;align-items:center;gap:20px;}
+.vip-user{color:rgba(255,255,255,0.6);font-size:13px;}
+.vip-user strong{color:#fff;}
+.vip-logout{color:rgba(255,255,255,0.5);font-size:12px;font-weight:500;text-decoration:none;letter-spacing:.04em;text-transform:uppercase;transition:color .2s;cursor:pointer;background:none;border:none;font-family:inherit;}
+.vip-logout:hover{color:var(--red);}
+
+/* Progress bar */
+.progress-wrapper{background:var(--white);border-bottom:1px solid var(--border);padding:16px 5%;position:sticky;top:60px;z-index:99;}
+.progress-inner{max-width:1100px;margin:0 auto;}
+.progress-bar-bg{background:var(--sand);border-radius:10px;height:8px;overflow:hidden;margin-bottom:8px;}
+.progress-bar-fill{background:linear-gradient(90deg,var(--red),var(--navy));height:100%;border-radius:10px;transition:width .4s ease;}
+.progress-steps{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;}
+.progress-step{font-size:10px;color:var(--silver);cursor:pointer;transition:color .2s;white-space:nowrap;}
+.progress-step.active{color:var(--navy);font-weight:600;}
+.progress-step.completed{color:var(--green);}
+.progress-info{font-size:12px;color:var(--muted);text-align:right;margin-top:4px;}
+
+/* Main */
+.aof-main{max-width:1100px;margin:0 auto;padding:30px 5% 80px;}
+.aof-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:24px;}
+
+/* Steps */
+.step{display:none;animation:fadeIn .3s ease;}
+.step.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.step-header{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:6px;}
+.step-subtitle{font-size:14px;color:var(--muted);margin-bottom:24px;}
+
+/* Cards/sections */
+.card{background:var(--white);border-radius:var(--radius);padding:28px;border:1px solid var(--border);margin-bottom:20px;}
+.card-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--border);}
+
+/* Form elements */
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group label{font-size:12px;font-weight:600;color:var(--navy);letter-spacing:.03em;}
+.form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;color:var(--navy);background:var(--white);transition:border-color .2s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--navy);}
+.form-group textarea{resize:vertical;min-height:60px;}
+.form-group .computed{background:var(--sand);font-weight:600;color:var(--navy);}
+
+/* Toggle */
+.toggle-group{display:flex;background:var(--sand);border-radius:12px;overflow:hidden;margin-bottom:16px;width:fit-content;}
+.toggle-btn{padding:10px 24px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .2s;}
+.toggle-btn.active{background:var(--navy);color:#fff;border-radius:12px;}
+
+/* Buttons */
+.btn{padding:10px 24px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.btn-primary{background:var(--navy);color:#fff;}
+.btn-primary:hover{background:#004066;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-red:hover{background:#c00a3e;}
+.btn-outline{background:transparent;color:var(--navy);border:1px solid var(--border);}
+.btn-outline:hover{border-color:var(--navy);}
+.btn-sm{padding:6px 16px;font-size:12px;}
+.btn-add{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;background:var(--sand);color:var(--navy);border:1px dashed var(--border);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;}
+.btn-add:hover{border-color:var(--navy);background:#e0e1e2;}
+
+/* Navigation */
+.step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:20px;border-top:1px solid var(--border);}
+
+/* Info box */
+.info-box{background:rgba(0,48,73,0.04);border-left:4px solid var(--navy);padding:16px 20px;border-radius:0 12px 12px 0;margin:16px 0;font-size:13px;line-height:1.7;}
+.info-box.warning{border-left-color:var(--red);background:rgba(171,5,52,0.04);}
+.info-box.success{border-left-color:var(--green);background:rgba(46,125,50,0.04);}
+
+/* Dynamic table */
+.dyn-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
+.dyn-table th{background:var(--sand);padding:10px 12px;text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.dyn-table th:first-child{border-radius:10px 0 0 10px;}
+.dyn-table th:last-child{border-radius:0 10px 10px 0;}
+.dyn-table td{padding:8px 12px;border-bottom:1px solid var(--border);}
+.dyn-table input,.dyn-table select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;width:100%;background:var(--white);}
+.dyn-table .remove-row{background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:4px;}
+
+/* Checkbox */
+.check-row{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:14px;}
+.check-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--navy);}
+
+/* Radio */
+.radio-group{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;}
+.radio-option{display:flex;align-items:center;gap:6px;font-size:14px;}
+.radio-option input{accent-color:var(--navy);}
+
+/* Timeline */
+.timeline{position:relative;padding:20px 0;margin:20px 0;}
+.timeline-line{position:absolute;top:50%;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--navy),var(--red));border-radius:2px;transform:translateY(-50%);}
+.timeline-items{display:flex;justify-content:space-between;position:relative;z-index:1;overflow-x:auto;gap:16px;padding:10px 0;}
+.timeline-item{display:flex;flex-direction:column;align-items:center;min-width:120px;text-align:center;}
+.timeline-dot{width:16px;height:16px;border-radius:50%;background:var(--navy);border:3px solid var(--white);box-shadow:0 0 0 2px var(--navy);margin-bottom:8px;}
+.timeline-label{font-size:11px;font-weight:600;max-width:120px;}
+.timeline-date{font-size:10px;color:var(--muted);}
+.timeline-amount{font-size:12px;font-weight:700;color:var(--red);}
+
+/* Summary cards */
+.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+@media(max-width:768px){.summary-grid{grid-template-columns:1fr;}}
+.summary-card{background:var(--white);border-radius:var(--radius);padding:24px;border:1px solid var(--border);}
+.summary-card h3{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:12px;}
+.summary-item{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border);}
+.summary-item:last-child{border-bottom:none;}
+.summary-value{font-weight:700;}
+.deficit{color:var(--red);}
+.surplus{color:var(--green);}
+
+/* Charts */
+.chart-container{position:relative;height:200px;margin:16px 0;}
+
+/* Save/Load */
+.save-load-bar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.save-load-bar select{padding:8px 14px;border-radius:10px;border:1px solid var(--border);font-family:inherit;font-size:13px;}
+
+/* Responsive */
+@media(max-width:600px){
+  .form-row{grid-template-columns:1fr;}
+  .toggle-group{width:100%;}
+  .toggle-btn{flex:1;text-align:center;padding:10px 12px;}
+  .step-nav{flex-direction:column;gap:12px;}
+  .progress-steps{display:none;}
+  .summary-grid{grid-template-columns:1fr;}
+  .dyn-table{font-size:11px;}
+  .dyn-table input,.dyn-table select{font-size:11px;padding:4px 6px;}
+}
+
+/* Print */
+@media print{
+  .vip-topbar,.progress-wrapper,.step-nav,.btn-add,.save-load-bar{display:none!important;}
+  .step{display:block!important;}
+  .card{break-inside:avoid;}
+}
+
+/* Zabezpečenie table */
+.zab-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;}
+.zab-table th{background:var(--sand);padding:10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+.zab-table td{padding:10px;border-bottom:1px solid var(--border);}
+.zab-table .negative{color:var(--red);font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- Session Check -->
+<script>
+if(!sessionStorage.getItem('vipAuth')){window.location.href='vip-login.html';}
+</script>
+
+<!-- Top Bar -->
+<header class="vip-topbar">
+  <div class="vip-topbar-inner">
+    <a href="vip-dashboard.html" class="vip-logo">Mário Tišťan<span>.</span><span class="vip-badge">VIP</span></a>
+    <div class="vip-topbar-right">
+      <span class="vip-user">Vitajte, <strong id="topUsername">Klient</strong></span>
+      <button class="vip-logout" onclick="sessionStorage.removeItem('vipAuth');location.href='vip-login.html'">Odhlásiť</button>
+    </div>
+  </div>
+</header>
+
+<!-- Progress Bar -->
+<div class="progress-wrapper">
+  <div class="progress-inner">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width:10%"></div>
+    </div>
+    <div class="progress-steps" id="progressSteps"></div>
+    <div class="progress-info">Krok <span id="currentStepNum">1</span> z 10 &mdash; <span id="progressPct">10</span>% dokončených</div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<main class="aof-main">
+  <h1 class="aof-title">Analýza osobných financií</h1>
+
+  <!-- Save/Load Bar -->
+  <div class="save-load-bar">
+    <button class="btn btn-outline btn-sm" onclick="saveAOF()">Uložiť AOF</button>
+    <select id="loadSelect" onchange="loadAOF(this.value)" style="display:none;">
+      <option value="">-- Načítať AOF --</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="showLoadSelect()">Načítať AOF</button>
+  </div>
+
+  <!-- ==================== STEP 1: Osobné údaje ==================== -->
+  <div class="step active" id="step1">
+    <h2 class="step-header">1. Osobné údaje</h2>
+    <p class="step-subtitle">Základné informácie o klientovi a jeho príjmoch</p>
+
+    <div class="card">
+      <div class="toggle-group">
+        <button class="toggle-btn active" onclick="setClientType('single',this)">Jednotlivec</button>
+        <button class="toggle-btn" onclick="setClientType('pair',this)">Pár</button>
+      </div>
+    </div>
+
+    <!-- Klient -->
+    <div class="card">
+      <div class="card-title">Klient</div>
+      <div class="form-row">
+        <div class="form-group"><label>Meno</label><input type="text" id="k_meno" oninput="updateSummary()"></div>
+        <div class="form-group"><label>Priezvisko</label><input type="text" id="k_priezvisko" oninput="updateSummary()"></div>
+        <div class="form-group"><label>Dátum narodenia</label><input type="date" id="k_narodenie" onchange="calcAge('k')"></div>
+        <div class="form-group"><label>Vek</label><input type="text" id="k_vek" class="computed" readonly></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Pohlavie</label>
+          <select id="k_pohlavie"><option value="muz">Muž</option><option value="zena">Žena</option></select>
+        </div>
+        <div class="form-group">
+          <label>Rodinný stav</label>
+          <select id="k_rodinny_stav"><option value="slobodny">Slobodný/á</option><option value="zenaty">Ženatý/Vydatá</option><option value="rozvedeny">Rozvedený/á</option><option value="vdovec">Vdovec/Vdova</option></select>
+        </div>
+        <div class="form-group">
+          <label>Pracovné zaradenie</label>
+          <select id="k_praca"><option value="zamestnanec">Zamestnanec</option><option value="szco">SZČO</option><option value="materska">Materská dovolenka</option><option value="ine">Iné</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Hrubý mesačný príjem (€)</label><input type="number" id="k_hruby" value="0" min="0" oninput="calcNet('k')"></div>
+        <div class="form-group"><label>Čistý mesačný príjem (€)</label><input type="number" id="k_cisty" value="0" min="0" oninput="updateAll()"></div>
+      </div>
+    </div>
+
+    <!-- Partner -->
+    <div class="card" id="partnerSection" style="display:none;">
+      <div class="card-title">Partner/ka</div>
+      <div class="form-row">
+        <div class="form-group"><label>Meno</label><input type="text" id="p_meno"></div>
+        <div class="form-group"><label>Priezvisko</label><input type="text" id="p_priezvisko"></div>
+        <div class="form-group"><label>Dátum narodenia</label><input type="date" id="p_narodenie" onchange="calcAge('p')"></div>
+        <div class="form-group"><label>Vek</label><input type="text" id="p_vek" class="computed" readonly></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Pohlavie</label>
+          <select id="p_pohlavie"><option value="muz">Muž</option><option value="zena">Žena</option></select>
+        </div>
+        <div class="form-group">
+          <label>Rodinný stav</label>
+          <select id="p_rodinny_stav"><option value="slobodny">Slobodný/á</option><option value="zenaty">Ženatý/Vydatá</option><option value="rozvedeny">Rozvedený/á</option><option value="vdovec">Vdovec/Vdova</option></select>
+        </div>
+        <div class="form-group">
+          <label>Pracovné zaradenie</label>
+          <select id="p_praca"><option value="zamestnanec">Zamestnanec</option><option value="szco">SZČO</option><option value="materska">Materská dovolenka</option><option value="ine">Iné</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Hrubý mesačný príjem (€)</label><input type="number" id="p_hruby" value="0" min="0" oninput="calcNet('p')"></div>
+        <div class="form-group"><label>Čistý mesačný príjem (€)</label><input type="number" id="p_cisty" value="0" min="0" oninput="updateAll()"></div>
+      </div>
+    </div>
+
+    <!-- Rodinní príslušníci -->
+    <div class="card">
+      <div class="card-title">Rodinní príslušníci</div>
+      <table class="dyn-table" id="familyTable">
+        <thead>
+          <tr><th>Meno</th><th>Vzťah</th><th>Dátum narodenia</th><th>Vek</th><th></th></tr>
+        </thead>
+        <tbody id="familyBody"></tbody>
+      </table>
+      <button class="btn-add" onclick="addFamilyMember()" style="margin-top:12px;">+ Pridať člena rodiny</button>
+    </div>
+
+    <div class="step-nav">
+      <div></div>
+      <button class="btn btn-primary" onclick="goToStep(2)">Ďalej &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 2: Nové bývanie ==================== -->
+  <div class="step" id="step2">
+    <h2 class="step-header">2. Nové bývanie</h2>
+    <p class="step-subtitle">Aktuálna a plánovaná bytová situácia</p>
+
+    <div class="card">
+      <div class="card-title">Aktuálna situácia</div>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="prenajom"> Prenájom</label>
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="podnajom"> Podnájom</label>
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="rodicia"> U rodičov</label>
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="vlastna" checked> Vlastná nehnuteľnosť</label>
+        <label class="radio-option"><input type="radio" name="byvanie_aktualne" value="hypoteka"> Hypotéka/úver</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Plánujete zmenu?</div>
+      <div class="toggle-group">
+        <button class="toggle-btn" onclick="toggleZmena(false,this)" id="zmenaNo">Nie</button>
+        <button class="toggle-btn active" onclick="toggleZmena(true,this)" id="zmenaYes">Áno</button>
+      </div>
+
+      <div id="zmenaSection">
+        <div style="margin:12px 0;">
+          <label style="font-size:12px;font-weight:600;">Typ zmeny:</label>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">
+            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_kupaByt"> Kúpa bytu</label>
+            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_kupaDom"> Kúpa domu/výstavba</label>
+            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_rekon"> Rekonštrukcia</label>
+            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_optim"> Optimalizácia</label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group"><label>Hodnota nehnuteľnosti (€)</label><input type="number" id="byv_hodnota" value="0" min="0" oninput="calcFinancovanie()"></div>
+          <div class="form-group"><label>Vlastné zdroje / Hotovosť (€)</label><input type="number" id="byv_hotovost" value="0" min="0" oninput="calcFinancovanie()"></div>
+          <div class="form-group"><label>Potrebné financovanie (€)</label><input type="number" id="byv_financovanie" class="computed" readonly></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Očakávaná preplácaná (€)</label><input type="number" id="byv_preplacana" value="0" min="0"></div>
+          <div class="form-group"><label>Počet izieb</label><input type="number" id="byv_izby" min="1" value="3"></div>
+          <div class="form-group"><label>Lokalita</label><input type="text" id="byv_lokalita" placeholder="napr. Bratislava"></div>
+          <div class="form-group"><label>Časový horizont</label><input type="date" id="byv_horizont"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Spôsob financovania</label>
+            <select id="byv_sposob"><option value="hotovost">Hotovosť</option><option value="uver" selected>Úver</option><option value="kombinacia">Kombinácia</option></select>
+          </div>
+        </div>
+        <div class="info-box">Hypotéky riešime cez: <strong>SLSP, VÚB, Prima Banka, ČSOB, Unicredit Banka, MBank</strong></div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="goToStep(1)">&larr; Späť</button>
+      <button class="btn btn-primary" onclick="goToStep(3)">Ďalej &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 3: Rezervy ==================== -->
+  <div class="step" id="step3">
+    <h2 class="step-header">3. Vytváranie a zhodnocovanie rezerv</h2>
+    <p class="step-subtitle">Pohotovostná rezerva a jej optimalizácia</p>
+
+    <div class="card">
+      <div class="card-title">Železná rezerva</div>
+      <div class="info-box success">
+        Optimálna výška vašej rezervy (6&times; čistý mesačný príjem): <strong id="zeleznaRezervaTxt">0 €</strong>
+      </div>
+
+      <div class="card-title" style="margin-top:20px;">Aktuálne rezervy</div>
+      <table class="dyn-table" id="rezervyTable">
+        <thead>
+          <tr><th>Typ</th><th>Názov</th><th>Suma (€)</th><th>Výnos %</th><th></th></tr>
+        </thead>
+        <tbody id="rezervyBody"></tbody>
+      </table>
+      <button class="btn-add" onclick="addRezerva()" style="margin-top:12px;">+ Pridať rezervu</button>
+
+      <div style="margin-top:16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+        <div style="font-size:14px;">Súčet aktuálnych rezerv: <strong id="rezervySumTxt">0 €</strong></div>
+        <div id="rezervyDiffBox" class="info-box warning" style="display:none;margin:0;flex:1;min-width:200px;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Rizikový profil</div>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="riziko" value="konz"> Konzervatívny</label>
+        <label class="radio-option"><input type="radio" name="riziko" value="vyv" checked> Vyvážený</label>
+        <label class="radio-option"><input type="radio" name="riziko" value="dyn"> Dynamický</label>
+      </div>
+      <div class="info-box" style="margin-top:16px;">
+        <strong>Odporúčanie:</strong> Partners Asset Management — krátkodobý fond, cieľ: do 5 rokov vytvoriť pohotovostnú rezervu vo výške 6&times; čistý príjem.
+      </div>
+      <div class="check-row"><input type="checkbox" id="fp_rezervy"> Zaradiť do finančného plánu</div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="goToStep(2)">&larr; Späť</button>
+      <button class="btn btn-primary" onclick="goToStep(4)">Ďalej &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 4: Lepší dôchodok ==================== -->
+  <div class="step" id="step4">
+    <h2 class="step-header">4. Lepší dôchodok</h2>
+    <p class="step-subtitle">Príprava na dôchodok a zabezpečenie príjmu v penzii</p>
+
+    <div class="card">
+      <div class="card-title">Dôchodkový vek a príjem</div>
+      <div class="form-row">
+        <div class="form-group"><label>Kedy by ste chceli ísť do dôchodku? (vek)</label><input type="number" id="doch_vek" value="65" min="50" max="75" oninput="calcDochodok()"></div>
+        <div class="form-group"><label>Rokov do dôchodku</label><input type="text" id="doch_roky" class="computed" readonly></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Očakávaný štátny dôchodok (€/mes)</label><input type="number" id="doch_statny" value="0" min="0" oninput="calcDochodok()"></div>
+        <div class="form-group"><label>Potrebný mesačný dôchodok (€)</label><input type="number" id="doch_potrebny" value="0" min="0" oninput="calcDochodok()"></div>
+        <div class="form-group"><label>Koľko Vám bude chýbať (€/mes)</label><input type="number" id="doch_medzera" class="computed" readonly></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Čo ste pre to urobili doteraz?</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>II. pilier</label>
+          <select id="doch_pilier2"><option value="nie">Nie</option><option value="ano">Áno</option></select>
+        </div>
+        <div class="form-group">
+          <label>III. pilier (DDS)</label>
+          <select id="doch_pilier3" onchange="toggleDDS()"><option value="nie">Nie</option><option value="ano">Áno</option></select>
+        </div>
+        <div class="form-group" id="ddsGroup" style="display:none;"><label>Mesačná suma DDS (€)</label><input type="number" id="doch_dds_suma" value="0" min="0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Investície</label>
+          <select id="doch_investicie" onchange="toggleInvest()"><option value="nie">Nie</option><option value="ano">Áno</option></select>
+        </div>
+        <div class="form-group" id="investGroup" style="display:none;"><label>Mesačná suma investícií (€)</label><input type="number" id="doch_invest_suma" value="0" min="0"></div>
+      </div>
+
+      <div class="info-box">
+        <strong>Sociálna poisťovňa:</strong> Orientačná výška dôchodku sa počíta ako cca 50 % z hrubého príjmu. Pre presné informácie navštívte portál Sociálnej poisťovne.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Odporúčaná investičná stratégia</div>
+      <div id="dochStrategia" class="info-box success"></div>
+      <div class="check-row"><input type="checkbox" id="fp_dochodok"> Zaradiť do finančného plánu</div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="goToStep(3)">&larr; Späť</button>
+      <button class="btn btn-primary" onclick="goToStep(5)">Ďalej &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 5: Deti ==================== -->
+  <div class="step" id="step5">
+    <h2 class="step-header">5. Finančné zabezpečenie detí</h2>
+    <p class="step-subtitle">Plány a ciele pre vaše deti</p>
+
+    <div class="card">
+      <div class="toggle-group">
+        <button class="toggle-btn" onclick="toggleDeti(false,this)" id="detiNo">Nie</button>
+        <button class="toggle-btn active" onclick="toggleDeti(true,this)" id="detiYes">Áno, mám / plánujem deti</button>
+      </div>
+    </div>
+
+    <div id="detiSection">
+      <div id="detiContainer"></div>
+      <button class="btn-add" onclick="addChild()" style="margin:12px 0;">+ Pridať dieťa</button>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="goToStep(4)">&larr; Späť</button>
+      <button class="btn btn-primary" onclick="goToStep(6)">Ďalej &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 6: Ochrana majetku ==================== -->
+  <div class="step" id="step6">
+    <h2 class="step-header">6. Ochrana majetku</h2>
+    <p class="step-subtitle">Prehľad a zabezpečenie vášho majetku</p>
+
+    <div class="card">
+      <div class="card-title">Majetok</div>
+      <table class="dyn-table" id="majetokTable">
+        <thead>
+          <tr><th>Typ</th><th>Popis</th><th>Obstarávacia cena (€)</th><th>Trhová hodnota (€)</th><th></th></tr>
+        </thead>
+        <tbody id="majetokBody"></tbody>
+      </table>
+      <button class="btn-add" onclick="addMajetok()" style="margin-top:12px;">+ Pridať majetok</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Zabezpečenie majetku</div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Ako máte zabezpečený váš majetok?</label>
+        <textarea id="majetok_zabezpecenie" placeholder="Popíšte aktuálne poistenie, zabezpečenie..."></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Kedy ste naposledy aktualizovali výšku zabezpečenia?</label>
+        <input type="text" id="majetok_aktualizacia" placeholder="dátum alebo Neviem">
+      </div>
+      <div class="info-box">Poistenie nehnuteľnosti riešime cez: <strong>Uniqa, Colonnade, ČSOB poisťovňa, Allianz</strong></div>
+      <div class="check-row"><input type="checkbox" id="fp_majetok"> Zaradiť do finančného plánu</div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="goToStep(5)">&larr; Späť</button>
+      <button class="btn btn-primary" onclick="goToStep(7)">Ďalej &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 7: Iné ciele ==================== -->
+  <div class="step" id="step7">
+    <h2 class="step-header">7. Iné ciele</h2>
+    <p class="step-subtitle">Ďalšie finančné ciele a plány (napr. Auto, Dovolenka, Svadba...)</p>
+
+    <div class="card">
+      <table class="dyn-table" id="cieleTable">
+        <thead>
+          <tr><th>Názov cieľa</th><th>Suma (€)</th><th>Termín</th><th>Priorita</th><th></th></tr>
+        </thead>
+        <tbody id="cieleBody"></tbody>
+      </table>
+      <button class="btn-add" onclick="addCiel()" style="margin-top:12px;">+ Pridať cieľ</button>
+      <div class="check-row" style="margin-top:16px;"><input type="checkbox" id="fp_ciele"> Zaradiť do finančného plánu</div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="goToStep(6)">&larr; Späť</button>
+      <button class="btn btn-primary" onclick="goToStep(8)">Ďalej &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 8: Zabezpečenie príjmu ==================== -->
+  <div class="step" id="step8">
+    <h2 class="step-header">8. Zabezpečenie príjmu</h2>
+    <p class="step-subtitle">Analýza rizík výpadku príjmu</p>
+
+    <div class="card">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Z akých zdrojov pochádza váš príjem?</label>
+        <textarea id="zab_zdroje" placeholder="napr. zamestnanie, podnikanie, prenájom..."></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Čo všetko financujete z vášho príjmu?</label>
+        <textarea id="zab_financovanie" placeholder="napr. bývanie, strava, auto, splátky, poistky..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Klient — Zabezpečenie príjmu</div>
+      <table class="zab-table" id="zabTableKlient">
+        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€)</th><th>Bude chýbať (€)</th><th>Zaradiť</th></tr></thead>
+        <tbody id="zabBodyKlient"></tbody>
+      </table>
+    </div>
+
+    <div class="card" id="zabPartnerCard" style="display:none;">
+      <div class="card-title">Partner — Zabezpečenie príjmu</div>
+      <table class="zab-table" id="zabTablePartner">
+        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€)</th><th>Bude chýbať (€)</th><th>Zaradiť</th></tr></thead>
+        <tbody id="zabBodyPartner"></tbody>
+      </table>
+    </div>
+
+    <div class="info-box">
+      <strong>Princíp:</strong> Minimálne na vykrytie mesačných výdavkov, optimálne na výšku čistého príjmu.<br>
+      Poistenie riešime cez: <strong>Partners Poisťovňa, NN, Allianz, MetLife, Generali</strong>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="goToStep(7)">&larr; Späť</button>
+      <button class="btn btn-primary" onclick="goToStep(9)">Ďalej &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 9: Časová os ==================== -->
+  <div class="step" id="step9">
+    <h2 class="step-header">9. Budovanie majetku — Časová os</h2>
+    <p class="step-subtitle">Prehľad všetkých cieľov zaradených do finančného plánu</p>
+
+    <div class="card">
+      <div id="timelineContainer">
+        <div class="info-box">Zaradením cieľov do finančného plánu (zaškrtnutím v predchádzajúcich krokoch) sa tu zobrazí vaša osobná finančná časová os.</div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="goToStep(8)">&larr; Späť</button>
+      <button class="btn btn-primary" onclick="goToStep(10)">Ďalej &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ==================== STEP 10: Súhrn ==================== -->
+  <div class="step" id="step10">
+    <h2 class="step-header">10. Súhrn a Finančný plán</h2>
+    <p class="step-subtitle">Kompletný prehľad vašej finančnej analýzy</p>
+
+    <div id="summaryContent">
+      <!-- Osobné údaje -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h3>Osobné údaje</h3>
+          <div id="summOsobne"></div>
+        </div>
+        <div class="summary-card">
+          <h3>Mesačný rozpočet</h3>
+          <div id="summRozpocet"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;" class="summary-grid">
+        <div class="summary-card">
+          <h3>Železná rezerva</h3>
+          <div class="chart-container"><canvas id="chartRezerva"></canvas></div>
+          <div id="summRezerva"></div>
+        </div>
+        <div class="summary-card">
+          <h3>Dôchodková medzera</h3>
+          <div class="chart-container"><canvas id="chartDochodok"></canvas></div>
+          <div id="summDochodok"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;" class="summary-grid">
+        <div class="summary-card">
+          <h3>Bývanie</h3>
+          <div id="summByvanie"></div>
+        </div>
+        <div class="summary-card">
+          <h3>Deti</h3>
+          <div id="summDeti"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="card">
+          <div class="card-title">Zabezpečenie príjmu</div>
+          <div id="summZabezpecenie"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="card">
+          <div class="card-title">Odporúčané investičné stratégie</div>
+          <table class="dyn-table" id="summStrategieTable">
+            <thead><tr><th>Oblasť</th><th>Cieľ</th><th>Horizont</th><th>Stratégia</th><th>Mesačná investícia</th><th>Poskytovateľ</th></tr></thead>
+            <tbody id="summStrategieBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="card">
+          <div class="card-title">Časová os</div>
+          <div id="summTimeline"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-red" onclick="generatePDF()">Generovať PDF Finančný plán</button>
+      <button class="btn btn-primary" onclick="saveAOF()">Uložiť AOF</button>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="goToStep(9)">&larr; Späť</button>
+      <div></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ============================================================
+// GLOBAL STATE
+// ============================================================
+let currentStep = 1;
+let clientType = 'single'; // 'single' or 'pair'
+let hasDeti = true;
+let hasZmena = true;
+let childCounter = 0;
+
+const stepNames = [
+  'Osobné údaje','Nové bývanie','Rezervy','Dôchodok','Deti',
+  'Majetok','Iné ciele','Zabezpečenie','Časová os','Súhrn'
+];
+
+// Init progress steps
+(function(){
+  const c = document.getElementById('progressSteps');
+  stepNames.forEach((n,i)=>{
+    const s = document.createElement('span');
+    s.className = 'progress-step' + (i===0?' active':'');
+    s.textContent = (i+1)+'. '+n;
+    s.onclick = ()=>goToStep(i+1);
+    c.appendChild(s);
+  });
+})();
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goToStep(n){
+  if(n<1||n>10) return;
+  document.getElementById('step'+currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step'+n).classList.add('active');
+  // Progress
+  const pct = n*10;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('currentStepNum').textContent = n;
+  document.getElementById('progressPct').textContent = pct;
+  // Step indicators
+  document.querySelectorAll('.progress-step').forEach((el,i)=>{
+    el.className = 'progress-step';
+    if(i<n-1) el.classList.add('completed');
+    if(i===n-1) el.classList.add('active');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  // Update specific steps
+  if(n===3) updateRezervy();
+  if(n===4) updateDochodok();
+  if(n===8) updateZabezpecenie();
+  if(n===9) buildTimeline();
+  if(n===10) buildSummary();
+}
+
+// ============================================================
+// STEP 1: Osobné údaje
+// ============================================================
+function setClientType(type, btn){
+  clientType = type;
+  btn.parentElement.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('partnerSection').style.display = type==='pair'?'block':'none';
+  updateAll();
+}
+
+function calcAge(prefix){
+  const dob = document.getElementById(prefix+'_narodenie').value;
+  if(!dob) return;
+  const today = new Date();
+  const birth = new Date(dob);
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if(m<0||(m===0&&today.getDate()<birth.getDate())) age--;
+  document.getElementById(prefix+'_vek').value = age;
+  updateAll();
+}
+
+function calcNet(prefix){
+  const gross = parseFloat(document.getElementById(prefix+'_hruby').value)||0;
+  // Slovak simplified: net = gross - social(13.4%) - tax(19% of base)
+  // base = gross - social - nezdanitelna_cast(416.18)
+  const social = gross * 0.134;
+  const taxBase = Math.max(0, gross - social - 416.18);
+  const tax = taxBase * 0.19;
+  const net = Math.round(gross - social - tax);
+  document.getElementById(prefix+'_cisty').value = Math.max(0, net);
+  updateAll();
+}
+
+function updateAll(){
+  // Called whenever key values change
+  updateTopUsername();
+}
+
+function updateTopUsername(){
+  const m = document.getElementById('k_meno').value;
+  const p = document.getElementById('k_priezvisko').value;
+  if(m||p) document.getElementById('topUsername').textContent = (m+' '+p).trim();
+}
+
+// Family members
+function addFamilyMember(){
+  const tbody = document.getElementById('familyBody');
+  const tr = document.createElement('tr');
+  const uid = 'fam_'+Date.now();
+  tr.innerHTML = `
+    <td><input type="text" placeholder="Meno"></td>
+    <td><select><option value="manzel">Manžel/ka</option><option value="dieta">Dieťa</option><option value="rodic">Rodič</option></select></td>
+    <td><input type="date" onchange="calcFamilyAge(this)"></td>
+    <td class="fam-age">—</td>
+    <td><button class="remove-row" onclick="this.closest('tr').remove()">&times;</button></td>`;
+  tbody.appendChild(tr);
+}
+function calcFamilyAge(inp){
+  const dob = inp.value;
+  if(!dob) return;
+  const today = new Date(); const birth = new Date(dob);
+  let age = today.getFullYear()-birth.getFullYear();
+  const m = today.getMonth()-birth.getMonth();
+  if(m<0||(m===0&&today.getDate()<birth.getDate())) age--;
+  inp.closest('tr').querySelector('.fam-age').textContent = age+' r.';
+}
+
+// ============================================================
+// STEP 2: Bývanie
+// ============================================================
+function toggleZmena(val, btn){
+  hasZmena = val;
+  document.getElementById('zmenaSection').style.display = val?'block':'none';
+  document.querySelectorAll('#step2 .toggle-group .toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function calcFinancovanie(){
+  const h = parseFloat(document.getElementById('byv_hodnota').value)||0;
+  const c = parseFloat(document.getElementById('byv_hotovost').value)||0;
+  document.getElementById('byv_financovanie').value = Math.max(0, h-c);
+}
+
+// ============================================================
+// STEP 3: Rezervy
+// ============================================================
+function updateRezervy(){
+  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
+  const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
+  const zelezna = (cisty + pCisty) * 6;
+  document.getElementById('zeleznaRezervaTxt').textContent = formatEUR(zelezna);
+  calcRezervy();
+}
+
+function addRezerva(){
+  const tbody = document.getElementById('rezervyBody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><select onchange="calcRezervy()"><option value="hotovost">Hotovosť</option><option value="bezny">Bežný účet</option><option value="sporiaci">Sporiaci účet</option><option value="fondy">Podielové fondy</option></select></td>
+    <td><input type="text" placeholder="Názov"></td>
+    <td><input type="number" value="0" min="0" oninput="calcRezervy()"></td>
+    <td><input type="number" value="0" step="0.1" min="0"></td>
+    <td><button class="remove-row" onclick="this.closest('tr').remove();calcRezervy()">&times;</button></td>`;
+  tbody.appendChild(tr);
+}
+
+function calcRezervy(){
+  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
+  const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
+  const zelezna = (cisty + pCisty) * 6;
+  document.getElementById('zeleznaRezervaTxt').textContent = formatEUR(zelezna);
+
+  let sum = 0;
+  document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
+    const inp = tr.querySelectorAll('input[type=number]')[0];
+    sum += parseFloat(inp?.value)||0;
+  });
+  document.getElementById('rezervySumTxt').textContent = formatEUR(sum);
+
+  const diff = zelezna - sum;
+  const box = document.getElementById('rezervyDiffBox');
+  if(diff > 0){
+    box.style.display = 'block';
+    box.textContent = 'Chýba vám '+formatEUR(diff)+' do optimálnej rezervy';
+  } else {
+    box.style.display = 'block';
+    box.className = 'info-box success';
+    box.textContent = 'Vaša rezerva je dostatočná!';
+    box.style.margin = '0';
+    box.style.flex = '1';
+    box.style.minWidth = '200px';
+  }
+}
+
+// ============================================================
+// STEP 4: Dôchodok
+// ============================================================
+function updateDochodok(){
+  const hruby = parseFloat(document.getElementById('k_hruby').value)||0;
+  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
+  const age = parseInt(document.getElementById('k_vek').value)||30;
+  const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
+  const roky = Math.max(0, dochVek - age);
+  document.getElementById('doch_roky').value = roky;
+
+  // Auto-fill state pension estimate
+  if(parseFloat(document.getElementById('doch_statny').value)===0){
+    document.getElementById('doch_statny').value = Math.round(hruby * 0.5);
+  }
+  if(parseFloat(document.getElementById('doch_potrebny').value)===0){
+    document.getElementById('doch_potrebny').value = Math.round(cisty);
+  }
+  calcDochodok();
+}
+
+function calcDochodok(){
+  const age = parseInt(document.getElementById('k_vek').value)||30;
+  const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
+  const roky = Math.max(0, dochVek - age);
+  document.getElementById('doch_roky').value = roky;
+
+  const statny = parseFloat(document.getElementById('doch_statny').value)||0;
+  const potrebny = parseFloat(document.getElementById('doch_potrebny').value)||0;
+  const medzera = potrebny - statny;
+  document.getElementById('doch_medzera').value = Math.max(0, medzera);
+
+  // Strategy
+  let strat = '';
+  if(roky >= 15) strat = 'Dynamická stratégia (Partners Investments) — dlhý horizont, vyšší výnosový potenciál';
+  else if(roky >= 10) strat = 'Dynamická stratégia (Partners Investments) — stredne dlhý horizont';
+  else if(roky >= 5) strat = 'Vyvážená stratégia (Partners Investments) — stredný horizont';
+  else strat = 'Konzervatívna stratégia (Partners Investments) — krátky horizont, ochrana kapitálu';
+  document.getElementById('dochStrategia').innerHTML = '<strong>Odporúčanie:</strong> '+strat+' ('+roky+' rokov do dôchodku)';
+}
+
+function toggleDDS(){
+  document.getElementById('ddsGroup').style.display = document.getElementById('doch_pilier3').value==='ano'?'flex':'none';
+}
+function toggleInvest(){
+  document.getElementById('investGroup').style.display = document.getElementById('doch_investicie').value==='ano'?'flex':'none';
+}
+
+// ============================================================
+// STEP 5: Deti
+// ============================================================
+function toggleDeti(val, btn){
+  hasDeti = val;
+  document.getElementById('detiSection').style.display = val?'block':'none';
+  document.querySelectorAll('#step5 .toggle-group .toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function addChild(){
+  childCounter++;
+  const n = childCounter;
+  const container = document.getElementById('detiContainer');
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.id = 'child_'+n;
+  card.innerHTML = `
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+      Dieťa ${n}
+      <button class="remove-row" onclick="this.closest('.card').remove()" style="font-size:20px;">&times;</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Meno</label><input type="text" class="child-meno"></div>
+      <div class="form-group"><label>Dátum narodenia</label><input type="date" class="child-dob" onchange="calcChildAge(this)"></div>
+      <div class="form-group"><label>Vek</label><input type="text" class="child-vek computed" readonly></div>
+    </div>
+    <div style="margin-top:12px;">
+      <strong style="font-size:13px;">Ciele:</strong>
+      <div class="form-row" style="margin-top:8px;">
+        <div class="form-group"><label>Vzdelanie (€)</label><input type="number" class="child-vzdelanie" value="0" min="0"></div>
+        <div class="form-group"><label>Termín vzdelávania</label><input type="date" class="child-vzdelanie-date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Štart do života (€)</label><input type="number" class="child-start" value="0" min="0"></div>
+        <div class="form-group"><label>Termín štartu</label><input type="date" class="child-start-date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Výdavky spojené s narodením (€)</label><input type="number" class="child-narodenie" value="0" min="0"></div>
+      </div>
+    </div>
+    <div class="check-row"><input type="checkbox" class="fp-child" checked> Zaradiť do finančného plánu</div>`;
+  container.appendChild(card);
+}
+
+function calcChildAge(inp){
+  const dob = inp.value;
+  if(!dob) return;
+  const today = new Date(); const birth = new Date(dob);
+  let age = today.getFullYear()-birth.getFullYear();
+  const m = today.getMonth()-birth.getMonth();
+  if(m<0||(m===0&&today.getDate()<birth.getDate())) age--;
+  inp.closest('.card').querySelector('.child-vek').value = Math.max(0,age);
+}
+
+function getChildStrategy(dateStr){
+  if(!dateStr) return 'Vyvážená';
+  const now = new Date();
+  const target = new Date(dateStr);
+  const years = (target - now) / (365.25*24*3600000);
+  if(years > 10) return 'Dynamická';
+  if(years >= 5) return 'Vyvážená';
+  return 'Konzervatívna';
+}
+
+// ============================================================
+// STEP 6: Majetok
+// ============================================================
+function addMajetok(){
+  const tbody = document.getElementById('majetokBody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><select><option>Byt</option><option>Dom</option><option>Auto</option><option>Chata</option><option>Pozemok</option></select></td>
+    <td><input type="text" placeholder="Popis"></td>
+    <td><input type="number" value="0" min="0"></td>
+    <td><input type="number" value="0" min="0"></td>
+    <td><button class="remove-row" onclick="this.closest('tr').remove()">&times;</button></td>`;
+  tbody.appendChild(tr);
+}
+
+// ============================================================
+// STEP 7: Iné ciele
+// ============================================================
+function addCiel(){
+  const tbody = document.getElementById('cieleBody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" placeholder="napr. Auto, Dovolenka, Svadba..."></td>
+    <td><input type="number" value="0" min="0"></td>
+    <td><input type="date"></td>
+    <td><select><option>Vysoká</option><option>Stredná</option><option>Nízka</option></select></td>
+    <td><button class="remove-row" onclick="this.closest('tr').remove()">&times;</button></td>`;
+  tbody.appendChild(tr);
+}
+
+// ============================================================
+// STEP 8: Zabezpečenie príjmu
+// ============================================================
+function updateZabezpecenie(){
+  buildZabTable('k', 'zabBodyKlient');
+  if(clientType==='pair'){
+    document.getElementById('zabPartnerCard').style.display = 'block';
+    buildZabTable('p', 'zabBodyPartner');
+  } else {
+    document.getElementById('zabPartnerCard').style.display = 'none';
+  }
+}
+
+function buildZabTable(prefix, bodyId){
+  const hruby = parseFloat(document.getElementById(prefix+'_hruby').value)||0;
+  const cisty = parseFloat(document.getElementById(prefix+'_cisty').value)||0;
+
+  const rows = [
+    {name:'Výpoveď', davka: Math.round(hruby*0.5)},
+    {name:'Materská dovolenka', davka: 370},
+    {name:'PN (práceneschopnosť)', davka: Math.round(hruby*0.55)},
+    {name:'Invalidita', davka: Math.round(hruby*0.375)},
+    {name:'Úmrtie', davka: Math.round(hruby*0.6)},
+  ];
+
+  const tbody = document.getElementById(bodyId);
+  tbody.innerHTML = '';
+  rows.forEach((r,i)=>{
+    const chyba = cisty - r.davka;
+    const cls = chyba > 0 ? 'negative' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.name}</td>
+      <td>${formatEUR(r.davka)}</td>
+      <td class="${cls}">${formatEUR(chyba)}</td>
+      <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${Math.max(0,chyba)}" ${chyba>0?'checked':''}></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ============================================================
+// STEP 9: Timeline
+// ============================================================
+function buildTimeline(){
+  const goals = collectGoals();
+  const container = document.getElementById('timelineContainer');
+
+  if(goals.length === 0){
+    container.innerHTML = '<div class="info-box">Zatiaľ nemáte zaradené žiadne ciele do finančného plánu. Vráťte sa do predchádzajúcich krokov a zaškrtnite "Zaradiť do finančného plánu".</div>';
+    return;
+  }
+
+  goals.sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  const age = parseInt(document.getElementById('k_vek').value)||30;
+  const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
+
+  let html = '<div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:13px;font-weight:600;">';
+  html += '<span>Aktuálny vek: '+age+'</span>';
+  html += '<span>Dôchodkový vek: '+dochVek+'</span></div>';
+  html += '<div class="timeline"><div class="timeline-line"></div><div class="timeline-items">';
+  goals.forEach(g=>{
+    html += `<div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-label">${g.name}</div>
+      <div class="timeline-amount">${formatEUR(g.suma)}</div>
+      <div class="timeline-date">${g.date||'—'}</div>
+    </div>`;
+  });
+  html += '</div></div>';
+  container.innerHTML = html;
+}
+
+function collectGoals(){
+  const goals = [];
+
+  // Step 2: Bývanie
+  if(hasZmena){
+    const fin = parseFloat(document.getElementById('byv_financovanie').value)||0;
+    const dt = document.getElementById('byv_horizont').value;
+    if(fin > 0) goals.push({name:'Bývanie', suma:fin, date:dt||'—'});
+  }
+
+  // Step 3: Rezervy
+  if(document.getElementById('fp_rezervy').checked){
+    const cisty = (parseFloat(document.getElementById('k_cisty').value)||0) + (clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0);
+    let sum = 0;
+    document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
+      sum += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
+    });
+    const diff = cisty*6 - sum;
+    if(diff>0) goals.push({name:'Železná rezerva', suma:diff, date:getDateIn(2)});
+  }
+
+  // Step 4: Dôchodok
+  if(document.getElementById('fp_dochodok').checked){
+    const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
+    const age = parseInt(document.getElementById('k_vek').value)||30;
+    const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
+    goals.push({name:'Dôchodok', suma:medzera*12, date:getDateInYears(dochVek-age)});
+  }
+
+  // Step 5: Deti
+  document.querySelectorAll('#detiContainer .card').forEach(card=>{
+    if(!card.querySelector('.fp-child')?.checked) return;
+    const meno = card.querySelector('.child-meno')?.value||'Dieťa';
+    const vz = parseFloat(card.querySelector('.child-vzdelanie')?.value)||0;
+    const vzd = card.querySelector('.child-vzdelanie-date')?.value||'';
+    const st = parseFloat(card.querySelector('.child-start')?.value)||0;
+    const std = card.querySelector('.child-start-date')?.value||'';
+    if(vz>0) goals.push({name:meno+' — Vzdelanie', suma:vz, date:vzd||'—'});
+    if(st>0) goals.push({name:meno+' — Štart', suma:st, date:std||'—'});
+  });
+
+  // Step 6: Majetok
+  if(document.getElementById('fp_majetok').checked){
+    let total = 0;
+    document.querySelectorAll('#majetokBody tr').forEach(tr=>{
+      total += parseFloat(tr.querySelectorAll('input[type=number]')[1]?.value)||0;
+    });
+    if(total>0) goals.push({name:'Ochrana majetku', suma:total, date:'—'});
+  }
+
+  // Step 7: Iné ciele
+  if(document.getElementById('fp_ciele').checked){
+    document.querySelectorAll('#cieleBody tr').forEach(tr=>{
+      const name = tr.querySelectorAll('input[type=text]')[0]?.value||'Cieľ';
+      const suma = parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
+      const dt = tr.querySelector('input[type=date]')?.value||'—';
+      if(suma>0) goals.push({name, suma, date:dt});
+    });
+  }
+
+  // Step 8: Zabezpečenie
+  document.querySelectorAll('.fp-zab-k:checked').forEach(cb=>{
+    goals.push({name:'Zabezpečenie: '+cb.dataset.name, suma:parseFloat(cb.dataset.suma)||0, date:'—'});
+  });
+
+  return goals;
+}
+
+// ============================================================
+// STEP 10: Summary
+// ============================================================
+let chartRezervaInst = null;
+let chartDochodokInst = null;
+
+function buildSummary(){
+  // Osobné údaje
+  const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim();
+  const vek = document.getElementById('k_vek').value||'—';
+  const hruby = parseFloat(document.getElementById('k_hruby').value)||0;
+  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
+
+  let osobneHtml = `<div class="summary-item"><span>Meno</span><span class="summary-value">${meno||'—'}</span></div>`;
+  osobneHtml += `<div class="summary-item"><span>Vek</span><span class="summary-value">${vek}</span></div>`;
+  if(clientType==='pair'){
+    const pm = (document.getElementById('p_meno').value+' '+document.getElementById('p_priezvisko').value).trim();
+    osobneHtml += `<div class="summary-item"><span>Partner/ka</span><span class="summary-value">${pm||'—'}</span></div>`;
+  }
+  document.getElementById('summOsobne').innerHTML = osobneHtml;
+
+  // Rozpočet
+  const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
+  const pHruby = clientType==='pair'?(parseFloat(document.getElementById('p_hruby').value)||0):0;
+  let rozpHtml = `<div class="summary-item"><span>Hrubý príjem (klient)</span><span class="summary-value">${formatEUR(hruby)}</span></div>`;
+  rozpHtml += `<div class="summary-item"><span>Čistý príjem (klient)</span><span class="summary-value">${formatEUR(cisty)}</span></div>`;
+  if(clientType==='pair'){
+    rozpHtml += `<div class="summary-item"><span>Hrubý príjem (partner)</span><span class="summary-value">${formatEUR(pHruby)}</span></div>`;
+    rozpHtml += `<div class="summary-item"><span>Čistý príjem (partner)</span><span class="summary-value">${formatEUR(pCisty)}</span></div>`;
+    rozpHtml += `<div class="summary-item"><span><strong>Celkový čistý príjem</strong></span><span class="summary-value"><strong>${formatEUR(cisty+pCisty)}</strong></span></div>`;
+  }
+  document.getElementById('summRozpocet').innerHTML = rozpHtml;
+
+  // Rezerva chart
+  const zelezna = (cisty+pCisty)*6;
+  let sumRezerv = 0;
+  document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
+    sumRezerv += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
+  });
+  if(chartRezervaInst) chartRezervaInst.destroy();
+  chartRezervaInst = new Chart(document.getElementById('chartRezerva'),{
+    type:'bar',
+    data:{labels:['Aktuálna rezerva','Optimálna rezerva'],datasets:[{data:[sumRezerv,zelezna],backgroundColor:['var(--navy)','var(--red)'],borderRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+  });
+  let rezHtml = `<div class="summary-item"><span>Aktuálna</span><span class="summary-value">${formatEUR(sumRezerv)}</span></div>`;
+  rezHtml += `<div class="summary-item"><span>Optimálna</span><span class="summary-value">${formatEUR(zelezna)}</span></div>`;
+  const diff = zelezna - sumRezerv;
+  rezHtml += `<div class="summary-item"><span>Rozdiel</span><span class="summary-value ${diff>0?'deficit':'surplus'}">${formatEUR(diff)}</span></div>`;
+  document.getElementById('summRezerva').innerHTML = rezHtml;
+
+  // Dôchodok chart
+  const statny = parseFloat(document.getElementById('doch_statny').value)||0;
+  const potrebny = parseFloat(document.getElementById('doch_potrebny').value)||0;
+  if(chartDochodokInst) chartDochodokInst.destroy();
+  chartDochodokInst = new Chart(document.getElementById('chartDochodok'),{
+    type:'bar',
+    data:{labels:['Štátny dôchodok','Potrebný dôchodok'],datasets:[{data:[statny,potrebny],backgroundColor:['var(--navy)','var(--red)'],borderRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+  });
+  let dochHtml = `<div class="summary-item"><span>Štátny dôchodok</span><span class="summary-value">${formatEUR(statny)}/mes</span></div>`;
+  dochHtml += `<div class="summary-item"><span>Potrebný dôchodok</span><span class="summary-value">${formatEUR(potrebny)}/mes</span></div>`;
+  const medzera = potrebny - statny;
+  dochHtml += `<div class="summary-item"><span>Medzera</span><span class="summary-value ${medzera>0?'deficit':'surplus'}">${formatEUR(medzera)}/mes</span></div>`;
+  document.getElementById('summDochodok').innerHTML = dochHtml;
+
+  // Bývanie
+  let byvHtml = '';
+  if(hasZmena){
+    const val = parseFloat(document.getElementById('byv_hodnota').value)||0;
+    const hot = parseFloat(document.getElementById('byv_hotovost').value)||0;
+    const fin = parseFloat(document.getElementById('byv_financovanie').value)||0;
+    byvHtml += `<div class="summary-item"><span>Hodnota</span><span class="summary-value">${formatEUR(val)}</span></div>`;
+    byvHtml += `<div class="summary-item"><span>Vlastné zdroje</span><span class="summary-value">${formatEUR(hot)}</span></div>`;
+    byvHtml += `<div class="summary-item"><span>Financovanie</span><span class="summary-value">${formatEUR(fin)}</span></div>`;
+  } else {
+    byvHtml = '<div style="font-size:13px;color:var(--muted);">Neplánujete zmenu bývania</div>';
+  }
+  document.getElementById('summByvanie').innerHTML = byvHtml;
+
+  // Deti
+  let detiHtml = '';
+  if(hasDeti){
+    document.querySelectorAll('#detiContainer .card').forEach(card=>{
+      const m = card.querySelector('.child-meno')?.value||'Dieťa';
+      const v = card.querySelector('.child-vek')?.value||'—';
+      const vz = parseFloat(card.querySelector('.child-vzdelanie')?.value)||0;
+      const st = parseFloat(card.querySelector('.child-start')?.value)||0;
+      detiHtml += `<div class="summary-item"><span>${m} (${v} r.)</span><span class="summary-value">${formatEUR(vz+st)}</span></div>`;
+    });
+  }
+  if(!detiHtml) detiHtml = '<div style="font-size:13px;color:var(--muted);">Žiadne deti</div>';
+  document.getElementById('summDeti').innerHTML = detiHtml;
+
+  // Zabezpečenie
+  let zabHtml = '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Sociálna dávka</th><th>Bude chýbať</th></tr></thead><tbody>';
+  document.querySelectorAll('#zabBodyKlient tr').forEach(tr=>{
+    const tds = tr.querySelectorAll('td');
+    zabHtml += `<tr><td>${tds[0].textContent}</td><td>${tds[1].textContent}</td><td class="${tds[2].className}">${tds[2].textContent}</td></tr>`;
+  });
+  zabHtml += '</tbody></table>';
+  document.getElementById('summZabezpecenie').innerHTML = zabHtml;
+
+  // Stratégie
+  const strategieBody = document.getElementById('summStrategieBody');
+  strategieBody.innerHTML = '';
+  const goals = collectGoals();
+  goals.forEach(g=>{
+    let horizont = '—';
+    let strat = 'Vyvážená';
+    if(g.date && g.date !== '—'){
+      const years = Math.max(0, Math.round((new Date(g.date)-new Date())/(365.25*24*3600000)));
+      horizont = years + ' rokov';
+      if(years > 10) strat = 'Dynamická';
+      else if(years >= 5) strat = 'Vyvážená';
+      else strat = 'Konzervatívna';
+    }
+    const mesInvest = g.suma > 0 && horizont !== '—' ? formatEUR(Math.round(g.suma / (parseFloat(horizont)*12||1))) : '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${g.name}</td><td>${formatEUR(g.suma)}</td><td>${horizont}</td><td>${strat}</td><td>${mesInvest}</td><td>Partners Investments</td>`;
+    strategieBody.appendChild(tr);
+  });
+
+  // Timeline in summary
+  const timelineGoals = [...goals].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  let tlHtml = '';
+  if(timelineGoals.length > 0){
+    const age2 = parseInt(document.getElementById('k_vek').value)||30;
+    const dv = parseInt(document.getElementById('doch_vek').value)||65;
+    tlHtml = '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;font-weight:600;"><span>Vek: '+age2+'</span><span>Dôchodok: '+dv+'</span></div>';
+    tlHtml += '<div class="timeline"><div class="timeline-line"></div><div class="timeline-items">';
+    timelineGoals.forEach(g=>{
+      tlHtml += `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-label">${g.name}</div><div class="timeline-amount">${formatEUR(g.suma)}</div><div class="timeline-date">${g.date||'—'}</div></div>`;
+    });
+    tlHtml += '</div></div>';
+  } else {
+    tlHtml = '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
+  }
+  document.getElementById('summTimeline').innerHTML = tlHtml;
+}
+
+// ============================================================
+// PDF Generation
+// ============================================================
+function generatePDF(){
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF('p','mm','a4');
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 15;
+  let y = 15;
+
+  // Header
+  doc.setFillColor(0,48,73);
+  doc.rect(0,0,pageW,35,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(20);
+  doc.text('Partners Group SK',margin,18);
+  doc.setFontSize(11);
+  doc.text('Analyza osobnych financii',margin,28);
+
+  const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Klient';
+  const today = new Date().toLocaleDateString('sk-SK');
+  doc.setFontSize(9);
+  doc.text('Klient: '+meno+' | Datum: '+today, pageW-margin, 18, {align:'right'});
+
+  y = 45;
+  doc.setTextColor(0,48,73);
+
+  // Helper
+  function addSection(title){
+    if(y > 260){ doc.addPage(); y = 15; }
+    doc.setFontSize(14);
+    doc.setFont(undefined,'bold');
+    doc.text(title, margin, y);
+    y += 2;
+    doc.setDrawColor(171,5,52);
+    doc.line(margin, y, pageW-margin, y);
+    y += 7;
+    doc.setFontSize(10);
+    doc.setFont(undefined,'normal');
+  }
+
+  function addLine(label, value){
+    if(y > 275){ doc.addPage(); y = 15; }
+    doc.text(label+': ', margin, y);
+    doc.setFont(undefined,'bold');
+    doc.text(value, margin + 60, y);
+    doc.setFont(undefined,'normal');
+    y += 6;
+  }
+
+  // 1. Osobné údaje
+  addSection('1. Osobne udaje');
+  addLine('Meno', meno);
+  addLine('Vek', (document.getElementById('k_vek').value||'—')+' rokov');
+  addLine('Hruby prijem', formatEUR(parseFloat(document.getElementById('k_hruby').value)||0));
+  addLine('Cisty prijem', formatEUR(parseFloat(document.getElementById('k_cisty').value)||0));
+  if(clientType==='pair'){
+    const pm = (document.getElementById('p_meno').value+' '+document.getElementById('p_priezvisko').value).trim();
+    addLine('Partner', pm);
+    addLine('Partner cisty', formatEUR(parseFloat(document.getElementById('p_cisty').value)||0));
+  }
+  y += 4;
+
+  // 2. Bývanie
+  addSection('2. Byvanie');
+  if(hasZmena){
+    addLine('Hodnota', formatEUR(parseFloat(document.getElementById('byv_hodnota').value)||0));
+    addLine('Vlastne zdroje', formatEUR(parseFloat(document.getElementById('byv_hotovost').value)||0));
+    addLine('Financovanie', formatEUR(parseFloat(document.getElementById('byv_financovanie').value)||0));
+  } else {
+    doc.text('Neplanuje zmenu byvania', margin, y); y+=6;
+  }
+  y += 4;
+
+  // 3. Rezervy
+  addSection('3. Rezervy');
+  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
+  const pCisty2 = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
+  const zel = (cisty+pCisty2)*6;
+  let sr = 0;
+  document.querySelectorAll('#rezervyBody tr').forEach(tr=>{sr += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;});
+  addLine('Optimalna rezerva', formatEUR(zel));
+  addLine('Aktualna rezerva', formatEUR(sr));
+  addLine('Rozdiel', formatEUR(zel-sr));
+  y += 4;
+
+  // 4. Dôchodok
+  addSection('4. Dochodok');
+  addLine('Roky do dochodku', (document.getElementById('doch_roky').value||'—'));
+  addLine('Statny dochodok', formatEUR(parseFloat(document.getElementById('doch_statny').value)||0)+'/mes');
+  addLine('Potrebny dochodok', formatEUR(parseFloat(document.getElementById('doch_potrebny').value)||0)+'/mes');
+  addLine('Medzera', formatEUR(parseFloat(document.getElementById('doch_medzera').value)||0)+'/mes');
+  y += 4;
+
+  // 5. Deti
+  addSection('5. Financne zabezpecenie deti');
+  if(hasDeti){
+    document.querySelectorAll('#detiContainer .card').forEach(card=>{
+      const m2 = card.querySelector('.child-meno')?.value||'Dieta';
+      const vz = parseFloat(card.querySelector('.child-vzdelanie')?.value)||0;
+      const st = parseFloat(card.querySelector('.child-start')?.value)||0;
+      addLine(m2, formatEUR(vz+st));
+    });
+  } else {
+    doc.text('Ziadne deti', margin, y); y+=6;
+  }
+  y += 4;
+
+  // 6-8 brief
+  addSection('6-8. Majetok, Ciele, Zabezpecenie');
+  const goals = collectGoals();
+  goals.forEach(g=>{
+    addLine(g.name, formatEUR(g.suma));
+  });
+  y += 4;
+
+  // Strategies table
+  addSection('Odporucane investicne strategie');
+  goals.forEach(g=>{
+    let horizont = '—';
+    let strat = 'Vyvazena';
+    if(g.date && g.date!=='—'){
+      const yrs = Math.max(0,Math.round((new Date(g.date)-new Date())/(365.25*24*3600000)));
+      horizont = yrs+' r.';
+      strat = yrs>10?'Dynamicka':yrs>=5?'Vyvazena':'Konzervativna';
+    }
+    if(y > 275){ doc.addPage(); y = 15; }
+    doc.text(g.name+' | '+formatEUR(g.suma)+' | '+horizont+' | '+strat+' | Partners Investments', margin, y);
+    y += 5;
+  });
+
+  y += 10;
+  if(y > 260){ doc.addPage(); y = 15; }
+  doc.setFillColor(0,48,73);
+  doc.rect(0, y, pageW, 20, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(9);
+  doc.text('Mario Tistan | Senior Consultant | Partners Group SK | mario.tistan@partnersgroup.sk | +421 902 130 096', pageW/2, y+12, {align:'center'});
+
+  doc.save('AOF_'+meno.replace(/\s+/g,'_')+'_'+today.replace(/\./g,'-')+'.pdf');
+}
+
+// ============================================================
+// Save / Load
+// ============================================================
+function saveAOF(){
+  const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Nová analýza';
+  const key = 'aof_'+meno.replace(/\s+/g,'_')+'_'+Date.now();
+
+  // Collect all input values
+  const data = {name:meno, date:new Date().toISOString(), clientType, hasZmena, hasDeti};
+  const inputs = document.querySelectorAll('input, select, textarea');
+  data.fields = {};
+  inputs.forEach(inp=>{
+    if(inp.id){
+      if(inp.type==='checkbox') data.fields[inp.id] = inp.checked;
+      else if(inp.type==='radio') data.fields[inp.id+'_'+inp.name] = inp.checked ? inp.value : undefined;
+      else data.fields[inp.id] = inp.value;
+    }
+  });
+
+  // Save radio groups
+  data.radios = {};
+  document.querySelectorAll('input[type=radio]:checked').forEach(r=>{
+    data.radios[r.name] = r.value;
+  });
+
+  // Save dynamic tables HTML
+  data.familyHTML = document.getElementById('familyBody').innerHTML;
+  data.rezervyHTML = document.getElementById('rezervyBody').innerHTML;
+  data.majetokHTML = document.getElementById('majetokBody').innerHTML;
+  data.cieleHTML = document.getElementById('cieleBody').innerHTML;
+  data.detiHTML = document.getElementById('detiContainer').innerHTML;
+
+  localStorage.setItem(key, JSON.stringify(data));
+  alert('AOF uložená: '+meno);
+}
+
+function showLoadSelect(){
+  const sel = document.getElementById('loadSelect');
+  sel.innerHTML = '<option value="">-- Načítať AOF --</option>';
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k.startsWith('aof_')){
+      try{
+        const d = JSON.parse(localStorage.getItem(k));
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.textContent = d.name + ' (' + new Date(d.date).toLocaleDateString('sk-SK') + ')';
+        sel.appendChild(opt);
+      }catch(e){}
+    }
+  }
+  sel.style.display = 'inline-block';
+}
+
+function loadAOF(key){
+  if(!key) return;
+  try{
+    const data = JSON.parse(localStorage.getItem(key));
+    if(!data) return;
+
+    clientType = data.clientType || 'single';
+    hasZmena = data.hasZmena !== undefined ? data.hasZmena : true;
+    hasDeti = data.hasDeti !== undefined ? data.hasDeti : true;
+
+    // Restore fields
+    if(data.fields){
+      Object.keys(data.fields).forEach(id=>{
+        const el = document.getElementById(id);
+        if(el){
+          if(el.type==='checkbox') el.checked = data.fields[id];
+          else el.value = data.fields[id]||'';
+        }
+      });
+    }
+
+    // Restore radios
+    if(data.radios){
+      Object.keys(data.radios).forEach(name=>{
+        const r = document.querySelector(`input[name="${name}"][value="${data.radios[name]}"]`);
+        if(r) r.checked = true;
+      });
+    }
+
+    // Restore dynamic content
+    if(data.familyHTML) document.getElementById('familyBody').innerHTML = data.familyHTML;
+    if(data.rezervyHTML) document.getElementById('rezervyBody').innerHTML = data.rezervyHTML;
+    if(data.majetokHTML) document.getElementById('majetokBody').innerHTML = data.majetokHTML;
+    if(data.cieleHTML) document.getElementById('cieleBody').innerHTML = data.cieleHTML;
+    if(data.detiHTML) document.getElementById('detiContainer').innerHTML = data.detiHTML;
+
+    // Update UI state
+    document.getElementById('partnerSection').style.display = clientType==='pair'?'block':'none';
+    document.getElementById('zmenaSection').style.display = hasZmena?'block':'none';
+    document.getElementById('detiSection').style.display = hasDeti?'block':'none';
+
+    // Update toggles
+    document.querySelectorAll('#step1 .toggle-group .toggle-btn').forEach((b,i)=>{
+      b.classList.toggle('active', (clientType==='single'&&i===0)||(clientType==='pair'&&i===1));
+    });
+
+    alert('AOF načítaná: '+data.name);
+    goToStep(1);
+  }catch(e){
+    alert('Chyba pri načítaní AOF');
+    console.error(e);
+  }
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function formatEUR(n){
+  if(isNaN(n)) return '0 €';
+  return Math.round(n).toLocaleString('sk-SK')+' €';
+}
+
+function getDateIn(years){
+  const d = new Date();
+  d.setFullYear(d.getFullYear()+years);
+  return d.toISOString().split('T')[0];
+}
+
+function getDateInYears(years){
+  return getDateIn(years);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function(){
+  // Add one default child
+  addChild();
+  // Add one default reserve row
+  addRezerva();
+  // Add one default majetok row
+  addMajetok();
+  // Add one default ciel row
+  addCiel();
+  // Initial zabezpecenie
+  updateZabezpecenie();
+
+  // Set username from session
+  const user = sessionStorage.getItem('vipUser');
+  if(user) document.getElementById('topUsername').textContent = user;
+});
+</script>
+</body>
+</html>
