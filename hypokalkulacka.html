@@ -863,15 +863,15 @@ function submitPdfForm(){
 <div class="pdf-modal-overlay" id="pdfModal" onclick="if(event.target===this)closePdfModal()">
   <div class="pdf-modal">
     <button class="pdf-modal-close" onclick="closePdfModal()">&times;</button>
-    <h3>Získaj výpočet na email</h3>
-    <p>Zadaj svoju emailovú adresu a pošleme ti PDF s výpočtom.</p>
+    <h3>Stiahni si výpočet</h3>
+    <p>Zadaj email a stiahni si PDF s výpočtom.</p>
     <div id="pdfModalForm">
       <input type="email" class="pdf-modal-input" id="pdfEmail" placeholder="tvoj@email.sk" required>
       <label class="pdf-modal-check">
         <input type="checkbox" id="pdfGdpr">
         Súhlasím so spracovaním osobných údajov za účelom zaslania výpočtu. <a href="ochrana-udajov.html" target="_blank">Viac informácií</a>
       </label>
-      <button class="pdf-modal-btn" id="pdfSubmitBtn" onclick="submitPdfForm()">Odoslať a stiahnuť PDF</button>
+      <button class="pdf-modal-btn" id="pdfSubmitBtn" onclick="submitPdfForm()">Stiahnuť PDF</button>
     </div>
     <div id="pdfModalSuccess" style="display:none" class="pdf-modal-success">
       ✓ PDF bol stiahnutý.<br>Ďakujeme!

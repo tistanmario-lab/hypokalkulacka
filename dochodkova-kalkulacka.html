@@ -513,8 +513,8 @@ header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding
   <div class="pdf-modal">
     <button class="pdf-modal-close" onclick="closePdfModal()">&#10005;</button>
     <div id="pdfModalForm">
-      <h3>V&#225;&#353; d&#244;chodkov&#253; pl&#225;n</h3>
-      <p>Zadajte email a po&#353;leme v&#225;m PDF s detailn&#253;m v&#253;po&#269;tom.</p>
+      <h3>Stiahni si výpočet</h3>
+      <p>Zadaj email a stiahni si PDF s výpočtom.</p>
       <input class="pdf-modal-input" type="email" id="pdfEmail" placeholder="vas@email.sk">
       <div class="pdf-modal-check">
         <input type="checkbox" id="pdfGdpr">
@@ -940,12 +940,12 @@ function submitPdfForm(){
       document.getElementById('pdfModalForm').style.display='none';
       document.getElementById('pdfModalSuccess').style.display='block';
       submitBtn.disabled=false;
-      submitBtn.textContent='Odoslať a stiahnuť PDF';
+      submitBtn.textContent='Stiahnuť PDF';
     }).catch(function(){
       document.getElementById('pdfModalForm').style.display='none';
       document.getElementById('pdfModalSuccess').style.display='block';
       submitBtn.disabled=false;
-      submitBtn.textContent='Odoslať a stiahnuť PDF';
+      submitBtn.textContent='Stiahnuť PDF';
     });
   });
 }
