@@ -1203,7 +1203,8 @@ function buildZabTable(prefix, bodyId){
     {name:'Výpoveď', davka: isSzco ? 0 : Math.round(hruby*0.5)},
     {name:'Materská dovolenka', davka: isSzco ? Math.round(915*0.75) : 370},
     {name:'PN (práceneschopnosť)', davka: Math.round(hruby*0.55)},
-    {name:'Invalidita', davka: Math.round(hruby*0.375)},
+    {name:'Čiastočná invalidita (41–70 %)', davka: Math.round(hruby*0.25)},
+    {name:'Plná invalidita (71 %+)', davka: Math.round(hruby*0.375)},
     {name:'Úmrtie', davka: Math.round(hruby*0.6)},
   ];
 
