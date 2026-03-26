@@ -182,6 +182,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);l
 .zab-table th{background:var(--sand);padding:10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
 .zab-table td{padding:10px;border-bottom:1px solid var(--border);}
 .zab-table .negative{color:var(--red);font-weight:700;}
+
+/* Financial Plan Tabs */
+.fp-tabs{display:flex;background:var(--white);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:24px;}
+.fp-tab{flex:1;padding:14px 24px;font-family:inherit;font-size:14px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--muted);transition:all .2s;position:relative;}
+.fp-tab.active{color:var(--navy);background:var(--sand);}
+.fp-tab.active::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:3px;background:var(--red);border-radius:3px 3px 0 0;}
+.fp-tab-content{display:none;}
+.fp-tab-content.active{display:block;animation:fadeIn .3s ease;}
+
+/* FP Section headers */
+.fp-section-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;}
+.fp-section-num{display:flex;align-items:center;justify-content:center;width:36px;height:36px;min-width:36px;border-radius:50%;background:var(--navy);color:#fff;font-size:16px;font-weight:700;margin-top:2px;}
+
+/* FP Recommendation box */
+.fp-rec{background:rgba(0,48,73,0.03);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:12px 0;}
+.fp-rec-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.fp-rec-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid var(--border);}
+.fp-rec-row:last-child{border-bottom:none;}
+.fp-rec-highlight{font-weight:700;color:var(--red);}
+
+/* FP Strategy badges */
+.strat-badge{display:inline-block;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:.04em;}
+.strat-badge.konz{background:rgba(46,125,50,0.1);color:var(--green);}
+.strat-badge.vyv{background:rgba(255,152,0,0.1);color:var(--orange);}
+.strat-badge.dyn{background:rgba(171,5,52,0.08);color:var(--red);}
+
+/* FP Table footer */
+#fpStrategieTable tfoot td{font-weight:700;border-top:2px solid var(--navy);padding:12px;font-size:14px;}
 </style>
 </head>
 <body>
@@ -242,8 +270,8 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <div class="card">
       <div class="card-title">Klient</div>
       <div class="form-row">
-        <div class="form-group"><label>Meno</label><input type="text" id="k_meno" oninput="updateSummary()"></div>
-        <div class="form-group"><label>Priezvisko</label><input type="text" id="k_priezvisko" oninput="updateSummary()"></div>
+        <div class="form-group"><label>Meno</label><input type="text" id="k_meno" oninput="updateTopUsername()"></div>
+        <div class="form-group"><label>Priezvisko</label><input type="text" id="k_priezvisko" oninput="updateTopUsername()"></div>
         <div class="form-group"><label>Dátum narodenia</label><input type="date" id="k_narodenie" onchange="calcAge('k')"></div>
         <div class="form-group"><label>Vek</label><input type="text" id="k_vek" class="computed" readonly></div>
       </div>
@@ -751,13 +779,19 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     </div>
   </div>
 
-  <!-- ==================== STEP 10: Súhrn ==================== -->
+  <!-- ==================== STEP 10: Súhrn & Finančný plán ==================== -->
   <div class="step" id="step10">
     <h2 class="step-header">10. Súhrn a Finančný plán</h2>
-    <p class="step-subtitle">Kompletný prehľad vašej finančnej analýzy</p>
+    <p class="step-subtitle">Kompletný prehľad vašej finančnej analýzy a odporúčania</p>
 
-    <div id="summaryContent">
-      <!-- Osobné údaje -->
+    <!-- Tab Navigation -->
+    <div class="fp-tabs">
+      <button class="fp-tab active" onclick="switchTab('suhrn',this)">Súhrn AOF</button>
+      <button class="fp-tab" onclick="switchTab('plan',this)">Finančný plán</button>
+    </div>
+
+    <!-- ===== TAB 1: Súhrn AOF ===== -->
+    <div id="tabSuhrn" class="fp-tab-content active">
       <div class="summary-grid">
         <div class="summary-card">
           <h3>Osobné údaje</h3>
@@ -802,24 +836,141 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
 
       <div style="margin-top:20px;">
         <div class="card">
-          <div class="card-title">Odporúčané investičné stratégie</div>
-          <table class="dyn-table" id="summStrategieTable">
-            <thead><tr><th>Oblasť</th><th>Cieľ</th><th>Horizont</th><th>Stratégia</th><th>Mesačná investícia</th><th>Poskytovateľ</th></tr></thead>
-            <tbody id="summStrategieBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div style="margin-top:20px;">
-        <div class="card">
           <div class="card-title">Časová os</div>
           <div id="summTimeline"></div>
         </div>
       </div>
     </div>
 
+    <!-- ===== TAB 2: Finančný plán ===== -->
+    <div id="tabPlan" class="fp-tab-content">
+
+      <!-- FP Header -->
+      <div class="card" style="background:linear-gradient(135deg,var(--navy),#004a73);color:#fff;border:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Finančný plán</div>
+            <div style="font-size:13px;opacity:0.7;margin-top:4px;" id="fpKlientName">Klient</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;opacity:0.5;text-transform:uppercase;letter-spacing:.1em;">Vypracoval</div>
+            <div style="font-size:14px;font-weight:600;">Mário Tišťan</div>
+            <div style="font-size:11px;opacity:0.7;">Senior Consultant &bull; Partners Group SK</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FP: Celkový mesačný rozpočet -->
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title">Celkový mesačný rozpočet finančného plánu</div>
+        <div id="fpRozpocetSummary"></div>
+        <div class="chart-container" style="height:250px;"><canvas id="chartFPRozpocet"></canvas></div>
+      </div>
+
+      <!-- FP: 1. Rezervy -->
+      <div class="card fp-section" id="fpSecRezervy" style="margin-top:20px;display:none;">
+        <div class="fp-section-header">
+          <span class="fp-section-num">1</span>
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">Vytváranie a zhodnocovanie rezerv</div>
+            <div style="font-size:12px;color:var(--muted);">Partners Asset Management — Fond krátkodobých rezerv</div>
+          </div>
+        </div>
+        <div id="fpRezervy"></div>
+      </div>
+
+      <!-- FP: 2. Dôchodok -->
+      <div class="card fp-section" id="fpSecDochodok" style="margin-top:20px;display:none;">
+        <div class="fp-section-header">
+          <span class="fp-section-num">2</span>
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">Lepší dôchodok</div>
+            <div style="font-size:12px;color:var(--muted);">Partners Investments</div>
+          </div>
+        </div>
+        <div id="fpDochodok"></div>
+      </div>
+
+      <!-- FP: 3. Deti -->
+      <div class="card fp-section" id="fpSecDeti" style="margin-top:20px;display:none;">
+        <div class="fp-section-header">
+          <span class="fp-section-num">3</span>
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">Finančné zabezpečenie detí</div>
+            <div style="font-size:12px;color:var(--muted);">Partners Investments</div>
+          </div>
+        </div>
+        <div id="fpDeti"></div>
+      </div>
+
+      <!-- FP: 4. Bývanie -->
+      <div class="card fp-section" id="fpSecByvanie" style="margin-top:20px;display:none;">
+        <div class="fp-section-header">
+          <span class="fp-section-num">4</span>
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">Bývanie</div>
+            <div style="font-size:12px;color:var(--muted);">SLSP, VÚB, Prima Banka, ČSOB, Unicredit, MBank</div>
+          </div>
+        </div>
+        <div id="fpByvanie"></div>
+      </div>
+
+      <!-- FP: 5. Iné ciele -->
+      <div class="card fp-section" id="fpSecCiele" style="margin-top:20px;display:none;">
+        <div class="fp-section-header">
+          <span class="fp-section-num">5</span>
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">Iné ciele</div>
+            <div style="font-size:12px;color:var(--muted);">Partners Investments</div>
+          </div>
+        </div>
+        <div id="fpCiele"></div>
+      </div>
+
+      <!-- FP: 6. Zabezpečenie príjmu -->
+      <div class="card fp-section" id="fpSecZabezpecenie" style="margin-top:20px;display:none;">
+        <div class="fp-section-header">
+          <span class="fp-section-num">6</span>
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">Zabezpečenie príjmu</div>
+            <div style="font-size:12px;color:var(--muted);">Partners Poisťovňa, NN, Allianz, MetLife, Generali</div>
+          </div>
+        </div>
+        <div id="fpZabezpecenie"></div>
+      </div>
+
+      <!-- FP: 7. Ochrana majetku -->
+      <div class="card fp-section" id="fpSecMajetok" style="margin-top:20px;display:none;">
+        <div class="fp-section-header">
+          <span class="fp-section-num">7</span>
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">Ochrana majetku</div>
+            <div style="font-size:12px;color:var(--muted);">Uniqa, Colonnade, ČSOB poisťovňa, Allianz</div>
+          </div>
+        </div>
+        <div id="fpMajetok"></div>
+      </div>
+
+      <!-- FP: Celkový prehľad investícií -->
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title">Prehľad investícií — Celkový mesačný náklad</div>
+        <table class="dyn-table" id="fpStrategieTable">
+          <thead><tr><th>Program</th><th>Cieľ</th><th>Horizont</th><th>Stratégia</th><th>Zhodnotenie</th><th>Mesačná investícia</th><th>Poskytovateľ</th></tr></thead>
+          <tbody id="fpStrategieBody"></tbody>
+          <tfoot id="fpStrategieFoot"></tfoot>
+        </table>
+      </div>
+
+      <!-- FP: Časová os -->
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title">Časová os finančného plánu</div>
+        <div id="fpTimeline"></div>
+      </div>
+
+    </div>
+
     <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
-      <button class="btn btn-red" onclick="generatePDF()">Generovať PDF Finančný plán</button>
+      <button class="btn btn-red" onclick="generatePDF()">Generovať PDF</button>
       <button class="btn btn-primary" onclick="saveAOF()">Uložiť AOF</button>
     </div>
 
@@ -1456,10 +1607,22 @@ function collectGoals(){
 }
 
 // ============================================================
+// TABS
+// ============================================================
+function switchTab(tab, btn){
+  document.querySelectorAll('.fp-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.fp-tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='suhrn') document.getElementById('tabSuhrn').classList.add('active');
+  else { document.getElementById('tabPlan').classList.add('active'); buildFinancialPlan(); }
+}
+
+// ============================================================
 // STEP 10: Summary
 // ============================================================
 let chartRezervaInst = null;
 let chartDochodokInst = null;
+let chartFPRozpocetInst = null;
 
 function buildSummary(){
   // Osobné údaje
@@ -1497,7 +1660,7 @@ function buildSummary(){
   if(chartRezervaInst) chartRezervaInst.destroy();
   chartRezervaInst = new Chart(document.getElementById('chartRezerva'),{
     type:'bar',
-    data:{labels:['Aktuálna rezerva','Optimálna rezerva'],datasets:[{data:[sumRezerv,zelezna],backgroundColor:['var(--navy)','var(--red)'],borderRadius:8}]},
+    data:{labels:['Aktuálna rezerva','Optimálna rezerva'],datasets:[{data:[sumRezerv,zelezna],backgroundColor:['#003049','#AB0534'],borderRadius:8}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
   });
   let rezHtml = `<div class="summary-item"><span>Aktuálna</span><span class="summary-value">${formatEUR(sumRezerv)}</span></div>`;
@@ -1512,7 +1675,7 @@ function buildSummary(){
   if(chartDochodokInst) chartDochodokInst.destroy();
   chartDochodokInst = new Chart(document.getElementById('chartDochodok'),{
     type:'bar',
-    data:{labels:['Štátny dôchodok','Potrebný dôchodok'],datasets:[{data:[statny,potrebny],backgroundColor:['var(--navy)','var(--red)'],borderRadius:8}]},
+    data:{labels:['Štátny dôchodok','Potrebný dôchodok'],datasets:[{data:[statny,potrebny],backgroundColor:['#003049','#AB0534'],borderRadius:8}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
   });
   let dochHtml = `<div class="summary-item"><span>Štátny dôchodok</span><span class="summary-value">${formatEUR(statny)}/mes</span></div>`;
@@ -1558,173 +1721,684 @@ function buildSummary(){
   zabHtml += '</tbody></table>';
   document.getElementById('summZabezpecenie').innerHTML = zabHtml;
 
-  // Stratégie
-  const strategieBody = document.getElementById('summStrategieBody');
-  strategieBody.innerHTML = '';
-  const goals = collectGoals();
-  goals.forEach(g=>{
-    let horizont = '—';
-    let strat = 'Vyvážená';
-    if(g.date && g.date !== '—'){
-      const years = Math.max(0, Math.round((new Date(g.date)-new Date())/(365.25*24*3600000)));
-      horizont = years + ' rokov';
-      if(years > 10) strat = 'Dynamická';
-      else if(years >= 5) strat = 'Vyvážená';
-      else strat = 'Konzervatívna';
-    }
-    const mesInvest = g.suma > 0 && horizont !== '—' ? formatEUR(Math.round(g.suma / (parseFloat(horizont)*12||1))) : '—';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${g.name}</td><td>${formatEUR(g.suma)}</td><td>${horizont}</td><td>${strat}</td><td>${mesInvest}</td><td>Partners Investments</td>`;
-    strategieBody.appendChild(tr);
-  });
-
   // Timeline in summary — reuse buildTimeline logic
-  const tempContainer = document.createElement('div');
   const origContainer = document.getElementById('timelineContainer');
   const origHTML = origContainer.innerHTML;
   document.getElementById('summTimeline').innerHTML = origHTML || '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
 }
 
 // ============================================================
+// FINANCIAL PLAN GENERATOR
+// ============================================================
+const STRATEGIES = {
+  konzervativna: {name:'Konzervatívna', rate:0.02, badge:'konz', desc:'Nízke riziko, stabilný výnos'},
+  vyvazena:      {name:'Vyvážená',      rate:0.05, badge:'vyv',  desc:'Stredné riziko, vyvážený rast'},
+  dynamicka:     {name:'Dynamická',     rate:0.08, badge:'dyn',  desc:'Vyššie riziko, vyšší potenciál rastu'}
+};
+
+function getStrategy(years){
+  if(years >= 10) return STRATEGIES.dynamicka;
+  if(years >= 5) return STRATEGIES.vyvazena;
+  return STRATEGIES.konzervativna;
+}
+
+// PMT with compound interest: PMT = FV * r / ((1+r)^n - 1)
+function calcPMT(fv, annualRate, years){
+  if(fv <= 0 || years <= 0) return 0;
+  const r = annualRate / 12;
+  const n = years * 12;
+  if(r === 0) return Math.round(fv / n);
+  return Math.round(fv * r / (Math.pow(1 + r, n) - 1));
+}
+
+// FV with monthly contributions: FV = PMT * ((1+r)^n - 1) / r
+function calcFV(pmt, annualRate, years){
+  const r = annualRate / 12;
+  const n = years * 12;
+  if(r === 0) return pmt * n;
+  return Math.round(pmt * (Math.pow(1 + r, n) - 1) / r);
+}
+
+function buildFinancialPlan(){
+  const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Klient';
+  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
+  const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
+  const age = parseInt(document.getElementById('k_vek').value)||30;
+  const today = new Date();
+
+  document.getElementById('fpKlientName').textContent = meno + ' | ' + new Date().toLocaleDateString('sk-SK');
+
+  // Collect all FP items
+  const fpItems = []; // {program, ciel, suma, horizont, strategy, pmt, provider}
+  let totalMesacne = 0;
+
+  // ── 1. REZERVY ──
+  const fpSec1 = document.getElementById('fpSecRezervy');
+  if(document.getElementById('fp_rezervy').checked){
+    fpSec1.style.display = 'block';
+    const zelezna = (() => {
+      const vlastna = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
+      return vlastna > 0 ? vlastna : (cisty + pCisty) * 6;
+    })();
+    let sumRezerv = 0;
+    document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
+      sumRezerv += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
+    });
+    const deficit = Math.max(0, zelezna - sumRezerv);
+    const rezRate = 0.02; // 2% p.a.
+    const rezYears = 5;
+    const rezPmt = calcPMT(deficit, rezRate, rezYears);
+    const rezFV = calcFV(rezPmt, rezRate, rezYears);
+
+    let html = '<div class="fp-rec">';
+    html += '<div class="fp-rec-title">Fond krátkodobých rezerv <span class="strat-badge konz">Konzervatívna</span></div>';
+    html += `<div class="fp-rec-row"><span>Cieľová rezerva</span><span>${formatEUR(zelezna)}</span></div>`;
+    html += `<div class="fp-rec-row"><span>Aktuálne nasporené</span><span>${formatEUR(sumRezerv)}</span></div>`;
+    html += `<div class="fp-rec-row"><span>Chýbajúca suma</span><span class="fp-rec-highlight">${formatEUR(deficit)}</span></div>`;
+    html += `<div class="fp-rec-row"><span>Predpokladané zhodnotenie</span><span>2 % p.a.</span></div>`;
+    html += `<div class="fp-rec-row"><span>Horizont</span><span>5 rokov (60 mesiacov)</span></div>`;
+    html += `<div class="fp-rec-row"><span><strong>Odporúčaná mesačná investícia</strong></span><span class="fp-rec-highlight"><strong>${formatEUR(rezPmt)}</strong></span></div>`;
+    html += `<div class="fp-rec-row"><span>Predpokladaná hodnota po 5 rokoch</span><span>${formatEUR(rezFV)}</span></div>`;
+    html += '</div>';
+    html += '<div class="info-box success"><strong>Poskytovateľ:</strong> Partners Asset Management — Fond krátkodobých rezerv</div>';
+    document.getElementById('fpRezervy').innerHTML = html;
+
+    if(deficit > 0){
+      fpItems.push({program:'Rezervy', ciel:formatEUR(deficit), horizont:'5 rokov', strategy:STRATEGIES.konzervativna, rate:'2 %', pmt:rezPmt, provider:'Partners AM'});
+      totalMesacne += rezPmt;
+    }
+  } else { fpSec1.style.display = 'none'; }
+
+  // ── 2. DÔCHODOK ──
+  const fpSec2 = document.getElementById('fpSecDochodok');
+  if(document.getElementById('fp_dochodok').checked){
+    fpSec2.style.display = 'block';
+    const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
+    const roky = Math.max(0, dochVek - age);
+    const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
+    const cielSuma = medzera * 12 * 20; // 20 rokov na dôchodku
+    const strat = getStrategy(roky);
+    const dochPmt = calcPMT(cielSuma, strat.rate, roky);
+    const dochFV = calcFV(dochPmt, strat.rate, roky);
+
+    // Existing pillar info
+    const p2 = document.getElementById('doch_pilier2').value === 'ano';
+    const p3 = document.getElementById('doch_pilier3').value === 'ano';
+    const inv = document.getElementById('doch_investicie').value === 'ano';
+
+    let html = '';
+    // Existing pillars
+    if(p2 || p3 || inv){
+      html += '<div style="margin-bottom:16px;">';
+      html += '<div style="font-size:13px;font-weight:600;margin-bottom:8px;">Aktuálne produkty:</div>';
+      if(p2){
+        const sp = document.getElementById('doch_p2_spolocnost').value||'—';
+        const sm = formatEUR(parseFloat(document.getElementById('doch_p2_suma').value)||0);
+        html += `<div style="font-size:12px;color:var(--muted);padding:4px 0;">II. pilier: ${sp} — nasporené ${sm}</div>`;
+      }
+      if(p3){
+        const sp = document.getElementById('doch_dds_spolocnost').value||'—';
+        const sm = formatEUR(parseFloat(document.getElementById('doch_dds_nasporena').value)||0);
+        const ms = formatEUR(parseFloat(document.getElementById('doch_dds_suma').value)||0);
+        const zam = formatEUR(parseFloat(document.getElementById('doch_dds_zamestnavatel').value)||0);
+        html += `<div style="font-size:12px;color:var(--muted);padding:4px 0;">III. pilier DDS: ${sp} — nasporené ${sm}, mesačne ${ms} + zamestnávateľ ${zam}</div>`;
+      }
+      if(inv){
+        const sp = document.getElementById('doch_invest_spolocnost').value||'—';
+        const sm = formatEUR(parseFloat(document.getElementById('doch_invest_nasporena').value)||0);
+        html += `<div style="font-size:12px;color:var(--muted);padding:4px 0;">Investície: ${sp} — nasporené ${sm}</div>`;
+      }
+      html += '</div>';
+    }
+
+    html += '<div class="fp-rec">';
+    html += `<div class="fp-rec-title">Doplnkové sporenie na dôchodok <span class="strat-badge ${strat.badge}">${strat.name}</span></div>`;
+    html += `<div class="fp-rec-row"><span>Dôchodková medzera</span><span class="fp-rec-highlight">${formatEUR(medzera)}/mes</span></div>`;
+    html += `<div class="fp-rec-row"><span>Cieľová suma (20 rokov na dôchodku)</span><span>${formatEUR(cielSuma)}</span></div>`;
+    html += `<div class="fp-rec-row"><span>Rokov do dôchodku</span><span>${roky} rokov</span></div>`;
+    html += `<div class="fp-rec-row"><span>Predpokladané zhodnotenie</span><span>${Math.round(strat.rate*100)} % p.a.</span></div>`;
+    html += `<div class="fp-rec-row"><span><strong>Odporúčaná mesačná investícia</strong></span><span class="fp-rec-highlight"><strong>${formatEUR(dochPmt)}</strong></span></div>`;
+    html += `<div class="fp-rec-row"><span>Predpokladaná hodnota</span><span>${formatEUR(dochFV)}</span></div>`;
+    html += '</div>';
+    html += '<div class="info-box success"><strong>Poskytovateľ:</strong> Partners Investments — '+strat.name+' stratégia ('+strat.desc+')</div>';
+    document.getElementById('fpDochodok').innerHTML = html;
+
+    if(cielSuma > 0){
+      fpItems.push({program:'Dôchodok', ciel:formatEUR(cielSuma), horizont:roky+' rokov', strategy:strat, rate:Math.round(strat.rate*100)+' %', pmt:dochPmt, provider:'Partners Investments'});
+      totalMesacne += dochPmt;
+    }
+  } else { fpSec2.style.display = 'none'; }
+
+  // ── 3. DETI ──
+  const fpSec3 = document.getElementById('fpSecDeti');
+  let hasDetiPlan = false;
+  let detiHtml = '';
+  document.querySelectorAll('#detiContainer .card').forEach(card => {
+    if(!card.querySelector('.fp-child')?.checked) return;
+    const meno2 = card.querySelector('.child-meno')?.value||'Dieťa';
+    const vz = parseFloat(card.querySelector('.child-vzdelanie')?.value)||0;
+    const vzd = card.querySelector('.child-vzdelanie-date')?.value||'';
+    const st = parseFloat(card.querySelector('.child-start')?.value)||0;
+    const std = card.querySelector('.child-start-date')?.value||'';
+
+    if(vz > 0 && vzd){
+      const yrs = Math.max(1, Math.round((new Date(vzd)-today)/(365.25*24*3600000)));
+      const s = getStrategy(yrs);
+      const pmt = calcPMT(vz, s.rate, yrs);
+      detiHtml += '<div class="fp-rec">';
+      detiHtml += `<div class="fp-rec-title">${meno2} — Vzdelanie <span class="strat-badge ${s.badge}">${s.name}</span></div>`;
+      detiHtml += `<div class="fp-rec-row"><span>Cieľová suma</span><span>${formatEUR(vz)}</span></div>`;
+      detiHtml += `<div class="fp-rec-row"><span>Horizont</span><span>${yrs} rokov</span></div>`;
+      detiHtml += `<div class="fp-rec-row"><span>Zhodnotenie</span><span>${Math.round(s.rate*100)} % p.a.</span></div>`;
+      detiHtml += `<div class="fp-rec-row"><span><strong>Mesačná investícia</strong></span><span class="fp-rec-highlight"><strong>${formatEUR(pmt)}</strong></span></div>`;
+      detiHtml += '</div>';
+      fpItems.push({program:meno2+' — Vzdelanie', ciel:formatEUR(vz), horizont:yrs+' rokov', strategy:s, rate:Math.round(s.rate*100)+' %', pmt, provider:'Partners Investments'});
+      totalMesacne += pmt;
+      hasDetiPlan = true;
+    }
+    if(st > 0 && std){
+      const yrs = Math.max(1, Math.round((new Date(std)-today)/(365.25*24*3600000)));
+      const s = getStrategy(yrs);
+      const pmt = calcPMT(st, s.rate, yrs);
+      detiHtml += '<div class="fp-rec">';
+      detiHtml += `<div class="fp-rec-title">${meno2} — Štart do života <span class="strat-badge ${s.badge}">${s.name}</span></div>`;
+      detiHtml += `<div class="fp-rec-row"><span>Cieľová suma</span><span>${formatEUR(st)}</span></div>`;
+      detiHtml += `<div class="fp-rec-row"><span>Horizont</span><span>${yrs} rokov</span></div>`;
+      detiHtml += `<div class="fp-rec-row"><span>Zhodnotenie</span><span>${Math.round(s.rate*100)} % p.a.</span></div>`;
+      detiHtml += `<div class="fp-rec-row"><span><strong>Mesačná investícia</strong></span><span class="fp-rec-highlight"><strong>${formatEUR(pmt)}</strong></span></div>`;
+      detiHtml += '</div>';
+      fpItems.push({program:meno2+' — Štart', ciel:formatEUR(st), horizont:yrs+' rokov', strategy:s, rate:Math.round(s.rate*100)+' %', pmt, provider:'Partners Investments'});
+      totalMesacne += pmt;
+      hasDetiPlan = true;
+    }
+  });
+  if(hasDetiPlan){
+    fpSec3.style.display = 'block';
+    detiHtml += '<div class="info-box success"><strong>Poskytovateľ:</strong> Partners Investments</div>';
+    document.getElementById('fpDeti').innerHTML = detiHtml;
+  } else { fpSec3.style.display = 'none'; }
+
+  // ── 4. BÝVANIE ──
+  const fpSec4 = document.getElementById('fpSecByvanie');
+  if(hasZmena){
+    fpSec4.style.display = 'block';
+    const fin = parseFloat(document.getElementById('byv_financovanie').value)||0;
+    const hot = parseFloat(document.getElementById('byv_hotovost').value)||0;
+    const val = parseFloat(document.getElementById('byv_hodnota').value)||0;
+    const lokalita = document.getElementById('byv_lokalita').value||'—';
+    const sposob = document.getElementById('byv_sposob').value;
+
+    // Existing loan info
+    const hasOptim = document.getElementById('ch_optim').checked;
+    let html = '';
+    if(hasOptim){
+      const banka = document.getElementById('optim_banka').value||'—';
+      const zostatok = formatEUR(parseFloat(document.getElementById('optim_zostatok').value)||0);
+      const urok = document.getElementById('optim_urok').value||'—';
+      const fixacia = document.getElementById('optim_fixacia').value||'—';
+      const fixDatum = document.getElementById('optim_fixacia_datum').value||'—';
+      const splatka = formatEUR(parseFloat(document.getElementById('optim_splatka').value)||0);
+      html += '<div class="fp-rec">';
+      html += '<div class="fp-rec-title">Aktuálny úver — optimalizácia</div>';
+      html += `<div class="fp-rec-row"><span>Banka</span><span>${banka}</span></div>`;
+      html += `<div class="fp-rec-row"><span>Zostatok</span><span>${zostatok}</span></div>`;
+      html += `<div class="fp-rec-row"><span>Úroková sadzba</span><span>${urok} %</span></div>`;
+      html += `<div class="fp-rec-row"><span>Fixácia</span><span>${fixacia} rokov (do ${fixDatum})</span></div>`;
+      html += `<div class="fp-rec-row"><span>Mesačná splátka</span><span>${splatka}</span></div>`;
+      html += '</div>';
+      html += '<div class="info-box"><strong>Odporúčanie:</strong> Pri konci fixácie zvážte refinancovanie pre lepšiu sadzbu. Porovnáme ponuky: SLSP, VÚB, Prima Banka, ČSOB, Unicredit, MBank.</div>';
+    }
+
+    if(fin > 0){
+      html += '<div class="fp-rec">';
+      html += '<div class="fp-rec-title">Nové bývanie</div>';
+      html += `<div class="fp-rec-row"><span>Hodnota nehnuteľnosti</span><span>${formatEUR(val)}</span></div>`;
+      html += `<div class="fp-rec-row"><span>Vlastné zdroje</span><span>${formatEUR(hot)}</span></div>`;
+      html += `<div class="fp-rec-row"><span>Potrebné financovanie</span><span class="fp-rec-highlight">${formatEUR(fin)}</span></div>`;
+      html += `<div class="fp-rec-row"><span>Lokalita</span><span>${lokalita}</span></div>`;
+      html += `<div class="fp-rec-row"><span>Spôsob</span><span>${sposob}</span></div>`;
+      html += '</div>';
+    }
+    html += '<div class="info-box success"><strong>Hypotéky riešime cez:</strong> SLSP, VÚB, Prima Banka, ČSOB, Unicredit Banka, MBank</div>';
+    document.getElementById('fpByvanie').innerHTML = html;
+  } else { fpSec4.style.display = 'none'; }
+
+  // ── 5. INÉ CIELE ──
+  const fpSec5 = document.getElementById('fpSecCiele');
+  if(document.getElementById('fp_ciele').checked){
+    let cieleHtml = '';
+    let hasCiele = false;
+    document.querySelectorAll('#cieleBody tr').forEach(tr=>{
+      const name = tr.querySelectorAll('input[type=text]')[0]?.value||'Cieľ';
+      const suma = parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
+      const dt = tr.querySelector('input[type=date]')?.value||'';
+      if(suma <= 0) return;
+      hasCiele = true;
+      if(dt){
+        const yrs = Math.max(1, Math.round((new Date(dt)-today)/(365.25*24*3600000)));
+        const s = getStrategy(yrs);
+        const pmt = calcPMT(suma, s.rate, yrs);
+        cieleHtml += '<div class="fp-rec">';
+        cieleHtml += `<div class="fp-rec-title">${name} <span class="strat-badge ${s.badge}">${s.name}</span></div>`;
+        cieleHtml += `<div class="fp-rec-row"><span>Cieľová suma</span><span>${formatEUR(suma)}</span></div>`;
+        cieleHtml += `<div class="fp-rec-row"><span>Horizont</span><span>${yrs} rokov</span></div>`;
+        cieleHtml += `<div class="fp-rec-row"><span>Zhodnotenie</span><span>${Math.round(s.rate*100)} % p.a.</span></div>`;
+        cieleHtml += `<div class="fp-rec-row"><span><strong>Mesačná investícia</strong></span><span class="fp-rec-highlight"><strong>${formatEUR(pmt)}</strong></span></div>`;
+        cieleHtml += '</div>';
+        fpItems.push({program:name, ciel:formatEUR(suma), horizont:yrs+' rokov', strategy:s, rate:Math.round(s.rate*100)+' %', pmt, provider:'Partners Investments'});
+        totalMesacne += pmt;
+      } else {
+        cieleHtml += '<div class="fp-rec">';
+        cieleHtml += `<div class="fp-rec-title">${name}</div>`;
+        cieleHtml += `<div class="fp-rec-row"><span>Cieľová suma</span><span>${formatEUR(suma)}</span></div>`;
+        cieleHtml += `<div class="fp-rec-row"><span>Horizont</span><span>Neurčený</span></div>`;
+        cieleHtml += '</div>';
+      }
+    });
+    if(hasCiele){
+      fpSec5.style.display = 'block';
+      document.getElementById('fpCiele').innerHTML = cieleHtml;
+    } else { fpSec5.style.display = 'none'; }
+  } else { fpSec5.style.display = 'none'; }
+
+  // ── 6. ZABEZPEČENIE PRÍJMU ──
+  const fpSec6 = document.getElementById('fpSecZabezpecenie');
+  const zabChecked = document.querySelectorAll('.fp-zab-k:checked');
+  if(zabChecked.length > 0){
+    fpSec6.style.display = 'block';
+    let zabHtml = '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Chýbajúce krytie</th><th>Odporúčanie</th></tr></thead><tbody>';
+    zabChecked.forEach(cb=>{
+      const name = cb.dataset.name;
+      const suma = parseFloat(cb.dataset.suma)||0;
+      let rec = 'Rizikové životné poistenie';
+      if(name.includes('Výpoveď')) rec = 'Poistenie straty zamestnania';
+      else if(name.includes('PN')) rec = 'Poistenie práceneschopnosti (denné odškodné)';
+      else if(name.includes('Materská')) rec = 'Doplnkové pripoistenie';
+      else if(name.includes('invalidita')) rec = 'Invalidný dôchodok — pripoistenie';
+      else if(name.includes('Úmrtie')) rec = 'Rizikové životné poistenie (jednorazová suma)';
+      zabHtml += `<tr><td>${name}</td><td class="negative">${formatEUR(suma)}${name==='Úmrtie'?' jednorazovo':'/mes'}</td><td>${rec}</td></tr>`;
+    });
+    zabHtml += '</tbody></table>';
+    zabHtml += '<div class="info-box success"><strong>Poistenie riešime cez:</strong> Partners Poisťovňa, NN, Allianz, MetLife, Generali</div>';
+    document.getElementById('fpZabezpecenie').innerHTML = zabHtml;
+  } else { fpSec6.style.display = 'none'; }
+
+  // ── 7. OCHRANA MAJETKU ──
+  const fpSec7 = document.getElementById('fpSecMajetok');
+  if(document.getElementById('fp_majetok').checked){
+    fpSec7.style.display = 'block';
+    const hasPoist = document.getElementById('ch_poistenie_nehnut').checked;
+    let majHtml = '';
+    if(hasPoist){
+      const psN = formatEUR(parseFloat(document.getElementById('majetok_ps_nehnut').value)||0);
+      const psD = formatEUR(parseFloat(document.getElementById('majetok_ps_domacnost').value)||0);
+      const rp = formatEUR(parseFloat(document.getElementById('majetok_rocne_poistne').value)||0);
+      const poistovna = document.getElementById('majetok_poistovna').value||'—';
+      majHtml += '<div class="fp-rec">';
+      majHtml += '<div class="fp-rec-title">Aktuálne poistenie</div>';
+      majHtml += `<div class="fp-rec-row"><span>Poistná suma — nehnuteľnosť</span><span>${psN}</span></div>`;
+      majHtml += `<div class="fp-rec-row"><span>Poistná suma — domácnosť</span><span>${psD}</span></div>`;
+      majHtml += `<div class="fp-rec-row"><span>Ročné poistné</span><span>${rp}</span></div>`;
+      majHtml += `<div class="fp-rec-row"><span>Poisťovňa</span><span>${poistovna}</span></div>`;
+      majHtml += '</div>';
+      majHtml += '<div class="info-box"><strong>Odporúčanie:</strong> Skontrolovať aktuálnosť poistných súm voči trhovej hodnote nehnuteľnosti. Porovnáme ponuky na trhu.</div>';
+    } else {
+      majHtml += '<div class="info-box warning"><strong>Upozornenie:</strong> Klient nemá poistenie nehnuteľnosti / domácnosti. Odporúčame uzatvoriť poistenie na ochranu majetku.</div>';
+    }
+    majHtml += '<div class="info-box success"><strong>Poistenie nehnuteľnosti riešime cez:</strong> Uniqa, Colonnade, ČSOB poisťovňa, Allianz</div>';
+    document.getElementById('fpMajetok').innerHTML = majHtml;
+  } else { fpSec7.style.display = 'none'; }
+
+  // ── PREHĽAD INVESTÍCIÍ ──
+  const tbody = document.getElementById('fpStrategieBody');
+  tbody.innerHTML = '';
+  fpItems.forEach(item=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${item.program}</td><td>${item.ciel}</td><td>${item.horizont}</td><td><span class="strat-badge ${item.strategy.badge}">${item.strategy.name}</span></td><td>${item.rate} p.a.</td><td class="fp-rec-highlight">${formatEUR(item.pmt)}</td><td>${item.provider}</td>`;
+    tbody.appendChild(tr);
+  });
+  const tfoot = document.getElementById('fpStrategieFoot');
+  tfoot.innerHTML = `<tr><td colspan="5" style="text-align:right;">Celková mesačná investícia:</td><td class="fp-rec-highlight">${formatEUR(totalMesacne)}</td><td></td></tr>`;
+
+  // ── ROZPOČET SUMMARY ──
+  const vydavky = parseFloat(document.getElementById('zab_vydavky').value)||0;
+  const volne = (cisty + pCisty) - vydavky - totalMesacne;
+  let rozpHtml = '<div class="fp-rec">';
+  rozpHtml += `<div class="fp-rec-row"><span>Čistý mesačný príjem</span><span>${formatEUR(cisty + pCisty)}</span></div>`;
+  rozpHtml += `<div class="fp-rec-row"><span>Mesačné výdavky na život</span><span>${formatEUR(vydavky)}</span></div>`;
+  rozpHtml += `<div class="fp-rec-row"><span>Investície podľa finančného plánu</span><span class="fp-rec-highlight">${formatEUR(totalMesacne)}</span></div>`;
+  rozpHtml += `<div class="fp-rec-row"><span><strong>Voľné prostriedky</strong></span><span style="color:${volne>=0?'var(--green)':'var(--red)'};font-weight:700;"><strong>${formatEUR(volne)}</strong></span></div>`;
+  rozpHtml += '</div>';
+  document.getElementById('fpRozpocetSummary').innerHTML = rozpHtml;
+
+  // Budget chart
+  if(chartFPRozpocetInst) chartFPRozpocetInst.destroy();
+  chartFPRozpocetInst = new Chart(document.getElementById('chartFPRozpocet'),{
+    type:'doughnut',
+    data:{
+      labels:['Výdavky na život','Investície (FP)','Voľné prostriedky'],
+      datasets:[{data:[vydavky, totalMesacne, Math.max(0,volne)], backgroundColor:['#989FA7','#AB0534','#003049'], borderWidth:2, borderColor:'#fff'}]
+    },
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{font:{size:12}}}}}
+  });
+
+  // ── TIMELINE ──
+  const origHTML = document.getElementById('timelineContainer').innerHTML;
+  document.getElementById('fpTimeline').innerHTML = origHTML || '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
+}
+
+// ============================================================
 // PDF Generation
 // ============================================================
 function generatePDF(){
+  // Build FP data first
+  buildFinancialPlan();
+
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF('p','mm','a4');
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
+  const contentW = pageW - 2*margin;
   let y = 15;
 
-  // Header
-  doc.setFillColor(0,48,73);
-  doc.rect(0,0,pageW,35,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(20);
-  doc.text('Partners Group SK',margin,18);
-  doc.setFontSize(11);
-  doc.text('Analyza osobnych financii',margin,28);
-
   const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Klient';
-  const today = new Date().toLocaleDateString('sk-SK');
-  doc.setFontSize(9);
-  doc.text('Klient: '+meno+' | Datum: '+today, pageW-margin, 18, {align:'right'});
+  const todayStr = new Date().toLocaleDateString('sk-SK');
+  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
+  const pCisty2 = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
+  const age = parseInt(document.getElementById('k_vek').value)||30;
 
-  y = 45;
-  doc.setTextColor(0,48,73);
-
-  // Helper
-  function addSection(title){
-    if(y > 260){ doc.addPage(); y = 15; }
-    doc.setFontSize(14);
+  // Helpers
+  function checkPage(need){if(y+need>280){doc.addPage();y=15;}}
+  function addHeader(title, subtitle){
+    doc.setFillColor(0,48,73);
+    doc.rect(0,0,pageW,38,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(22);
+    doc.text(title,margin,20);
+    doc.setFontSize(11);
+    doc.text(subtitle,margin,30);
+    doc.setFontSize(9);
+    doc.text('Klient: '+meno+' | Datum: '+todayStr, pageW-margin, 20, {align:'right'});
+    doc.text('Vypracoval: Mario Tistan | Partners Group SK', pageW-margin, 28, {align:'right'});
+    y = 48;
+    doc.setTextColor(0,48,73);
+  }
+  function addSection(num, title){
+    checkPage(20);
+    doc.setFillColor(0,48,73);
+    doc.circle(margin+4, y-1, 4, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(8);
+    doc.text(String(num), margin+4, y+1, {align:'center'});
+    doc.setTextColor(0,48,73);
+    doc.setFontSize(13);
     doc.setFont(undefined,'bold');
-    doc.text(title, margin, y);
+    doc.text(title, margin+12, y);
     y += 2;
     doc.setDrawColor(171,5,52);
-    doc.line(margin, y, pageW-margin, y);
+    doc.line(margin+12, y, pageW-margin, y);
     y += 7;
     doc.setFontSize(10);
     doc.setFont(undefined,'normal');
   }
-
-  function addLine(label, value){
-    if(y > 275){ doc.addPage(); y = 15; }
-    doc.text(label+': ', margin, y);
-    doc.setFont(undefined,'bold');
-    doc.text(value, margin + 60, y);
+  function addLine(label, value, bold){
+    checkPage(7);
+    doc.setFont(undefined,'normal');
+    doc.text(label, margin+4, y);
+    doc.setFont(undefined, bold?'bold':'normal');
+    doc.text(String(value), pageW-margin, y, {align:'right'});
     doc.setFont(undefined,'normal');
     y += 6;
   }
+  function addSubtitle(text){
+    checkPage(10);
+    doc.setFontSize(10);
+    doc.setFont(undefined,'bold');
+    doc.text(text, margin+4, y);
+    doc.setFont(undefined,'normal');
+    y += 6;
+  }
+  function addNote(text){
+    checkPage(10);
+    doc.setFontSize(8);
+    doc.setTextColor(100,100,100);
+    const lines = doc.splitTextToSize(text, contentW-8);
+    doc.text(lines, margin+4, y);
+    y += lines.length * 4 + 2;
+    doc.setTextColor(0,48,73);
+    doc.setFontSize(10);
+  }
 
-  // 1. Osobné údaje
-  addSection('1. Osobne udaje');
+  // ===== PAGE 1: AOF Summary =====
+  addHeader('Analyza osobnych financii', 'Kompletny prehlad financnej situacie klienta');
+
+  addSection(1, 'Osobne udaje');
   addLine('Meno', meno);
-  addLine('Vek', (document.getElementById('k_vek').value||'—')+' rokov');
+  addLine('Vek', age+' rokov');
   addLine('Hruby prijem', formatEUR(parseFloat(document.getElementById('k_hruby').value)||0));
-  addLine('Cisty prijem', formatEUR(parseFloat(document.getElementById('k_cisty').value)||0));
+  addLine('Cisty prijem', formatEUR(cisty));
   if(clientType==='pair'){
     const pm = (document.getElementById('p_meno').value+' '+document.getElementById('p_priezvisko').value).trim();
-    addLine('Partner', pm);
-    addLine('Partner cisty', formatEUR(parseFloat(document.getElementById('p_cisty').value)||0));
+    addLine('Partner/ka', pm);
+    addLine('Cisty prijem (partner)', formatEUR(pCisty2));
+    addLine('Celkovy cisty prijem', formatEUR(cisty+pCisty2), true);
   }
-  y += 4;
+  y += 3;
 
-  // 2. Bývanie
-  addSection('2. Byvanie');
+  addSection(2, 'Byvanie');
   if(hasZmena){
-    addLine('Hodnota', formatEUR(parseFloat(document.getElementById('byv_hodnota').value)||0));
+    addLine('Hodnota nehnutelnosti', formatEUR(parseFloat(document.getElementById('byv_hodnota').value)||0));
     addLine('Vlastne zdroje', formatEUR(parseFloat(document.getElementById('byv_hotovost').value)||0));
-    addLine('Financovanie', formatEUR(parseFloat(document.getElementById('byv_financovanie').value)||0));
+    addLine('Potrebne financovanie', formatEUR(parseFloat(document.getElementById('byv_financovanie').value)||0), true);
+    if(document.getElementById('ch_optim').checked){
+      const banka = document.getElementById('optim_banka').value||'—';
+      const zostatok = formatEUR(parseFloat(document.getElementById('optim_zostatok').value)||0);
+      const urok = document.getElementById('optim_urok').value||'—';
+      addLine('Aktualny uver ('+banka+')', zostatok+' pri '+urok+' %');
+    }
   } else {
-    doc.text('Neplanuje zmenu byvania', margin, y); y+=6;
+    addLine('Zmena byvania', 'Neplanuje');
   }
-  y += 4;
+  y += 3;
 
-  // 3. Rezervy
-  addSection('3. Rezervy');
-  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
-  const pCisty2 = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
-  const zel = (cisty+pCisty2)*6;
+  addSection(3, 'Rezervy');
+  const zel = (() => {
+    const vlastna = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
+    return vlastna > 0 ? vlastna : (cisty+pCisty2)*6;
+  })();
   let sr = 0;
-  document.querySelectorAll('#rezervyBody tr').forEach(tr=>{sr += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;});
+  document.querySelectorAll('#rezervyBody tr').forEach(tr=>{sr+=parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;});
   addLine('Optimalna rezerva', formatEUR(zel));
   addLine('Aktualna rezerva', formatEUR(sr));
-  addLine('Rozdiel', formatEUR(zel-sr));
-  y += 4;
+  addLine('Chybajuca suma', formatEUR(Math.max(0,zel-sr)), true);
+  y += 3;
 
-  // 4. Dôchodok
-  addSection('4. Dochodok');
-  addLine('Roky do dochodku', (document.getElementById('doch_roky').value||'—'));
+  addSection(4, 'Dochodok');
+  addLine('Roky do dochodku', document.getElementById('doch_roky').value||'—');
   addLine('Statny dochodok', formatEUR(parseFloat(document.getElementById('doch_statny').value)||0)+'/mes');
-  addLine('Potrebny dochodok', formatEUR(parseFloat(document.getElementById('doch_potrebny').value)||0)+'/mes');
-  addLine('Medzera', formatEUR(parseFloat(document.getElementById('doch_medzera').value)||0)+'/mes');
-  y += 4;
+  addLine('Zelany dochodok', formatEUR(parseFloat(document.getElementById('doch_potrebny').value)||0)+'/mes');
+  addLine('Medzera', formatEUR(parseFloat(document.getElementById('doch_medzera').value)||0)+'/mes', true);
+  y += 3;
 
-  // 5. Deti
-  addSection('5. Financne zabezpecenie deti');
+  addSection(5, 'Deti');
   if(hasDeti){
     document.querySelectorAll('#detiContainer .card').forEach(card=>{
       const m2 = card.querySelector('.child-meno')?.value||'Dieta';
       const vz = parseFloat(card.querySelector('.child-vzdelanie')?.value)||0;
       const st = parseFloat(card.querySelector('.child-start')?.value)||0;
-      addLine(m2, formatEUR(vz+st));
+      if(vz+st>0) addLine(m2, formatEUR(vz+st));
     });
-  } else {
-    doc.text('Ziadne deti', margin, y); y+=6;
-  }
-  y += 4;
+  } else { addLine('Deti', 'Ziadne'); }
+  y += 3;
 
-  // 6-8 brief
-  addSection('6-8. Majetok, Ciele, Zabezpecenie');
-  const goals = collectGoals();
-  goals.forEach(g=>{
-    addLine(g.name, formatEUR(g.suma));
+  addSection(6, 'Zabezpecenie prijmu');
+  const vydavky = parseFloat(document.getElementById('zab_vydavky').value)||0;
+  addLine('Mesacne vydavky', formatEUR(vydavky));
+  document.querySelectorAll('.fp-zab-k:checked').forEach(cb=>{
+    const suma = parseFloat(cb.dataset.suma)||0;
+    if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name==='Úmrtie'?' jednorazovo':'/mes chyba'));
   });
-  y += 4;
 
-  // Strategies table
-  addSection('Odporucane investicne strategie');
-  goals.forEach(g=>{
-    let horizont = '—';
-    let strat = 'Vyvazena';
-    if(g.date && g.date!=='—'){
-      const yrs = Math.max(0,Math.round((new Date(g.date)-new Date())/(365.25*24*3600000)));
-      horizont = yrs+' r.';
-      strat = yrs>10?'Dynamicka':yrs>=5?'Vyvazena':'Konzervativna';
+  // ===== PAGE 2: Financial Plan =====
+  doc.addPage();
+  y = 15;
+  addHeader('Financny plan', 'Odporucania a investicne strategie');
+
+  // Collect FP items (same logic as buildFinancialPlan)
+  const fpPdfItems = [];
+  let totalPdf = 0;
+
+  // Reserves
+  if(document.getElementById('fp_rezervy').checked){
+    const deficit = Math.max(0, zel - sr);
+    if(deficit > 0){
+      const pmt = calcPMT(deficit, 0.02, 5);
+      addSection(1, 'Rezervy — Fond kratkodobych rezerv');
+      addLine('Cielova rezerva', formatEUR(zel));
+      addLine('Chybajuca suma', formatEUR(deficit));
+      addLine('Zhodnotenie', '2 % p.a. (Konzervativna)');
+      addLine('Horizont', '5 rokov');
+      addLine('Mesacna investicia', formatEUR(pmt), true);
+      addNote('Poskytovatel: Partners Asset Management — Fond kratkodobych rezerv');
+      fpPdfItems.push({name:'Rezervy', pmt});
+      totalPdf += pmt;
+      y += 3;
     }
-    if(y > 275){ doc.addPage(); y = 15; }
-    doc.text(g.name+' | '+formatEUR(g.suma)+' | '+horizont+' | '+strat+' | Partners Investments', margin, y);
-    y += 5;
+  }
+
+  // Retirement
+  if(document.getElementById('fp_dochodok').checked){
+    const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
+    const roky = Math.max(0, dochVek - age);
+    const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
+    const cielSuma = medzera * 12 * 20;
+    if(cielSuma > 0){
+      const s = getStrategy(roky);
+      const pmt = calcPMT(cielSuma, s.rate, roky);
+      addSection(2, 'Dochodok — Partners Investments');
+      addLine('Dochodkova medzera', formatEUR(medzera)+'/mes');
+      addLine('Cielova suma (20 r.)', formatEUR(cielSuma));
+      addLine('Strategia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
+      addLine('Horizont', roky+' rokov');
+      addLine('Mesacna investicia', formatEUR(pmt), true);
+      addNote('Poskytovatel: Partners Investments — '+s.name+' strategia');
+      fpPdfItems.push({name:'Dochodok', pmt});
+      totalPdf += pmt;
+      y += 3;
+    }
+  }
+
+  // Children
+  let childSecNum = 3;
+  document.querySelectorAll('#detiContainer .card').forEach(card=>{
+    if(!card.querySelector('.fp-child')?.checked) return;
+    const m2 = card.querySelector('.child-meno')?.value||'Dieta';
+    const vz = parseFloat(card.querySelector('.child-vzdelanie')?.value)||0;
+    const vzd = card.querySelector('.child-vzdelanie-date')?.value||'';
+    const st = parseFloat(card.querySelector('.child-start')?.value)||0;
+    const std = card.querySelector('.child-start-date')?.value||'';
+    if(vz > 0 && vzd){
+      const yrs = Math.max(1, Math.round((new Date(vzd)-new Date())/(365.25*24*3600000)));
+      const s = getStrategy(yrs);
+      const pmt = calcPMT(vz, s.rate, yrs);
+      addSection(childSecNum, m2+' — Vzdelanie');
+      addLine('Cielova suma', formatEUR(vz));
+      addLine('Strategia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
+      addLine('Horizont', yrs+' rokov');
+      addLine('Mesacna investicia', formatEUR(pmt), true);
+      fpPdfItems.push({name:m2+' vzd.', pmt});
+      totalPdf += pmt;
+      childSecNum++;
+      y += 2;
+    }
+    if(st > 0 && std){
+      const yrs = Math.max(1, Math.round((new Date(std)-new Date())/(365.25*24*3600000)));
+      const s = getStrategy(yrs);
+      const pmt = calcPMT(st, s.rate, yrs);
+      addSection(childSecNum, m2+' — Start do zivota');
+      addLine('Cielova suma', formatEUR(st));
+      addLine('Strategia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
+      addLine('Horizont', yrs+' rokov');
+      addLine('Mesacna investicia', formatEUR(pmt), true);
+      fpPdfItems.push({name:m2+' start', pmt});
+      totalPdf += pmt;
+      childSecNum++;
+      y += 2;
+    }
   });
 
-  y += 10;
-  if(y > 260){ doc.addPage(); y = 15; }
+  // Other goals
+  if(document.getElementById('fp_ciele').checked){
+    document.querySelectorAll('#cieleBody tr').forEach(tr=>{
+      const name = tr.querySelectorAll('input[type=text]')[0]?.value||'Ciel';
+      const suma = parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
+      const dt = tr.querySelector('input[type=date]')?.value||'';
+      if(suma > 0 && dt){
+        const yrs = Math.max(1, Math.round((new Date(dt)-new Date())/(365.25*24*3600000)));
+        const s = getStrategy(yrs);
+        const pmt = calcPMT(suma, s.rate, yrs);
+        checkPage(30);
+        addSubtitle(name);
+        addLine('Cielova suma', formatEUR(suma));
+        addLine('Strategia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
+        addLine('Mesacna investicia', formatEUR(pmt), true);
+        fpPdfItems.push({name, pmt});
+        totalPdf += pmt;
+        y += 2;
+      }
+    });
+  }
+
+  // Total summary
+  checkPage(30);
+  y += 5;
+  doc.setFillColor(236,237,237);
+  doc.rect(margin, y-5, contentW, 22, 'F');
+  doc.setFontSize(12);
+  doc.setFont(undefined,'bold');
+  doc.text('Celkova mesacna investicia:', margin+4, y+4);
+  doc.setTextColor(171,5,52);
+  doc.setFontSize(14);
+  doc.text(formatEUR(totalPdf), pageW-margin, y+4, {align:'right'});
+  doc.setTextColor(0,48,73);
+  y += 8;
+  doc.setFontSize(9);
+  doc.setFont(undefined,'normal');
+  const volne = (cisty + pCisty2) - vydavky - totalPdf;
+  doc.text('Cisty prijem: '+formatEUR(cisty+pCisty2)+' | Vydavky: '+formatEUR(vydavky)+' | Volne prostriedky: '+formatEUR(volne), margin+4, y+4);
+  y += 15;
+
+  // Zabezpečenie
+  const zabItems = document.querySelectorAll('.fp-zab-k:checked');
+  if(zabItems.length > 0){
+    checkPage(30);
+    addSubtitle('Zabezpecenie prijmu — poistenie');
+    zabItems.forEach(cb=>{
+      const suma = parseFloat(cb.dataset.suma)||0;
+      if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name==='Úmrtie'?' jednorazovo':'/mes'));
+    });
+    addNote('Poskytovatel: Partners Poistovna, NN, Allianz, MetLife, Generali');
+    y += 3;
+  }
+
+  // Ochrana majetku
+  if(document.getElementById('fp_majetok').checked){
+    checkPage(15);
+    addSubtitle('Ochrana majetku');
+    addNote('Poistenie nehnutelnosti: Uniqa, Colonnade, CSOB poistovna, Allianz');
+  }
+
+  // Footer
+  checkPage(25);
+  y = Math.max(y+5, 265);
   doc.setFillColor(0,48,73);
-  doc.rect(0, y, pageW, 20, 'F');
+  doc.rect(0, y, pageW, 25, 'F');
   doc.setTextColor(255,255,255);
   doc.setFontSize(9);
-  doc.text('Mario Tistan | Senior Consultant | Partners Group SK | mario.tistan@partnersgroup.sk | +421 902 130 096', pageW/2, y+12, {align:'center'});
+  doc.text('Mario Tistan | Senior Consultant | Partners Group SK', pageW/2, y+9, {align:'center'});
+  doc.text('mario.tistan@partnersgroup.sk | +421 902 130 096 | www.mariotistan.sk', pageW/2, y+16, {align:'center'});
 
-  doc.save('AOF_'+meno.replace(/\s+/g,'_')+'_'+today.replace(/\./g,'-')+'.pdf');
+  doc.save('Financny_plan_'+meno.replace(/\s+/g,'_')+'_'+todayStr.replace(/\./g,'-')+'.pdf');
 }
 
 // ============================================================
