@@ -1529,7 +1529,8 @@ function buildTimeline(){
     html += '<strong style="font-size:13px;">Priebežné zabezpečenie príjmu:</strong>';
     html += '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">';
     protectionGoals.forEach(g=>{
-      html += `<span style="font-size:12px;background:var(--white);padding:6px 12px;border-radius:8px;border:1px solid var(--border);">${g.name.replace('Zabezpečenie: ','')} <strong style="color:var(--red);">${formatEUR(g.suma)}/mes</strong></span>`;
+      const unit = g.name.includes('Úmrtie') || g.name.includes('mrtie') ? ' jednorazovo' : '/mes';
+      html += `<span style="font-size:12px;background:var(--white);padding:6px 12px;border-radius:8px;border:1px solid var(--border);">${g.name.replace('Zabezpečenie: ','').replace('Partner — ','')} <strong style="color:var(--red);">${formatEUR(g.suma)}${unit}</strong></span>`;
     });
     html += '</div></div>';
   }
@@ -1960,7 +1961,8 @@ function buildFinancialPlan(){
       html += `<div class="fp-rec-row"><span>Banka</span><span>${banka}</span></div>`;
       html += `<div class="fp-rec-row"><span>Zostatok</span><span>${zostatok}</span></div>`;
       html += `<div class="fp-rec-row"><span>Úroková sadzba</span><span>${urok} %</span></div>`;
-      html += `<div class="fp-rec-row"><span>Fixácia</span><span>${fixacia} rokov (do ${fixDatum})</span></div>`;
+      const fixDatumFmt = fixDatum && fixDatum !== '—' ? new Date(fixDatum).toLocaleDateString('sk-SK') : fixDatum;
+      html += `<div class="fp-rec-row"><span>Fixácia</span><span>${fixacia} rokov (do ${fixDatumFmt})</span></div>`;
       html += `<div class="fp-rec-row"><span>Mesačná splátka</span><span>${splatka}</span></div>`;
       html += '</div>';
       html += '<div class="info-box"><strong>Odporúčanie:</strong> Pri konci fixácie zvážte refinancovanie pre lepšiu sadzbu. Porovnáme ponuky: SLSP, VÚB, Prima Banka, ČSOB, Unicredit, MBank.</div>';
@@ -2115,11 +2117,34 @@ function buildFinancialPlan(){
 }
 
 // ============================================================
-// PDF Generation
+// PDF Generation — with Slovak diacritics support
 // ============================================================
-function generatePDF(){
+function arrayBufferToBase64(buffer){
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  for(let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
+async function generatePDF(){
   // Build FP data first
   buildFinancialPlan();
+
+  // Load DM Sans fonts with diacritics
+  let fontLoaded = false;
+  try {
+    const [regResp, boldResp] = await Promise.all([
+      fetch('fonts/dm-sans-regular.ttf'),
+      fetch('fonts/dm-sans-bold.ttf')
+    ]);
+    if(regResp.ok && boldResp.ok){
+      const regBuf = await regResp.arrayBuffer();
+      const boldBuf = await boldResp.arrayBuffer();
+      window._fontRegB64 = arrayBufferToBase64(regBuf);
+      window._fontBoldB64 = arrayBufferToBase64(boldBuf);
+      fontLoaded = true;
+    }
+  } catch(e){ console.warn('Font loading failed, using fallback', e); }
 
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF('p','mm','a4');
@@ -2128,25 +2153,39 @@ function generatePDF(){
   const contentW = pageW - 2*margin;
   let y = 15;
 
+  // Register custom fonts
+  if(fontLoaded){
+    doc.addFileToVFS('DMSans-Regular.ttf', window._fontRegB64);
+    doc.addFileToVFS('DMSans-Bold.ttf', window._fontBoldB64);
+    doc.addFont('DMSans-Regular.ttf', 'DMSans', 'normal');
+    doc.addFont('DMSans-Bold.ttf', 'DMSans', 'bold');
+    doc.setFont('DMSans');
+  }
+
   const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Klient';
   const todayStr = new Date().toLocaleDateString('sk-SK');
   const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
   const pCisty2 = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
   const age = parseInt(document.getElementById('k_vek').value)||30;
+  const fontName = fontLoaded ? 'DMSans' : undefined;
 
   // Helpers
   function checkPage(need){if(y+need>280){doc.addPage();y=15;}}
+  function setNormal(){ doc.setFont(fontName,'normal'); }
+  function setBold(){ doc.setFont(fontName,'bold'); }
   function addHeader(title, subtitle){
     doc.setFillColor(0,48,73);
     doc.rect(0,0,pageW,38,'F');
     doc.setTextColor(255,255,255);
     doc.setFontSize(22);
+    setBold();
     doc.text(title,margin,20);
     doc.setFontSize(11);
+    setNormal();
     doc.text(subtitle,margin,30);
     doc.setFontSize(9);
-    doc.text('Klient: '+meno+' | Datum: '+todayStr, pageW-margin, 20, {align:'right'});
-    doc.text('Vypracoval: Mario Tistan | Partners Group SK', pageW-margin, 28, {align:'right'});
+    doc.text('Klient: '+meno+' | Dátum: '+todayStr, pageW-margin, 20, {align:'right'});
+    doc.text('Vypracoval: Mário Tišťan | Partners Group SK', pageW-margin, 28, {align:'right'});
     y = 48;
     doc.setTextColor(0,48,73);
   }
@@ -2156,33 +2195,33 @@ function generatePDF(){
     doc.circle(margin+4, y-1, 4, 'F');
     doc.setTextColor(255,255,255);
     doc.setFontSize(8);
+    setBold();
     doc.text(String(num), margin+4, y+1, {align:'center'});
     doc.setTextColor(0,48,73);
     doc.setFontSize(13);
-    doc.setFont(undefined,'bold');
     doc.text(title, margin+12, y);
     y += 2;
     doc.setDrawColor(171,5,52);
     doc.line(margin+12, y, pageW-margin, y);
     y += 7;
     doc.setFontSize(10);
-    doc.setFont(undefined,'normal');
+    setNormal();
   }
   function addLine(label, value, bold){
     checkPage(7);
-    doc.setFont(undefined,'normal');
+    setNormal();
     doc.text(label, margin+4, y);
-    doc.setFont(undefined, bold?'bold':'normal');
+    if(bold) setBold(); else setNormal();
     doc.text(String(value), pageW-margin, y, {align:'right'});
-    doc.setFont(undefined,'normal');
+    setNormal();
     y += 6;
   }
   function addSubtitle(text){
     checkPage(10);
     doc.setFontSize(10);
-    doc.setFont(undefined,'bold');
+    setBold();
     doc.text(text, margin+4, y);
-    doc.setFont(undefined,'normal');
+    setNormal();
     y += 6;
   }
   function addNote(text){
@@ -2197,34 +2236,34 @@ function generatePDF(){
   }
 
   // ===== PAGE 1: AOF Summary =====
-  addHeader('Analyza osobnych financii', 'Kompletny prehlad financnej situacie klienta');
+  addHeader('Analýza osobných financií', 'Kompletný prehľad finančnej situácie klienta');
 
-  addSection(1, 'Osobne udaje');
+  addSection(1, 'Osobné údaje');
   addLine('Meno', meno);
   addLine('Vek', age+' rokov');
-  addLine('Hruby prijem', formatEUR(parseFloat(document.getElementById('k_hruby').value)||0));
-  addLine('Cisty prijem', formatEUR(cisty));
+  addLine('Hrubý príjem', formatEUR(parseFloat(document.getElementById('k_hruby').value)||0));
+  addLine('Čistý príjem', formatEUR(cisty));
   if(clientType==='pair'){
     const pm = (document.getElementById('p_meno').value+' '+document.getElementById('p_priezvisko').value).trim();
     addLine('Partner/ka', pm);
-    addLine('Cisty prijem (partner)', formatEUR(pCisty2));
-    addLine('Celkovy cisty prijem', formatEUR(cisty+pCisty2), true);
+    addLine('Čistý príjem (partner)', formatEUR(pCisty2));
+    addLine('Celkový čistý príjem', formatEUR(cisty+pCisty2), true);
   }
   y += 3;
 
-  addSection(2, 'Byvanie');
+  addSection(2, 'Bývanie');
   if(hasZmena){
-    addLine('Hodnota nehnutelnosti', formatEUR(parseFloat(document.getElementById('byv_hodnota').value)||0));
-    addLine('Vlastne zdroje', formatEUR(parseFloat(document.getElementById('byv_hotovost').value)||0));
-    addLine('Potrebne financovanie', formatEUR(parseFloat(document.getElementById('byv_financovanie').value)||0), true);
+    addLine('Hodnota nehnuteľnosti', formatEUR(parseFloat(document.getElementById('byv_hodnota').value)||0));
+    addLine('Vlastné zdroje', formatEUR(parseFloat(document.getElementById('byv_hotovost').value)||0));
+    addLine('Potrebné financovanie', formatEUR(parseFloat(document.getElementById('byv_financovanie').value)||0), true);
     if(document.getElementById('ch_optim').checked){
       const banka = document.getElementById('optim_banka').value||'—';
       const zostatok = formatEUR(parseFloat(document.getElementById('optim_zostatok').value)||0);
       const urok = document.getElementById('optim_urok').value||'—';
-      addLine('Aktualny uver ('+banka+')', zostatok+' pri '+urok+' %');
+      addLine('Aktuálny úver ('+banka+')', zostatok+' pri '+urok+' %');
     }
   } else {
-    addLine('Zmena byvania', 'Neplanuje');
+    addLine('Zmena bývania', 'Neplánuje');
   }
   y += 3;
 
@@ -2235,43 +2274,42 @@ function generatePDF(){
   })();
   let sr = 0;
   document.querySelectorAll('#rezervyBody tr').forEach(tr=>{sr+=parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;});
-  addLine('Optimalna rezerva', formatEUR(zel));
-  addLine('Aktualna rezerva', formatEUR(sr));
-  addLine('Chybajuca suma', formatEUR(Math.max(0,zel-sr)), true);
+  addLine('Optimálna rezerva', formatEUR(zel));
+  addLine('Aktuálna rezerva', formatEUR(sr));
+  addLine('Chýbajúca suma', formatEUR(Math.max(0,zel-sr)), true);
   y += 3;
 
-  addSection(4, 'Dochodok');
-  addLine('Roky do dochodku', document.getElementById('doch_roky').value||'—');
-  addLine('Statny dochodok', formatEUR(parseFloat(document.getElementById('doch_statny').value)||0)+'/mes');
-  addLine('Zelany dochodok', formatEUR(parseFloat(document.getElementById('doch_potrebny').value)||0)+'/mes');
+  addSection(4, 'Dôchodok');
+  addLine('Roky do dôchodku', document.getElementById('doch_roky').value||'—');
+  addLine('Štátny dôchodok', formatEUR(parseFloat(document.getElementById('doch_statny').value)||0)+'/mes');
+  addLine('Želaný dôchodok', formatEUR(parseFloat(document.getElementById('doch_potrebny').value)||0)+'/mes');
   addLine('Medzera', formatEUR(parseFloat(document.getElementById('doch_medzera').value)||0)+'/mes', true);
   y += 3;
 
   addSection(5, 'Deti');
   if(hasDeti){
     document.querySelectorAll('#detiContainer .card').forEach(card=>{
-      const m2 = card.querySelector('.child-meno')?.value||'Dieta';
+      const m2 = card.querySelector('.child-meno')?.value||'Dieťa';
       const vz = parseFloat(card.querySelector('.child-vzdelanie')?.value)||0;
       const st = parseFloat(card.querySelector('.child-start')?.value)||0;
       if(vz+st>0) addLine(m2, formatEUR(vz+st));
     });
-  } else { addLine('Deti', 'Ziadne'); }
+  } else { addLine('Deti', 'Žiadne'); }
   y += 3;
 
-  addSection(6, 'Zabezpecenie prijmu');
+  addSection(6, 'Zabezpečenie príjmu');
   const vydavky = parseFloat(document.getElementById('zab_vydavky').value)||0;
-  addLine('Mesacne vydavky', formatEUR(vydavky));
+  addLine('Mesačné výdavky', formatEUR(vydavky));
   document.querySelectorAll('.fp-zab-k:checked').forEach(cb=>{
     const suma = parseFloat(cb.dataset.suma)||0;
-    if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name==='Úmrtie'?' jednorazovo':'/mes chyba'));
+    if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name==='Úmrtie'?' jednorazovo':'/mes'));
   });
 
   // ===== PAGE 2: Financial Plan =====
   doc.addPage();
   y = 15;
-  addHeader('Financny plan', 'Odporucania a investicne strategie');
+  addHeader('Finančný plán', 'Odporúčania a investičné stratégie');
 
-  // Collect FP items (same logic as buildFinancialPlan)
   const fpPdfItems = [];
   let totalPdf = 0;
 
@@ -2280,13 +2318,13 @@ function generatePDF(){
     const deficit = Math.max(0, zel - sr);
     if(deficit > 0){
       const pmt = calcPMT(deficit, 0.02, 5);
-      addSection(1, 'Rezervy — Fond kratkodobych rezerv');
-      addLine('Cielova rezerva', formatEUR(zel));
-      addLine('Chybajuca suma', formatEUR(deficit));
-      addLine('Zhodnotenie', '2 % p.a. (Konzervativna)');
+      addSection(1, 'Rezervy — Fond krátkodobých rezerv');
+      addLine('Cieľová rezerva', formatEUR(zel));
+      addLine('Chýbajúca suma', formatEUR(deficit));
+      addLine('Zhodnotenie', '2 % p.a. (Konzervatívna)');
       addLine('Horizont', '5 rokov');
-      addLine('Mesacna investicia', formatEUR(pmt), true);
-      addNote('Poskytovatel: Partners Asset Management — Fond kratkodobych rezerv');
+      addLine('Mesačná investícia', formatEUR(pmt), true);
+      addNote('Poskytovateľ: Partners Asset Management — Fond krátkodobých rezerv');
       fpPdfItems.push({name:'Rezervy', pmt});
       totalPdf += pmt;
       y += 3;
@@ -2302,14 +2340,14 @@ function generatePDF(){
     if(cielSuma > 0){
       const s = getStrategy(roky);
       const pmt = calcPMT(cielSuma, s.rate, roky);
-      addSection(2, 'Dochodok — Partners Investments');
-      addLine('Dochodkova medzera', formatEUR(medzera)+'/mes');
-      addLine('Cielova suma (20 r.)', formatEUR(cielSuma));
-      addLine('Strategia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
+      addSection(2, 'Dôchodok — Partners Investments');
+      addLine('Dôchodková medzera', formatEUR(medzera)+'/mes');
+      addLine('Cieľová suma (20 r.)', formatEUR(cielSuma));
+      addLine('Stratégia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
       addLine('Horizont', roky+' rokov');
-      addLine('Mesacna investicia', formatEUR(pmt), true);
-      addNote('Poskytovatel: Partners Investments — '+s.name+' strategia');
-      fpPdfItems.push({name:'Dochodok', pmt});
+      addLine('Mesačná investícia', formatEUR(pmt), true);
+      addNote('Poskytovateľ: Partners Investments — '+s.name+' stratégia');
+      fpPdfItems.push({name:'Dôchodok', pmt});
       totalPdf += pmt;
       y += 3;
     }
@@ -2319,7 +2357,7 @@ function generatePDF(){
   let childSecNum = 3;
   document.querySelectorAll('#detiContainer .card').forEach(card=>{
     if(!card.querySelector('.fp-child')?.checked) return;
-    const m2 = card.querySelector('.child-meno')?.value||'Dieta';
+    const m2 = card.querySelector('.child-meno')?.value||'Dieťa';
     const vz = parseFloat(card.querySelector('.child-vzdelanie')?.value)||0;
     const vzd = card.querySelector('.child-vzdelanie-date')?.value||'';
     const st = parseFloat(card.querySelector('.child-start')?.value)||0;
@@ -2329,10 +2367,10 @@ function generatePDF(){
       const s = getStrategy(yrs);
       const pmt = calcPMT(vz, s.rate, yrs);
       addSection(childSecNum, m2+' — Vzdelanie');
-      addLine('Cielova suma', formatEUR(vz));
-      addLine('Strategia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
+      addLine('Cieľová suma', formatEUR(vz));
+      addLine('Stratégia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
       addLine('Horizont', yrs+' rokov');
-      addLine('Mesacna investicia', formatEUR(pmt), true);
+      addLine('Mesačná investícia', formatEUR(pmt), true);
       fpPdfItems.push({name:m2+' vzd.', pmt});
       totalPdf += pmt;
       childSecNum++;
@@ -2342,12 +2380,12 @@ function generatePDF(){
       const yrs = Math.max(1, Math.round((new Date(std)-new Date())/(365.25*24*3600000)));
       const s = getStrategy(yrs);
       const pmt = calcPMT(st, s.rate, yrs);
-      addSection(childSecNum, m2+' — Start do zivota');
-      addLine('Cielova suma', formatEUR(st));
-      addLine('Strategia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
+      addSection(childSecNum, m2+' — Štart do života');
+      addLine('Cieľová suma', formatEUR(st));
+      addLine('Stratégia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
       addLine('Horizont', yrs+' rokov');
-      addLine('Mesacna investicia', formatEUR(pmt), true);
-      fpPdfItems.push({name:m2+' start', pmt});
+      addLine('Mesačná investícia', formatEUR(pmt), true);
+      fpPdfItems.push({name:m2+' štart', pmt});
       totalPdf += pmt;
       childSecNum++;
       y += 2;
@@ -2357,7 +2395,7 @@ function generatePDF(){
   // Other goals
   if(document.getElementById('fp_ciele').checked){
     document.querySelectorAll('#cieleBody tr').forEach(tr=>{
-      const name = tr.querySelectorAll('input[type=text]')[0]?.value||'Ciel';
+      const name = tr.querySelectorAll('input[type=text]')[0]?.value||'Cieľ';
       const suma = parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
       const dt = tr.querySelector('input[type=date]')?.value||'';
       if(suma > 0 && dt){
@@ -2366,9 +2404,9 @@ function generatePDF(){
         const pmt = calcPMT(suma, s.rate, yrs);
         checkPage(30);
         addSubtitle(name);
-        addLine('Cielova suma', formatEUR(suma));
-        addLine('Strategia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
-        addLine('Mesacna investicia', formatEUR(pmt), true);
+        addLine('Cieľová suma', formatEUR(suma));
+        addLine('Stratégia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
+        addLine('Mesačná investícia', formatEUR(pmt), true);
         fpPdfItems.push({name, pmt});
         totalPdf += pmt;
         y += 2;
@@ -2382,29 +2420,29 @@ function generatePDF(){
   doc.setFillColor(236,237,237);
   doc.rect(margin, y-5, contentW, 22, 'F');
   doc.setFontSize(12);
-  doc.setFont(undefined,'bold');
-  doc.text('Celkova mesacna investicia:', margin+4, y+4);
+  setBold();
+  doc.text('Celková mesačná investícia:', margin+4, y+4);
   doc.setTextColor(171,5,52);
   doc.setFontSize(14);
   doc.text(formatEUR(totalPdf), pageW-margin, y+4, {align:'right'});
   doc.setTextColor(0,48,73);
   y += 8;
   doc.setFontSize(9);
-  doc.setFont(undefined,'normal');
+  setNormal();
   const volne = (cisty + pCisty2) - vydavky - totalPdf;
-  doc.text('Cisty prijem: '+formatEUR(cisty+pCisty2)+' | Vydavky: '+formatEUR(vydavky)+' | Volne prostriedky: '+formatEUR(volne), margin+4, y+4);
+  doc.text('Čistý príjem: '+formatEUR(cisty+pCisty2)+' | Výdavky: '+formatEUR(vydavky)+' | Voľné prostriedky: '+formatEUR(volne), margin+4, y+4);
   y += 15;
 
   // Zabezpečenie
   const zabItems = document.querySelectorAll('.fp-zab-k:checked');
   if(zabItems.length > 0){
     checkPage(30);
-    addSubtitle('Zabezpecenie prijmu — poistenie');
+    addSubtitle('Zabezpečenie príjmu — poistenie');
     zabItems.forEach(cb=>{
       const suma = parseFloat(cb.dataset.suma)||0;
       if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name==='Úmrtie'?' jednorazovo':'/mes'));
     });
-    addNote('Poskytovatel: Partners Poistovna, NN, Allianz, MetLife, Generali');
+    addNote('Poskytovateľ: Partners Poisťovňa, NN, Allianz, MetLife, Generali');
     y += 3;
   }
 
@@ -2412,18 +2450,22 @@ function generatePDF(){
   if(document.getElementById('fp_majetok').checked){
     checkPage(15);
     addSubtitle('Ochrana majetku');
-    addNote('Poistenie nehnutelnosti: Uniqa, Colonnade, CSOB poistovna, Allianz');
+    addNote('Poistenie nehnuteľnosti: Uniqa, Colonnade, ČSOB poisťovňa, Allianz');
   }
 
-  // Footer
-  checkPage(25);
-  y = Math.max(y+5, 265);
-  doc.setFillColor(0,48,73);
-  doc.rect(0, y, pageW, 25, 'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(9);
-  doc.text('Mario Tistan | Senior Consultant | Partners Group SK', pageW/2, y+9, {align:'center'});
-  doc.text('mario.tistan@partnersgroup.sk | +421 902 130 096 | www.mariotistan.sk', pageW/2, y+16, {align:'center'});
+  // Footer on each page
+  const totalPages = doc.internal.getNumberOfPages();
+  for(let p = 1; p <= totalPages; p++){
+    doc.setPage(p);
+    const py = doc.internal.pageSize.getHeight() - 12;
+    doc.setFillColor(0,48,73);
+    doc.rect(0, py - 2, pageW, 14, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(8);
+    setNormal();
+    doc.text('Mário Tišťan | Senior Consultant | Partners Group SK', pageW/2, py+4, {align:'center'});
+    doc.text('mario.tistan@partnersgroup.sk | +421 902 130 096 | www.mariotistan.sk', pageW/2, py+8, {align:'center'});
+  }
 
   doc.save('Financny_plan_'+meno.replace(/\s+/g,'_')+'_'+todayStr.replace(/\./g,'-')+'.pdf');
 }
