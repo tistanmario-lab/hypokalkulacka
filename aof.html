@@ -1867,6 +1867,66 @@ function buildStratSelector(programId, currentKey){
 // Stored FP state for interactive recalculation
 let fpState = {};
 
+function switchRezMode(mode){
+  const deficit = window._rezDeficit || 0;
+  const modes = {
+    bu:       {name:'Bežný účet', rate:0.00, desc:'0% zhodnotenie — peniaze len ležia', icon:'🏦', btnClass:''},
+    sporiak:  {name:'Sporiaci účet', rate:0.01, desc:'~1% p.a. — minimálne zhodnotenie', icon:'💰', btnClass:''},
+    partners: {name:'Partners Fond krátkodobých rezerv', rate:0.02, desc:'2% p.a. — konzervatívna stratégia', icon:'🛡️', btnClass:'konz'}
+  };
+  const m = modes[mode];
+  const pmt = calcPMT(deficit, m.rate, 5);
+  const fv = calcFV(pmt, m.rate, 5);
+  const vklady = pmt * 60;
+  const zhodnotenie = fv - vklady;
+
+  // Update buttons
+  document.querySelectorAll('#fpSecRezervy .fp-strat-btn').forEach(btn => {
+    btn.className = 'fp-strat-btn';
+  });
+  const btnIdx = {bu:0, sporiak:1, partners:2}[mode];
+  const btns = document.querySelectorAll('#fpSecRezervy .fp-strat-btn');
+  if(btns[btnIdx]) btns[btnIdx].className = 'fp-strat-btn active-' + (mode==='partners'?'konz': mode==='sporiak'?'vyv':'dyn');
+
+  let html = '';
+  html += `<div class="fp-product"><div class="fp-product-icon invest">${m.icon}</div><div class="fp-product-info"><div class="fp-product-name">${m.name}</div><div class="fp-product-desc">${m.desc}</div></div></div>`;
+
+  html += '<div class="fp-rec" style="margin-top:12px;">';
+  html += `<div class="fp-rec-row"><span>Predpokladané zhodnotenie</span><span>${Math.round(m.rate*100)} % p.a.</span></div>`;
+  html += `<div class="fp-rec-row"><span><strong>Potrebná mesačná suma</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(pmt)}</strong></span></div>`;
+  html += `<div class="fp-rec-row"><span>Súčet vašich vkladov za 5 rokov</span><span>${formatEUR(vklady)}</span></div>`;
+  html += `<div class="fp-rec-row"><span>Zhodnotenie (výnos)</span><span style="color:${zhodnotenie>0?'var(--green)':'var(--muted)'};">${zhodnotenie > 0 ? '+'+formatEUR(zhodnotenie) : '0 €'}</span></div>`;
+  html += `<div class="fp-rec-row"><span>Hodnota po 5 rokoch</span><span>${formatEUR(fv)}</span></div>`;
+
+  if(mode === 'partners'){
+    const rezCielovaSuma = vklady;
+    const rezFee = getEntryFee(rezCielovaSuma, 'konzervativna');
+    if(rezFee){
+      html += `<div class="fp-fee-row"><span>Cieľová suma (súčet vkladov)</span><span>${formatEUR(rezCielovaSuma)}</span></div>`;
+      html += `<div class="fp-fee-row"><span>Vstupný poplatok (jednorazová úhrada)</span><span>${rezFee.pct}% = ${formatEUR(rezFee.suma)}</span></div>`;
+    }
+  }
+  html += '</div>';
+
+  // Comparison with Partners
+  if(mode !== 'partners'){
+    const partnersPmt = calcPMT(deficit, 0.02, 5);
+    const rozdiel = pmt - partnersPmt;
+    html += '<div class="fp-impact" style="margin-top:12px;">';
+    html += `<div class="fp-impact-card alt"><div class="fp-impact-label">${m.name}</div><div class="fp-impact-value">${formatEUR(pmt)}/mes</div><div style="font-size:11px;color:var(--muted);">${Math.round(m.rate*100)}% p.a.</div></div>`;
+    html += `<div class="fp-impact-card current"><div class="fp-impact-label">Partners Fond (2%)</div><div class="fp-impact-value" style="color:var(--green);">${formatEUR(partnersPmt)}/mes</div><div style="font-size:11px;color:var(--green);">Úspora ${formatEUR(rozdiel)}/mes</div></div>`;
+    html += '</div>';
+  }
+
+  document.getElementById('fpRezDetail').innerHTML = html;
+
+  // Update fpState
+  if(fpState['rezervy']){
+    fpState['rezervy'].origPmt = pmt;
+    fpState['rezervy'].currentStrategy = mode === 'partners' ? 'konzervativna' : 'konzervativna';
+  }
+}
+
 function changeStrategy(programId, stratKey){
   const state = fpState[programId];
   if(!state) return;
@@ -2029,27 +2089,33 @@ function buildFinancialPlan(){
       sumRezerv += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
     });
     const deficit = Math.max(0, zelezna - sumRezerv);
+
+    // Store for interactive comparison
+    window._rezDeficit = deficit;
+    window._rezZelezna = zelezna;
+    window._rezSumRezerv = sumRezerv;
+
     const rezPmt = calcPMT(deficit, 0.02, 5);
-    const rezFV = calcFV(rezPmt, 0.02, 5);
 
     let html = '';
-    html += `<div class="fp-product"><div class="fp-product-icon invest">🛡️</div><div class="fp-product-info"><div class="fp-product-name">Partners Fond krátkodobých rezerv</div><div class="fp-product-desc">Peňažný/dlhopisový fond · Konzervatívna stratégia · Priemerné zhodnotenie 2% p.a.</div></div></div>`;
-    html += '<div class="fp-rec" style="margin-top:12px;">';
+    html += `<div class="fp-rec" style="margin-bottom:16px;">`;
     html += `<div class="fp-rec-row"><span>Cieľová rezerva</span><span>${formatEUR(zelezna)}</span></div>`;
     html += `<div class="fp-rec-row"><span>Aktuálne nasporené</span><span>${formatEUR(sumRezerv)}</span></div>`;
     html += `<div class="fp-rec-row"><span>Chýbajúca suma</span><span class="fp-rec-highlight">${formatEUR(deficit)}</span></div>`;
     html += `<div class="fp-rec-row"><span>Horizont</span><span>5 rokov (60 mesiacov)</span></div>`;
-    html += `<div class="fp-rec-row"><span>Predpokladané zhodnotenie</span><span>2 % p.a.</span></div>`;
-    html += `<div class="fp-rec-row"><span><strong>Odporúčaná mesačná investícia</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(rezPmt)}</strong></span></div>`;
-    html += `<div class="fp-rec-row"><span>Predpokladaná hodnota po 5 rokoch</span><span>${formatEUR(rezFV)}</span></div>`;
-    const rezCielovaSuma = rezPmt * 5 * 12; // súčet vkladov
-    const rezFee = getEntryFee(rezCielovaSuma, 'konzervativna');
-    if(rezFee){
-      html += `<div class="fp-fee-row"><span>Cieľová suma (súčet vkladov)</span><span>${formatEUR(rezCielovaSuma)}</span></div>`;
-      html += `<div class="fp-fee-row"><span>Vstupný poplatok (jednorazová úhrada)</span><span>${rezFee.pct}% = ${formatEUR(rezFee.suma)}</span></div>`;
-    }
     html += '</div>';
+
+    // Selector for comparison
+    html += '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Kam odkladať rezervu?</div>';
+    html += '<div class="fp-strat-selector">';
+    html += `<button class="fp-strat-btn" onclick="switchRezMode('bu')">Bežný účet (0%)</button>`;
+    html += `<button class="fp-strat-btn" onclick="switchRezMode('sporiak')">Sporiaci účet (~1%)</button>`;
+    html += `<button class="fp-strat-btn active-konz" onclick="switchRezMode('partners')">Partners Fond (2%)</button>`;
+    html += '</div>';
+
+    html += '<div id="fpRezDetail"></div>';
     document.getElementById('fpRezervy').innerHTML = html;
+    switchRezMode('partners'); // default
 
     if(deficit > 0){
       fpState['rezervy'] = {type:'invest', label:'Rezervy', cielSuma:deficit, roky:5, origStrategy:'konzervativna', currentStrategy:'konzervativna', origPmt:rezPmt};
