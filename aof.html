@@ -437,7 +437,6 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
             <select id="byv_sposob"><option value="hotovost">Hotovosť</option><option value="uver" selected>Úver</option><option value="kombinacia">Kombinácia</option></select>
           </div>
         </div>
-        <div class="info-box">Hypotéky riešime cez: <strong>SLSP, VÚB, Prima Banka, ČSOB, Unicredit Banka, MBank</strong></div>
       </div>
     </div>
 
@@ -535,7 +534,16 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       </div>
       <div id="pilier2Group" style="display:none;">
         <div class="form-row">
-          <div class="form-group"><label>Dôchodková správcovská spoločnosť</label><input type="text" id="doch_p2_spolocnost" placeholder="napr. DSSPB, Allianz..."></div>
+          <div class="form-group"><label>Dôchodková správcovská spoločnosť</label>
+            <select id="doch_p2_spolocnost">
+              <option value="">-- Vyberte --</option>
+              <option value="Allianz - Slovenská d.s.s.">Allianz - Slovenská d.s.s.</option>
+              <option value="ČSOB d.s.s.">ČSOB d.s.s.</option>
+              <option value="NN d.s.s.">NN d.s.s.</option>
+              <option value="VÚB Generali d.s.s.">VÚB Generali d.s.s.</option>
+              <option value="365.invest d.s.s.">365.invest d.s.s.</option>
+            </select>
+          </div>
           <div class="form-group"><label>Nasporená suma (€)</label><input type="number" id="doch_p2_suma" value="0" min="0"></div>
           <div class="form-group">
             <label>Fond</label>
@@ -553,7 +561,15 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       </div>
       <div id="ddsGroup" style="display:none;">
         <div class="form-row">
-          <div class="form-group"><label>DDS spoločnosť</label><input type="text" id="doch_dds_spolocnost" placeholder="napr. NN, Partners..."></div>
+          <div class="form-group"><label>DDS spoločnosť</label>
+            <select id="doch_dds_spolocnost">
+              <option value="">-- Vyberte --</option>
+              <option value="NN Tatry - Sympatia d.d.s.">NN Tatry - Sympatia d.d.s.</option>
+              <option value="STABILITA d.d.s.">STABILITA d.d.s.</option>
+              <option value="Doplnková d.d.s. Tatra banky">Doplnková d.d.s. Tatra banky</option>
+              <option value="UNIQA d.d.s.">UNIQA d.d.s.</option>
+            </select>
+          </div>
           <div class="form-group"><label>Nasporená suma (€)</label><input type="number" id="doch_dds_nasporena" value="0" min="0"></div>
           <div class="form-group">
             <label>Fond</label>
@@ -1423,13 +1439,12 @@ function buildZabTable(prefix, bodyId){
     {name:'PN (práceneschopnosť)', davka: Math.round(hruby*0.55)},
     {name:'Čiastočná invalidita (41–70 %)', davka: Math.round(hruby*0.25)},
     {name:'Plná invalidita (71 %+)', davka: Math.round(hruby*0.375)},
-    {name:'Úmrtie', davka: 0, isUmrtie: true},
   ];
 
-  // Úmrtie: špeciálny výpočet — zostatok úveru + 2× ročný čistý príjem
+  // Úmrtie: dynamický výpočet podľa checkboxov
   const optimZostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
-  const umrtieNeed = optimZostatok + (cisty * 24);
-  rows[rows.length-1].umrtieNeed = umrtieNeed;
+  const optimSplatnost = parseInt(document.getElementById('optim_doba')?.value)||0;
+  const hasFamily = clientType === 'pair' || document.querySelectorAll('#detiContainer .card').length > 0;
 
   const tbody = document.getElementById(bodyId);
   tbody.innerHTML = '';
@@ -1442,19 +1457,7 @@ function buildZabTable(prefix, bodyId){
   }
 
   rows.forEach((r,i)=>{
-    if(r.isUmrtie){
-      // Úmrtie: jednorázová suma = zostatok úveru + 2× ročný čistý príjem
-      const need = r.umrtieNeed;
-      const cls = need > 0 ? 'negative' : '';
-      const tr = document.createElement('tr');
-      tr.style.background = 'rgba(0,48,73,0.03)';
-      tr.innerHTML = `
-        <td><strong>${r.name}</strong></td>
-        <td colspan="2" style="font-size:12px;color:var(--muted);">Zostatok úveru: ${formatEUR(optimZostatok)} + 2× ročný príjem: ${formatEUR(cisty*24)}</td>
-        <td class="${cls}"><strong>${formatEUR(need)}</strong></td>
-        <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${need}" ${need>0?'checked':''}></td>`;
-      tbody.appendChild(tr);
-    } else {
+    {
       const chyba = Math.max(0, vydavky - r.davka);
       const cls = chyba > 0 ? 'negative' : '';
       const tr = document.createElement('tr');
@@ -1467,6 +1470,41 @@ function buildZabTable(prefix, bodyId){
       tbody.appendChild(tr);
     }
   });
+
+  // ── Úmrtie – samostatná sekcia s checkboxmi ──
+  const umrtieSep = document.createElement('tr');
+  umrtieSep.innerHTML = `<td colspan="5" style="background:var(--navy);color:#fff;font-weight:700;font-size:13px;padding:10px;">Krytie pre prípad úmrtia</td>`;
+  tbody.appendChild(umrtieSep);
+
+  // A) Krytie hypotéky (klesajúca PS)
+  if(optimZostatok > 0){
+    const trH = document.createElement('tr');
+    trH.style.background = 'rgba(0,48,73,0.03)';
+    trH.innerHTML = `
+      <td><strong>Úmrtie — krytie hypotéky</strong><div style="font-size:11px;color:var(--muted);">Klesajúca poistná suma, ${optimSplatnost > 0 ? optimSplatnost + ' rokov' : 'podľa splatnosti'}</div></td>
+      <td colspan="2" style="font-size:12px;color:var(--muted);">Zostatok úveru: ${formatEUR(optimZostatok)}</td>
+      <td class="negative"><strong>${formatEUR(optimZostatok)}</strong></td>
+      <td><input type="checkbox" class="fp-zab-${prefix}" data-name="Úmrtie — krytie hypotéky" data-suma="${optimZostatok}" data-typ="klesajuca" data-roky="${optimSplatnost}" checked></td>`;
+    tbody.appendChild(trH);
+  }
+
+  // B) Krytie dvojročného príjmu (fixná PS) — len ak má rodinu
+  const dvojrocnyPrijem = cisty * 24;
+  if(hasFamily && dvojrocnyPrijem > 0){
+    const trP = document.createElement('tr');
+    trP.style.background = 'rgba(0,48,73,0.03)';
+    trP.innerHTML = `
+      <td><strong>Úmrtie — 2-ročný príjem pre rodinu</strong><div style="font-size:11px;color:var(--muted);">Fixná poistná suma</div></td>
+      <td colspan="2" style="font-size:12px;color:var(--muted);">2 × ročný čistý príjem: ${formatEUR(dvojrocnyPrijem)}</td>
+      <td class="negative"><strong>${formatEUR(dvojrocnyPrijem)}</strong></td>
+      <td><input type="checkbox" class="fp-zab-${prefix}" data-name="Úmrtie — 2-ročný príjem" data-suma="${dvojrocnyPrijem}" data-typ="fixna" checked></td>`;
+    tbody.appendChild(trP);
+  } else if(!hasFamily){
+    const trInfo = document.createElement('tr');
+    trInfo.innerHTML = `<td colspan="5" style="font-size:12px;color:var(--muted);padding:10px;">Klient nemá partnera ani deti — krytie dvojročného príjmu nie je relevantné.</td>`;
+    tbody.appendChild(trInfo);
+  }
+
 }
 
 // ============================================================
@@ -1517,7 +1555,7 @@ function buildTimeline(){
         <span class="timeline-v-name">${g.name}</span>
         <span class="timeline-v-badge ${isMilestone ? 'red' : 'green'}">za ${yearsFromNow} r. (vek ${ageAtGoal})</span>
       </div>
-      <div class="timeline-v-detail">Cieľová suma: <span class="timeline-v-amount">${formatEUR(g.suma)}</span></div>
+      <div class="timeline-v-detail">${g.name.includes('splatenie hypotéky') ? 'Zostatok k splateniu sa upresní' : 'Cieľová suma: <span class="timeline-v-amount">'+formatEUR(g.suma)+'</span>'}</div>
     </div>`;
   });
 
@@ -1551,12 +1589,14 @@ function collectGoals(){
   // Step 3: Rezervy
   if(document.getElementById('fp_rezervy').checked){
     const cisty = (parseFloat(document.getElementById('k_cisty').value)||0) + (clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0);
+    const vlastnaCielova = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
+    const cielova = vlastnaCielova > 0 ? vlastnaCielova : cisty*6;
     let sum = 0;
     document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
       sum += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
     });
-    const diff = cisty*6 - sum;
-    if(diff>0) goals.push({name:'Železná rezerva', suma:diff, date:getDateIn(5)});
+    const diff = cielova - sum;
+    if(diff>0) goals.push({name:'Železná rezerva', suma:cielova, date:getDateIn(5)});
   }
 
   // Step 4: Dôchodok
@@ -2027,14 +2067,14 @@ function buildFinancialPlan(){
   if(zabCheckedK.length > 0 || zabCheckedP.length > 0){
     fpSec6.style.display = 'block';
     let zabHtml = '';
-    function getZabRec(name){ if(name.includes('Výpoveď')) return 'Poistenie straty zamestnania'; if(name.includes('PN')) return 'Poistenie práceneschopnosti (denné odškodné)'; if(name.includes('Materská')) return 'Doplnkové pripoistenie'; if(name.includes('invalidita')) return 'Invalidný dôchodok — pripoistenie'; if(name.includes('Úmrtie')) return 'Rizikové životné poistenie (jednorazová suma)'; return 'Rizikové životné poistenie'; }
+    function getZabRec(name){ if(name.includes('Výpoveď')) return 'Poistenie straty zamestnania'; if(name.includes('PN')) return 'Poistenie práceneschopnosti (denné odškodné)'; if(name.includes('Materská')) return 'Doplnkové pripoistenie'; if(name.includes('invalidita')) return 'Invalidný dôchodok — pripoistenie'; if(name.includes('Úmrtie') && name.includes('hypotéky')) return 'Rizikové životné poistenie — klesajúca PS'; if(name.includes('Úmrtie') && name.includes('príjem')) return 'Rizikové životné poistenie — fixná PS'; if(name.includes('Úmrtie')) return 'Rizikové životné poistenie'; return 'Poistenie'; }
     // Klient
     if(zabCheckedK.length > 0){
       zabHtml += '<div style="font-size:13px;font-weight:600;margin-bottom:8px;">Klient</div>';
       zabHtml += '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Chýbajúce krytie</th><th>Odporúčanie</th></tr></thead><tbody>';
       zabCheckedK.forEach(cb=>{
         const name = cb.dataset.name; const suma = parseFloat(cb.dataset.suma)||0;
-        zabHtml += `<tr><td>${name}</td><td class="negative">${formatEUR(suma)}${name==='Úmrtie'?' jednorazovo':'/mes'}</td><td>${getZabRec(name)}</td></tr>`;
+        zabHtml += `<tr><td>${name}</td><td class="negative">${formatEUR(suma)}${name.includes('Úmrtie')?' jednorazovo':'/mes'}</td><td>${getZabRec(name)}</td></tr>`;
       });
       zabHtml += '</tbody></table>';
     }
@@ -2044,7 +2084,7 @@ function buildFinancialPlan(){
       zabHtml += '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Chýbajúce krytie</th><th>Odporúčanie</th></tr></thead><tbody>';
       zabCheckedP.forEach(cb=>{
         const name = cb.dataset.name; const suma = parseFloat(cb.dataset.suma)||0;
-        zabHtml += `<tr><td>${name}</td><td class="negative">${formatEUR(suma)}${name==='Úmrtie'?' jednorazovo':'/mes'}</td><td>${getZabRec(name)}</td></tr>`;
+        zabHtml += `<tr><td>${name}</td><td class="negative">${formatEUR(suma)}${name.includes('Úmrtie')?' jednorazovo':'/mes'}</td><td>${getZabRec(name)}</td></tr>`;
       });
       zabHtml += '</tbody></table>';
     }
@@ -2302,7 +2342,7 @@ async function generatePDF(){
   addLine('Mesačné výdavky', formatEUR(vydavky));
   document.querySelectorAll('.fp-zab-k:checked').forEach(cb=>{
     const suma = parseFloat(cb.dataset.suma)||0;
-    if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name==='Úmrtie'?' jednorazovo':'/mes'));
+    if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name.includes('Úmrtie')?' jednorazovo':'/mes'));
   });
 
   // ===== PAGE 2: Financial Plan =====
@@ -2440,7 +2480,7 @@ async function generatePDF(){
     addSubtitle('Zabezpečenie príjmu — poistenie');
     zabItems.forEach(cb=>{
       const suma = parseFloat(cb.dataset.suma)||0;
-      if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name==='Úmrtie'?' jednorazovo':'/mes'));
+      if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name.includes('Úmrtie')?' jednorazovo':'/mes'));
     });
     addNote('Poskytovateľ: Partners Poisťovňa, NN, Allianz, MetLife, Generali');
     y += 3;
