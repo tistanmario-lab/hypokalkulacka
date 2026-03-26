@@ -1974,9 +1974,11 @@ function buildProgramDetail(programId, state, strat, pmt, fv){
   html += `<div class="fp-rec-row"><span><strong>Odporúčaná mesačná investícia</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(pmt)}</strong></span></div>`;
   html += `<div class="fp-rec-row"><span>Predpokladaná hodnota na konci</span><span>${formatEUR(fv)}</span></div>`;
 
-  // Fee calculation
-  const fee = getEntryFee(state.cielSuma, state.currentStrategy);
+  // Fee calculation — cieľová suma = súčet vkladov (PMT × mesiace), nie cieľ po zhodnotení
+  const cielovaSumaVkladov = pmt * state.roky * 12;
+  const fee = getEntryFee(cielovaSumaVkladov, state.currentStrategy);
   if(fee !== null){
+    html += `<div class="fp-fee-row"><span>Cieľová suma (súčet vkladov)</span><span>${formatEUR(cielovaSumaVkladov)}</span></div>`;
     html += `<div class="fp-fee-row"><span>Vstupný poplatok (jednorazová úhrada)</span><span>${fee.pct}% = ${formatEUR(fee.suma)}</span></div>`;
   }
 
@@ -2040,8 +2042,12 @@ function buildFinancialPlan(){
     html += `<div class="fp-rec-row"><span>Predpokladané zhodnotenie</span><span>2 % p.a.</span></div>`;
     html += `<div class="fp-rec-row"><span><strong>Odporúčaná mesačná investícia</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(rezPmt)}</strong></span></div>`;
     html += `<div class="fp-rec-row"><span>Predpokladaná hodnota po 5 rokoch</span><span>${formatEUR(rezFV)}</span></div>`;
-    const rezFee = getEntryFee(deficit, 'konzervativna');
-    if(rezFee) html += `<div class="fp-fee-row"><span>Vstupný poplatok (jednorazová úhrada)</span><span>${rezFee.pct}% = ${formatEUR(rezFee.suma)}</span></div>`;
+    const rezCielovaSuma = rezPmt * 5 * 12; // súčet vkladov
+    const rezFee = getEntryFee(rezCielovaSuma, 'konzervativna');
+    if(rezFee){
+      html += `<div class="fp-fee-row"><span>Cieľová suma (súčet vkladov)</span><span>${formatEUR(rezCielovaSuma)}</span></div>`;
+      html += `<div class="fp-fee-row"><span>Vstupný poplatok (jednorazová úhrada)</span><span>${rezFee.pct}% = ${formatEUR(rezFee.suma)}</span></div>`;
+    }
     html += '</div>';
     document.getElementById('fpRezervy').innerHTML = html;
 
