@@ -1851,8 +1851,6 @@ function getEntryFee(cielovaSuma, stratKey){
   return {pct, suma};
 }
 
-// Správcovský poplatok
-const MGMT_FEE = 1.0; // 1% p.a.
 
 // Build strategy selector buttons HTML
 function buildStratSelector(programId, currentKey){
@@ -1980,7 +1978,6 @@ function buildProgramDetail(programId, state, strat, pmt, fv){
   const fee = getEntryFee(state.cielSuma, state.currentStrategy);
   if(fee !== null){
     html += `<div class="fp-fee-row"><span>Vstupný poplatok (jednorazová úhrada)</span><span>${fee.pct}% = ${formatEUR(fee.suma)}</span></div>`;
-    html += `<div class="fp-fee-row"><span>Správcovský poplatok</span><span>${MGMT_FEE}% p.a.</span></div>`;
   }
 
   html += '</div>';
@@ -2045,7 +2042,6 @@ function buildFinancialPlan(){
     html += `<div class="fp-rec-row"><span>Predpokladaná hodnota po 5 rokoch</span><span>${formatEUR(rezFV)}</span></div>`;
     const rezFee = getEntryFee(deficit, 'konzervativna');
     if(rezFee) html += `<div class="fp-fee-row"><span>Vstupný poplatok (jednorazová úhrada)</span><span>${rezFee.pct}% = ${formatEUR(rezFee.suma)}</span></div>`;
-    html += `<div class="fp-fee-row"><span>Správcovský poplatok</span><span>${MGMT_FEE}% p.a.</span></div>`;
     html += '</div>';
     document.getElementById('fpRezervy').innerHTML = html;
 
