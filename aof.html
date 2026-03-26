@@ -457,17 +457,12 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     </div>
 
     <div class="card">
-      <div class="card-title">Plán doplnenia rezervy</div>
-      <div class="info-box success">
-        <strong>Odporúčanie:</strong> Partners Asset Management — Fond krátkodobých rezerv, cieľ: do 5 rokov vytvoriť pohotovostnú rezervu vo výške 6&times; čistý príjem (predpokladané zhodnotenie ~2 % p.a.)
+      <div class="card-title">Zhrnutie</div>
+      <div class="form-row">
+        <div class="form-group"><label>Chýbajúca suma do cieľovej rezervy (€)</label><input type="number" id="rez_chybajuca" class="computed" readonly></div>
       </div>
-      <div style="margin-top:16px;">
-        <div class="form-row">
-          <div class="form-group"><label>Chýbajúca suma (€)</label><input type="number" id="rez_chybajuca" class="computed" readonly></div>
-          <div class="form-group"><label>Odporúčaná mesačná investícia (€)</label><input type="number" id="rez_mesacna" class="computed" readonly></div>
-        </div>
-        <div class="info-box" id="rez_plan_info"></div>
-      </div>
+      <input type="hidden" id="rez_mesacna" value="0">
+      <div id="rez_plan_info" style="display:none;"></div>
       <div class="check-row"><input type="checkbox" id="fp_rezervy"> Zaradiť do finančného plánu</div>
     </div>
 
