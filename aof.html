@@ -1419,7 +1419,7 @@ function buildZabTable(prefix, bodyId){
   const isSzco = praca === 'szco';
   const rows = [
     {name:'Výpoveď', davka: isSzco ? 0 : Math.round(hruby*0.5)},
-    {name:'Materská dovolenka', davka: isSzco ? Math.round(915*0.75) : 370},
+    {name:'Materská dovolenka', davka: isSzco ? Math.round(915*0.75) : Math.round(hruby*0.75)},
     {name:'PN (práceneschopnosť)', davka: Math.round(hruby*0.55)},
     {name:'Čiastočná invalidita (41–70 %)', davka: Math.round(hruby*0.25)},
     {name:'Plná invalidita (71 %+)', davka: Math.round(hruby*0.375)},
@@ -1602,6 +1602,13 @@ function collectGoals(){
     const s = parseFloat(cb.dataset.suma)||0;
     if(s > 0) goals.push({name:'Zabezpečenie: '+cb.dataset.name, suma:s, date:'—', category:'zabezpecenie'});
   });
+  // Partner zabezpečenie
+  if(clientType==='pair'){
+    document.querySelectorAll('.fp-zab-p:checked').forEach(cb=>{
+      const s = parseFloat(cb.dataset.suma)||0;
+      if(s > 0) goals.push({name:'Partner — '+cb.dataset.name, suma:s, date:'—', category:'zabezpecenie'});
+    });
+  }
 
   return goals;
 }
@@ -1713,12 +1720,22 @@ function buildSummary(){
   document.getElementById('summDeti').innerHTML = detiHtml;
 
   // Zabezpečenie
-  let zabHtml = '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Sociálna dávka</th><th>Min. krytie</th><th>Bude chýbať</th></tr></thead><tbody>';
+  let zabHtml = '<div style="font-size:13px;font-weight:600;margin-bottom:8px;">Klient</div>';
+  zabHtml += '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Sociálna dávka</th><th>Min. krytie</th><th>Bude chýbať</th></tr></thead><tbody>';
   document.querySelectorAll('#zabBodyKlient tr').forEach(tr=>{
     const tds = tr.querySelectorAll('td');
-    zabHtml += `<tr><td>${tds[0].textContent}</td><td>${tds[1].textContent}</td><td>${tds[2].textContent}</td><td class="${tds[3].className}">${tds[3].textContent}</td></tr>`;
+    if(tds.length >= 4) zabHtml += `<tr><td>${tds[0].textContent}</td><td>${tds[1].textContent}</td><td>${tds[2].textContent}</td><td class="${tds[3].className}">${tds[3].textContent}</td></tr>`;
   });
   zabHtml += '</tbody></table>';
+  if(clientType==='pair'){
+    zabHtml += '<div style="font-size:13px;font-weight:600;margin:16px 0 8px;">Partner/ka</div>';
+    zabHtml += '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Sociálna dávka</th><th>Min. krytie</th><th>Bude chýbať</th></tr></thead><tbody>';
+    document.querySelectorAll('#zabBodyPartner tr').forEach(tr=>{
+      const tds = tr.querySelectorAll('td');
+      if(tds.length >= 4) zabHtml += `<tr><td>${tds[0].textContent}</td><td>${tds[1].textContent}</td><td>${tds[2].textContent}</td><td class="${tds[3].className}">${tds[3].textContent}</td></tr>`;
+    });
+    zabHtml += '</tbody></table>';
+  }
   document.getElementById('summZabezpecenie').innerHTML = zabHtml;
 
   // Timeline in summary — reuse buildTimeline logic
@@ -2003,22 +2020,32 @@ function buildFinancialPlan(){
 
   // ── 6. ZABEZPEČENIE PRÍJMU ──
   const fpSec6 = document.getElementById('fpSecZabezpecenie');
-  const zabChecked = document.querySelectorAll('.fp-zab-k:checked');
-  if(zabChecked.length > 0){
+  const zabCheckedK = document.querySelectorAll('.fp-zab-k:checked');
+  const zabCheckedP = clientType==='pair' ? document.querySelectorAll('.fp-zab-p:checked') : [];
+  if(zabCheckedK.length > 0 || zabCheckedP.length > 0){
     fpSec6.style.display = 'block';
-    let zabHtml = '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Chýbajúce krytie</th><th>Odporúčanie</th></tr></thead><tbody>';
-    zabChecked.forEach(cb=>{
-      const name = cb.dataset.name;
-      const suma = parseFloat(cb.dataset.suma)||0;
-      let rec = 'Rizikové životné poistenie';
-      if(name.includes('Výpoveď')) rec = 'Poistenie straty zamestnania';
-      else if(name.includes('PN')) rec = 'Poistenie práceneschopnosti (denné odškodné)';
-      else if(name.includes('Materská')) rec = 'Doplnkové pripoistenie';
-      else if(name.includes('invalidita')) rec = 'Invalidný dôchodok — pripoistenie';
-      else if(name.includes('Úmrtie')) rec = 'Rizikové životné poistenie (jednorazová suma)';
-      zabHtml += `<tr><td>${name}</td><td class="negative">${formatEUR(suma)}${name==='Úmrtie'?' jednorazovo':'/mes'}</td><td>${rec}</td></tr>`;
-    });
-    zabHtml += '</tbody></table>';
+    let zabHtml = '';
+    function getZabRec(name){ if(name.includes('Výpoveď')) return 'Poistenie straty zamestnania'; if(name.includes('PN')) return 'Poistenie práceneschopnosti (denné odškodné)'; if(name.includes('Materská')) return 'Doplnkové pripoistenie'; if(name.includes('invalidita')) return 'Invalidný dôchodok — pripoistenie'; if(name.includes('Úmrtie')) return 'Rizikové životné poistenie (jednorazová suma)'; return 'Rizikové životné poistenie'; }
+    // Klient
+    if(zabCheckedK.length > 0){
+      zabHtml += '<div style="font-size:13px;font-weight:600;margin-bottom:8px;">Klient</div>';
+      zabHtml += '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Chýbajúce krytie</th><th>Odporúčanie</th></tr></thead><tbody>';
+      zabCheckedK.forEach(cb=>{
+        const name = cb.dataset.name; const suma = parseFloat(cb.dataset.suma)||0;
+        zabHtml += `<tr><td>${name}</td><td class="negative">${formatEUR(suma)}${name==='Úmrtie'?' jednorazovo':'/mes'}</td><td>${getZabRec(name)}</td></tr>`;
+      });
+      zabHtml += '</tbody></table>';
+    }
+    // Partner
+    if(zabCheckedP.length > 0){
+      zabHtml += '<div style="font-size:13px;font-weight:600;margin:16px 0 8px;">Partner/ka</div>';
+      zabHtml += '<table class="zab-table"><thead><tr><th>Udalosť</th><th>Chýbajúce krytie</th><th>Odporúčanie</th></tr></thead><tbody>';
+      zabCheckedP.forEach(cb=>{
+        const name = cb.dataset.name; const suma = parseFloat(cb.dataset.suma)||0;
+        zabHtml += `<tr><td>${name}</td><td class="negative">${formatEUR(suma)}${name==='Úmrtie'?' jednorazovo':'/mes'}</td><td>${getZabRec(name)}</td></tr>`;
+      });
+      zabHtml += '</tbody></table>';
+    }
     zabHtml += '<div class="info-box success"><strong>Poistenie riešime cez:</strong> Partners Poisťovňa, NN, Allianz, MetLife, Generali</div>';
     document.getElementById('fpZabezpecenie').innerHTML = zabHtml;
   } else { fpSec6.style.display = 'none'; }
