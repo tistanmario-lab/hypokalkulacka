@@ -1899,12 +1899,7 @@ function switchRezMode(mode){
   html += `<div class="fp-rec-row"><span>Hodnota po 5 rokoch</span><span>${formatEUR(fv)}</span></div>`;
 
   if(mode === 'partners'){
-    const rezCielovaSuma = vklady;
-    const rezFee = getEntryFee(rezCielovaSuma, 'konzervativna');
-    if(rezFee){
-      html += `<div class="fp-fee-row"><span>Cieľová suma (súčet vkladov)</span><span>${formatEUR(rezCielovaSuma)}</span></div>`;
-      html += `<div class="fp-fee-row"><span>Vstupný poplatok (jednorazová úhrada)</span><span>${rezFee.pct}% = ${formatEUR(rezFee.suma)}</span></div>`;
-    }
+    html += `<div style="margin-top:8px;padding:8px 12px;background:rgba(46,125,50,0.06);border-radius:8px;font-size:12px;color:var(--green);font-weight:600;">✓ Vstupný poplatok: 0 € — benefit pre klientov Partners Group</div>`;
   }
   html += '</div>';
 
