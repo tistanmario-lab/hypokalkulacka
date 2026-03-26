@@ -1008,6 +1008,14 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
         </table>
       </div>
 
+      <!-- FP: Rast investičného portfólia -->
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title">Rast investičného portfólia v čase</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Predpokladaný vývoj celkovej hodnoty vašich investícií podľa aktuálneho nastavenia finančného plánu</div>
+        <div class="chart-container" style="height:320px;"><canvas id="chartPortfolioGrowth"></canvas></div>
+        <div id="fpMilestones" style="margin-top:16px;"></div>
+      </div>
+
       <!-- FP: Časová os -->
       <div class="card" style="margin-top:20px;">
         <div class="card-title">Časová os finančného plánu</div>
@@ -1702,6 +1710,7 @@ function switchTab(tab, btn){
 let chartRezervaInst = null;
 let chartDochodokInst = null;
 let chartFPRozpocetInst = null;
+let chartPortfolioInst = null;
 
 function buildSummary(){
   // Osobné údaje
@@ -2511,9 +2520,153 @@ function buildFinancialPlan(){
   // ── ROZPOČET ──
   updateFPBudget(totalMesacne);
 
+  // ── RAST PORTFÓLIA ──
+  buildPortfolioChart();
+
   // ── TIMELINE ──
   const origHTML = document.getElementById('timelineContainer').innerHTML;
   document.getElementById('fpTimeline').innerHTML = origHTML || '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
+}
+
+function buildPortfolioChart(){
+  const age = parseInt(document.getElementById('k_vek').value)||30;
+  const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
+  const maxYears = Math.max(dochVek - age, 30);
+  const thisYear = new Date().getFullYear();
+
+  // Collect all active investment programs
+  const programs = [];
+  Object.entries(fpState).forEach(([id, st]) => {
+    if(st.type !== 'invest' || st.isHypo) return;
+    const s = STRATEGIES[st.currentStrategy];
+    const pmt = calcPMT(st.cielSuma, s.rate, st.roky);
+    programs.push({label:st.label, pmt, rate:s.rate, roky:st.roky});
+  });
+
+  if(programs.length === 0){
+    document.getElementById('fpMilestones').innerHTML = '';
+    return;
+  }
+
+  // Simulate year by year
+  const labels = [];
+  const totalValues = [];
+  const depositValues = [];
+  const milestoneYears = [1, 2, 3, 5, 10, 15, 20, 25, 30, 35];
+  const milestones = [];
+
+  for(let yr = 0; yr <= maxYears; yr++){
+    labels.push(thisYear + yr);
+    let totalVal = 0;
+    let totalDep = 0;
+
+    programs.forEach(p => {
+      if(yr <= p.roky){
+        // Still investing
+        const months = yr * 12;
+        const r = p.rate / 12;
+        let val = 0;
+        if(r > 0) val = p.pmt * (Math.pow(1+r, months) - 1) / r;
+        else val = p.pmt * months;
+        totalVal += val;
+        totalDep += p.pmt * months;
+      } else {
+        // Reached goal — full value stays (or was redeemed)
+        const months = p.roky * 12;
+        const r = p.rate / 12;
+        let val = 0;
+        if(r > 0) val = p.pmt * (Math.pow(1+r, months) - 1) / r;
+        else val = p.pmt * months;
+        totalVal += val;
+        totalDep += p.pmt * months;
+      }
+    });
+
+    totalValues.push(Math.round(totalVal));
+    depositValues.push(Math.round(totalDep));
+
+    if(milestoneYears.includes(yr) && yr <= maxYears){
+      milestones.push({yr, year:thisYear+yr, age:age+yr, value:Math.round(totalVal), deposits:Math.round(totalDep), profit:Math.round(totalVal-totalDep)});
+    }
+  }
+
+  // Build chart
+  if(chartPortfolioInst) chartPortfolioInst.destroy();
+  chartPortfolioInst = new Chart(document.getElementById('chartPortfolioGrowth'),{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {
+          label:'Hodnota portfólia',
+          data:totalValues,
+          borderColor:'#AB0534',
+          backgroundColor:'rgba(171,5,52,0.08)',
+          fill:true,
+          borderWidth:2.5,
+          pointRadius:0,
+          pointHoverRadius:5,
+          tension:0.3
+        },
+        {
+          label:'Vaše vklady',
+          data:depositValues,
+          borderColor:'#003049',
+          backgroundColor:'rgba(0,48,73,0.05)',
+          fill:true,
+          borderWidth:2,
+          borderDash:[5,3],
+          pointRadius:0,
+          pointHoverRadius:5,
+          tension:0.3
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{position:'top',labels:{font:{size:12,family:'DM Sans'}}},
+        tooltip:{
+          callbacks:{
+            title: ctx => 'Rok '+ctx[0].label+' (vek '+(age+(ctx[0].dataIndex))+')',
+            label: ctx => ctx.dataset.label+': '+formatEUR(ctx.raw),
+            afterBody: ctx => {
+              const i = ctx[0].dataIndex;
+              const profit = totalValues[i] - depositValues[i];
+              return 'Zhodnotenie: +'+formatEUR(profit);
+            }
+          }
+        }
+      },
+      scales:{
+        x:{
+          grid:{display:false},
+          ticks:{font:{size:10},maxTicksLimit:15,callback:function(v,i){return labels[i]%5===0?labels[i]:'';}}
+        },
+        y:{
+          grid:{color:'rgba(0,48,73,0.06)'},
+          ticks:{font:{size:10},callback:v=>{if(v>=1000000) return (v/1000000).toFixed(1)+'M €'; if(v>=1000) return Math.round(v/1000)+'k €'; return v+' €';}}
+        }
+      }
+    }
+  });
+
+  // Build milestones cards
+  let mHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">';
+  milestones.forEach(m => {
+    const profitPct = m.deposits > 0 ? Math.round(m.profit / m.deposits * 100) : 0;
+    mHtml += `<div style="background:rgba(0,48,73,0.03);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;">`;
+    mHtml += `<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Po ${m.yr} ${m.yr===1?'roku':'rokoch'}</div>`;
+    mHtml += `<div style="font-size:11px;color:var(--muted);">vek ${m.age} · rok ${m.year}</div>`;
+    mHtml += `<div style="font-size:18px;font-weight:700;color:var(--red);margin:6px 0;">${formatEUR(m.value)}</div>`;
+    mHtml += `<div style="font-size:11px;color:var(--muted);">vklady: ${formatEUR(m.deposits)}</div>`;
+    mHtml += `<div style="font-size:11px;color:var(--green);font-weight:600;">+${formatEUR(m.profit)} (${profitPct>0?'+':''}${profitPct}%)</div>`;
+    mHtml += '</div>';
+  });
+  mHtml += '</div>';
+  document.getElementById('fpMilestones').innerHTML = mHtml;
 }
 
 // ============================================================
