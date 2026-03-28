@@ -136,7 +136,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .vip-card-icon {
   font-size: 40px;
   margin-bottom: 16px;
+  color: var(--red);
 }
+.vip-card-icon svg { width: 1em; height: 1em; stroke-width: 1.5; }
 .vip-card h3 {
   font-family: 'Playfair Display', serif;
   font-size: 18px;
@@ -212,6 +214,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
   border-top: 1px solid var(--border);
 }
 </style>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
@@ -271,7 +274,7 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
 
     <!-- Analýza osobných financií -->
     <a href="aof.html" class="vip-card">
-      <div class="vip-card-icon">📋</div>
+      <div class="vip-card-icon"><i data-lucide="clipboard-list"></i></div>
       <h3>Analýza osobných financií</h3>
       <p>Komplexný prehľad príjmov, výdavkov, majetku a záväzkov klienta. Základ pre finančný plán.</p>
       <span class="vip-card-status status-active">Aktívne</span>
@@ -279,7 +282,7 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
 
     <!-- Generátor finančného plánu -->
     <a href="aof.html" class="vip-card">
-      <div class="vip-card-icon">📊</div>
+      <div class="vip-card-icon"><i data-lucide="bar-chart-3"></i></div>
       <h3>Generátor finančného plánu</h3>
       <p>Súčasť AOF — na konci analýzy vygenerujete PDF finančný plán s odporúčaniami.</p>
       <span class="vip-card-status status-active">Aktívne</span>
@@ -287,7 +290,7 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
 
     <!-- Porovnávač produktov -->
     <a href="#" class="vip-card" onclick="alert('Nástroj sa pripravuje. Čoskoro bude dostupný!');return false;">
-      <div class="vip-card-icon">🔍</div>
+      <div class="vip-card-icon"><i data-lucide="search"></i></div>
       <h3>Porovnávač produktov</h3>
       <p>Porovnanie hypotekárnych, investičných a poistných produktov naprieč partnermi.</p>
       <span class="vip-card-status status-planned">Plánované</span>
@@ -295,21 +298,21 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
 
     <!-- Existujúce kalkulačky -->
     <a href="hypokalkulacka.html" class="vip-card">
-      <div class="vip-card-icon">🏠</div>
+      <div class="vip-card-icon"><i data-lucide="home"></i></div>
       <h3>HypoKalkulačka+</h3>
       <p>Výpočet splátky, porovnanie stratégií a úspora na úrokoch mimoriadnymi splátkami.</p>
       <span class="vip-card-status status-active">Aktívne</span>
     </a>
 
     <a href="dochodkova-kalkulacka.html" class="vip-card">
-      <div class="vip-card-icon">🎯</div>
+      <div class="vip-card-icon"><i data-lucide="target"></i></div>
       <h3>DôchodKalkulačka+</h3>
       <p>Výpočet dôchodkovej medzery a potrebnej mesačnej investície pre klienta.</p>
       <span class="vip-card-status status-active">Aktívne</span>
     </a>
 
     <a href="invest-kalkulacka.html" class="vip-card">
-      <div class="vip-card-icon">💰</div>
+      <div class="vip-card-icon"><i data-lucide="wallet"></i></div>
       <h3>InvestKalkulačka+</h3>
       <p>Porovnanie 7 investičných stratégií vrátane inflácie a reálnych hodnôt.</p>
       <span class="vip-card-status status-active">Aktívne</span>
@@ -321,19 +324,19 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
   <h2 class="vip-section-title">Rýchle linky</h2>
   <div class="vip-grid">
     <a href="index.html" class="vip-card">
-      <div class="vip-card-icon">🌐</div>
+      <div class="vip-card-icon"><i data-lucide="globe"></i></div>
       <h3>Webová stránka</h3>
       <p>Hlavná stránka mariotistan.sk — verejná prezentácia.</p>
     </a>
 
     <a href="https://www.partnersgroup.sk" target="_blank" class="vip-card">
-      <div class="vip-card-icon">🏢</div>
+      <div class="vip-card-icon"><i data-lucide="building-2"></i></div>
       <h3>Partners Group SK</h3>
       <p>Firemná stránka Partners Group SK.</p>
     </a>
 
     <a href="https://analytics.google.com" target="_blank" class="vip-card">
-      <div class="vip-card-icon">📈</div>
+      <div class="vip-card-icon"><i data-lucide="trending-up"></i></div>
       <h3>Google Analytics</h3>
       <p>Štatistiky návštevnosti webu a správanie návštevníkov.</p>
     </a>
@@ -357,6 +360,7 @@ function doLogout() {
   sessionStorage.removeItem('vip_user');
   window.location.href = 'vip-login.html';
 }
+lucide.createIcons();
 </script>
 
 </body>

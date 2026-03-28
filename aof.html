@@ -13,6 +13,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
 :root {
   --navy: #003049;
@@ -1047,6 +1048,22 @@ let hasDeti = true;
 let hasZmena = true;
 let childCounter = 0;
 
+// Lucide SVG icon helper — returns inline SVG string for use in innerHTML
+function ico(name, size){
+  size = size || 18;
+  const el = lucide.icons[name];
+  if(!el) return '';
+  const [attrs, children] = el;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">`;
+  children.forEach(([tag, a]) => {
+    svg += `<${tag}`;
+    Object.entries(a).forEach(([k,v]) => { svg += ` ${k}="${v}"`; });
+    svg += `/>`;
+  });
+  svg += '</svg>';
+  return svg;
+}
+
 const stepNames = [
   'Osobné údaje','Nové bývanie','Rezervy','Dôchodok','Deti',
   'Majetok','Iné ciele','Zabezpečenie','Časová os','Súhrn'
@@ -1530,7 +1547,7 @@ function buildZabTable(prefix, bodyId){
         <td>${r.name}</td>
         <td>${formatEUR(r.davka)}</td>
         <td>${formatEUR(vydavky)}</td>
-        <td class="${cls}">${chyba > 0 ? formatEUR(chyba) : '0 € ✓'}</td>
+        <td class="${cls}">${chyba > 0 ? formatEUR(chyba) : '0 € '+ico('check',14)}</td>
         <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${chyba}" ${chyba>0?'checked':''}></td>`;
       tbody.appendChild(tr);
     }
@@ -1906,9 +1923,9 @@ let fpState = {};
 function switchRezMode(mode){
   const deficit = window._rezDeficit || 0;
   const modes = {
-    bu:       {name:'Bežný účet', rate:0.00, desc:'0% zhodnotenie — peniaze len ležia', icon:'🏦', btnClass:''},
-    sporiak:  {name:'Sporiaci účet', rate:0.001, desc:'~0,1% p.a. — minimálne zhodnotenie', icon:'💰', btnClass:''},
-    partners: {name:'Partners Fond krátkodobých rezerv', rate:0.02, desc:'2% p.a. — konzervatívna stratégia', icon:'🛡️', btnClass:'konz'}
+    bu:       {name:'Bežný účet', rate:0.00, desc:'0% zhodnotenie — peniaze len ležia', icon:ico('landmark'), btnClass:''},
+    sporiak:  {name:'Sporiaci účet', rate:0.001, desc:'~0,1% p.a. — minimálne zhodnotenie', icon:ico('piggy-bank'), btnClass:''},
+    partners: {name:'Partners Fond krátkodobých rezerv', rate:0.02, desc:'2% p.a. — konzervatívna stratégia', icon:ico('shield-check'), btnClass:'konz'}
   };
   const m = modes[mode];
   const pmt = calcPMT(deficit, m.rate, 5);
@@ -1935,7 +1952,7 @@ function switchRezMode(mode){
   html += `<div class="fp-rec-row"><span>Hodnota po 5 rokoch</span><span>${formatEUR(fv)}</span></div>`;
 
   if(mode === 'partners'){
-    html += `<div style="margin-top:8px;padding:8px 12px;background:rgba(46,125,50,0.06);border-radius:8px;font-size:12px;color:var(--green);font-weight:600;">✓ Vstupný poplatok: 0 € — benefit pre klientov Partners Group</div>`;
+    html += `<div style="margin-top:8px;padding:8px 12px;background:rgba(46,125,50,0.06);border-radius:8px;font-size:12px;color:var(--green);font-weight:600;">${ico('check',14)} Vstupný poplatok: 0 € — benefit pre klientov Partners Group</div>`;
   }
   html += '</div>';
 
@@ -2007,7 +2024,7 @@ function recalcHypoPayoff(id, stratKey){
   });
 
   let html = '';
-  html += `<div class="fp-product"><div class="fp-product-icon invest">📈</div><div class="fp-product-info"><div class="fp-product-name">${s.fond}</div><div class="fp-product-desc">${s.typ} · ${Math.round(s.rate*100)}% p.a. · Investícia popri hypotéke</div></div></div>`;
+  html += `<div class="fp-product"><div class="fp-product-icon invest">${ico('trending-up')}</div><div class="fp-product-info"><div class="fp-product-name">${s.fond}</div><div class="fp-product-desc">${s.typ} · ${Math.round(s.rate*100)}% p.a. · Investícia popri hypotéke</div></div></div>`;
 
   html += '<div class="fp-rec" style="margin-top:12px;">';
   html += `<div class="fp-rec-row"><span>Aktuálny zostatok hypotéky</span><span>${formatEUR(zostatok)}</span></div>`;
@@ -2054,7 +2071,7 @@ function recalcHypoPayoff(id, stratKey){
         investData.push(Math.round(iv2));
       }
     }
-    html += `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px;">📊 Vizualizácia: Investícia ${formatEUR(chartInvest)}/mes vs. zostatok hypotéky</div>`;
+    html += `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px;">${ico('bar-chart-3',16)} Vizualizácia: Investícia ${formatEUR(chartInvest)}/mes vs. zostatok hypotéky</div>`;
     html += `<div class="chart-container" style="height:260px;"><canvas id="chartHypoPayoff_${id}"></canvas></div></div>`;
   }
 
@@ -2193,7 +2210,7 @@ function updateFPBudget(totalMesacne){
   rozpHtml += `<div class="fp-rec-row"><span>Investície podľa finančného plánu</span><span class="fp-rec-highlight">${formatEUR(totalMesacne)}</span></div>`;
   if(poistne > 0) rozpHtml += `<div class="fp-rec-row"><span>Poistné (orientačný odhad)</span><span>${formatEUR(poistne)}</span></div>`;
   rozpHtml += `<div class="fp-rec-row"><span><strong>Voľné prostriedky</strong></span><span style="color:${volne>=0?'var(--green)':'var(--red)'};font-weight:700;font-size:15px;"><strong>${formatEUR(volne)}</strong></span></div>`;
-  if(volne < 0) rozpHtml += `<div style="margin-top:8px;padding:8px 12px;background:rgba(171,5,52,0.06);border-radius:8px;font-size:12px;color:var(--red);">⚠ Mesačné náklady presahujú dostupné prostriedky. Zvážte úpravu stratégie alebo cieľových súm.</div>`;
+  if(volne < 0) rozpHtml += `<div style="margin-top:8px;padding:8px 12px;background:rgba(171,5,52,0.06);border-radius:8px;font-size:12px;color:var(--red);">${ico('alert-triangle',14)} Mesačné náklady presahujú dostupné prostriedky. Zvážte úpravu stratégie alebo cieľových súm.</div>`;
   if(poistne > 0) rozpHtml += `<div style="margin-top:4px;font-size:11px;color:var(--muted);">* Poistné je orientačný odhad. Presná suma bude stanovená na základe individuálnej ponuky.</div>`;
   rozpHtml += '</div>';
   document.getElementById('fpRozpocetSummary').innerHTML = rozpHtml;
@@ -2235,7 +2252,7 @@ function buildProgramDetail(programId, state, strat, pmt, fv){
   }
 
   // Product card
-  html += `<div class="fp-product"><div class="fp-product-icon invest">📈</div><div class="fp-product-info"><div class="fp-product-name">${strat.fond}</div><div class="fp-product-desc">${strat.typ} · Priemerné zhodnotenie ${Math.round(strat.rate*100)}% p.a. · ${strat.desc}</div></div></div>`;
+  html += `<div class="fp-product"><div class="fp-product-icon invest">${ico('trending-up')}</div><div class="fp-product-info"><div class="fp-product-name">${strat.fond}</div><div class="fp-product-desc">${strat.typ} · Priemerné zhodnotenie ${Math.round(strat.rate*100)}% p.a. · ${strat.desc}</div></div></div>`;
 
   // Key numbers
   html += '<div class="fp-rec" style="margin-top:12px;">';
@@ -2453,7 +2470,7 @@ function buildFinancialPlan(){
       const fixDatum = document.getElementById('optim_fixacia_datum').value||'—';
       const splatka = formatEUR(parseFloat(document.getElementById('optim_splatka').value)||0);
       const doba = document.getElementById('optim_doba').value||'—';
-      html += `<div class="fp-product"><div class="fp-product-icon protect">🏠</div><div class="fp-product-info"><div class="fp-product-name">Aktuálny hypotekárny úver — ${banka}</div><div class="fp-product-desc">Zostatok ${zostatok} · Sadzba ${urok}% · Splátka ${splatka} · Zostáva ${doba} rokov</div></div></div>`;
+      html += `<div class="fp-product"><div class="fp-product-icon protect">${ico('home')}</div><div class="fp-product-info"><div class="fp-product-name">Aktuálny hypotekárny úver — ${banka}</div><div class="fp-product-desc">Zostatok ${zostatok} · Sadzba ${urok}% · Splátka ${splatka} · Zostáva ${doba} rokov</div></div></div>`;
       html += '<div class="fp-rec" style="margin-top:12px;">';
       html += `<div class="fp-rec-row"><span>Banka</span><span>${banka}</span></div>`;
       html += `<div class="fp-rec-row"><span>Zostatok</span><span>${zostatok}</span></div>`;
@@ -2498,7 +2515,7 @@ function buildFinancialPlan(){
         const mesacnaSplatka = parseFloat(document.getElementById('optim_splatka').value)||0;
         const id = 'ciel_'+cielIdx;
 
-        cieleHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:8px;">🏠 ${name}</div>`;
+        cieleHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:8px;">${ico('home',16)} ${name}</div>`;
         cieleHtml += '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Princíp: Popri splácaní hypotéky pravidelne investujeme. Keď hodnota investície dosiahne zostatok na hypotéke, odkúpime investíciu a doplatíme hypotéku.</div>';
 
         // Strategy selector
@@ -2553,13 +2570,13 @@ function buildFinancialPlan(){
     let zabHtml = '';
     function getZabRec(name){ if(name.includes('Výpoveď')) return 'Poistenie straty zamestnania'; if(name.includes('PN')) return 'Poistenie práceneschopnosti (denné odškodné)'; if(name.includes('Materská')) return 'Doplnkové pripoistenie'; if(name.includes('invalidita')) return 'Invalidný dôchodok — pripoistenie'; if(name.includes('Úmrtie') && name.includes('hypotéky')) return 'Rizikové životné poistenie — klesajúca PS'; if(name.includes('Úmrtie') && name.includes('príjem')) return 'Rizikové životné poistenie — fixná PS'; if(name.includes('Úmrtie')) return 'Rizikové životné poistenie'; return 'Poistenie'; }
     function getZabProduct(name){
-      if(name.includes('Úmrtie') && name.includes('hypotéky')) return {icon:'🏠', product:'Rizikové životné poistenie', detail:'Klesajúca poistná suma, naviazaná na splatnosť hypotéky'};
-      if(name.includes('Úmrtie') && name.includes('príjem')) return {icon:'👨‍👩‍👧', product:'Rizikové životné poistenie', detail:'Fixná poistná suma pre zabezpečenie rodiny'};
-      if(name.includes('invalidita')) return {icon:'🛡️', product:'Poistenie invalidity', detail:'Mesačná renta pri poklese pracovnej schopnosti'};
-      if(name.includes('PN')) return {icon:'🏥', product:'Poistenie práceneschopnosti', detail:'Denné odškodné počas PN'};
-      if(name.includes('Výpoveď')) return {icon:'💼', product:'Poistenie straty zamestnania', detail:'Mesačná dávka po strate zamestnania'};
-      if(name.includes('Materská')) return {icon:'👶', product:'Doplnkové pripoistenie', detail:'Finančná podpora pri materskej dovolenke'};
-      return {icon:'🛡️', product:'Poistenie', detail:''};
+      if(name.includes('Úmrtie') && name.includes('hypotéky')) return {icon:ico('home'), product:'Rizikové životné poistenie', detail:'Klesajúca poistná suma, naviazaná na splatnosť hypotéky'};
+      if(name.includes('Úmrtie') && name.includes('príjem')) return {icon:ico('users'), product:'Rizikové životné poistenie', detail:'Fixná poistná suma pre zabezpečenie rodiny'};
+      if(name.includes('invalidita')) return {icon:ico('shield-check'), product:'Poistenie invalidity', detail:'Mesačná renta pri poklese pracovnej schopnosti'};
+      if(name.includes('PN')) return {icon:ico('heart-pulse'), product:'Poistenie práceneschopnosti', detail:'Denné odškodné počas PN'};
+      if(name.includes('Výpoveď')) return {icon:ico('briefcase'), product:'Poistenie straty zamestnania', detail:'Mesačná dávka po strate zamestnania'};
+      if(name.includes('Materská')) return {icon:ico('baby'), product:'Doplnkové pripoistenie', detail:'Finančná podpora pri materskej dovolenke'};
+      return {icon:ico('shield'), product:'Poistenie', detail:''};
     }
     // Klient
     if(zabCheckedK.length > 0){
@@ -2596,7 +2613,7 @@ function buildFinancialPlan(){
       const psD = formatEUR(parseFloat(document.getElementById('majetok_ps_domacnost').value)||0);
       const rp = formatEUR(parseFloat(document.getElementById('majetok_rocne_poistne').value)||0);
       const poistovna = document.getElementById('majetok_poistovna').value||'—';
-      majHtml += `<div class="fp-product"><div class="fp-product-icon protect">🏠</div><div class="fp-product-info"><div class="fp-product-name">Poistenie nehnuteľnosti a domácnosti — ${poistovna}</div><div class="fp-product-desc">PS nehnuteľnosť ${psN} · PS domácnosť ${psD} · Ročné poistné ${rp}</div></div></div>`;
+      majHtml += `<div class="fp-product"><div class="fp-product-icon protect">${ico('home')}</div><div class="fp-product-info"><div class="fp-product-name">Poistenie nehnuteľnosti a domácnosti — ${poistovna}</div><div class="fp-product-desc">PS nehnuteľnosť ${psN} · PS domácnosť ${psD} · Ročné poistné ${rp}</div></div></div>`;
       majHtml += '<div class="info-box" style="margin-top:12px;"><strong>Odporúčanie:</strong> Skontrolovať aktuálnosť poistných súm voči trhovej hodnote nehnuteľnosti. Porovnáme ponuky na trhu.</div>';
     } else {
       majHtml += '<div class="info-box warning"><strong>Upozornenie:</strong> Klient nemá poistenie nehnuteľnosti / domácnosti. Odporúčame uzatvoriť poistenie na ochranu majetku.</div>';
