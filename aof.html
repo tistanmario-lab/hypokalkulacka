@@ -2842,69 +2842,91 @@ async function generatePDF(){
   const fontName = fontLoaded ? 'DMSans' : undefined;
 
   // Helpers
-  function checkPage(need){if(y+need>280){doc.addPage();y=15;}}
+  function checkPage(need){if(y+need>275){doc.addPage();y=20;}}
   function setNormal(){ doc.setFont(fontName,'normal'); }
   function setBold(){ doc.setFont(fontName,'bold'); }
   function addHeader(title, subtitle){
     doc.setFillColor(0,48,73);
-    doc.rect(0,0,pageW,38,'F');
+    doc.rect(0,0,pageW,42,'F');
+    // Red accent line
+    doc.setFillColor(171,5,52);
+    doc.rect(0,42,pageW,1.5,'F');
     doc.setTextColor(255,255,255);
     doc.setFontSize(22);
     setBold();
-    doc.text(title,margin,20);
+    doc.text(title,margin,18);
     doc.setFontSize(11);
     setNormal();
-    doc.text(subtitle,margin,30);
+    doc.text(subtitle,margin,28);
     doc.setFontSize(9);
-    doc.text('Klient: '+meno+' | Dátum: '+todayStr, pageW-margin, 20, {align:'right'});
-    doc.text('Vypracoval: Mário Tišťan | Partners Group SK', pageW-margin, 28, {align:'right'});
-    y = 48;
+    doc.text('Klient: '+meno+' | Vek: '+age+' | Dátum: '+todayStr, pageW-margin, 16, {align:'right'});
+    doc.text('Vypracoval: Mário Tišťan | Senior Consultant', pageW-margin, 24, {align:'right'});
+    doc.text('Partners Group SK | www.mariotistan.sk', pageW-margin, 32, {align:'right'});
+    y = 52;
     doc.setTextColor(0,48,73);
   }
   function addSection(num, title){
     checkPage(20);
-    doc.setFillColor(0,48,73);
-    doc.circle(margin+4, y-1, 4, 'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(8);
-    setBold();
-    doc.text(String(num), margin+4, y+1, {align:'center'});
-    doc.setTextColor(0,48,73);
-    doc.setFontSize(13);
-    doc.text(title, margin+12, y);
     y += 2;
-    doc.setDrawColor(171,5,52);
-    doc.line(margin+12, y, pageW-margin, y);
-    y += 7;
+    doc.setFillColor(0,48,73);
+    doc.roundedRect(margin, y-5, contentW, 10, 2, 2, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(10);
+    setBold();
+    doc.text(num+'. '+title, margin+5, y+1);
+    doc.setTextColor(0,48,73);
+    y += 10;
     doc.setFontSize(10);
     setNormal();
   }
   function addLine(label, value, bold){
     checkPage(7);
     setNormal();
+    doc.setFontSize(9);
     doc.text(label, margin+4, y);
-    if(bold) setBold(); else setNormal();
+    if(bold){
+      setBold();
+      doc.setTextColor(171,5,52);
+    }
     doc.text(String(value), pageW-margin, y, {align:'right'});
+    if(bold) doc.setTextColor(0,48,73);
     setNormal();
-    y += 6;
+    doc.setFontSize(10);
+    y += 5.5;
+  }
+  function addLineAlt(label, value, bold){
+    // Alternating row with light background
+    checkPage(7);
+    doc.setFillColor(244,245,245);
+    doc.rect(margin, y-4, contentW, 6.5, 'F');
+    addLine(label, value, bold);
   }
   function addSubtitle(text){
-    checkPage(10);
+    checkPage(12);
+    y += 2;
     doc.setFontSize(10);
     setBold();
+    doc.setTextColor(171,5,52);
     doc.text(text, margin+4, y);
+    doc.setTextColor(0,48,73);
     setNormal();
     y += 6;
   }
   function addNote(text){
-    checkPage(10);
-    doc.setFontSize(8);
-    doc.setTextColor(100,100,100);
+    checkPage(12);
+    doc.setFontSize(7.5);
+    doc.setTextColor(120,120,120);
     const lines = doc.splitTextToSize(text, contentW-8);
     doc.text(lines, margin+4, y);
-    y += lines.length * 4 + 2;
+    y += lines.length * 3.5 + 2;
     doc.setTextColor(0,48,73);
     doc.setFontSize(10);
+  }
+  function addSeparator(){
+    y += 1;
+    doc.setDrawColor(220,220,220);
+    doc.line(margin+4, y, pageW-margin, y);
+    y += 3;
   }
 
   // ===== PAGE 1: AOF Summary =====
@@ -3028,12 +3050,14 @@ async function generatePDF(){
     const fee = getEntryFee(vklady, st.currentStrategy);
     addSection(2, 'Dôchodok — Partners Investments');
     const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
+    const dochFV = calcFV(pmt, s.rate, st.roky);
     addLine('Dôchodková medzera', formatEUR(medzera)+'/mes');
-    addLine('Cieľová suma (20 r.)', formatEUR(st.cielSuma));
+    addLine('Cieľová suma (20 r. na dôchodku)', formatEUR(st.cielSuma));
     addLine('Stratégia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
     addLine('Fond', s.fond);
     addLine('Horizont', st.roky+' rokov');
     addLine('Mesačná investícia', formatEUR(pmt), true);
+    addLine('Predpokladaná hodnota na konci', formatEUR(dochFV));
     addLine('Cieľová suma (súčet vkladov)', formatEUR(vklady));
     if(fee) addLine('Vstupný poplatok', fee.pct+'% = '+formatEUR(fee.suma));
     // DSS info
@@ -3060,6 +3084,7 @@ async function generatePDF(){
     if(st.isHypo) return; // handle separately
     const s = STRATEGIES[st.currentStrategy];
     const pmt = calcPMT(st.cielSuma, s.rate, st.roky);
+    const fv = calcFV(pmt, s.rate, st.roky);
     const vklady = pmt * st.roky * 12;
     const fee = getEntryFee(vklady, st.currentStrategy);
     addSection(secNum, st.label);
@@ -3068,7 +3093,10 @@ async function generatePDF(){
     addLine('Fond', s.fond);
     addLine('Horizont', st.roky+' rokov');
     addLine('Mesačná investícia', formatEUR(pmt), true);
+    addLine('Predpokladaná hodnota na konci', formatEUR(fv));
+    addLine('Cieľová suma (súčet vkladov)', formatEUR(vklady));
     if(fee) addLine('Vstupný poplatok', fee.pct+'% = '+formatEUR(fee.suma));
+    addNote('Poskytovateľ: Partners Investments — '+s.name+' stratégia');
     fpPdfItems.push({name:st.label, pmt});
     totalPdf += pmt;
     secNum++;
@@ -3106,30 +3134,64 @@ async function generatePDF(){
     y += 2;
   });
 
-  // Total summary
-  checkPage(30);
-  y += 5;
-  doc.setFillColor(236,237,237);
-  doc.rect(margin, y-5, contentW, 22, 'F');
+  // ── PREHĽAD INVESTÍCIÍ (tabuľka) ──
+  if(fpPdfItems.length > 1){
+    checkPage(15 + fpPdfItems.length * 6);
+    addSubtitle('Prehľad všetkých investícií');
+    fpPdfItems.forEach((item, i) => {
+      if(i % 2 === 0) addLineAlt(item.name, formatEUR(item.pmt)+'/mes');
+      else addLine(item.name, formatEUR(item.pmt)+'/mes');
+    });
+    addSeparator();
+  }
+
+  // Total summary box
+  checkPage(40);
+  y += 3;
+  doc.setFillColor(0,48,73);
+  doc.roundedRect(margin, y-5, contentW, 14, 2, 2, 'F');
+  doc.setTextColor(255,255,255);
   doc.setFontSize(12);
   setBold();
-  doc.text('Celková mesačná investícia:', margin+4, y+4);
-  doc.setTextColor(171,5,52);
+  doc.text('Celková mesačná investícia:', margin+6, y+4);
   doc.setFontSize(14);
-  doc.text(formatEUR(totalPdf), pageW-margin, y+4, {align:'right'});
+  doc.text(formatEUR(totalPdf), pageW-margin-4, y+4, {align:'right'});
   doc.setTextColor(0,48,73);
-  y += 8;
-  doc.setFontSize(9);
-  setNormal();
+  y += 14;
+
+  // Budget breakdown
   const poistne = calcPoistne();
   const splatka = parseFloat(document.getElementById('optim_splatka').value)||0;
   const volne = (cisty + pCisty2) - vydavky - splatka - totalPdf - poistne;
-  doc.text('Čistý príjem: '+formatEUR(cisty+pCisty2)+' | Výdavky: '+formatEUR(vydavky)+' | Investície: '+formatEUR(totalPdf), margin+4, y+4);
-  y += 5;
-  if(splatka > 0) doc.text('Splátka hypotéky: '+formatEUR(splatka), margin+4, y+4);
-  if(poistne > 0) doc.text((splatka>0?' | ':'')+'Poistné (odhad): '+formatEUR(poistne)+' | Voľné: '+formatEUR(volne), splatka>0?margin+60:margin+4, y+4);
-  else doc.text('Voľné prostriedky: '+formatEUR(volne), margin+4, y+(splatka>0?9:4));
-  y += 15;
+
+  checkPage(40);
+  addSubtitle('Mesačný rozpočet po nastavení finančného plánu');
+  addLine('Čistý mesačný príjem', formatEUR(cisty + pCisty2));
+  addLineAlt('Mesačné výdavky na život', formatEUR(vydavky));
+  if(splatka > 0) addLine('Splátka hypotéky', formatEUR(splatka));
+  addLineAlt('Investície podľa finančného plánu', formatEUR(totalPdf));
+  if(poistne > 0) addLine('Poistné (orientačný odhad)', formatEUR(poistne));
+
+  // Voľné prostriedky — highlighted
+  y += 1;
+  doc.setFillColor(volne >= 0 ? 234 : 252, volne >= 0 ? 245 : 234, volne >= 0 ? 234 : 234);
+  doc.roundedRect(margin, y-4, contentW, 9, 1.5, 1.5, 'F');
+  doc.setFontSize(10);
+  setBold();
+  doc.text('Voľné prostriedky:', margin+4, y+2);
+  doc.setTextColor(volne >= 0 ? 46 : 171, volne >= 0 ? 125 : 5, volne >= 0 ? 50 : 52);
+  doc.text(formatEUR(volne), pageW-margin, y+2, {align:'right'});
+  doc.setTextColor(0,48,73);
+  setNormal();
+  y += 10;
+
+  if(volne < 0){
+    addNote('Mesačné náklady presahujú dostupné prostriedky. Zvážte úpravu stratégie alebo cieľových súm.');
+  }
+  if(poistne > 0){
+    addNote('* Poistné je orientačný odhad. Presná suma bude stanovená na základe individuálnej ponuky.');
+  }
+  y += 3;
 
   // Zabezpečenie — klient + partner
   const zabItemsK = document.querySelectorAll('.fp-zab-k:checked');
@@ -3194,21 +3256,76 @@ async function generatePDF(){
   if(document.getElementById('fp_majetok').checked){
     checkPage(15);
     addSubtitle('Ochrana majetku');
-    addNote('Poistenie nehnuteľnosti: Uniqa, Colonnade, ČSOB poisťovňa, Allianz');
+    const hasPdf = document.getElementById('ch_poistenie_nehnut')?.checked;
+    if(hasPdf){
+      const pN = formatEUR(parseFloat(document.getElementById('majetok_ps_nehnut').value)||0);
+      const pD = formatEUR(parseFloat(document.getElementById('majetok_ps_domacnost').value)||0);
+      const rP = formatEUR(parseFloat(document.getElementById('majetok_rocne_poistne').value)||0);
+      const poist = document.getElementById('majetok_poistovna')?.value||'—';
+      addLine('Poisťovňa', poist);
+      addLine('PS nehnuteľnosť', pN);
+      addLine('PS domácnosť', pD);
+      addLine('Ročné poistné', rP);
+    } else {
+      addNote('Klient nemá poistenie nehnuteľnosti — odporúčame uzatvoriť poistenie na ochranu majetku.');
+    }
+    addNote('Poistenie nehnuteľnosti riešime cez: Uniqa, Colonnade, ČSOB poisťovňa, Allianz');
+    y += 2;
   }
+
+  // ── ČASOVÁ OS ── (timeline of goals)
+  {
+    const goals = collectGoals();
+    const timeGoalsPdf = goals.filter(g => g.date && g.date !== '—' && g.category !== 'zabezpecenie');
+    if(timeGoalsPdf.length > 0){
+      checkPage(15 + timeGoalsPdf.length * 6);
+      addSubtitle('Časová os finančných cieľov');
+      const thisYearPdf = new Date().getFullYear();
+      timeGoalsPdf.sort((a,b) => new Date(a.date)-new Date(b.date));
+      timeGoalsPdf.forEach((g, i) => {
+        const tYear = new Date(g.date).getFullYear();
+        const yrsFromNow = tYear - thisYearPdf;
+        const ageAtGoal = age + yrsFromNow;
+        const label = tYear+' — '+g.name+' (vek '+ageAtGoal+')';
+        if(i % 2 === 0) addLineAlt(label, formatEUR(g.suma));
+        else addLine(label, formatEUR(g.suma));
+      });
+      y += 3;
+    }
+  }
+
+  // Closing disclaimer
+  checkPage(25);
+  y += 5;
+  doc.setDrawColor(200,200,200);
+  doc.line(margin, y, pageW-margin, y);
+  y += 6;
+  doc.setFontSize(7);
+  doc.setTextColor(140,140,140);
+  setNormal();
+  const disclaimer = 'Tento finančný plán je informatívneho charakteru a nepredstavuje záväznú ponuku. Uvedené výnosy sú predpokladané a nezaručené — skutočné výnosy sa môžu líšiť. Pred podpisom zmluvy si dôkladne prečítajte štatút fondu a kľúčové informácie pre investorov. Minulé výnosy nie sú zárukou budúcich výnosov.';
+  const discLines = doc.splitTextToSize(disclaimer, contentW);
+  doc.text(discLines, margin, y);
+  y += discLines.length * 3 + 4;
+  doc.setTextColor(0,48,73);
+  doc.setFontSize(10);
 
   // Footer on each page
   const totalPages = doc.internal.getNumberOfPages();
   for(let p = 1; p <= totalPages; p++){
     doc.setPage(p);
-    const py = doc.internal.pageSize.getHeight() - 12;
+    const py = doc.internal.pageSize.getHeight() - 14;
     doc.setFillColor(0,48,73);
-    doc.rect(0, py - 2, pageW, 14, 'F');
+    doc.rect(0, py, pageW, 14, 'F');
+    // Red accent line above footer
+    doc.setFillColor(171,5,52);
+    doc.rect(0, py - 0.5, pageW, 0.5, 'F');
     doc.setTextColor(255,255,255);
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     setNormal();
-    doc.text('Mário Tišťan | Senior Consultant | Partners Group SK', pageW/2, py+4, {align:'center'});
-    doc.text('mario.tistan@partnersgroup.sk | +421 902 130 096 | www.mariotistan.sk', pageW/2, py+8, {align:'center'});
+    doc.text('Mário Tišťan | Senior Consultant | Partners Group SK', margin, py+5);
+    doc.text('mario.tistan@partnersgroup.sk | +421 902 130 096 | www.mariotistan.sk', margin, py+9);
+    doc.text('Strana '+p+' z '+totalPages, pageW-margin, py+7, {align:'right'});
   }
 
   doc.save('Financny_plan_'+meno.replace(/\s+/g,'_')+'_'+todayStr.replace(/\./g,'-')+'.pdf');
