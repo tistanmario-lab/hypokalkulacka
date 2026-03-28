@@ -1303,13 +1303,39 @@ function updateDochodok(){
   const roky = Math.max(0, dochVek - age);
   document.getElementById('doch_roky').value = roky;
 
+  const praca = document.getElementById('k_praca').value;
+  const isSzco = praca === 'szco';
+
   // Auto-fill state pension estimate
   if(parseFloat(document.getElementById('doch_statny').value)===0){
-    document.getElementById('doch_statny').value = Math.round(hruby * 0.5);
+    if(isSzco){
+      // SZČO platiaca z min. vymeriavacieho základu: minimálny dôchodok ~ 390 €/mes (2025)
+      document.getElementById('doch_statny').value = 390;
+    } else {
+      document.getElementById('doch_statny').value = Math.round(hruby * 0.5);
+    }
   }
   if(parseFloat(document.getElementById('doch_potrebny').value)===0){
     document.getElementById('doch_potrebny').value = Math.round(cisty);
   }
+
+  // SZČO info box
+  let szcoBox = document.getElementById('szcoDochodokInfo');
+  if(isSzco){
+    if(!szcoBox){
+      szcoBox = document.createElement('div');
+      szcoBox.id = 'szcoDochodokInfo';
+      szcoBox.className = 'info-box warning';
+      szcoBox.style.marginBottom = '16px';
+      const dochCard = document.getElementById('doch_statny').closest('.card');
+      dochCard.appendChild(szcoBox);
+    }
+    szcoBox.innerHTML = '<strong>SZČO — upozornenie k dôchodku:</strong><br>Ak platíte odvody z minimálneho vymeriavacieho základu (915 €/mes v roku 2026), váš štátny dôchodok bude výrazne nižší ako u zamestnanca.<br><br><strong>Minimálny dôchodok zo Sociálnej poisťovne:</strong> cca <strong>390 €/mes</strong> (pri 30+ rokoch poistenia, rok 2025).<br><strong>Priemerný dôchodok (SR):</strong> cca 660 €/mes.<br><br>Pre SZČO je preto ešte dôležitejšie zabezpečiť si dôchodok cez <strong>III. pilier (DDS)</strong> a <strong>vlastné investície</strong>, aby ste si zachovali životný štandard.';
+    szcoBox.style.display = 'block';
+  } else {
+    if(szcoBox) szcoBox.style.display = 'none';
+  }
+
   calcDochodok();
 }
 
@@ -2870,7 +2896,10 @@ async function generatePDF(){
   addSection(1, 'Osobné údaje');
   addLine('Meno', meno);
   addLine('Vek', age+' rokov');
-  addLine('Hrubý príjem', formatEUR(parseFloat(document.getElementById('k_hruby').value)||0));
+  const pracaVal = document.getElementById('k_praca').value||'zamestnanec';
+  const pracaLabels = {zamestnanec:'Zamestnanec', szco:'SZČO', materska:'Materská dovolenka', ine:'Iné'};
+  addLine('Pracovný status', pracaLabels[pracaVal]||pracaVal);
+  addLine('Hrubý príjem', formatEUR(parseFloat(document.getElementById('k_hruby').value)||0) + (pracaVal==='szco' ? ' (min. vymeriavací základ)' : ''));
   addLine('Čistý príjem', formatEUR(cisty));
   if(clientType==='pair'){
     const pm = (document.getElementById('p_meno').value+' '+document.getElementById('p_priezvisko').value).trim();
@@ -2913,6 +2942,9 @@ async function generatePDF(){
   addLine('Štátny dôchodok', formatEUR(parseFloat(document.getElementById('doch_statny').value)||0)+'/mes');
   addLine('Želaný dôchodok', formatEUR(parseFloat(document.getElementById('doch_potrebny').value)||0)+'/mes');
   addLine('Medzera', formatEUR(parseFloat(document.getElementById('doch_medzera').value)||0)+'/mes', true);
+  if(pracaVal === 'szco'){
+    addNote('SZČO: Minimálny dôchodok zo Sociálnej poisťovne pri odvodzoch z min. vymeriavacieho základu (915 €/mes) je cca 390 €/mes. Pre SZČO je kľúčové zabezpečiť si dôchodok cez III. pilier (DDS) a vlastné investície.');
+  }
   y += 3;
 
   addSection(5, 'Deti');
