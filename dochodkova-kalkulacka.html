@@ -149,11 +149,11 @@ header>div:first-child{order:1}
 header>div:last-child{order:2}
 .logo-title{font-size:11px;margin-left:8px}
 .pg-label{display:none}
-.main{padding:12px 8px;gap:12px}
+.main{padding:8px 10px;gap:10px}
 .panel{padding:16px 12px}
 .field-row{flex-wrap:wrap;gap:4px}
 .field-lbl{font-size:9px}
-.num-input{width:90px;font-size:10px;padding:4px 6px}
+.num-input{width:80px;font-size:10px;padding:4px 6px}
 .info-row{font-size:9px;padding:6px 10px;flex-wrap:wrap;gap:4px}
 .splatka-card{padding:16px}
 .splatka-val{font-size:28px}
@@ -180,38 +180,15 @@ footer{font-size:8px;padding:16px 10px}
 .delay-value{font-size:11px;text-align:right}
 .delay-panel{padding:12px;overflow:hidden}
 .delay-item{flex-wrap:nowrap;gap:4px}
-.main{padding:8px 10px;gap:10px}
 .panel,.delay-panel,.compare-grid,.outcome-panel,.splatka-card{max-width:100%;overflow:hidden}
-.field-row{flex-wrap:wrap;gap:4px}
-.field-lbl{font-size:9px}
-.num-input{width:80px;font-size:10px;padding:4px 6px}
-.info-row{font-size:9px;padding:6px 10px;flex-wrap:wrap;gap:4px}
 .gap-card{padding:16px 12px;margin:0;box-sizing:border-box;max-width:100%}
 .gap-amount{font-size:28px}
 .gap-sub{font-size:9px}
 .gap-bar-container{flex-wrap:wrap;gap:4px}
 .gap-bar-label{font-size:7px}
 .splatka-card{padding:16px 12px;box-sizing:border-box;max-width:100%}
-header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding-top:8px;padding-bottom:8px}
-.logo-title{font-size:11px;margin-left:8px}
-.pg-label{display:none}
-.panel{padding:16px 12px}
 }
 </style>
-<!-- JSON-LD Structured Data -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "DôchodKalkulačka+",
-  "description": "Dôchodková kalkulačka — zistite, koľko potrebujete investovať na dôchodok a aká bude medzera vo vašom príjme.",
-  "url": "https://www.mariotistan.sk/dochodkova-kalkulacka.html",
-  "applicationCategory": "FinanceApplication",
-  "operatingSystem": "Web",
-  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
-  "author": {"@type": "Person", "name": "Mário Tišťan", "url": "https://www.mariotistan.sk"}
-}
-</script>
 </head>
 <body>
 
@@ -520,7 +497,7 @@ header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding
         <input type="checkbox" id="pdfGdpr">
         <label for="pdfGdpr">S&#250;hlas&#237;m so spracovan&#237;m osobn&#253;ch &#250;dajov pod&#318;a <a href="ochrana-udajov.html" target="_blank" rel="noopener">GDPR</a> za &#250;&#269;elom zaslania v&#253;po&#269;tu a pr&#237;padnej konzult&#225;cie.</label>
       </div>
-      <button class="pdf-modal-btn" id="pdfSubmitBtn" onclick="submitPdfForm()">Odosla&#357; a stiahnu&#357; PDF</button>
+      <button class="pdf-modal-btn" id="pdfSubmitBtn" onclick="submitPdfForm()" disabled>Odosla&#357; a stiahnu&#357; PDF</button>
     </div>
     <div class="pdf-modal-success" id="pdfModalSuccess" style="display:none">
       <div style="font-size:32px;margin-bottom:12px">&#10004;</div>
@@ -822,6 +799,16 @@ function closePdfModal(){
   document.getElementById('pdfModal').classList.remove('show');
 }
 
+function checkModalForm(){
+  var email=document.getElementById('pdfEmail').value.trim();
+  var gdpr=document.getElementById('pdfGdpr').checked;
+  document.getElementById('pdfSubmitBtn').disabled=!(email&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)&&gdpr);
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('pdfEmail').addEventListener('input',checkModalForm);
+  document.getElementById('pdfGdpr').addEventListener('change',checkModalForm);
+});
+
 function submitPdfForm(){
   var email=document.getElementById('pdfEmail').value.trim();
   var gdpr=document.getElementById('pdfGdpr').checked;
@@ -905,7 +892,11 @@ function submitPdfForm(){
           '<div style="font-size:20px;font-weight:800;color:#AB0534;">'+fmt(neededMonthly)+'</div>'+
         '</div>'+
       '</div>'+
-      '<div style="text-align:center;padding:16px 0;font-size:11px;color:rgba(0,48,73,0.4);">Kontakt: mario.tistan@partnersgroup.sk · mariotistan.sk</div>'+
+      '<div style="background:rgba(0,48,73,0.03);padding:20px 36px;font-size:10px;color:rgba(0,48,73,0.4);line-height:1.6;">'+
+        '<div>Tento výpočet je orientačný a nenahrádza individuálnu konzultáciu.</div>'+
+        '<div>Kontakt: mario.tistan@partnersgroup.sk | +421 902 130 096 | mariotistan.sk</div>'+
+        '<div>Podriadený finančný agent Partners Group SK s.r.o. · Registrácia NBS č. 221967</div>'+
+      '</div>'+
     '</div>';
 
   document.body.appendChild(div);
@@ -913,7 +904,7 @@ function submitPdfForm(){
   html2canvas(div,{scale:2,useCORS:true,backgroundColor:'#fff'}).then(function(canvas){
     document.body.removeChild(div);
     var imgData=canvas.toDataURL('image/png');
-    var pdf=new jspdf.jsPDF('p','mm','a4');
+    var pdf=new window.jspdf.jsPDF('p','mm','a4');
     var pdfW=pdf.internal.pageSize.getWidth();
     var pdfH=canvas.height*pdfW/canvas.width;
     pdf.addImage(imgData,'PNG',0,0,pdfW,pdfH);
