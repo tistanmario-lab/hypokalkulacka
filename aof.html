@@ -2172,25 +2172,25 @@ function recalcFPTotal(){
 }
 
 function calcPoistne(){
-  // Estimate monthly insurance cost from all checked zabezpečenie items
-  // Poistné sa upresní v ponuke, tu je orientačný odhad pre rozpočet
-  let mesacnePoistne = 0;
-  const allChecked = [...document.querySelectorAll('.fp-zab-k:checked'), ...(clientType==='pair'?document.querySelectorAll('.fp-zab-p:checked'):[])];
-  allChecked.forEach(cb => {
-    const suma = parseFloat(cb.dataset.suma)||0;
-    const name = cb.dataset.name||'';
-    if(name.includes('Úmrtie')){
-      // Jednorazové krytie: orientačne ~0.05-0.1% poistnej sumy mesačne
-      mesacnePoistne += Math.round(suma * 0.0006); // ~0.06% mesačne
-    } else {
-      // Mesačné krytie: orientačne ~3-5% z krytej sumy
-      mesacnePoistne += Math.round(suma * 0.04);
-    }
-  });
-  // Poistenie majetku (ročné poistné / 12)
+  // Orientačný odhad poistného: 5% z čistého príjmu + 2,5% navyše ak má hypotéku
+  // Poistné sa upresní v individuálnej ponuke
+  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
+  const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
+  const celkovyPrijem = cisty + pCisty;
+  let mesacnePoistne = Math.round(celkovyPrijem * 0.05);
+
+  // Ak má hypotéku alebo plánuje hypotéku, navýšenie o ~2,5%
+  const maHypoteku = document.querySelector('input[name="byvanie_aktualne"][value="hypoteka"]')?.checked;
+  const planujeUver = document.getElementById('byv_sposob')?.value === 'uver' || document.getElementById('byv_sposob')?.value === 'kombinacia';
+  const optimHypoteka = document.getElementById('ch_optim')?.checked;
+  if(maHypoteku || planujeUver || optimHypoteka){
+    mesacnePoistne += Math.round(celkovyPrijem * 0.025);
+  }
+
+  // Poistenie majetku (ročné poistné / 12) — ak je zadané konkrétne
   if(document.getElementById('fp_majetok')?.checked){
     const rocnePoistne = parseFloat(document.getElementById('majetok_rocne_poistne')?.value)||0;
-    mesacnePoistne += Math.round(rocnePoistne / 12);
+    if(rocnePoistne > 0) mesacnePoistne += Math.round(rocnePoistne / 12);
   }
   return mesacnePoistne;
 }
