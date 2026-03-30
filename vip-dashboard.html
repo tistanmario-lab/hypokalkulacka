@@ -272,29 +272,21 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
   <h2 class="vip-section-title">Nástroje</h2>
   <div class="vip-grid">
 
-    <!-- Analýza osobných financií -->
+    <!-- Analýza osobných financií + Finančný plán -->
     <a href="aof.html" class="vip-card">
       <div class="vip-card-icon"><i data-lucide="clipboard-list"></i></div>
-      <h3>Analýza osobných financií</h3>
-      <p>Komplexný prehľad príjmov, výdavkov, majetku a záväzkov klienta. Základ pre finančný plán.</p>
-      <span class="vip-card-status status-active">Aktívne</span>
-    </a>
-
-    <!-- Generátor finančného plánu -->
-    <a href="aof.html" class="vip-card">
-      <div class="vip-card-icon"><i data-lucide="bar-chart-3"></i></div>
-      <h3>Generátor finančného plánu</h3>
-      <p>Súčasť AOF — na konci analýzy vygenerujete PDF finančný plán s odporúčaniami.</p>
+      <h3>AOF — Analýza &amp; Finančný plán</h3>
+      <p>10-krokový proces — komplexná analýza klienta, interaktívny finančný plán a export do PDF.</p>
       <span class="vip-card-status status-active">Aktívne</span>
     </a>
 
     <!-- Porovnávač produktov -->
-    <a href="#" class="vip-card" onclick="alert('Nástroj sa pripravuje. Čoskoro bude dostupný!');return false;">
+    <div class="vip-card" style="cursor:default;opacity:0.55;">
       <div class="vip-card-icon"><i data-lucide="search"></i></div>
       <h3>Porovnávač produktov</h3>
       <p>Porovnanie hypotekárnych, investičných a poistných produktov naprieč partnermi.</p>
-      <span class="vip-card-status status-planned">Plánované</span>
-    </a>
+      <span class="vip-card-status status-planned">Čoskoro</span>
+    </div>
 
     <!-- Existujúce kalkulačky -->
     <a href="hypokalkulacka.html" class="vip-card">
@@ -353,6 +345,18 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
 // Display username
 var userName = sessionStorage.getItem('vip_user') || 'Používateľ';
 document.getElementById('vipUserName').textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
+
+// Stats from localStorage
+(function(){
+  var count = 0;
+  for(var i = 0; i < localStorage.length; i++){
+    if(localStorage.key(i).startsWith('aof_')) count++;
+  }
+  if(count > 0){
+    document.getElementById('statClients').textContent = count;
+    document.getElementById('statPlans').textContent = count;
+  }
+})();
 
 // Logout
 function doLogout() {

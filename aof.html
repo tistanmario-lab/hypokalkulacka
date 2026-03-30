@@ -522,7 +522,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       </div>
       <input type="hidden" id="rez_mesacna" value="0">
       <div id="rez_plan_info" style="display:none;"></div>
-      <div class="check-row"><input type="checkbox" id="fp_rezervy"> Zaradiť do finančného plánu</div>
+      <div class="check-row"><input type="checkbox" id="fp_rezervy" checked> Zaradiť do finančného plánu</div>
     </div>
 
     <div class="card">
@@ -631,7 +631,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
         <strong>Sociálna poisťovňa:</strong> Orientačná výška dôchodku sa počíta ako cca 50 % z hrubého príjmu. Pre presné informácie navštívte portál Sociálnej poisťovne.
       </div>
 
-      <div class="check-row"><input type="checkbox" id="fp_dochodok"> Zaradiť do finančného plánu</div>
+      <div class="check-row"><input type="checkbox" id="fp_dochodok" checked> Zaradiť do finančného plánu</div>
     </div>
 
     <div class="card">
@@ -709,7 +709,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
         <input type="text" id="majetok_aktualizacia" placeholder="dátum alebo Neviem">
       </div>
       <div class="info-box">Poistenie nehnuteľnosti riešime cez: <strong>Uniqa, Colonnade, ČSOB poisťovňa, Allianz</strong></div>
-      <div class="check-row"><input type="checkbox" id="fp_majetok"> Zaradiť do finančného plánu</div>
+      <div class="check-row"><input type="checkbox" id="fp_majetok" checked> Zaradiť do finančného plánu</div>
     </div>
 
     <div class="card">
@@ -739,7 +739,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
         <button class="btn-add" onclick="addCiel()">+ Pridať cieľ</button>
         <button class="btn-add" onclick="addCielHypoteka()" style="border-color:var(--red);color:var(--red);">+ Rýchlejšie splatenie hypotéky</button>
       </div>
-      <div class="check-row" style="margin-top:16px;"><input type="checkbox" id="fp_ciele"> Zaradiť do finančného plánu</div>
+      <div class="check-row" style="margin-top:16px;"><input type="checkbox" id="fp_ciele" checked> Zaradiť do finančného plánu</div>
     </div>
 
     <div class="card">
@@ -1021,6 +1021,11 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       <div class="card" style="margin-top:20px;">
         <div class="card-title">Časová os finančného plánu</div>
         <div id="fpTimeline"></div>
+      </div>
+
+      <!-- FP: Disclaimer -->
+      <div style="margin-top:20px;padding:12px 16px;background:#f8f8f8;border-radius:8px;border:1px solid #e0e0e0;">
+        <p style="font-size:11px;color:#7a7a7a;margin:0;line-height:1.6;">Tento finančný plán je informatívneho charakteru a nepredstavuje záväznú ponuku. Uvedené výnosy sú predpokladané a nezaručené — skutočné výnosy sa môžu líšiť. Pred podpisom zmluvy si dôkladne prečítajte štatút fondu a kľúčové informácie pre investorov. Minulé výnosy nie sú zárukou budúcich výnosov.</p>
       </div>
 
     </div>
