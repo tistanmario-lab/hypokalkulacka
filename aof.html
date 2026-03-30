@@ -437,7 +437,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group"><label>Zostatok na hypotéke (€)</label><input type="number" id="optim_zostatok" value="0" min="0"></div>
+              <div class="form-group"><label>Zostatok na hypotéke (€)</label><input type="number" id="optim_zostatok" value="0" min="0" oninput="calcPreplatenie()"></div>
               <div class="form-group"><label>Aktuálna úroková sadzba (%)</label><input type="number" id="optim_urok" value="0" min="0" step="0.01"></div>
             </div>
             <div class="form-row">
@@ -446,7 +446,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
                 <select id="optim_fixacia"><option value="1">1 rok</option><option value="2">2 roky</option><option value="3">3 roky</option><option value="5" selected>5 rokov</option><option value="10">10 rokov</option></select>
               </div>
               <div class="form-group"><label>Koniec fixácie (dátum)</label><input type="date" id="optim_fixacia_datum"></div>
-              <div class="form-group"><label>Zostávajúca doba splácania (rokov)</label><input type="number" id="optim_doba" value="0" min="0"></div>
+              <div class="form-group"><label>Zostávajúca doba splácania (rokov)</label><input type="number" id="optim_doba" value="0" min="0" oninput="calcPreplatenie()"></div>
               <div class="form-group"><label>Mesačná splátka (€)</label><input type="number" id="optim_splatka" value="0" min="0"></div>
             </div>
           </div>
@@ -458,7 +458,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
           <div class="form-group"><label>Potrebné financovanie (€)</label><input type="number" id="byv_financovanie" class="computed" readonly></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Očakávaná preplácaná (€)</label><input type="number" id="byv_preplacana" value="0" min="0"></div>
+          <div class="form-group"><label>Očakávané preplatenie (€)</label><input type="number" id="byv_preplacana" value="0" class="computed" readonly></div>
           <div class="form-group"><label>Počet izieb</label><input type="number" id="byv_izby" min="1" value="3"></div>
           <div class="form-group"><label>Lokalita</label><input type="text" id="byv_lokalita" placeholder="napr. Bratislava"></div>
           <div class="form-group"><label>Časový horizont</label><input type="date" id="byv_horizont"></div>
@@ -1201,6 +1201,26 @@ function calcFinancovanie(){
   const h = parseFloat(document.getElementById('byv_hodnota').value)||0;
   const c = parseFloat(document.getElementById('byv_hotovost').value)||0;
   document.getElementById('byv_financovanie').value = Math.max(0, h-c);
+  calcPreplatenie();
+}
+
+function calcPreplatenie(){
+  // Výpočet očakávaného preplatenia pri priemernej sadzbe 3,5% p.a. počas celej doby splácania
+  const zostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
+  const roky = parseFloat(document.getElementById('optim_doba').value)||0;
+  if(zostatok <= 0 || roky <= 0){
+    document.getElementById('byv_preplacana').value = 0;
+    return;
+  }
+  const rocnaSadzba = 0.035; // 3,5% priemerná sadzba
+  const mesacnaSadzba = rocnaSadzba / 12;
+  const pocetMesiacov = roky * 12;
+  // Anuitná splátka: M = P * [r(1+r)^n] / [(1+r)^n - 1]
+  const mocnina = Math.pow(1 + mesacnaSadzba, pocetMesiacov);
+  const mesacnaSplatka = zostatok * (mesacnaSadzba * mocnina) / (mocnina - 1);
+  const celkovaZaplatena = mesacnaSplatka * pocetMesiacov;
+  const preplatenie = Math.round(celkovaZaplatena - zostatok);
+  document.getElementById('byv_preplacana').value = preplatenie;
 }
 
 function toggleNajom(){
