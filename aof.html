@@ -1003,7 +1003,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       <div class="card" style="margin-top:20px;">
         <div class="card-title">Prehľad investícií — Celkový mesačný náklad</div>
         <table class="dyn-table" id="fpStrategieTable">
-          <thead><tr><th>Program</th><th>Cieľ</th><th>Horizont</th><th>Stratégia</th><th>Zhodnotenie</th><th>Mesačná investícia</th><th>Poskytovateľ</th></tr></thead>
+          <thead><tr><th>Program</th><th>Cieľ</th><th>Horizont</th><th>Stratégia</th><th>Zhodnotenie</th><th>Mesačná investícia</th><th>Nominálna hodnota</th><th>Reálna hodnota</th><th>Poskytovateľ</th></tr></thead>
           <tbody id="fpStrategieBody"></tbody>
           <tfoot id="fpStrategieFoot"></tfoot>
         </table>
@@ -1013,6 +1013,11 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       <div class="card" style="margin-top:20px;">
         <div class="card-title">Rast investičného portfólia v čase</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Predpokladaný vývoj celkovej hodnoty vašich investícií podľa aktuálneho nastavenia finančného plánu</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="fp-strat-btn active-konz" id="btnChartNom" onclick="togglePortfolioView('nominal')">Nominálne hodnoty</button>
+          <button class="fp-strat-btn" id="btnChartReal" onclick="togglePortfolioView('real')">Reálne hodnoty (−2,5 % inflácia)</button>
+          <button class="fp-strat-btn" id="btnChartBoth" onclick="togglePortfolioView('both')">Porovnanie</button>
+        </div>
         <div class="chart-container" style="height:320px;"><canvas id="chartPortfolioGrowth"></canvas></div>
         <div id="fpMilestones" style="margin-top:16px;"></div>
       </div>
@@ -1032,7 +1037,8 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
 
     <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
       <button class="btn btn-red" onclick="generatePDF()">Generovať PDF</button>
-      <button class="btn btn-primary" onclick="saveAOF()">Uložiť AOF</button>
+      <button class="btn btn-primary" onclick="openPresentation()">Otvoriť prezentáciu</button>
+      <button class="btn btn-outline" onclick="saveAOF()">Uložiť AOF</button>
     </div>
 
     <div class="step-nav">
@@ -1903,6 +1909,11 @@ const STRATEGIES = {
   dynamicka:     {key:'dynamicka', name:'Dynamická',     rate:0.08, badge:'dyn',  desc:'Vyššie riziko, vyšší potenciál rastu', fond:'Partners Dynamický fond', typ:'Akciový fond (globálne akcie)'}
 };
 
+const INFLATION_RATE = 0.025;
+function calcRealValue(nominal, years){
+  return Math.round(nominal / Math.pow(1 + INFLATION_RATE, years));
+}
+
 function getStrategy(years){
   if(years >= 10) return STRATEGIES.dynamicka;
   if(years >= 5) return STRATEGIES.vyvazena;
@@ -2285,7 +2296,9 @@ function buildProgramDetail(programId, state, strat, pmt, fv){
   html += `<div class="fp-rec-row"><span>Horizont</span><span>${state.roky} rokov (${state.roky*12} mesiacov)</span></div>`;
   html += `<div class="fp-rec-row"><span>Predpokladané zhodnotenie</span><span>${Math.round(strat.rate*100)} % p.a.</span></div>`;
   html += `<div class="fp-rec-row"><span><strong>Odporúčaná mesačná investícia</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(pmt)}</strong></span></div>`;
-  html += `<div class="fp-rec-row"><span>Predpokladaná hodnota na konci</span><span>${formatEUR(fv)}</span></div>`;
+  html += `<div class="fp-rec-row"><span>Predpokladaná hodnota (nominálne)</span><span>${formatEUR(fv)}</span></div>`;
+  const realFV = calcRealValue(fv, state.roky);
+  html += `<div class="fp-rec-row" style="background:rgba(0,48,73,0.02);border-radius:6px;padding:4px 0;"><span>Reálna hodnota (dnešné €, −2,5 % inflácia)</span><span style="color:var(--muted);font-weight:600;">${formatEUR(realFV)}</span></div>`;
 
   // Fee calculation — cieľová suma = súčet vkladov (PMT × mesiace), nie cieľ po zhodnotení
   const cielovaSumaVkladov = pmt * state.roky * 12;
@@ -2427,6 +2440,28 @@ function buildFinancialPlan(){
     html += `<div id="fpDetail_dochodok">`;
     html += buildProgramDetail('dochodok', fpState['dochodok'], strat, dochPmt, dochFV);
     html += '</div>';
+
+    // Kúpna sila na dôchodku
+    if(cielSuma > 0){
+      const realDochFV = calcRealValue(dochFV, roky);
+      const nomMes = Math.round(dochFV / (20 * 12));
+      const realMes = Math.round(realDochFV / (20 * 12));
+      html += '<div style="margin-top:20px;padding:16px;background:linear-gradient(135deg,rgba(0,48,73,0.03),rgba(171,5,52,0.03));border-radius:12px;border:1px solid var(--border);">';
+      html += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;">Kúpna sila na dôchodku (vo veku '+dochVek+')</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
+      html += '<div style="text-align:center;padding:12px;background:#fff;border-radius:10px;border:1px solid var(--border);">';
+      html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Nominálna hodnota</div>';
+      html += `<div style="font-size:22px;font-weight:700;color:var(--navy);margin:6px 0;">${formatEUR(dochFV)}</div>`;
+      html += `<div style="font-size:12px;color:var(--muted);">= ${formatEUR(nomMes)}/mes na 20 rokov</div>`;
+      html += '</div>';
+      html += '<div style="text-align:center;padding:12px;background:#fff;border-radius:10px;border:1px solid var(--border);">';
+      html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Reálna hodnota (dnešné €)</div>';
+      html += `<div style="font-size:22px;font-weight:700;color:var(--red);margin:6px 0;">${formatEUR(realDochFV)}</div>`;
+      html += `<div style="font-size:12px;color:var(--muted);">= ${formatEUR(realMes)}/mes na 20 rokov</div>`;
+      html += '</div></div>';
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;">Reálna hodnota ukazuje kúpnu silu v dnešných cenách — čo si za tieto peniaze budete vedieť dovoliť. Počítané s priemernou infláciou 2,5 % ročne.</div>';
+      html += '</div>';
+    }
 
     document.getElementById('fpDochodok').innerHTML = html;
     if(cielSuma > 0) totalMesacne += dochPmt;
@@ -2654,12 +2689,14 @@ function buildFinancialPlan(){
     if(state.type !== 'invest') return;
     const s = STRATEGIES[state.currentStrategy];
     const pmt = calcPMT(state.cielSuma, s.rate, state.roky);
+    const fv = calcFV(pmt, s.rate, state.roky);
+    const realFv = calcRealValue(fv, state.roky);
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${state.label}</td><td>${formatEUR(state.cielSuma)}</td><td>${state.roky} r.</td><td><span class="strat-badge ${s.badge}">${s.name}</span></td><td>${Math.round(s.rate*100)} %</td><td class="fp-rec-highlight">${formatEUR(pmt)}</td><td>Partners Investments</td>`;
+    tr.innerHTML = `<td>${state.label}</td><td>${formatEUR(state.cielSuma)}</td><td>${state.roky} r.</td><td><span class="strat-badge ${s.badge}">${s.name}</span></td><td>${Math.round(s.rate*100)} %</td><td class="fp-rec-highlight">${formatEUR(pmt)}</td><td>${formatEUR(fv)}</td><td style="color:var(--muted);">${formatEUR(realFv)}</td><td>Partners Investments</td>`;
     tbody.appendChild(tr);
   });
   const tfoot = document.getElementById('fpStrategieFoot');
-  tfoot.innerHTML = `<tr><td colspan="5" style="text-align:right;">Celková mesačná investícia:</td><td class="fp-rec-highlight">${formatEUR(totalMesacne)}</td><td></td></tr>`;
+  tfoot.innerHTML = `<tr><td colspan="5" style="text-align:right;">Celková mesačná investícia:</td><td class="fp-rec-highlight">${formatEUR(totalMesacne)}</td><td colspan="3"></td></tr>`;
 
   // ── ROZPOČET ──
   updateFPBudget(totalMesacne);
@@ -2671,6 +2708,10 @@ function buildFinancialPlan(){
   const origHTML = document.getElementById('timelineContainer').innerHTML;
   document.getElementById('fpTimeline').innerHTML = origHTML || '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
 }
+
+// Portfolio chart state for toggle
+let _portfolioData = null;
+let _portfolioView = 'nominal';
 
 function buildPortfolioChart(){
   const age = parseInt(document.getElementById('k_vek').value)||30;
@@ -2695,6 +2736,7 @@ function buildPortfolioChart(){
   // Simulate year by year
   const labels = [];
   const totalValues = [];
+  const realValues = [];
   const depositValues = [];
   const milestoneYears = [1, 2, 3, 5, 10, 15, 20, 25, 30, 35];
   const milestones = [];
@@ -2705,67 +2747,98 @@ function buildPortfolioChart(){
     let totalDep = 0;
 
     programs.forEach(p => {
-      if(yr <= p.roky){
-        // Still investing
-        const months = yr * 12;
-        const r = p.rate / 12;
-        let val = 0;
-        if(r > 0) val = p.pmt * (Math.pow(1+r, months) - 1) / r;
-        else val = p.pmt * months;
-        totalVal += val;
-        totalDep += p.pmt * months;
-      } else {
-        // Reached goal — full value stays (or was redeemed)
-        const months = p.roky * 12;
-        const r = p.rate / 12;
-        let val = 0;
-        if(r > 0) val = p.pmt * (Math.pow(1+r, months) - 1) / r;
-        else val = p.pmt * months;
-        totalVal += val;
-        totalDep += p.pmt * months;
-      }
+      const yrs = Math.min(yr, p.roky);
+      const months = yrs * 12;
+      const r = p.rate / 12;
+      let val = 0;
+      if(r > 0) val = p.pmt * (Math.pow(1+r, months) - 1) / r;
+      else val = p.pmt * months;
+      totalVal += val;
+      totalDep += p.pmt * months;
     });
 
     totalValues.push(Math.round(totalVal));
+    realValues.push(calcRealValue(Math.round(totalVal), yr));
     depositValues.push(Math.round(totalDep));
 
     if(milestoneYears.includes(yr) && yr <= maxYears){
-      milestones.push({yr, year:thisYear+yr, age:age+yr, value:Math.round(totalVal), deposits:Math.round(totalDep), profit:Math.round(totalVal-totalDep)});
+      const realVal = calcRealValue(Math.round(totalVal), yr);
+      milestones.push({yr, year:thisYear+yr, age:age+yr, value:Math.round(totalVal), realValue:realVal, deposits:Math.round(totalDep), profit:Math.round(totalVal-totalDep)});
     }
   }
 
-  // Build chart
+  // Store for toggle
+  _portfolioData = {labels, totalValues, realValues, depositValues, milestones, age};
+  _portfolioView = 'nominal';
+
+  // Reset toggle buttons
+  document.getElementById('btnChartNom').className = 'fp-strat-btn active-konz';
+  document.getElementById('btnChartReal').className = 'fp-strat-btn';
+  document.getElementById('btnChartBoth').className = 'fp-strat-btn';
+
+  renderPortfolioChart('nominal');
+}
+
+function togglePortfolioView(mode){
+  _portfolioView = mode;
+  document.getElementById('btnChartNom').className = 'fp-strat-btn' + (mode==='nominal'?' active-konz':'');
+  document.getElementById('btnChartReal').className = 'fp-strat-btn' + (mode==='real'?' active-dyn':'');
+  document.getElementById('btnChartBoth').className = 'fp-strat-btn' + (mode==='both'?' active-vyv':'');
+  renderPortfolioChart(mode);
+}
+
+function renderPortfolioChart(mode){
+  if(!_portfolioData) return;
+  const {labels, totalValues, realValues, depositValues, milestones, age} = _portfolioData;
+
+  const datasets = [];
+
+  if(mode === 'nominal' || mode === 'both'){
+    datasets.push({
+      label:'Nominálna hodnota',
+      data:totalValues,
+      borderColor:'#AB0534',
+      backgroundColor: mode==='both' ? 'transparent' : 'rgba(171,5,52,0.08)',
+      fill: mode!=='both',
+      borderWidth:2.5,
+      pointRadius:0,
+      pointHoverRadius:5,
+      tension:0.3
+    });
+  }
+
+  if(mode === 'real' || mode === 'both'){
+    datasets.push({
+      label:'Reálna hodnota (dnešné €)',
+      data:realValues,
+      borderColor: mode==='real' ? '#AB0534' : '#e65100',
+      backgroundColor: mode==='real' ? 'rgba(171,5,52,0.08)' : 'transparent',
+      fill: mode==='real',
+      borderWidth:2.5,
+      borderDash: mode==='both' ? [6,3] : [],
+      pointRadius:0,
+      pointHoverRadius:5,
+      tension:0.3
+    });
+  }
+
+  datasets.push({
+    label:'Vaše vklady',
+    data:depositValues,
+    borderColor:'#003049',
+    backgroundColor:'rgba(0,48,73,0.05)',
+    fill:true,
+    borderWidth:2,
+    borderDash:[5,3],
+    pointRadius:0,
+    pointHoverRadius:5,
+    tension:0.3
+  });
+
   if(chartPortfolioInst) chartPortfolioInst.destroy();
   chartPortfolioInst = new Chart(document.getElementById('chartPortfolioGrowth'),{
     type:'line',
-    data:{
-      labels,
-      datasets:[
-        {
-          label:'Hodnota portfólia',
-          data:totalValues,
-          borderColor:'#AB0534',
-          backgroundColor:'rgba(171,5,52,0.08)',
-          fill:true,
-          borderWidth:2.5,
-          pointRadius:0,
-          pointHoverRadius:5,
-          tension:0.3
-        },
-        {
-          label:'Vaše vklady',
-          data:depositValues,
-          borderColor:'#003049',
-          backgroundColor:'rgba(0,48,73,0.05)',
-          fill:true,
-          borderWidth:2,
-          borderDash:[5,3],
-          pointRadius:0,
-          pointHoverRadius:5,
-          tension:0.3
-        }
-      ]
-    },
+    data:{labels, datasets},
     options:{
       responsive:true,
       maintainAspectRatio:false,
@@ -2779,7 +2852,10 @@ function buildPortfolioChart(){
             afterBody: ctx => {
               const i = ctx[0].dataIndex;
               const profit = totalValues[i] - depositValues[i];
-              return 'Zhodnotenie: +'+formatEUR(profit);
+              const lines = ['Zhodnotenie: +'+formatEUR(profit)];
+              if(mode === 'nominal') lines.push('Reálna hodnota: '+formatEUR(realValues[i]));
+              if(mode === 'real') lines.push('Nominálna hodnota: '+formatEUR(totalValues[i]));
+              return lines;
             }
           }
         }
@@ -2798,13 +2874,19 @@ function buildPortfolioChart(){
   });
 
   // Build milestones cards
-  let mHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">';
+  const showReal = (mode === 'real' || mode === 'both');
+  let mHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">';
   milestones.forEach(m => {
     const profitPct = m.deposits > 0 ? Math.round(m.profit / m.deposits * 100) : 0;
     mHtml += `<div style="background:rgba(0,48,73,0.03);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;">`;
     mHtml += `<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Po ${m.yr} ${m.yr===1?'roku':'rokoch'}</div>`;
     mHtml += `<div style="font-size:11px;color:var(--muted);">vek ${m.age} · rok ${m.year}</div>`;
-    mHtml += `<div style="font-size:18px;font-weight:700;color:var(--red);margin:6px 0;">${formatEUR(m.value)}</div>`;
+    if(mode !== 'real'){
+      mHtml += `<div style="font-size:18px;font-weight:700;color:var(--red);margin:6px 0;">${formatEUR(m.value)}</div>`;
+    }
+    if(showReal || mode === 'real'){
+      mHtml += `<div style="font-size:${mode==='real'?'18':'13'}px;font-weight:${mode==='real'?'700':'600'};color:${mode==='real'?'var(--red)':'var(--muted)'};${mode==='real'?'margin:6px 0;':'margin-top:2px;'}">${mode!=='real'?'reálne: ':''}${formatEUR(m.realValue)}</div>`;
+    }
     mHtml += `<div style="font-size:11px;color:var(--muted);">vklady: ${formatEUR(m.deposits)}</div>`;
     mHtml += `<div style="font-size:11px;color:var(--green);font-weight:600;">+${formatEUR(m.profit)} (${profitPct>0?'+':''}${profitPct}%)</div>`;
     mHtml += '</div>';
@@ -2821,6 +2903,78 @@ function arrayBufferToBase64(buffer){
   const bytes = new Uint8Array(buffer);
   for(let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
   return btoa(binary);
+}
+
+function openPresentation(){
+  buildFinancialPlan();
+  const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Klient';
+  const planContent = document.getElementById('tabPlan').innerHTML;
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html lang="sk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Finančný plán — ${meno}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"><\/script>
+<style>
+:root{--navy:#003049;--red:#AB0534;--muted:#989FA7;--green:#16a34a;--border:#e5e7eb;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:#f5f5f5;color:#1a1a1a;line-height:1.6;padding:32px 16px;}
+.pres-wrap{max-width:900px;margin:0 auto;}
+.pres-header{background:linear-gradient(135deg,var(--navy),#004a73);color:#fff;padding:32px;border-radius:16px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+.pres-header h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;}
+.pres-header .sub{font-size:13px;opacity:0.7;margin-top:4px;}
+.pres-actions{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;}
+.pres-actions button{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+.pres-actions button:hover{background:var(--navy);color:#fff;}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.card-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px;}
+.fp-section{display:none;}
+.fp-section-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.fp-section-num{background:var(--navy);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.fp-rec{border:1px solid var(--border);border-radius:10px;padding:12px 16px;}
+.fp-rec-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(0,0,0,0.04);}
+.fp-rec-row:last-child{border-bottom:none;}
+.fp-rec-highlight{color:var(--red);font-weight:700;}
+.fp-product{display:flex;align-items:center;gap:14px;padding:12px 16px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;}
+.fp-product-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fp-product-icon.invest{background:rgba(171,5,52,0.08);color:var(--red);}
+.fp-product-icon.protect{background:rgba(0,48,73,0.08);color:var(--navy);}
+.fp-product-name{font-size:14px;font-weight:600;}
+.fp-product-desc{font-size:12px;color:var(--muted);}
+.fp-impact{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
+.fp-impact-card{padding:12px;border-radius:10px;border:1px solid var(--border);text-align:center;}
+.fp-impact-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.fp-impact-value{font-size:18px;font-weight:700;margin:4px 0;}
+.fp-strat-selector{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.fp-strat-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+.fp-strat-btn.active-konz{background:var(--navy);color:#fff;border-color:var(--navy);}
+.fp-strat-btn.active-vyv{background:#e65100;color:#fff;border-color:#e65100;}
+.fp-strat-btn.active-dyn{background:var(--red);color:#fff;border-color:var(--red);}
+.strat-badge{padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;}
+.strat-badge.konz{background:rgba(0,48,73,0.08);color:var(--navy);}
+.strat-badge.vyv{background:rgba(230,81,0,0.08);color:#e65100;}
+.strat-badge.dyn{background:rgba(171,5,52,0.08);color:var(--red);}
+.fp-fee-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:var(--muted);border-bottom:1px dashed rgba(0,0,0,0.06);}
+.info-box{padding:12px 16px;border-radius:10px;font-size:13px;border:1px solid var(--border);background:rgba(0,48,73,0.02);margin-bottom:8px;}
+.info-box.success{background:rgba(22,163,74,0.04);border-color:rgba(22,163,74,0.2);}
+.info-box.warning{background:rgba(230,81,0,0.04);border-color:rgba(230,81,0,0.2);}
+.chart-container{position:relative;}
+.dyn-table{width:100%;border-collapse:collapse;font-size:12px;}
+.dyn-table th,.dyn-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.dyn-table th{font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em;font-weight:600;}
+@media print{body{padding:0;background:#fff;}.pres-actions{display:none;}.card{break-inside:avoid;box-shadow:none;border:1px solid #ddd;}}
+@media(max-width:600px){.fp-impact{grid-template-columns:1fr;}.pres-header{padding:20px;}.pres-header h1{font-size:22px;}}
+</style></head><body>
+<div class="pres-wrap">
+<div class="pres-actions">
+<button onclick="window.print()">Tlačiť / PDF</button>
+<button onclick="window.close()">Zavrieť</button>
+</div>
+${planContent}
+</div>
+<script>lucide.createIcons();<\/script>
+</body></html>`);
+  w.document.close();
 }
 
 async function generatePDF(){
