@@ -771,10 +771,10 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
 
     <div class="card">
       <div class="form-row">
-        <div class="form-group"><label>Mesačné výdavky na život (€)</label><input type="number" id="zab_vydavky" value="0" min="0" oninput="updateZabezpecenie()"></div>
+        <div class="form-group"><label>Celkové mesačné výdavky (€)</label><input type="number" id="zab_vydavky" value="0" min="0" oninput="updateZabezpecenie()"></div>
       </div>
       <div class="info-box">
-        <strong>Princíp krytia:</strong> Minimálne na vykrytie mesačných výdavkov na život, optimálne na výšku čistého príjmu.
+        <strong>Čo sem patrí:</strong> Sem zadajte <strong>všetky</strong> mesačné výdavky klienta — bežné výdavky na život (nájom, strava, auto, splátky...) <strong>aj</strong> mesačné príspevky do portfólia (investície, sporenie, poistky). Pri výpadku príjmu musia byť kryté oboje, inak klient prestane investovať.
       </div>
     </div>
 
@@ -2230,7 +2230,7 @@ function updateFPBudget(totalMesacne){
 
   let rozpHtml = '<div class="fp-rec">';
   rozpHtml += `<div class="fp-rec-row"><span>Čistý mesačný príjem</span><span>${formatEUR(cisty + pCisty)}</span></div>`;
-  rozpHtml += `<div class="fp-rec-row"><span>Mesačné výdavky na život</span><span>${formatEUR(vydavky)}</span></div>`;
+  rozpHtml += `<div class="fp-rec-row"><span>Celkové mesačné výdavky (vrátane portfólia)</span><span>${formatEUR(vydavky)}</span></div>`;
   if(splatka > 0) rozpHtml += `<div class="fp-rec-row"><span>Splátka hypotéky</span><span>${formatEUR(splatka)}</span></div>`;
   rozpHtml += `<div class="fp-rec-row"><span>Investície podľa finančného plánu</span><span class="fp-rec-highlight">${formatEUR(totalMesacne)}</span></div>`;
   if(poistne > 0) rozpHtml += `<div class="fp-rec-row"><span>Poistné (orientačný odhad)</span><span>${formatEUR(poistne)}</span></div>`;
@@ -3192,7 +3192,7 @@ async function generatePDF(){
   checkPage(40);
   addSubtitle('Mesačný rozpočet po nastavení finančného plánu');
   addLine('Čistý mesačný príjem', formatEUR(cisty + pCisty2));
-  addLineAlt('Mesačné výdavky na život', formatEUR(vydavky));
+  addLineAlt('Celkové mesačné výdavky (vrátane portfólia)', formatEUR(vydavky));
   if(splatka > 0) addLine('Splátka hypotéky', formatEUR(splatka));
   addLineAlt('Investície podľa finančného plánu', formatEUR(totalPdf));
   if(poistne > 0) addLine('Poistné (orientačný odhad)', formatEUR(poistne));
