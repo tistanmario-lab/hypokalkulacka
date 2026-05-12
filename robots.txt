@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /vip-login.html
+Disallow: /vip-dashboard.html
+Disallow: /aof.html
+Disallow: /email-podpis.html
+
+Sitemap: https://www.mariotistan.sk/sitemap.xml
