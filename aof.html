@@ -284,7 +284,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <a href="vip-dashboard.html" class="vip-logo">Mário Tišťan<span>.</span><span class="vip-badge">VIP</span></a>
     <div class="vip-topbar-right">
       <span class="vip-user">Vitajte, <strong id="topUsername">Klient</strong></span>
-      <button class="vip-logout" onclick="sessionStorage.removeItem('vip_auth');sessionStorage.removeItem('vip_user');location.href='vip-login.html'">Odhlásiť</button>
+      <button class="vip-logout" onclick="doLogout()">Odhlásiť</button>
     </div>
   </div>
 </header>
@@ -1094,6 +1094,23 @@ let clientType = 'single'; // 'single' or 'pair'
 let hasDeti = true;
 let hasZmena = true;
 let childCounter = 0;
+
+// Logout — voliteľne vymaže uložené AOF záznamy klientov pred odhlásením
+function doLogout(){
+  var aofKeys = Object.keys(localStorage).filter(function(k){ return k.indexOf('aof_') === 0; });
+  if (aofKeys.length > 0) {
+    if (!confirm('Odhlásiť a zmazať aj ' + aofKeys.length + ' uložených AOF záznamov klientov z tohto prehliadača?\n\nOK = vymazať a odhlásiť\nZrušiť = iba odhlásiť (záznamy zostanú)')) {
+      sessionStorage.removeItem('vip_auth');
+      sessionStorage.removeItem('vip_user');
+      location.href='vip-login.html';
+      return;
+    }
+    aofKeys.forEach(function(k){ localStorage.removeItem(k); });
+  }
+  sessionStorage.removeItem('vip_auth');
+  sessionStorage.removeItem('vip_user');
+  location.href='vip-login.html';
+}
 
 // Lucide SVG icon helper — returns inline SVG string for use in innerHTML
 function ico(name, size){

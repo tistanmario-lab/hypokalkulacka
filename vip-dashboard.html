@@ -321,13 +321,13 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
       <p>Hlavná stránka mariotistan.sk — verejná prezentácia.</p>
     </a>
 
-    <a href="https://www.partnersgroup.sk" target="_blank" class="vip-card">
+    <a href="https://www.partnersgroup.sk" target="_blank" rel="noopener noreferrer" class="vip-card">
       <div class="vip-card-icon"><i data-lucide="building-2"></i></div>
       <h3>Partners Group SK</h3>
       <p>Firemná stránka Partners Group SK.</p>
     </a>
 
-    <a href="https://analytics.google.com" target="_blank" class="vip-card">
+    <a href="https://analytics.google.com" target="_blank" rel="noopener noreferrer" class="vip-card">
       <div class="vip-card-icon"><i data-lucide="trending-up"></i></div>
       <h3>Google Analytics</h3>
       <p>Štatistiky návštevnosti webu a správanie návštevníkov.</p>
@@ -358,8 +358,18 @@ document.getElementById('vipUserName').textContent = userName.charAt(0).toUpperC
   }
 })();
 
-// Logout
+// Logout — pri odhlásení voliteľne vymazať uložené AOF záznamy
 function doLogout() {
+  var aofKeys = Object.keys(localStorage).filter(function(k){ return k.indexOf('aof_') === 0; });
+  if (aofKeys.length > 0) {
+    if (!confirm('Odhlásiť a zmazať aj ' + aofKeys.length + ' uložených AOF záznamov klientov z tohto prehliadača?\n\nOK = vymazať a odhlásiť\nZrušiť = iba odhlásiť (záznamy zostanú)')) {
+      sessionStorage.removeItem('vip_auth');
+      sessionStorage.removeItem('vip_user');
+      window.location.href = 'vip-login.html';
+      return;
+    }
+    aofKeys.forEach(function(k){ localStorage.removeItem(k); });
+  }
   sessionStorage.removeItem('vip_auth');
   sessionStorage.removeItem('vip_user');
   window.location.href = 'vip-login.html';
