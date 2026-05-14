@@ -2339,6 +2339,12 @@ function updateFPBudget(totalMesacne){
   if(poistne > 0) rozpHtml += `<div class="fp-rec-row"><span>Poistné (orientačný odhad)</span><span>${formatEUR(poistne)}</span></div>`;
   rozpHtml += `<div class="fp-rec-row"><span><strong>Voľné prostriedky</strong></span><span style="color:${volne>=0?'var(--green)':'var(--red)'};font-weight:700;font-size:15px;"><strong>${formatEUR(volne)}</strong></span></div>`;
   if(volne < 0) rozpHtml += `<div style="margin-top:8px;padding:8px 12px;background:rgba(171,5,52,0.06);border-radius:8px;font-size:12px;color:var(--red);">${ico('alert-triangle',14)} Mesačné náklady presahujú dostupné prostriedky. Zvážte úpravu stratégie alebo cieľových súm.</div>`;
+  // Upozornenie ak nie sú zadané životné výdavky
+  if(vydavky === 0 && (cisty + pCisty) > 0){
+    rozpHtml += `<div style="margin-top:10px;padding:10px 12px;background:rgba(230,81,0,0.08);border-left:3px solid #e65100;border-radius:8px;font-size:12px;color:var(--navy);line-height:1.5;">`;
+    rozpHtml += `<strong style="color:#e65100;">⚠ Pozor — nezadané životné náklady.</strong> Plán nezohľadňuje bežné mesačné výdavky (jedlo, energie, doprava, oblečenie, voľný čas). Typická slovenská domácnosť potrebuje <strong>400–800 €/mes</strong> na bežný chod. Aktuálne uvedené „voľné prostriedky" treba o túto sumu znížiť — odporúčam doplniť výdavky v Kroku 8.`;
+    rozpHtml += `</div>`;
+  }
   if(poistne > 0) rozpHtml += `<div style="margin-top:4px;font-size:11px;color:var(--muted);">* Poistné je orientačný odhad. Presná suma bude stanovená na základe individuálnej ponuky.</div>`;
   rozpHtml += '</div>';
   document.getElementById('fpRozpocetSummary').innerHTML = rozpHtml;
@@ -2460,8 +2466,13 @@ function buildFinancialPlan(){
     html += `<div class="fp-rec-row"><span>Cieľová rezerva</span><span>${formatEUR(zelezna)}</span></div>`;
     html += `<div class="fp-rec-row"><span>Aktuálne nasporené</span><span>${formatEUR(sumRezerv)}</span></div>`;
     html += `<div class="fp-rec-row"><span>Chýbajúca suma</span><span class="fp-rec-highlight">${formatEUR(deficit)}</span></div>`;
-    html += `<div class="fp-rec-row"><span>Horizont</span><span>5 rokov (60 mesiacov)</span></div>`;
+    html += `<div class="fp-rec-row"><span>Horizont vytvorenia</span><span>5 rokov (60 mesiacov)</span></div>`;
     html += '</div>';
+
+    // Vysvetlenie pre klienta — rezerva po dosiahnutí cieľa
+    html += `<div style="margin-bottom:16px;padding:12px 14px;background:rgba(0,48,73,0.03);border-left:3px solid var(--navy);border-radius:8px;font-size:12px;line-height:1.55;color:var(--navy);">`;
+    html += `<strong>Ako rezerva funguje po dosiahnutí cieľa?</strong> Po piatich rokoch budete mať vytvorenú plnú rezervu. Tá zostáva <strong>kedykoľvek k dispozícii</strong> pre nepredvídané situácie (oprava auta, zdravotné výdavky, výpadok príjmu) a medzitým sa <strong>naďalej zhodnocuje</strong> rovnakou sadzbou — peniaze teda neležia ladom, ale ani sa neviažu na dlhý horizont.`;
+    html += `</div>`;
 
     // Selector for comparison
     html += '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Kam odkladať rezervu?</div>';
@@ -2488,7 +2499,12 @@ function buildFinancialPlan(){
     const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
     const roky = Math.max(1, dochVek - age);
     const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
-    const cielSuma = medzera * 12 * 20;
+    // Klient potrebuje "medzera €/mes (v dnešných cenách)" počas 20 rokov dôchodku.
+    // Aby kúpna sila vystačila, cieľ musí byť v NOMINÁLNYCH eurách v čase dôchodku
+    // — preto inflačne navyšujeme cieľovú sumu o (1+infl)^roky.
+    const realCielSuma = Math.round(medzera * 12 * 20); // v dnešných €
+    const cielSuma = Math.round(realCielSuma * Math.pow(1 + INFLATION_RATE, roky)); // nominálne v čase dôchodku
+    const nomMedzeraMonthly = Math.round(medzera * Math.pow(1 + INFLATION_RATE, roky)); // nominálny mesačný príjem o N rokov
     const strat = getStrategy(roky);
     const dochPmt = calcPMT(cielSuma, strat.rate, roky);
     const dochFV = calcFV(dochPmt, strat.rate, roky);
@@ -2523,8 +2539,13 @@ function buildFinancialPlan(){
       html += '</div>';
     }
 
-    html += `<div style="font-size:13px;font-weight:600;margin-bottom:4px;">Dôchodková medzera: <span class="fp-rec-highlight">${formatEUR(medzera)}/mes</span></div>`;
-    html += `<div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Cieľová suma na 20 rokov na dôchodku: ${formatEUR(cielSuma)}</div>`;
+    html += `<div style="font-size:13px;font-weight:600;margin-bottom:4px;">Dôchodková medzera: <span class="fp-rec-highlight">${formatEUR(medzera)}/mes</span> <span style="color:var(--muted);font-weight:400;font-size:11px;">(v dnešných cenách)</span></div>`;
+    html += `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(0,48,73,0.03);border-radius:10px;border:1px solid var(--border);">`;
+    html += `<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px;">Cieľová suma na 20 rokov na dôchodku</div>`;
+    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">`;
+    html += `<div><span style="color:var(--muted);">V dnešných €:</span> <strong>${formatEUR(realCielSuma)}</strong><div style="font-size:10px;color:var(--muted);margin-top:2px;">kúpna sila ${formatEUR(medzera)}/mes</div></div>`;
+    html += `<div><span style="color:var(--muted);">Nominálne (vek ${dochVek}):</span> <strong style="color:var(--red);">${formatEUR(cielSuma)}</strong><div style="font-size:10px;color:var(--muted);margin-top:2px;">po inflácii 2,5 % p.a. · ${formatEUR(nomMedzeraMonthly)}/mes</div></div>`;
+    html += `</div></div>`;
 
     // Store state for interactive recalculation
     fpState['dochodok'] = {type:'invest', label:'Dôchodok', cielSuma, roky, origStrategy:strat.key, currentStrategy:strat.key, origPmt:dochPmt};
@@ -2533,11 +2554,13 @@ function buildFinancialPlan(){
     html += buildProgramDetail('dochodok', fpState['dochodok'], strat, dochPmt, dochFV);
     html += '</div>';
 
-    // Kúpna sila na dôchodku
+    // Kúpna sila na dôchodku — porovnanie s cieľom
     if(cielSuma > 0){
       const realDochFV = calcRealValue(dochFV, roky);
       const nomMes = Math.round(dochFV / (20 * 12));
       const realMes = Math.round(realDochFV / (20 * 12));
+      const pctReal = realCielSuma > 0 ? Math.round((realDochFV / realCielSuma) * 100) : 0;
+      const pctColor = pctReal >= 95 ? 'var(--green)' : (pctReal >= 70 ? '#e65100' : 'var(--red)');
       html += '<div style="margin-top:20px;padding:16px;background:linear-gradient(135deg,rgba(0,48,73,0.03),rgba(171,5,52,0.03));border-radius:12px;border:1px solid var(--border);">';
       html += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;">Kúpna sila na dôchodku (vo veku '+dochVek+')</div>';
       html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
@@ -2545,13 +2568,15 @@ function buildFinancialPlan(){
       html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Nominálna hodnota</div>';
       html += `<div style="font-size:22px;font-weight:700;color:var(--navy);margin:6px 0;">${formatEUR(dochFV)}</div>`;
       html += `<div style="font-size:12px;color:var(--muted);">= ${formatEUR(nomMes)}/mes na 20 rokov</div>`;
+      html += `<div style="font-size:10px;color:var(--muted);margin-top:4px;">cieľ: ${formatEUR(cielSuma)}</div>`;
       html += '</div>';
       html += '<div style="text-align:center;padding:12px;background:#fff;border-radius:10px;border:1px solid var(--border);">';
       html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Reálna hodnota (dnešné €)</div>';
       html += `<div style="font-size:22px;font-weight:700;color:var(--red);margin:6px 0;">${formatEUR(realDochFV)}</div>`;
       html += `<div style="font-size:12px;color:var(--muted);">= ${formatEUR(realMes)}/mes na 20 rokov</div>`;
+      html += `<div style="font-size:10px;color:var(--muted);margin-top:4px;">cieľ: ${formatEUR(realCielSuma)} · <strong style="color:${pctColor};">${pctReal}%</strong></div>`;
       html += '</div></div>';
-      html += '<div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;">Reálna hodnota ukazuje kúpnu silu v dnešných cenách — čo si za tieto peniaze budete vedieť dovoliť. Počítané s priemernou infláciou 2,5 % ročne.</div>';
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;"><strong>Vysvetlenie:</strong> Nominálna hodnota je suma, ktorú reálne uvidíte na účte. Reálna hodnota ukazuje kúpnu silu v dnešných cenách — koľko si za tieto peniaze budete vedieť dovoliť. Cieľ je nastavený tak, aby vám reálna mesačná renta pokryla dôchodkovú medzeru aj po inflácii 2,5 % p.a.</div>';
       html += '</div>';
     }
 
@@ -2839,14 +2864,24 @@ function buildPortfolioChart(){
     let totalDep = 0;
 
     programs.forEach(p => {
-      const yrs = Math.min(yr, p.roky);
-      const months = yrs * 12;
+      // Fáza 1: aktívne vkladanie (yr <= p.roky)
+      const yrsContrib = Math.min(yr, p.roky);
+      const monthsContrib = yrsContrib * 12;
       const r = p.rate / 12;
       let val = 0;
-      if(r > 0) val = p.pmt * (Math.pow(1+r, months) - 1) / r;
-      else val = p.pmt * months;
+      if(r > 0) val = p.pmt * (Math.pow(1+r, monthsContrib) - 1) / r;
+      else val = p.pmt * monthsContrib;
+
+      // Fáza 2: po dosiahnutí horizontu peniaze zostávajú a ďalej sa zhodnocujú bez nových vkladov.
+      // (Klient má cieľ dosiahnutý, ale peniaze sú stále investované — napr. rezerva je dostupná
+      //  pre nepredvídané situácie a medzičasom kumuluje výnos rovnakého fondu.)
+      if(yr > p.roky){
+        const monthsAfter = (yr - p.roky) * 12;
+        val = val * Math.pow(1 + r, monthsAfter);
+      }
+
       totalVal += val;
-      totalDep += p.pmt * months;
+      totalDep += p.pmt * monthsContrib;
     });
 
     totalValues.push(Math.round(totalVal));
