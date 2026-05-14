@@ -113,7 +113,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
   margin-bottom: 48px;
 }
 @media (max-width: 900px) { .vip-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px) { .vip-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) {
+  .vip-grid { grid-template-columns: 1fr; }
+  .vip-logout { padding: 8px 12px; min-height: 40px; display: inline-flex; align-items: center; }
+  .vip-stat-value { font-size: 22px; }
+  .vip-card { padding: 18px; }
+}
 
 .vip-card {
   background: var(--white);

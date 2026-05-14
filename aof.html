@@ -163,12 +163,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);l
 @media(max-width:600px){
   .form-row{grid-template-columns:1fr;}
   .toggle-group{width:100%;}
-  .toggle-btn{flex:1;text-align:center;padding:10px 12px;}
+  .toggle-btn{flex:1;text-align:center;padding:12px 12px;min-height:44px;}
   .step-nav{flex-direction:column;gap:12px;}
+  .step-nav .btn{width:100%;}
   .progress-steps{display:none;}
+  .progress-info{font-size:13px;line-height:1.45;}
   .summary-grid{grid-template-columns:1fr;}
-  .dyn-table{font-size:11px;}
-  .dyn-table input,.dyn-table select{font-size:11px;padding:4px 6px;}
+  /* Tabuľky: horizontálny scroll namiesto zalamovania */
+  .dyn-table,.zab-table{display:block;overflow-x:auto;white-space:nowrap;}
+  .dyn-table input,.dyn-table select{font-size:13px;padding:8px 8px;min-height:36px;}
+  /* Save/Load bar — scrollovateľný horizontálne, aby boli buttony dostupné */
+  .save-load-bar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:6px;}
+  .save-load-bar .btn,.save-load-bar select{flex-shrink:0;min-height:40px;}
+  /* Lepšie tap targety pre primárne buttony */
+  .btn{min-height:44px;padding:12px 18px;}
+  /* Client email modal full-width */
+  #clientEmailModal > div{max-width:100%;padding:20px;}
 }
 
 /* Print */
@@ -296,7 +306,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       <div class="progress-bar-fill" id="progressFill" style="width:10%"></div>
     </div>
     <div class="progress-steps" id="progressSteps"></div>
-    <div class="progress-info">Krok <span id="currentStepNum">1</span> z 10 &mdash; <span id="progressPct">10</span>% dokončených</div>
+    <div class="progress-info">Krok <span id="currentStepNum">1</span> z 10: <strong id="currentStepName">Osobné údaje</strong> &mdash; <span id="progressPct">10</span>% dokončených</div>
   </div>
 </div>
 
@@ -1185,6 +1195,8 @@ function goToStep(n){
   document.getElementById('progressFill').style.width = pct+'%';
   document.getElementById('currentStepNum').textContent = n;
   document.getElementById('progressPct').textContent = pct;
+  const nameEl = document.getElementById('currentStepName');
+  if (nameEl && stepNames[n-1]) nameEl.textContent = stepNames[n-1];
   // Step indicators
   document.querySelectorAll('.progress-step').forEach((el,i)=>{
     el.className = 'progress-step';
