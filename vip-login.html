@@ -164,7 +164,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
     <form onsubmit="return doLogin()">
       <div class="input-group">
         <label for="username">Používateľ</label>
-        <input type="text" id="username" placeholder="Zadajte meno" autocomplete="username" required>
+        <input type="text" id="username" placeholder="Zadajte meno" autocomplete="username" autofocus required>
       </div>
       <div class="input-group">
         <label for="password">Heslo</label>
@@ -198,10 +198,17 @@ var users = [
   { user: 'pgsk', hash: 92668751 }
 ];
 
+var loginAttempts = 0;
+var loginLocked = false;
+
 function doLogin() {
+  if (loginLocked) return false;
+
   var username = document.getElementById('username').value.toLowerCase().trim();
   var password = document.getElementById('password').value;
   var passHash = simpleHash(password);
+  var btn = document.querySelector('.login-btn');
+  var errEl = document.getElementById('loginError');
 
   var valid = users.some(function(u) {
     return u.user === username && u.hash === passHash;
@@ -212,9 +219,37 @@ function doLogin() {
     sessionStorage.setItem('vip_user', username);
     window.location.href = 'vip-dashboard.html';
   } else {
-    document.getElementById('loginError').style.display = 'block';
+    loginAttempts++;
+    // Progresívny delay: 1s, 2s, 4s, 8s, max 15s
+    var delay = Math.min(1000 * Math.pow(2, loginAttempts - 1), 15000);
+    loginLocked = true;
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.style.cursor = 'not-allowed';
+    var originalText = btn.textContent;
+    var remainingSec = Math.ceil(delay / 1000);
+    btn.textContent = 'Skúsiť znova za ' + remainingSec + ' s';
+    errEl.textContent = 'Nesprávne meno alebo heslo.' + (loginAttempts >= 3 ? ' (pokus ' + loginAttempts + ')' : '');
+    errEl.style.display = 'block';
     document.getElementById('password').value = '';
-    document.getElementById('password').focus();
+
+    var countdown = setInterval(function(){
+      remainingSec--;
+      if (remainingSec > 0) {
+        btn.textContent = 'Skúsiť znova za ' + remainingSec + ' s';
+      } else {
+        clearInterval(countdown);
+      }
+    }, 1000);
+
+    setTimeout(function(){
+      loginLocked = false;
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+      btn.textContent = originalText;
+      document.getElementById('password').focus();
+    }, delay);
   }
   return false;
 }

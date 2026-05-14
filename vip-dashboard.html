@@ -280,14 +280,6 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
       <span class="vip-card-status status-active">Aktívne</span>
     </a>
 
-    <!-- Porovnávač produktov -->
-    <div class="vip-card" style="cursor:default;opacity:0.55;">
-      <div class="vip-card-icon"><i data-lucide="search"></i></div>
-      <h3>Porovnávač produktov</h3>
-      <p>Porovnanie hypotekárnych, investičných a poistných produktov naprieč partnermi.</p>
-      <span class="vip-card-status status-planned">Čoskoro</span>
-    </div>
-
     <!-- Existujúce kalkulačky -->
     <a href="hypokalkulacka.html" class="vip-card">
       <div class="vip-card-icon"><i data-lucide="home"></i></div>
@@ -311,6 +303,10 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
     </a>
 
   </div>
+
+  <!-- Posledné AOF záznamy -->
+  <h2 class="vip-section-title" id="recentAofTitle" style="display:none">Posledné AOF záznamy</h2>
+  <div class="vip-grid" id="recentAofGrid" style="display:none"></div>
 
   <!-- Rýchle linky -->
   <h2 class="vip-section-title">Rýchle linky</h2>
@@ -346,15 +342,65 @@ if (sessionStorage.getItem('vip_auth') !== 'true') {
 var userName = sessionStorage.getItem('vip_user') || 'Používateľ';
 document.getElementById('vipUserName').textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
 
-// Stats from localStorage
+// Stats + zoznam posledných AOF z localStorage
 (function(){
-  var count = 0;
+  var now = new Date();
+  var currentMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
+  var aofItems = [];
+  var thisMonthCount = 0;
+
   for(var i = 0; i < localStorage.length; i++){
-    if(localStorage.key(i).startsWith('aof_')) count++;
+    var key = localStorage.key(i);
+    if(!key || key.indexOf('aof_') !== 0) continue;
+    // Vynechať autosave draft (rezervovaný kľúč)
+    if(key === 'aof_autosave_draft') continue;
+    try {
+      var raw = localStorage.getItem(key);
+      var data = JSON.parse(raw);
+      var dateStr = data && data.date ? data.date : null;
+      var dt = dateStr ? new Date(dateStr) : null;
+      // Fallback: timestamp na konci kľúča
+      if (!dt || isNaN(dt.getTime())) {
+        var parts = key.split('_');
+        var maybeTs = parseInt(parts[parts.length-1], 10);
+        if (!isNaN(maybeTs)) dt = new Date(maybeTs);
+      }
+      var name = (data && data.name) ? data.name : 'Bez mena';
+      aofItems.push({ key: key, name: name, date: dt || new Date(0) });
+      if (dt && (dt.getFullYear() + '-' + (dt.getMonth() + 1)) === currentMonth) {
+        thisMonthCount++;
+      }
+    } catch(e) { /* skip corrupted */ }
   }
-  if(count > 0){
-    document.getElementById('statClients').textContent = count;
-    document.getElementById('statPlans').textContent = count;
+
+  if(aofItems.length > 0){
+    document.getElementById('statClients').textContent = aofItems.length;
+    document.getElementById('statPlans').textContent = aofItems.length;
+  }
+  document.getElementById('statRevenue').textContent = thisMonthCount;
+
+  // Posledné AOF — top 5 podľa dátumu
+  aofItems.sort(function(a, b){ return b.date - a.date; });
+  var top = aofItems.slice(0, 5);
+  if (top.length > 0) {
+    var grid = document.getElementById('recentAofGrid');
+    var title = document.getElementById('recentAofTitle');
+    title.style.display = '';
+    grid.style.display = '';
+    top.forEach(function(item){
+      var dateLabel = item.date && item.date.getTime() > 0
+        ? item.date.toLocaleDateString('sk-SK', {day:'numeric', month:'short', year:'numeric'})
+        : '—';
+      var safeName = (item.name + '').replace(/[<>&"']/g, function(c){ return ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'})[c]; });
+      var safeKey = encodeURIComponent(item.key);
+      var html = '<a href="aof.html?load=' + safeKey + '" class="vip-card">' +
+                 '<div class="vip-card-icon"><i data-lucide="file-text"></i></div>' +
+                 '<h3>' + safeName + '</h3>' +
+                 '<p>Uložené: ' + dateLabel + '</p>' +
+                 '<span class="vip-card-status status-active">Otvoriť</span>' +
+                 '</a>';
+      grid.insertAdjacentHTML('beforeend', html);
+    });
   }
 })();
 

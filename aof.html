@@ -3511,12 +3511,13 @@ async function generatePDF(){
 // ============================================================
 // Save / Load
 // ============================================================
-function saveAOF(){
-  const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Nová analýza';
-  const key = 'aof_'+meno.replace(/\s+/g,'_')+'_'+Date.now();
+const AUTOSAVE_KEY = 'aof_autosave_draft';
 
-  // Collect all input values
+// Helper: vyzbieraj všetky dáta AOFu do jedného objektu
+function collectAOFData(){
+  const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Nová analýza';
   const data = {name:meno, date:new Date().toISOString(), clientType, hasZmena, hasDeti};
+
   const inputs = document.querySelectorAll('input, select, textarea');
   data.fields = {};
   inputs.forEach(inp=>{
@@ -3527,36 +3528,72 @@ function saveAOF(){
     }
   });
 
-  // Save radio groups
   data.radios = {};
   document.querySelectorAll('input[type=radio]:checked').forEach(r=>{
     data.radios[r.name] = r.value;
   });
 
-  // Sync all dynamic checkboxes to HTML attributes before saving
+  // Sync dynamic checkboxes (deti)
   document.querySelectorAll('#detiContainer input[type=checkbox]').forEach(cb => {
     if(cb.checked) cb.setAttribute('checked','checked');
     else cb.removeAttribute('checked');
   });
 
-  // Save dynamic tables HTML
   data.familyHTML = document.getElementById('familyBody').innerHTML;
   data.rezervyHTML = document.getElementById('rezervyBody').innerHTML;
   data.majetokHTML = document.getElementById('majetokBody').innerHTML;
   data.cieleHTML = document.getElementById('cieleBody').innerHTML;
   data.detiHTML = document.getElementById('detiContainer').innerHTML;
 
-  // Sync checkbox checked attribute to HTML before saving
+  // Sync zabezpečenie checkboxy
   document.querySelectorAll('#zabBodyKlient input[type=checkbox], #zabBodyPartner input[type=checkbox]').forEach(cb => {
     if(cb.checked) cb.setAttribute('checked','checked');
     else cb.removeAttribute('checked');
   });
-  // Save zabezpečenie tables (dynamically generated with checkboxes)
   data.zabKlientHTML = document.getElementById('zabBodyKlient').innerHTML;
   data.zabPartnerHTML = document.getElementById('zabBodyPartner')?.innerHTML||'';
 
+  return data;
+}
+
+function saveAOF(){
+  // Validácia: meno klienta musí byť vyplnené
+  const krstne = document.getElementById('k_meno').value.trim();
+  const priezvisko = document.getElementById('k_priezvisko').value.trim();
+  if (!krstne || !priezvisko) {
+    alert('Pre uloženie AOF prosím vyplňte meno a priezvisko klienta (Krok 1).');
+    goToStep(1);
+    setTimeout(function(){
+      const target = !krstne ? 'k_meno' : 'k_priezvisko';
+      const el = document.getElementById(target);
+      if (el) el.focus();
+    }, 100);
+    return;
+  }
+
+  const data = collectAOFData();
+  const meno = data.name;
+  const key = 'aof_'+meno.replace(/\s+/g,'_')+'_'+Date.now();
   localStorage.setItem(key, JSON.stringify(data));
+  // Vymaž autosave draft — manuálny save ho nahrádza
+  localStorage.removeItem(AUTOSAVE_KEY);
   alert('AOF uložená: '+meno);
+}
+
+// Autosave: každých 30 sekúnd uloží draft, ak je čo zachovať
+let autosaveTimer = null;
+function startAutosave(){
+  if (autosaveTimer) return;
+  autosaveTimer = setInterval(function(){
+    try {
+      // Iba ak je niečo zmysluplné — aspoň meno alebo priezvisko
+      const krstne = document.getElementById('k_meno').value.trim();
+      const priezvisko = document.getElementById('k_priezvisko').value.trim();
+      if (!krstne && !priezvisko) return;
+      const data = collectAOFData();
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
+    } catch(e) { /* ignore */ }
+  }, 30000);
 }
 
 function showLoadSelect(){
@@ -3627,6 +3664,9 @@ function loadAOF(key){
       b.classList.toggle('active', (clientType==='single'&&i===0)||(clientType==='pair'&&i===1));
     });
 
+    // Po úspešnom načítaní vymaž autosave draft (už ho nepotrebujeme)
+    if (key !== AUTOSAVE_KEY) localStorage.removeItem(AUTOSAVE_KEY);
+
     alert('AOF načítaná: '+data.name);
     goToStep(1);
   }catch(e){
@@ -3670,6 +3710,34 @@ document.addEventListener('DOMContentLoaded', function(){
   // Set username from session
   const user = sessionStorage.getItem('vip_user');
   if(user) document.getElementById('topUsername').textContent = user;
+
+  // 1) Skontroluj URL ?load=<key> — otvorenie konkrétneho AOFu z dashboardu
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const loadKey = params.get('load');
+    if (loadKey && localStorage.getItem(loadKey)) {
+      loadAOF(loadKey);
+      // Odstráň ?load z URL aby refresh nezopakoval load
+      history.replaceState(null, '', window.location.pathname);
+    } else {
+      // 2) Inak ponúkni recovery z autosave draftu (ak existuje)
+      const draft = localStorage.getItem(AUTOSAVE_KEY);
+      if (draft) {
+        try {
+          const d = JSON.parse(draft);
+          const dateStr = d && d.date ? new Date(d.date).toLocaleString('sk-SK') : '';
+          if (confirm('Našiel som rozpracovaný AOF z predchádzajúcej relácie' + (d && d.name ? ' (' + d.name + ')' : '') + (dateStr ? ', uložený ' + dateStr : '') + '.\n\nOK = obnoviť\nZrušiť = začať nový AOF (rozpracovaný sa vymaže)')) {
+            loadAOF(AUTOSAVE_KEY);
+          } else {
+            localStorage.removeItem(AUTOSAVE_KEY);
+          }
+        } catch(e) { localStorage.removeItem(AUTOSAVE_KEY); }
+      }
+    }
+  } catch(e) { /* ignore URL/recovery errors */ }
+
+  // 3) Spusti autosave (každých 30s)
+  startAutosave();
 });
 </script>
 </body>
