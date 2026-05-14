@@ -311,6 +311,9 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
       <option value="">-- Načítať AOF --</option>
     </select>
     <button class="btn btn-outline btn-sm" onclick="showLoadSelect()">Načítať AOF</button>
+    <button class="btn btn-outline btn-sm" onclick="exportAOFJson()" title="Stiahne aktuálnu AOF ako .json súbor pre zálohovanie">Export JSON</button>
+    <button class="btn btn-outline btn-sm" onclick="document.getElementById('importJsonInput').click()" title="Načíta AOF z .json súboru (záloha)">Import JSON</button>
+    <input type="file" id="importJsonInput" accept="application/json,.json" style="display:none" onchange="importAOFJson(event)">
   </div>
 
   <!-- ==================== STEP 1: Osobné údaje ==================== -->
@@ -1065,7 +1068,31 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
       <button class="btn btn-red" onclick="generatePDF()">Generovať PDF</button>
       <button class="btn btn-primary" onclick="openPresentation()">Otvoriť prezentáciu</button>
+      <button class="btn btn-outline" onclick="openClientEmailModal()">Pripraviť email klientovi</button>
       <button class="btn btn-outline" onclick="saveAOF()">Uložiť AOF</button>
+    </div>
+
+    <!-- Client Email Modal -->
+    <div id="clientEmailModal" style="display:none;position:fixed;inset:0;background:rgba(0,48,73,0.55);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:#fff;max-width:480px;width:100%;border-radius:12px;padding:28px;box-shadow:0 12px 40px rgba(0,0,0,0.2);">
+        <h3 style="margin:0 0 8px;font-family:'Playfair Display',serif;color:#003049;font-size:22px;">Pripraviť email klientovi</h3>
+        <p style="margin:0 0 18px;font-size:13px;color:#666;line-height:1.5;">Otvorí váš email klient s vopred vyplneným textom. <strong>PDF priložte ručne</strong> (stiahnuté tlačidlom „Generovať PDF").</p>
+
+        <label style="display:block;margin-bottom:14px;font-size:12px;font-weight:600;letter-spacing:.04em;color:#003049;">
+          E-mail klienta:
+          <input type="email" id="clientEmailInput" placeholder="klient@example.sk" style="display:block;width:100%;margin-top:6px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+        </label>
+
+        <label style="display:block;margin-bottom:18px;font-size:12px;font-weight:600;letter-spacing:.04em;color:#003049;">
+          Predmet:
+          <input type="text" id="clientEmailSubject" value="Vaša osobná finančná analýza" style="display:block;width:100%;margin-top:6px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+        </label>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('clientEmailModal').style.display='none'">Zrušiť</button>
+          <button class="btn btn-red btn-sm" onclick="sendClientEmail()">Otvoriť email</button>
+        </div>
+      </div>
     </div>
 
     <div class="step-nav">
@@ -3578,6 +3605,90 @@ function saveAOF(){
   // Vymaž autosave draft — manuálny save ho nahrádza
   localStorage.removeItem(AUTOSAVE_KEY);
   alert('AOF uložená: '+meno);
+}
+
+// Export aktuálneho AOFu ako JSON súbor (backup/transport medzi zariadeniami)
+function exportAOFJson(){
+  const krstne = document.getElementById('k_meno').value.trim();
+  const priezvisko = document.getElementById('k_priezvisko').value.trim();
+  if (!krstne && !priezvisko) {
+    alert('Pred exportom prosím vyplňte aspoň meno klienta (Krok 1).');
+    goToStep(1);
+    return;
+  }
+  const data = collectAOFData();
+  const filename = 'AOF_' + (data.name || 'klient').replace(/\s+/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.json';
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Import AOFu zo JSON súboru (zo zálohy)
+function importAOFJson(evt){
+  const file = evt.target.files && evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data || typeof data !== 'object' || !data.fields) {
+        alert('Súbor nie je platný AOF JSON.');
+        return;
+      }
+      // Ulož do localStorage pod novým kľúčom a načítaj cez loadAOF (re-using existujúcej logiky)
+      const meno = (data.name || 'Import').replace(/\s+/g,'_');
+      const key = 'aof_' + meno + '_' + Date.now();
+      localStorage.setItem(key, JSON.stringify(data));
+      loadAOF(key);
+    } catch(err) {
+      alert('Chyba pri čítaní súboru: ' + err.message);
+    }
+    // Reset file input aby ten istý súbor mohol byť načítaný znova
+    evt.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// Pripraví email klientovi cez mailto: (otvorí natívny mail klient s pre-fill textom)
+function openClientEmailModal(){
+  const modal = document.getElementById('clientEmailModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  setTimeout(function(){
+    const inp = document.getElementById('clientEmailInput');
+    if (inp) inp.focus();
+  }, 50);
+}
+
+function sendClientEmail(){
+  const email = (document.getElementById('clientEmailInput').value || '').trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    alert('Zadajte platnú emailovú adresu.');
+    return;
+  }
+  const subject = (document.getElementById('clientEmailSubject').value || 'Vaša osobná finančná analýza').trim();
+  const klientMeno = (document.getElementById('k_meno').value + ' ' + document.getElementById('k_priezvisko').value).trim() || 'klient';
+  const body =
+    'Dobrý deň,\n\n' +
+    'v prílohe Vám zasielam Vašu osobnú finančnú analýzu (AOF), ktorú sme spolu pripravili. ' +
+    'Dokument obsahuje prehľad Vašich príjmov, výdavkov, cieľov a odporúčaní pre budovanie majetku.\n\n' +
+    'V prípade akýchkoľvek otázok ma neváhajte kontaktovať.\n\n' +
+    'S pozdravom,\n' +
+    'Mário Tišťan\n' +
+    'Senior Consultant | Partners Group SK\n' +
+    'mario.tistan@partnersgroup.sk | +421 902 130 096\n' +
+    'www.mariotistan.sk';
+  const mailto = 'mailto:' + encodeURIComponent(email) +
+                 '?subject=' + encodeURIComponent(subject) +
+                 '&body=' + encodeURIComponent(body);
+  document.getElementById('clientEmailModal').style.display = 'none';
+  window.location.href = mailto;
 }
 
 // Autosave: každých 30 sekúnd uloží draft, ak je čo zachovať
