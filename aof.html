@@ -191,8 +191,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);l
 /* Zabezpečenie table */
 .zab-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;}
 .zab-table th{background:var(--sand);padding:10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
-.zab-table td{padding:10px;border-bottom:1px solid var(--border);}
+.zab-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .zab-table .negative{color:var(--red);font-weight:700;}
+.zab-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.zab-grp{background:var(--navy);color:#fff;font-weight:700;font-size:12px;padding:9px 10px;letter-spacing:.03em;}
+.zab-davka-override{width:96px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--navy);background:var(--white);transition:border-color .2s;}
+.zab-davka-override:focus{outline:none;border-color:var(--navy);}
+.zab-davka-override.edited{border-color:var(--red);background:rgba(171,5,52,0.03);}
+
+/* Priority badges */
+.zab-priority{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.04em;white-space:nowrap;}
+.zab-priority.p1{background:rgba(171,5,52,0.1);color:var(--red);}
+.zab-priority.p2{background:rgba(255,152,0,0.12);color:var(--orange);}
+.zab-priority.p3{background:rgba(46,125,50,0.1);color:var(--green);}
+
+/* PS-do-zmluvy table (output) */
+.zab-ps-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;border-radius:10px;overflow:hidden;}
+.zab-ps-table th{background:var(--navy);color:#fff;padding:10px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:700;}
+.zab-ps-table td{padding:10px 12px;border-bottom:1px solid var(--border);}
+.zab-ps-table tr:nth-child(even) td{background:rgba(0,48,73,0.02);}
+.zab-ps-table .ps-amount{font-weight:700;color:var(--red);text-align:right;white-space:nowrap;}
+.zab-ps-table .ps-grp td{background:var(--sand);font-weight:700;color:var(--navy);font-size:12px;}
 
 /* Financial Plan Tabs */
 .fp-tabs{display:flex;background:var(--white);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:24px;}
@@ -812,24 +831,36 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <div class="card">
       <div class="form-row">
         <div class="form-group"><label>Celkové mesačné výdavky (€)</label><input type="number" id="zab_vydavky" value="0" min="0" oninput="updateZabezpecenie()"></div>
+        <div class="form-group"><label>Nesplatené spotrebné dlhy / úvery (€)</label><input type="number" id="zab_dlhy" value="0" min="0" oninput="updateZabezpecenie()"></div>
+        <div class="form-group">
+          <label>Cieľ krytia výpadku príjmu</label>
+          <select id="zab_krytie_mode" onchange="updateZabezpecenie()">
+            <option value="min">Minimálne — pokryť mesačné výdavky</option>
+            <option value="opt">Optimálne — pokryť čistý príjem</option>
+          </select>
+        </div>
       </div>
       <div class="info-box">
-        <strong>Čo sem patrí:</strong> Sem zadajte <strong>všetky</strong> mesačné výdavky klienta — bežné výdavky na život (nájom, strava, auto, splátky...) <strong>aj</strong> mesačné príspevky do portfólia (investície, sporenie, poistky). Pri výpadku príjmu musia byť kryté oboje, inak klient prestane investovať.
+        <strong>Čo sem patrí:</strong> Do výdavkov zadajte <strong>všetky</strong> mesačné výdavky klienta — bežné výdavky na život (nájom, strava, auto, splátky...) <strong>aj</strong> mesačné príspevky do portfólia (investície, sporenie, poistky). Pri výpadku príjmu musia byť kryté oboje, inak klient prestane investovať.<br>
+        <strong>Spotrebné dlhy</strong> = pôžičky a úvery <strong>mimo hypotéky</strong> (tá je krytá samostatne klesajúcou poistnou sumou).
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">Klient — Zabezpečenie príjmu</div>
+      <div class="check-row" style="margin-bottom:10px;"><input type="checkbox" id="zab_zavisly_k" onchange="this.dataset.edited='1';updateZabezpecenie()"> Niekto je ekonomicky závislý od príjmu klienta (partner/ka, deti)</div>
       <table class="zab-table" id="zabTableKlient">
-        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€)</th><th>Min. krytie (€)</th><th>Bude chýbať (€)</th><th>Zaradiť</th></tr></thead>
+        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€/mes) ✎</th><th>Cieľ krytia (€)</th><th>Chýba / Poist. suma</th><th>Zaradiť</th></tr></thead>
         <tbody id="zabBodyKlient"></tbody>
       </table>
+      <div class="zab-sub">✎ Sociálnu dávku môžete prepísať reálnou sumou zo Sociálnej poisťovne — gap sa prepočíta automaticky.</div>
     </div>
 
     <div class="card" id="zabPartnerCard" style="display:none;">
       <div class="card-title">Partner — Zabezpečenie príjmu</div>
+      <div class="check-row" style="margin-bottom:10px;"><input type="checkbox" id="zab_zavisly_p" onchange="this.dataset.edited='1';updateZabezpecenie()"> Niekto je ekonomicky závislý od príjmu partnera/ky</div>
       <table class="zab-table" id="zabTablePartner">
-        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€)</th><th>Min. krytie (€)</th><th>Bude chýbať (€)</th><th>Zaradiť</th></tr></thead>
+        <thead><tr><th>Udalosť</th><th>Sociálna dávka (€/mes) ✎</th><th>Cieľ krytia (€)</th><th>Chýba / Poist. suma</th><th>Zaradiť</th></tr></thead>
         <tbody id="zabBodyPartner"></tbody>
       </table>
     </div>
@@ -1152,11 +1183,14 @@ function doLogout(){
 // Lucide SVG icon helper — returns inline SVG string for use in innerHTML
 function ico(name, size){
   size = size || 18;
-  const el = lucide.icons[name];
+  // Lucide používa PascalCase kľúče (Home, ShieldCheck...), staršie verzie kebab-case
+  const pascal = name.split('-').map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join('');
+  const el = (lucide.icons && (lucide.icons[pascal]||lucide.icons[name])) || null;
   if(!el) return '';
-  const [attrs, children] = el;
+  // Nový formát: ['svg', attrs, children]; starší: [attrs, children]
+  const children = (typeof el[0]==='string') ? el[2] : el[1];
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">`;
-  children.forEach(([tag, a]) => {
+  (children||[]).forEach(([tag, a]) => {
     svg += `<${tag}`;
     Object.entries(a).forEach(([k,v]) => { svg += ` ${k}="${v}"`; });
     svg += `/>`;
@@ -1629,87 +1663,185 @@ function updateZabezpecenie(){
   }
 }
 
+// ── Sociálne dávky SR — konštanty (rok 2026; upraviteľné raz ročne) ──
+const SP = {
+  ADH: 19.7633,      // aktuálna dôchodková hodnota 2026
+  AVG_WAGE: 1568,    // priemerná mzda v hospodárstve (pre POMB)
+  DVZ_MAX: 49.32,    // max denný vymeriavací základ (€/deň)
+  SZCO_BASE: 914.40, // min. vymeriavací základ SZČO 2026
+  MIN_INVAL: 412,    // orientačný min. invalidný dôchodok (30 r., 2026)
+  START_WORK_AGE: 20,
+  R_PN: 0.55, R_MAT: 0.75, R_NEZAM: 0.50,
+  DAYS_M: 30.4167
+};
+function zabDvz(hrubyM){ return Math.min(SP.DVZ_MAX, (hrubyM*12)/365); }
+function zabDavkaMes(hrubyM, rate){ return Math.round(zabDvz(hrubyM)*rate*SP.DAYS_M); }
+function zabInvalid(hrubyM, vek, retireAge, pokles){
+  const POMB = Math.max(0.3, Math.min(3, hrubyM/SP.AVG_WAGE));
+  const odprac = Math.max(1, vek - SP.START_WORK_AGE);
+  const dopoc = Math.max(0, retireAge - vek);
+  let d = POMB*(odprac+dopoc)*SP.ADH*pokles;
+  d = Math.max(d, pokles>=1 ? SP.MIN_INVAL : SP.MIN_INVAL*0.5);
+  return Math.round(d);
+}
+function zabAmountLabel(suma,u){ return formatEUR(suma)+(u==='jednorazovo' ? ' jednorazovo' : (u==='den' ? '/deň' : '/mes')); }
+function zabTypLabel(u){ return u==='jednorazovo' ? 'jednorazová PS' : (u==='den' ? 'denná dávka' : 'mesačná renta'); }
+
+// Je niekto ekonomicky závislý od príjmu danej osoby?
+function hasDependents(prefix){
+  const kids = document.querySelectorAll('#detiContainer .card').length > 0;
+  const other = prefix==='k' ? 'p' : 'k';
+  const otherCisty = clientType==='pair' ? (parseFloat(document.getElementById(other+'_cisty').value)||0) : 0;
+  const partnerDep = clientType==='pair' && otherCisty===0;
+  const derived = kids || partnerDep;
+  const box = document.getElementById('zab_zavisly_'+prefix);
+  if(box){
+    if(box.dataset.edited!=='1') box.checked = derived;
+    return box.checked;
+  }
+  return derived;
+}
+
 function buildZabTable(prefix, bodyId){
   const praca = document.getElementById(prefix+'_praca').value;
-  // SZČO: sociálne dávky sa počítajú z min. vymeriavacieho základu (915 € v 2026)
+  const isSzco = praca === 'szco';
   const hrubyReal = parseFloat(document.getElementById(prefix+'_hruby').value)||0;
-  const hruby = praca === 'szco' ? 915 : hrubyReal;
+  // SZČO: dávky z min. vymeriavacieho základu
+  const hrubyBase = isSzco ? SP.SZCO_BASE : hrubyReal;
   const cisty = parseFloat(document.getElementById(prefix+'_cisty').value)||0;
   const vydavky = parseFloat(document.getElementById('zab_vydavky').value)||0;
-
-  const isSzco = praca === 'szco';
-  const rows = [
-    {name:'Výpoveď', davka: isSzco ? 0 : Math.round(hruby*0.5)},
-    {name:'Materská dovolenka', davka: isSzco ? Math.round(915*0.75) : Math.round(hruby*0.75)},
-    {name:'PN (práceneschopnosť)', davka: Math.round(hruby*0.55)},
-    {name:'Čiastočná invalidita (41–70 %)', davka: Math.round(hruby*0.25)},
-    {name:'Plná invalidita (71 %+)', davka: Math.round(hruby*0.375)},
-  ];
-
-  // Úmrtie: dynamický výpočet podľa checkboxov
+  const dlhy = parseFloat(document.getElementById('zab_dlhy')?.value)||0;
+  const krytieMode = document.getElementById('zab_krytie_mode')?.value || 'min';
+  const krytie = krytieMode==='opt' ? cisty : vydavky;
+  const vek = parseInt(document.getElementById(prefix+'_vek').value)||35;
+  const retireAge = parseInt(document.getElementById('doch_vek')?.value)||65;
   const optimZostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
   const optimSplatnost = parseInt(document.getElementById('optim_doba')?.value)||0;
-  const hasFamily = clientType === 'pair' || document.querySelectorAll('#detiContainer .card').length > 0;
 
   const tbody = document.getElementById(bodyId);
+
+  // Zachovaj ručne prepísané dávky/PS pred prestavbou tabuľky
+  const prevEdit = {};
+  tbody.querySelectorAll('.zab-davka-override[data-edited="1"]').forEach(inp=>{ prevEdit[inp.dataset.row] = inp.value; });
   tbody.innerHTML = '';
 
-  // SZČO info row
+  // ── Skupina A: výpadok príjmu (mesačná renta) ──
+  const grpA = document.createElement('tr');
+  grpA.innerHTML = `<td colspan="5" class="zab-grp">Výpadok príjmu — mesačná renta (rozdiel medzi dávkou a krytím)</td>`;
+  tbody.appendChild(grpA);
+
   if(isSzco){
     const infoTr = document.createElement('tr');
-    infoTr.innerHTML = `<td colspan="5" style="background:rgba(171,5,52,0.04);font-size:12px;color:var(--red);padding:10px;"><strong>SZČO:</strong> Dávky sa počítajú z min. vymeriavacieho základu 915 €/mes. Výpoveď = 0 € (SZČO nemá nárok na odstupné).</td>`;
+    infoTr.innerHTML = `<td colspan="5" style="background:rgba(171,5,52,0.04);font-size:12px;color:var(--red);padding:10px;"><strong>SZČO:</strong> Dávky z min. vymeriavacieho základu ${formatEUR(SP.SZCO_BASE)}/mes. Výpoveď = 0 €. PN/materské len ak platí dobrovoľné nemocenské poistenie.</td>`;
     tbody.appendChild(infoTr);
   }
 
-  rows.forEach((r,i)=>{
-    {
-      const chyba = Math.max(0, vydavky - r.davka);
-      const cls = chyba > 0 ? 'negative' : '';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${r.name}</td>
-        <td>${formatEUR(r.davka)}</td>
-        <td>${formatEUR(vydavky)}</td>
-        <td class="${cls}">${chyba > 0 ? formatEUR(chyba) : '0 € '+ico('check',14)}</td>
-        <td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${chyba}" ${chyba>0?'checked':''}></td>`;
-      tbody.appendChild(tr);
-    }
+  const rentaRows = [
+    {name:'Výpoveď (strata zamestnania)', davka: isSzco?0:zabDavkaMes(hrubyBase, SP.R_NEZAM), note:'~6 mes.', prio:3},
+    {name:'Materská dovolenka', davka: zabDavkaMes(hrubyBase, SP.R_MAT), note:'~34 týž.', prio:3},
+    {name:'PN (práceneschopnosť)', davka: zabDavkaMes(hrubyBase, SP.R_PN), note:'max 52 týž.', prio:2},
+    {name:'Čiastočná invalidita (41–70 %)', davka: zabInvalid(hrubyBase, vek, retireAge, 0.5), note:'trvalá do dôchodku', prio:2},
+    {name:'Plná invalidita (nad 70 %)', davka: zabInvalid(hrubyBase, vek, retireAge, 1.0), note:'trvalá do dôchodku', prio:1},
+  ];
+
+  rentaRows.forEach(r=>{
+    const davka = prevEdit[r.name]!==undefined ? (parseFloat(prevEdit[r.name])||0) : r.davka;
+    const edited = prevEdit[r.name]!==undefined;
+    const gap = Math.max(0, krytie - davka);
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td>${r.name}<div class="zab-sub">Dávka SP · ${r.note}</div></td>`+
+      `<td><input type="number" min="0" class="zab-davka-override${edited?' edited':''}" data-mode="davka" data-row="${r.name}" data-krytie="${krytie}"${edited?' data-edited="1"':''} value="${Math.round(davka)}" oninput="recomputeZab(this)"></td>`+
+      `<td class="zab-krytie">${formatEUR(krytie)}</td>`+
+      `<td class="zab-gap ${gap>0?'negative':''}">${gap>0?formatEUR(gap):'0 € '+ico('check',14)}</td>`+
+      `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${gap}" data-unit="mes" data-priority="${r.prio}" ${gap>0?'checked':''}></td>`;
+    tbody.appendChild(tr);
   });
 
-  // ── Úmrtie – samostatná sekcia s checkboxmi ──
-  const umrtieSep = document.createElement('tr');
-  umrtieSep.innerHTML = `<td colspan="5" style="background:var(--navy);color:#fff;font-weight:700;font-size:13px;padding:10px;">Krytie pre prípad úmrtia</td>`;
-  tbody.appendChild(umrtieSep);
+  // ── Skupina B: jednorazové krytie (poistná suma) ──
+  const grpB = document.createElement('tr');
+  grpB.innerHTML = `<td colspan="5" class="zab-grp">Jednorazové krytie — poistná suma</td>`;
+  tbody.appendChild(grpB);
 
-  // A) Krytie hypotéky (klesajúca PS)
+  const dependent = hasDependents(prefix);
+  const twoYr = cisty*24;
+
+  // Úmrtie — krytie hypotéky (klesajúca PS)
   if(optimZostatok > 0){
-    const trH = document.createElement('tr');
-    trH.style.background = 'rgba(0,48,73,0.03)';
-    trH.innerHTML = `
-      <td><strong>Úmrtie — krytie hypotéky</strong><div style="font-size:11px;color:var(--muted);">Klesajúca poistná suma, ${optimSplatnost > 0 ? optimSplatnost + ' rokov' : 'podľa splatnosti'}</div></td>
-      <td colspan="2" style="font-size:12px;color:var(--muted);">Zostatok úveru: ${formatEUR(optimZostatok)}</td>
-      <td class="negative"><strong>${formatEUR(optimZostatok)}</strong></td>
-      <td><input type="checkbox" class="fp-zab-${prefix}" data-name="Úmrtie — krytie hypotéky" data-suma="${optimZostatok}" data-typ="klesajuca" data-roky="${optimSplatnost}" checked></td>`;
-    tbody.appendChild(trH);
+    addPsRow(tbody, prefix, 'Úmrtie — krytie hypotéky', optimZostatok,
+      `Klesajúca PS · ${optimSplatnost>0?optimSplatnost+' rokov':'podľa splatnosti'}`, 1, 'klesajuca', prevEdit, optimSplatnost);
   }
 
-  // B) Krytie dvojročného príjmu (fixná PS) — len ak má rodinu
-  const dvojrocnyPrijem = cisty * 24;
-  if(hasFamily && dvojrocnyPrijem > 0){
-    const trP = document.createElement('tr');
-    trP.style.background = 'rgba(0,48,73,0.03)';
-    trP.innerHTML = `
-      <td><strong>Úmrtie — 2-ročný príjem pre rodinu</strong><div style="font-size:11px;color:var(--muted);">Fixná poistná suma</div></td>
-      <td colspan="2" style="font-size:12px;color:var(--muted);">2 × ročný čistý príjem: ${formatEUR(dvojrocnyPrijem)}</td>
-      <td class="negative"><strong>${formatEUR(dvojrocnyPrijem)}</strong></td>
-      <td><input type="checkbox" class="fp-zab-${prefix}" data-name="Úmrtie — 2-ročný príjem" data-suma="${dvojrocnyPrijem}" data-typ="fixna" checked></td>`;
-    tbody.appendChild(trP);
-  } else if(!hasFamily){
-    const trInfo = document.createElement('tr');
-    trInfo.innerHTML = `<td colspan="5" style="font-size:12px;color:var(--muted);padding:10px;">Klient nemá partnera ani deti — krytie dvojročného príjmu nie je relevantné.</td>`;
-    tbody.appendChild(trInfo);
+  // Úmrtie — krytie rodiny / pohrebné (schválená metodika)
+  let psDeath, deathLabel, deathSub;
+  if(!dependent && dlhy<=0){
+    psDeath = 5000; deathLabel='Úmrtie — pohrebné náklady'; deathSub='Bez ekonomicky závislých osôb a bez dlhov';
+  } else {
+    psDeath = dlhy + (dependent ? twoYr : 0);
+    deathLabel='Úmrtie — krytie rodiny';
+    const parts = [];
+    if(dlhy>0) parts.push('Dlhy '+formatEUR(dlhy));
+    if(dependent) parts.push('2-ročný príjem '+formatEUR(twoYr));
+    deathSub = 'Fixná PS · '+(parts.join(' + ')||'—');
   }
+  addPsRow(tbody, prefix, deathLabel, psDeath, deathSub, 1, 'fixna', prevEdit);
 
+  // Kritické choroby — min. 10× čistý mesačný príjem
+  addPsRow(tbody, prefix, 'Kritické choroby', Math.round(10*cisty), 'min. 10× čistý mesačný príjem', 1, 'kch', prevEdit);
+
+  // Trvalé následky úrazu — 20× čistý mesačný príjem
+  addPsRow(tbody, prefix, 'Trvalé následky úrazu', Math.round(20*cisty), '20× čistý mesačný príjem · progresívne plnenie', 2, 'uraz', prevEdit);
+
+  // ── Skupina C: denná dávka (voliteľné) ──
+  const grpC = document.createElement('tr');
+  grpC.innerHTML = `<td colspan="5" class="zab-grp">Denná dávka (voliteľné)</td>`;
+  tbody.appendChild(grpC);
+  const dennaName = 'Denná dávka (PN / hospitalizácia)';
+  const dennaEdited = prevEdit[dennaName]!==undefined;
+  const dennaVal = dennaEdited ? (parseFloat(prevEdit[dennaName])||0) : 15;
+  const trD = document.createElement('tr');
+  trD.innerHTML =
+    `<td>${dennaName}<div class="zab-sub">Individuálne — najmä pri nízkych rezervách alebo SZČO bez nemocenského</div></td>`+
+    `<td colspan="2" class="zab-sub">Denné odškodné (€/deň)</td>`+
+    `<td><input type="number" min="0" class="zab-davka-override${dennaEdited?' edited':''}" data-mode="ps" data-row="${dennaName}"${dennaEdited?' data-edited="1"':''} value="${Math.round(dennaVal)}" oninput="recomputeZab(this)"></td>`+
+    `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${dennaName}" data-suma="${Math.round(dennaVal)}" data-unit="den" data-priority="3" ${isSzco?'checked':''}></td>`;
+  tbody.appendChild(trD);
+}
+
+// Pridá riadok s jednorazovou poistnou sumou (editovateľná PS)
+function addPsRow(tbody, prefix, name, ps, sub, prio, typ, prevEdit, roky){
+  const edited = prevEdit[name]!==undefined;
+  const val = edited ? (parseFloat(prevEdit[name])||0) : ps;
+  const rokyAttr = roky!==undefined ? ` data-roky="${roky}"` : '';
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    `<td><strong>${name}</strong><div class="zab-sub">${sub}</div></td>`+
+    `<td colspan="2" class="zab-sub">Poistná suma</td>`+
+    `<td><input type="number" min="0" class="zab-davka-override${edited?' edited':''}" data-mode="ps" data-row="${name}"${edited?' data-edited="1"':''} value="${Math.round(val)}" oninput="recomputeZab(this)"></td>`+
+    `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${name}" data-suma="${Math.round(val)}" data-unit="jednorazovo" data-priority="${prio}" data-typ="${typ}"${rokyAttr} ${val>0?'checked':''}></td>`;
+  tbody.appendChild(tr);
+}
+
+// Prepočet po ručnej úprave dávky alebo PS
+function recomputeZab(inp){
+  inp.dataset.edited = '1';
+  inp.classList.add('edited');
+  const tr = inp.closest('tr');
+  const cb = tr.querySelector('input[type=checkbox]');
+  if(inp.dataset.mode==='davka'){
+    const davka = parseFloat(inp.value)||0;
+    const krytie = parseFloat(inp.dataset.krytie)||0;
+    const gap = Math.max(0, krytie - davka);
+    const gapCell = tr.querySelector('.zab-gap');
+    if(gapCell){
+      gapCell.className = 'zab-gap'+(gap>0?' negative':'');
+      gapCell.innerHTML = gap>0 ? formatEUR(gap) : '0 € '+ico('check',14);
+    }
+    if(cb){ cb.dataset.suma = gap; cb.checked = gap>0; }
+  } else {
+    const ps = parseFloat(inp.value)||0;
+    if(cb){ cb.dataset.suma = ps; }
+  }
 }
 
 // ============================================================
@@ -1772,7 +1904,8 @@ function buildTimeline(){
     html += '<strong style="font-size:13px;">Priebežné zabezpečenie príjmu:</strong>';
     html += '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">';
     protectionGoals.forEach(g=>{
-      const unit = g.name.includes('Úmrtie') || g.name.includes('mrtie') ? ' jednorazovo' : '/mes';
+      const u = g.unit||'mes';
+      const unit = u==='jednorazovo' ? ' jednorazovo' : (u==='den' ? '/deň' : '/mes');
       html += `<span style="font-size:12px;background:var(--white);padding:6px 12px;border-radius:8px;border:1px solid var(--border);">${g.name.replace('Zabezpečenie: ','').replace('Partner — ','')} <strong style="color:var(--red);">${formatEUR(g.suma)}${unit}</strong></span>`;
     });
     html += '</div></div>';
@@ -1846,13 +1979,13 @@ function collectGoals(){
   // Step 8: Zabezpečenie (priebežné, bez dátumu)
   document.querySelectorAll('.fp-zab-k:checked').forEach(cb=>{
     const s = parseFloat(cb.dataset.suma)||0;
-    if(s > 0) goals.push({name:'Zabezpečenie: '+cb.dataset.name, suma:s, date:'—', category:'zabezpecenie'});
+    if(s > 0) goals.push({name:'Zabezpečenie: '+cb.dataset.name, suma:s, unit:cb.dataset.unit||'mes', date:'—', category:'zabezpecenie'});
   });
   // Partner zabezpečenie
   if(clientType==='pair'){
     document.querySelectorAll('.fp-zab-p:checked').forEach(cb=>{
       const s = parseFloat(cb.dataset.suma)||0;
-      if(s > 0) goals.push({name:'Partner — '+cb.dataset.name, suma:s, date:'—', category:'zabezpecenie'});
+      if(s > 0) goals.push({name:'Partner — '+cb.dataset.name, suma:s, unit:cb.dataset.unit||'mes', date:'—', category:'zabezpecenie'});
     });
   }
 
@@ -2745,37 +2878,58 @@ function buildFinancialPlan(){
   if(zabCheckedK.length > 0 || zabCheckedP.length > 0){
     fpSec6.style.display = 'block';
     let zabHtml = '';
-    function getZabRec(name){ if(name.includes('Výpoveď')) return 'Poistenie straty zamestnania'; if(name.includes('PN')) return 'Poistenie práceneschopnosti (denné odškodné)'; if(name.includes('Materská')) return 'Doplnkové pripoistenie'; if(name.includes('invalidita')) return 'Invalidný dôchodok — pripoistenie'; if(name.includes('Úmrtie') && name.includes('hypotéky')) return 'Rizikové životné poistenie — klesajúca PS'; if(name.includes('Úmrtie') && name.includes('príjem')) return 'Rizikové životné poistenie — fixná PS'; if(name.includes('Úmrtie')) return 'Rizikové životné poistenie'; return 'Poistenie'; }
     function getZabProduct(name){
-      if(name.includes('Úmrtie') && name.includes('hypotéky')) return {icon:ico('home'), product:'Rizikové životné poistenie', detail:'Klesajúca poistná suma, naviazaná na splatnosť hypotéky'};
-      if(name.includes('Úmrtie') && name.includes('príjem')) return {icon:ico('users'), product:'Rizikové životné poistenie', detail:'Fixná poistná suma pre zabezpečenie rodiny'};
+      if(name.includes('Úmrtie') && name.includes('hypotéky')) return {icon:ico('home'), product:'Rizikové životné poistenie', detail:'Klesajúca PS, naviazaná na splatnosť hypotéky'};
+      if(name.includes('Úmrtie') && name.includes('rodiny')) return {icon:ico('users'), product:'Rizikové životné poistenie', detail:'Fixná PS pre zabezpečenie rodiny'};
+      if(name.includes('pohrebné')) return {icon:ico('users'), product:'Rizikové životné poistenie', detail:'Krytie pohrebných nákladov'};
+      if(name.includes('Kritické')) return {icon:ico('heart-pulse'), product:'Poistenie kritických chorôb', detail:'Jednorazová výplata pri diagnóze (min. 10× čistý mes. príjem)'};
+      if(name.includes('Trvalé následky')) return {icon:ico('alert-triangle'), product:'Úrazové poistenie — trvalé následky', detail:'Progresívne plnenie pri trvalom poškodení'};
       if(name.includes('invalidita')) return {icon:ico('shield-check'), product:'Poistenie invalidity', detail:'Mesačná renta pri poklese pracovnej schopnosti'};
+      if(name.includes('Denná dávka')) return {icon:ico('shield'), product:'Denná dávka / hospitalizácia', detail:'Denné odškodné počas PN a pobytu v nemocnici'};
       if(name.includes('PN')) return {icon:ico('heart-pulse'), product:'Poistenie práceneschopnosti', detail:'Denné odškodné počas PN'};
       if(name.includes('Výpoveď')) return {icon:ico('briefcase'), product:'Poistenie straty zamestnania', detail:'Mesačná dávka po strate zamestnania'};
-      if(name.includes('Materská')) return {icon:ico('baby'), product:'Doplnkové pripoistenie', detail:'Finančná podpora pri materskej dovolenke'};
+      if(name.includes('Materská')) return {icon:ico('baby'), product:'Doplnkové pripoistenie', detail:'Finančná podpora počas materskej'};
       return {icon:ico('shield'), product:'Poistenie', detail:''};
     }
-    // Klient
-    if(zabCheckedK.length > 0){
-      zabHtml += '<div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px;">Klient</div>';
-      zabCheckedK.forEach(cb=>{
-        const name = cb.dataset.name; const suma = parseFloat(cb.dataset.suma)||0;
-        const prod = getZabProduct(name);
-        const unit = name.includes('Úmrtie') ? ' jednorazovo' : '/mes';
-        zabHtml += `<div class="fp-product"><div class="fp-product-icon protect">${prod.icon}</div><div class="fp-product-info"><div class="fp-product-name">${name}</div><div class="fp-product-desc">${prod.detail}</div></div><div style="text-align:right;min-width:100px;"><div style="font-size:15px;font-weight:700;color:var(--red);">${formatEUR(suma)}</div><div style="font-size:11px;color:var(--muted);">${unit}</div></div></div>`;
+    const prioLabel = {1:'<span class="zab-priority p1">Priorita 1</span>', 2:'<span class="zab-priority p2">Priorita 2</span>', 3:'<span class="zab-priority p3">Priorita 3</span>'};
+    function renderPerson(title, list){
+      const items = Array.from(list).map(cb=>({
+        name:cb.dataset.name, suma:parseFloat(cb.dataset.suma)||0,
+        unit:cb.dataset.unit||'mes', prio:parseInt(cb.dataset.priority)||3, typ:cb.dataset.typ||''
+      })).filter(it=>it.suma>0).sort((a,b)=>a.prio-b.prio);
+      if(items.length===0) return '';
+      let h = `<div style="font-size:14px;font-weight:700;color:var(--navy);margin:18px 0 10px;">${title}</div>`;
+      items.forEach(it=>{
+        const prod = getZabProduct(it.name);
+        const unitTxt = it.unit==='jednorazovo'?'jednorazovo':(it.unit==='den'?'/deň':'/mes');
+        h += `<div class="fp-product"><div class="fp-product-icon protect">${prod.icon}</div><div class="fp-product-info"><div class="fp-product-name">${it.name} ${prioLabel[it.prio]}</div><div class="fp-product-desc">${prod.detail}</div></div><div style="text-align:right;min-width:110px;"><div style="font-size:15px;font-weight:700;color:var(--red);">${formatEUR(it.suma)}</div><div style="font-size:11px;color:var(--muted);">${unitTxt}</div></div></div>`;
       });
-    }
-    // Partner
-    if(zabCheckedP.length > 0){
-      zabHtml += '<div style="font-size:14px;font-weight:700;color:var(--navy);margin:20px 0 12px;">Partner/ka</div>';
-      zabCheckedP.forEach(cb=>{
-        const name = cb.dataset.name; const suma = parseFloat(cb.dataset.suma)||0;
-        const prod = getZabProduct(name);
-        const unit = name.includes('Úmrtie') ? ' jednorazovo' : '/mes';
-        zabHtml += `<div class="fp-product"><div class="fp-product-icon protect">${prod.icon}</div><div class="fp-product-info"><div class="fp-product-name">${name}</div><div class="fp-product-desc">${prod.detail}</div></div><div style="text-align:right;min-width:100px;"><div style="font-size:15px;font-weight:700;color:var(--red);">${formatEUR(suma)}</div><div style="font-size:11px;color:var(--muted);">${unit}</div></div></div>`;
+      // Tabuľka poistných súm do zmluvy
+      h += `<table class="zab-ps-table"><thead><tr><th>Produkt</th><th>Typ krytia</th><th style="text-align:right;">Poistná suma</th><th>Priorita</th></tr></thead><tbody>`;
+      items.forEach(it=>{
+        const prod = getZabProduct(it.name);
+        h += `<tr><td>${it.name}<div class="zab-sub">${prod.product}</div></td><td>${zabTypLabel(it.unit)}</td><td class="ps-amount">${zabAmountLabel(it.suma,it.unit)}</td><td>${prioLabel[it.prio]}</td></tr>`;
       });
+      h += `</tbody></table>`;
+      // Súhrn poistnej sumy pre prípad úmrtia
+      const klesajuca = items.filter(it=>it.typ==='klesajuca').reduce((s,it)=>s+it.suma,0);
+      const fixna = items.filter(it=>it.typ==='fixna').reduce((s,it)=>s+it.suma,0);
+      if(klesajuca+fixna>0){
+        h += `<div class="info-box" style="margin-top:10px;"><strong>Celková poistná suma pre prípad úmrtia:</strong> ${formatEUR(klesajuca)} (klesajúca – hypotéka) + ${formatEUR(fixna)} (fixná – rodina) = <strong style="color:var(--red);">${formatEUR(klesajuca+fixna)}</strong></div>`;
+      }
+      return h;
     }
-    zabHtml += '<div class="info-box success" style="margin-top:16px;"><strong>Poistenie riešime cez:</strong> Partners Poisťovňa, NN, Allianz, MetLife, Generali</div>';
+    if(zabCheckedK.length>0) zabHtml += renderPerson('Klient', zabCheckedK);
+    if(zabCheckedP.length>0) zabHtml += renderPerson('Partner/ka', zabCheckedP);
+
+    // Orientačná cieľová zóna mesačného poistného (5–10 % čistého príjmu)
+    const cistyK = parseFloat(document.getElementById('k_cisty').value)||0;
+    const cistyP = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
+    const prijemSum = cistyK + cistyP;
+    if(prijemSum>0){
+      zabHtml += `<div class="fp-rec" style="margin-top:14px;"><div class="fp-rec-title">Orientačná cieľová zóna mesačného poistného</div><div class="fp-rec-row"><span>5–10 % čistého príjmu (${formatEUR(prijemSum)})</span><span class="fp-rec-highlight">${formatEUR(Math.round(prijemSum*0.05))} – ${formatEUR(Math.round(prijemSum*0.10))}/mes</span></div><div style="font-size:11px;color:var(--muted);margin-top:6px;">* Orientačné. Presné poistné závisí od veku, zdravotného stavu a konkrétnej poisťovne — upresní sa v individuálnej ponuke.</div></div>`;
+    }
+    zabHtml += '<div class="info-box success" style="margin-top:12px;"><strong>Poistenie riešime cez:</strong> Partners Poisťovňa, NN, Allianz, MetLife, Generali</div>';
     document.getElementById('fpZabezpecenie').innerHTML = zabHtml;
   } else { fpSec6.style.display = 'none'; }
 
@@ -3253,7 +3407,7 @@ async function generatePDF(){
   addLine('Mesačné výdavky', formatEUR(vydavky));
   document.querySelectorAll('.fp-zab-k:checked').forEach(cb=>{
     const suma = parseFloat(cb.dataset.suma)||0;
-    if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name.includes('Úmrtie')?' jednorazovo':'/mes'));
+    if(suma > 0) addLine(cb.dataset.name, zabAmountLabel(suma, cb.dataset.unit||'mes'));
   });
 
   // ===== PAGE 2: Financial Plan =====
@@ -3449,23 +3603,23 @@ async function generatePDF(){
   const zabItemsP = clientType==='pair' ? document.querySelectorAll('.fp-zab-p:checked') : [];
   if(zabItemsK.length > 0 || zabItemsP.length > 0){
     checkPage(30);
-    addSubtitle('Zabezpečenie príjmu — poistenie');
-    if(zabItemsK.length > 0){
-      addLine('— Klient —', '');
-      zabItemsK.forEach(cb=>{
-        const suma = parseFloat(cb.dataset.suma)||0;
-        if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name.includes('Úmrtie')?' jednorazovo':'/mes'));
-      });
+    addSubtitle('Zabezpečenie príjmu — poistné sumy do zmluvy');
+    function pdfZabPerson(label, list){
+      const items = Array.from(list).map(cb=>({name:cb.dataset.name, suma:parseFloat(cb.dataset.suma)||0, unit:cb.dataset.unit||'mes', prio:parseInt(cb.dataset.priority)||3, typ:cb.dataset.typ||''})).filter(it=>it.suma>0).sort((a,b)=>a.prio-b.prio);
+      if(items.length===0) return;
+      checkPage(12);
+      addLine(label, '');
+      items.forEach(it=>{ addLine('P'+it.prio+' · '+it.name, zabAmountLabel(it.suma, it.unit)); });
+      const kl = items.filter(it=>it.typ==='klesajuca').reduce((s,it)=>s+it.suma,0);
+      const fx = items.filter(it=>it.typ==='fixna').reduce((s,it)=>s+it.suma,0);
+      if(kl+fx>0) addLine('Spolu pre prípad úmrtia', formatEUR(kl+fx));
     }
-    if(zabItemsP.length > 0){
-      addLine('— Partner/ka —', '');
-      zabItemsP.forEach(cb=>{
-        const suma = parseFloat(cb.dataset.suma)||0;
-        if(suma > 0) addLine(cb.dataset.name, formatEUR(suma)+(cb.dataset.name.includes('Úmrtie')?' jednorazovo':'/mes'));
-      });
-    }
-    if(poistne > 0) addLine('Orientačné mesačné poistné', formatEUR(poistne));
-    addNote('Poskytovateľ: Partners Poisťovňa, NN, Allianz, MetLife, Generali');
+    if(zabItemsK.length>0) pdfZabPerson('— Klient —', zabItemsK);
+    if(zabItemsP.length>0) pdfZabPerson('— Partner/ka —', zabItemsP);
+    const cK = parseFloat(document.getElementById('k_cisty').value)||0;
+    const cP = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
+    if(cK+cP>0) addLine('Orientačné poistné (5–10 % príjmu)', formatEUR(Math.round((cK+cP)*0.05))+' – '+formatEUR(Math.round((cK+cP)*0.10))+'/mes');
+    addNote('Poskytovateľ: Partners Poisťovňa, NN, Allianz, MetLife, Generali. Poistné je orientačné, upresní sa v individuálnej ponuke.');
     y += 3;
   }
 
@@ -3624,6 +3778,8 @@ function collectAOFData(){
     if(cb.checked) cb.setAttribute('checked','checked');
     else cb.removeAttribute('checked');
   });
+  // Sync ručne prepísané dávky/PS (number inputy) do atribútu, nech prežijú innerHTML serializáciu
+  document.querySelectorAll('#zabBodyKlient input[type=number], #zabBodyPartner input[type=number]').forEach(inp => inp.setAttribute('value', inp.value));
   data.zabKlientHTML = document.getElementById('zabBodyKlient').innerHTML;
   data.zabPartnerHTML = document.getElementById('zabBodyPartner')?.innerHTML||'';
 
