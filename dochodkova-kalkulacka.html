@@ -586,7 +586,7 @@ function calc(){
   var pillar3=parseFloat(document.getElementById('pillar3').value)||0;
   var totalMonthlyInvest=monthlyInvest+pillar3;
   var returnRate=parseFloat(document.getElementById('returnRate').value)||7;
-  var inflation=parseFloat(document.getElementById('inflationR').value)||3;
+  var _inflRaw=parseFloat(document.getElementById('inflationR').value);var inflation=isNaN(_inflRaw)?3:_inflRaw;
 
   // Ensure retireAge > age
   if(retireAge<=age)retireAge=age+1;
@@ -831,7 +831,7 @@ function submitPdfForm(){
   var savings=parseFloat(document.getElementById('savings').value)||0;
   var monthlyInvest=parseFloat(document.getElementById('monthlyInvest').value)||0;
   var returnRate=parseFloat(document.getElementById('returnRate').value)||7;
-  var inflation=parseFloat(document.getElementById('inflationR').value)||3;
+  var _inflRaw=parseFloat(document.getElementById('inflationR').value);var inflation=isNaN(_inflRaw)?3:_inflRaw;
   if(retireAge<=age)retireAge=age+1;
   var gap=Math.max(0,desiredIncome-statePension);
   var yearsToRetire=retireAge-age;
