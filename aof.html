@@ -213,6 +213,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);l
 .zab-ps-table .ps-amount{font-weight:700;color:var(--red);text-align:right;white-space:nowrap;}
 .zab-ps-table .ps-grp td{background:var(--sand);font-weight:700;color:var(--navy);font-size:12px;}
 
+/* Krytie výpadku príjmu — vizuálne pruhy (dávka SP vs. treba dopoistiť) */
+.zab-bars{margin:8px 0 6px;}
+.zab-bar-block{margin:12px 0;}
+.zab-bar-head{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:5px;gap:10px;}
+.zab-bar-head .lbl{font-weight:700;color:var(--navy);}
+.zab-bar-head .ciel{color:var(--muted);white-space:nowrap;}
+.zab-bar{display:flex;height:30px;border-radius:8px;overflow:hidden;background:var(--sand);border:1px solid var(--border);}
+.zab-bar-seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;min-width:0;overflow:hidden;}
+.zab-bar-seg.davka{background:var(--green);}
+.zab-bar-seg.gap{background:var(--red);}
+.zab-bar-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin:6px 0 2px;}
+.zab-bar-legend span{display:inline-flex;align-items:center;gap:6px;}
+.zab-bar-legend .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+.zab-bar-legend .dot.davka{background:var(--green);}
+.zab-bar-legend .dot.gap{background:var(--red);}
+.zab-bar-legend .dot.ciel{background:var(--sand);border:1px solid var(--border);}
+
 /* Financial Plan Tabs */
 .fp-tabs{display:flex;background:var(--white);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:24px;}
 .fp-tab{flex:1;padding:14px 24px;font-family:inherit;font-size:14px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--muted);transition:all .2s;position:relative;}
@@ -1754,7 +1771,7 @@ function buildZabTable(prefix, bodyId){
       `<td><input type="number" min="0" class="zab-davka-override${edited?' edited':''}" data-mode="davka" data-row="${r.name}" data-krytie="${krytie}"${edited?' data-edited="1"':''} value="${Math.round(davka)}" oninput="recomputeZab(this)"></td>`+
       `<td class="zab-krytie">${formatEUR(krytie)}</td>`+
       `<td class="zab-gap ${gap>0?'negative':''}">${gap>0?formatEUR(gap):'0 € '+ico('check',14)}</td>`+
-      `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${gap}" data-unit="mes" data-priority="${r.prio}" ${gap>0?'checked':''}></td>`;
+      `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${gap}" data-davka="${Math.round(davka)}" data-krytie="${Math.round(krytie)}" data-unit="mes" data-priority="${r.prio}" ${gap>0?'checked':''}></td>`;
     tbody.appendChild(tr);
   });
 
@@ -1837,7 +1854,7 @@ function recomputeZab(inp){
       gapCell.className = 'zab-gap'+(gap>0?' negative':'');
       gapCell.innerHTML = gap>0 ? formatEUR(gap) : '0 € '+ico('check',14);
     }
-    if(cb){ cb.dataset.suma = gap; cb.checked = gap>0; }
+    if(cb){ cb.dataset.suma = gap; cb.dataset.davka = davka; cb.dataset.krytie = krytie; cb.checked = gap>0; }
   } else {
     const ps = parseFloat(inp.value)||0;
     if(cb){ cb.dataset.suma = ps; }
@@ -2895,10 +2912,24 @@ function buildFinancialPlan(){
     function renderPerson(title, list){
       const items = Array.from(list).map(cb=>({
         name:cb.dataset.name, suma:parseFloat(cb.dataset.suma)||0,
+        davka:parseFloat(cb.dataset.davka)||0, krytie:parseFloat(cb.dataset.krytie)||0,
         unit:cb.dataset.unit||'mes', prio:parseInt(cb.dataset.priority)||3, typ:cb.dataset.typ||''
       })).filter(it=>it.suma>0).sort((a,b)=>a.prio-b.prio);
       if(items.length===0) return '';
       let h = `<div style="font-size:14px;font-weight:700;color:var(--navy);margin:18px 0 10px;">${title}</div>`;
+      // Vizuál: koľko z výdavkov kryje Sociálna poisťovňa a koľko treba dopoistiť
+      const renta = items.filter(it=>it.unit==='mes' && it.krytie>0);
+      if(renta.length){
+        h += `<div class="zab-bars"><div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px;">Koľko treba dopoistiť pri výpadku príjmu (mesačne)</div>`;
+        h += `<div class="zab-bar-legend"><span><i class="dot ciel"></i> Cieľ krytia (výdavky/príjem)</span><span><i class="dot davka"></i> Dávka zo Sociálnej poisťovne</span><span><i class="dot gap"></i> Treba dopoistiť (poistná zmluva)</span></div>`;
+        renta.forEach(it=>{
+          const total = it.krytie||1;
+          const dPct = Math.max(0, Math.min(100, (it.davka/total)*100));
+          const gPct = Math.max(0, Math.min(100, (it.suma/total)*100));
+          h += `<div class="zab-bar-block"><div class="zab-bar-head"><span class="lbl">${it.name}</span><span class="ciel">cieľ krytia ${formatEUR(it.krytie)}</span></div><div class="zab-bar"><div class="zab-bar-seg davka" style="width:${dPct}%">${dPct>16?formatEUR(it.davka):''}</div><div class="zab-bar-seg gap" style="width:${gPct}%">${gPct>14?formatEUR(it.suma):''}</div></div></div>`;
+        });
+        h += `</div>`;
+      }
       items.forEach(it=>{
         const prod = getZabProduct(it.name);
         const unitTxt = it.unit==='jednorazovo'?'jednorazovo':(it.unit==='den'?'/deň':'/mes');
@@ -3604,11 +3635,36 @@ async function generatePDF(){
   if(zabItemsK.length > 0 || zabItemsP.length > 0){
     checkPage(30);
     addSubtitle('Zabezpečenie príjmu — poistné sumy do zmluvy');
+    function pdfZabBar(name, davka, gap, krytie){
+      checkPage(14);
+      doc.setFontSize(8.5); setBold(); doc.setTextColor(0,48,73);
+      doc.text(name, margin+4, y);
+      setNormal(); doc.setFontSize(7.5); doc.setTextColor(120,120,120);
+      doc.text('cieľ krytia '+formatEUR(krytie), pageW-margin, y, {align:'right'});
+      y += 2;
+      const barW = contentW-8, barX = margin+4, barH = 5, total = krytie||1;
+      const dW = barW * Math.max(0,Math.min(1, davka/total));
+      const gW = barW * Math.max(0,Math.min(1, gap/total));
+      doc.setFillColor(236,237,237); doc.rect(barX, y, barW, barH, 'F');
+      doc.setFillColor(46,125,50); doc.rect(barX, y, dW, barH, 'F');
+      doc.setFillColor(171,5,52); doc.rect(barX+dW, y, gW, barH, 'F');
+      doc.setFontSize(7); doc.setTextColor(255,255,255); setBold();
+      if(dW>14) doc.text(formatEUR(davka), barX+dW/2, y+3.4, {align:'center'});
+      if(gW>14) doc.text(formatEUR(gap), barX+dW+gW/2, y+3.4, {align:'center'});
+      setNormal(); doc.setTextColor(0,48,73); doc.setFontSize(10);
+      y += barH + 3;
+    }
     function pdfZabPerson(label, list){
-      const items = Array.from(list).map(cb=>({name:cb.dataset.name, suma:parseFloat(cb.dataset.suma)||0, unit:cb.dataset.unit||'mes', prio:parseInt(cb.dataset.priority)||3, typ:cb.dataset.typ||''})).filter(it=>it.suma>0).sort((a,b)=>a.prio-b.prio);
+      const items = Array.from(list).map(cb=>({name:cb.dataset.name, suma:parseFloat(cb.dataset.suma)||0, davka:parseFloat(cb.dataset.davka)||0, krytie:parseFloat(cb.dataset.krytie)||0, unit:cb.dataset.unit||'mes', prio:parseInt(cb.dataset.priority)||3, typ:cb.dataset.typ||''})).filter(it=>it.suma>0).sort((a,b)=>a.prio-b.prio);
       if(items.length===0) return;
       checkPage(12);
       addLine(label, '');
+      // Vizuál: dávka zo SP vs. treba dopoistiť (mesačná renta)
+      const renta = items.filter(it=>it.unit==='mes' && it.krytie>0);
+      if(renta.length){
+        renta.forEach(it=> pdfZabBar(it.name, it.davka, it.suma, it.krytie));
+        addNote('Zelená = dávka zo Sociálnej poisťovne · Červená = treba dopoistiť (poistná zmluva)');
+      }
       items.forEach(it=>{ addLine('P'+it.prio+' · '+it.name, zabAmountLabel(it.suma, it.unit)); });
       const kl = items.filter(it=>it.typ==='klesajuca').reduce((s,it)=>s+it.suma,0);
       const fx = items.filter(it=>it.typ==='fixna').reduce((s,it)=>s+it.suma,0);
