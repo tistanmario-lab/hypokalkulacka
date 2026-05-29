@@ -831,18 +831,23 @@ function submitPdfForm(){
   var savings=parseFloat(document.getElementById('savings').value)||0;
   var monthlyInvest=parseFloat(document.getElementById('monthlyInvest').value)||0;
   var returnRate=parseFloat(document.getElementById('returnRate').value)||7;
+  var inflation=parseFloat(document.getElementById('inflationR').value)||3;
+  if(retireAge<=age)retireAge=age+1;
   var gap=Math.max(0,desiredIncome-statePension);
   var yearsToRetire=retireAge-age;
   var retirementYears=LIFE_EXPECTANCY-retireAge;
+  if(retirementYears<1)retirementYears=1;
   var monthlyRate=returnRate/100/12;
+  var realReturnRate=returnRate-inflation;
+  if(realReturnRate<0)realReturnRate=0;
   var currentPortfolio=futureValue(savings,monthlyInvest,monthlyRate,yearsToRetire*12);
   var neededPortfolio=0;
   if(gap>0){
     if(rentaType==='inf'){
-      var drawdownRateAnnual=returnRate*0.7/100;
+      var drawdownRateAnnual=realReturnRate*0.7/100;
       neededPortfolio=drawdownRateAnnual>0?(gap*12)/drawdownRateAnnual:gap*12*50;
     } else {
-      var drawdownRate2=returnRate*0.7/100/12;
+      var drawdownRate2=realReturnRate*0.7/100/12;
       if(drawdownRate2>0){
         var n2=retirementYears*12;
         neededPortfolio=gap*(1-Math.pow(1+drawdownRate2,-n2))/drawdownRate2;
