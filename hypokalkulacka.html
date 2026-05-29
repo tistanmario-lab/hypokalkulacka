@@ -538,7 +538,7 @@ document.getElementById('loanPrincipalR').addEventListener('input',function(){
 function calc(){
   const loanAmount=parseFloat(document.getElementById('loanAmount').value)||150000;
   const principal=parseFloat(document.getElementById('loanPrincipal').value)||120000;
-  const interestRate=parseFloat(document.getElementById('interestRate').value)||3.5;
+  const _irRaw=parseFloat(document.getElementById('interestRate').value);const interestRate=isNaN(_irRaw)?3.5:_irRaw;
   const loanTerm=parseInt(document.getElementById('loanTerm').value)||30;
   const income1=parseFloat(document.getElementById('income').value)||0;
   const income2=parseFloat(document.getElementById('income2').value)||0;
