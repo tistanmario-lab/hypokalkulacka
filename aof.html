@@ -1746,7 +1746,7 @@ function buildZabTable(prefix, bodyId){
 
   // ── Skupina A: výpadok príjmu (mesačná renta) ──
   const grpA = document.createElement('tr');
-  grpA.innerHTML = `<td colspan="5" class="zab-grp">Výpadok príjmu — poistenie (PN + invalidita, vrátane splátky hypotéky)</td>`;
+  grpA.innerHTML = `<td colspan="5" class="zab-grp">Výpadok príjmu — poistenie (PN + invalidita)</td>`;
   tbody.appendChild(grpA);
 
   if(isSzco){
@@ -1756,10 +1756,9 @@ function buildZabTable(prefix, bodyId){
   }
 
   const splatka = parseFloat(document.getElementById('optim_splatka')?.value)||0;
-  // Splátku hypotéky pripočítavame ku krytiu len v režime "minimálne" (vo výdavkoch nie je); v režime "čistý príjem" je už zahrnutá
-  const mortgagePart = (krytieMode==='min') ? splatka : 0;
+  // Splátka hypotéky je súčasťou výdavkov — vo vizuáli ju len vyznačíme (do výšky výdavkov), NEpripočítavame ku krytiu
 
-  // Poistiteľné riziká s mesačnou rentou (PN + invalidita) — vrátane splátky hypotéky
+  // Poistiteľné riziká s mesačnou rentou (PN + invalidita); splátka hypotéky vyznačená v krytí
   const insurableRenta = [
     {name:'PN (práceneschopnosť)', davka: zabDavkaMes(hrubyBase, SP.R_PN), note:'max 52 týž.', prio:2},
     {name:'Čiastočná invalidita (41–70 %)', davka: zabInvalid(hrubyBase, vek, retireAge, 0.5), note:'trvalá do dôchodku', prio:2},
@@ -1768,16 +1767,15 @@ function buildZabTable(prefix, bodyId){
   insurableRenta.forEach(r=>{
     const davka = prevEdit[r.name]!==undefined ? (parseFloat(prevEdit[r.name])||0) : r.davka;
     const edited = prevEdit[r.name]!==undefined;
-    const expenseGap = Math.max(0, krytie - davka);
-    const gap = expenseGap + mortgagePart;
-    const total = krytie + mortgagePart;
+    const gap = Math.max(0, krytie - davka);          // poistná suma = výdavky − dávka
+    const mortgageMark = Math.min(splatka, gap);       // z toho splátka hypotéky (do výšky výdavkov)
     const tr = document.createElement('tr');
     tr.innerHTML =
       `<td>${r.name}<div class="zab-sub">Dávka SP · ${r.note}</div></td>`+
-      `<td><input type="number" min="0" class="zab-davka-override${edited?' edited':''}" data-mode="davka" data-row="${r.name}" data-vydavky="${Math.round(krytie)}" data-splatka="${Math.round(mortgagePart)}"${edited?' data-edited="1"':''} value="${Math.round(davka)}" oninput="recomputeZab(this)"></td>`+
-      `<td class="zab-krytie">${formatEUR(total)}${mortgagePart>0?'<div class="zab-sub">vr. splátky '+formatEUR(mortgagePart)+'</div>':''}</td>`+
+      `<td><input type="number" min="0" class="zab-davka-override${edited?' edited':''}" data-mode="davka" data-row="${r.name}" data-vydavky="${Math.round(krytie)}" data-splatka="${Math.round(splatka)}"${edited?' data-edited="1"':''} value="${Math.round(davka)}" oninput="recomputeZab(this)"></td>`+
+      `<td class="zab-krytie">${formatEUR(krytie)}${mortgageMark>0?'<div class="zab-sub">z toho hypotéka '+formatEUR(mortgageMark)+'</div>':''}</td>`+
       `<td class="zab-gap ${gap>0?'negative':''}">${gap>0?formatEUR(gap):'0 € '+ico('check',14)}</td>`+
-      `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${gap}" data-davka="${Math.round(davka)}" data-vydavky="${Math.round(krytie)}" data-splatka="${Math.round(mortgagePart)}" data-krytie="${Math.round(total)}" data-unit="mes" data-priority="${r.prio}" ${gap>0?'checked':''}></td>`;
+      `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${r.name}" data-suma="${gap}" data-davka="${Math.round(davka)}" data-vydavky="${Math.round(krytie)}" data-splatka="${Math.round(splatka)}" data-krytie="${Math.round(krytie)}" data-unit="mes" data-priority="${r.prio}" ${gap>0?'checked':''}></td>`;
     tbody.appendChild(tr);
   });
 
@@ -1876,8 +1874,7 @@ function recomputeZab(inp){
   if(inp.dataset.mode==='davka'){
     const davka = parseFloat(inp.value)||0;
     const vyd = parseFloat(inp.dataset.vydavky)||0;
-    const spl = parseFloat(inp.dataset.splatka)||0;
-    const gap = Math.max(0, vyd - davka) + spl;
+    const gap = Math.max(0, vyd - davka);
     const gapCell = tr.querySelector('.zab-gap');
     if(gapCell){
       gapCell.className = 'zab-gap'+(gap>0?' negative':'');
@@ -2950,19 +2947,21 @@ function buildFinancialPlan(){
       // Vizuál: koľko z výdavkov kryje Sociálna poisťovňa a koľko treba dopoistiť
       const renta = items.filter(it=>it.unit==='mes' && it.krytie>0);
       if(renta.length){
-        const anyHypo = renta.some(it=>it.splatka>0);
+        const anyHypo = renta.some(it=>it.splatka>0 && (it.vydavky-it.davka)>0);
         h += `<div class="zab-bars"><div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px;">Koľko treba dopoistiť pri výpadku príjmu (mesačne)</div>`;
-        h += `<div class="zab-bar-legend"><span><i class="dot davka"></i> Dávka zo Sociálnej poisťovne</span><span><i class="dot gap"></i> Treba dopoistiť – výdavky</span>${anyHypo?'<span><i class="dot hypo"></i> Splátka hypotéky (tiež dopoistiť)</span>':''}</div>`;
+        h += `<div class="zab-bar-legend"><span><i class="dot davka"></i> Dávka zo Sociálnej poisťovne</span><span><i class="dot gap"></i> Treba dopoistiť – ostatné výdavky</span>${anyHypo?'<span><i class="dot hypo"></i> Z toho splátka hypotéky</span>':''}</div>`;
         renta.forEach(it=>{
           const total = it.krytie||1;
-          const expGap = Math.max(0, it.vydavky - it.davka);
+          const gap = Math.max(0, it.vydavky - it.davka);
+          const mortgage = Math.min(it.splatka, gap);
+          const otherGap = Math.max(0, gap - mortgage);
           const dPct = Math.max(0, Math.min(100, (it.davka/total)*100));
-          const rPct = Math.max(0, Math.min(100, (expGap/total)*100));
-          const mPct = Math.max(0, Math.min(100, (it.splatka/total)*100));
+          const rPct = Math.max(0, Math.min(100, (otherGap/total)*100));
+          const mPct = Math.max(0, Math.min(100, (mortgage/total)*100));
           h += `<div class="zab-bar-block"><div class="zab-bar-head"><span class="lbl">${it.name}</span><span class="ciel">cieľ krytia ${formatEUR(it.krytie)}</span></div><div class="zab-bar">`+
             `<div class="zab-bar-seg davka" style="width:${dPct}%">${dPct>16?formatEUR(it.davka):''}</div>`+
-            `<div class="zab-bar-seg gap" style="width:${rPct}%">${rPct>14?formatEUR(expGap):''}</div>`+
-            (it.splatka>0?`<div class="zab-bar-seg hypo" style="width:${mPct}%">${mPct>14?formatEUR(it.splatka):''}</div>`:'')+
+            `<div class="zab-bar-seg gap" style="width:${rPct}%">${rPct>14?formatEUR(otherGap):''}</div>`+
+            (mortgage>0?`<div class="zab-bar-seg hypo" style="width:${mPct}%">${mPct>14?formatEUR(mortgage):''}</div>`:'')+
           `</div></div>`;
         });
         h += `</div>`;
@@ -3704,8 +3703,8 @@ async function generatePDF(){
       // Vizuál: dávka zo SP vs. treba dopoistiť (mesačná renta + hypotéka)
       const renta = items.filter(it=>it.unit==='mes' && it.krytie>0);
       if(renta.length){
-        renta.forEach(it=> pdfZabBar(it.name, it.davka, Math.max(0,it.vydavky-it.davka), it.splatka, it.krytie));
-        addNote('Modrá = dávka zo Sociálnej poisťovne · Červená = treba dopoistiť (výdavky) · Oranžová = splátka hypotéky');
+        renta.forEach(it=>{ const gap=Math.max(0,it.vydavky-it.davka); const mortgage=Math.min(it.splatka,gap); pdfZabBar(it.name, it.davka, gap-mortgage, mortgage, it.krytie); });
+        addNote('Modrá = dávka zo SP · Červená = treba dopoistiť (ostatné výdavky) · Oranžová = z toho splátka hypotéky');
       }
       items.forEach(it=>{ addLine('P'+it.prio+' · '+it.name, zabAmountLabel(it.suma, it.unit)); });
       const kl = items.filter(it=>it.typ==='klesajuca').reduce((s,it)=>s+it.suma,0);
