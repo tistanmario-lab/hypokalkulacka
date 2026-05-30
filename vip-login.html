@@ -219,7 +219,14 @@ async function doLogin() {
   try {
     var res = await window.sbc.auth.signInWithPassword({ email: email, password: password });
     if (res.error) {
-      errEl.textContent = 'Nesprávny e-mail alebo heslo.';
+      var m = (res.error.message || '').toLowerCase();
+      if (m.indexOf('not confirmed') > -1 || m.indexOf('confirm') > -1) {
+        errEl.textContent = 'Účet ešte nie je potvrdený. Skontrolujte e-mail s potvrdením, alebo požiadajte správcu o potvrdenie účtu.';
+      } else if (m.indexOf('invalid login') > -1 || m.indexOf('credentials') > -1) {
+        errEl.textContent = 'Nesprávny e-mail alebo heslo.';
+      } else {
+        errEl.textContent = 'Prihlásenie zlyhalo: ' + res.error.message;
+      }
       errEl.style.display = 'block';
       document.getElementById('password').value = '';
     } else {

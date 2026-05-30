@@ -3,6 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Presmerovanie odkazu na obnovu hesla (VIP zóna) na správnu stránku -->
+<script>
+(function(){
+  try{
+    var h = window.location.hash || '';
+    var q = window.location.search || '';
+    var isRecovery = /type=recovery/.test(h) || /type=recovery/.test(q) || /[#&?]access_token=/.test(h) || /[?&]code=/.test(q);
+    if(isRecovery){ window.location.replace('vip-reset.html' + q + h); }
+  }catch(e){}
+})();
+</script>
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YF1E1SN7J8"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YF1E1SN7J8');</script>
