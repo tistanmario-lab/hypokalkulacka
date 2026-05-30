@@ -280,8 +280,9 @@ async function resetPassword() {
 (async function(){
   try {
     if (!window.sbc) return;
-    var s = await window.sbc.auth.getSession();
-    if (!s.data.session) return; // odhlásený → zostaň na prihlásení
+    // Počkaj na hydratáciu relácie (beží na pozadí, formulár je hneď použiteľný).
+    var sess = await vipResolveSession(2500);
+    if (!sess) return; // odhlásený → zostaň na prihlásení
     var u = await window.sbc.auth.getUser(); // over reláciu so serverom
     if (u && !u.error && u.data && u.data.user) {
       window.location.replace('vip-dashboard.html'); // platná relácia
