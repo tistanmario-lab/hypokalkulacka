@@ -273,14 +273,22 @@ async function resetPassword() {
   }
 }
 
-// Ak je už používateľ prihlásený, presmeruj na dashboard
+// Ak je používateľ platne prihlásený, presmeruj na dashboard.
+// DÔLEŽITÉ: reláciu overíme so serverom (getUser). Ak je zastaraná/neplatná
+// (napr. po zmazaní účtu), odhlásime ju a zostaneme na login — tým sa preruší
+// prípadná slučka presmerovaní (blikanie stránky).
 (async function(){
   try {
-    if (window.sbc) {
-      var s = await window.sbc.auth.getSession();
-      if (s.data.session) window.location.replace('vip-dashboard.html');
+    if (!window.sbc) return;
+    var s = await window.sbc.auth.getSession();
+    if (!s.data.session) return; // odhlásený → zostaň na prihlásení
+    var u = await window.sbc.auth.getUser(); // over reláciu so serverom
+    if (u && !u.error && u.data && u.data.user) {
+      window.location.replace('vip-dashboard.html'); // platná relácia
+    } else {
+      try { await window.sbc.auth.signOut(); } catch(e) {} // neplatná → vyčisti
     }
-  } catch(e) {}
+  } catch(e) { /* sieťová chyba → zostaň na login */ }
 })();
 </script>
 
