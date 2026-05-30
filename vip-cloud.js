@@ -17,12 +17,28 @@
 })();
 
 // ── Autentifikácia ──────────────────────────────────────────
+// Počká na hydratáciu relácie z úložiska (rieši "blikanie" / redirect-loop:
+// getSession() môže hneď po načítaní stránky vrátiť null, kým Supabase obnoví
+// reláciu z localStorage). Vracia session alebo null po vypršaní maxWaitMs.
+async function vipResolveSession(maxWaitMs){
+  maxWaitMs = (typeof maxWaitMs === 'number') ? maxWaitMs : 3000;
+  var start = Date.now();
+  while(true){
+    try{
+      var s = await window.sbc.auth.getSession();
+      if(s && s.data && s.data.session) return s.data.session;
+    }catch(e){}
+    if(Date.now() - start > maxWaitMs) return null;
+    await new Promise(function(r){ setTimeout(r, 150); });
+  }
+}
+
 // Ochrana stránky: ak nie je relácia, presmeruje na login.
 async function vipRequireAuth(){
   try{
-    var res = await window.sbc.auth.getSession();
-    if(!res.data.session){ window.location.replace('vip-login.html'); return null; }
-    return res.data.session.user;
+    var sess = await vipResolveSession();
+    if(!sess){ window.location.replace('vip-login.html'); return null; }
+    return sess.user;
   }catch(e){
     window.location.replace('vip-login.html');
     return null;

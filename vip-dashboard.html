@@ -225,9 +225,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 
 <!-- Auth check -->
 <script>
-if (sessionStorage.getItem('vip_auth') !== 'true') {
-  window.location.href = 'vip-login.html';
-}
+// Počká na hydratáciu relácie (rieši blikanie), potom overí so serverom
+(async function(){
+  try{
+    var sess = await vipResolveSession();
+    if(!sess){ window.location.replace('vip-login.html'); return; }
+    var u = await window.sbc.auth.getUser();
+    if(!u || u.error || !u.data || !u.data.user){
+      try{ await window.sbc.auth.signOut(); }catch(e){}
+      window.location.replace('vip-login.html');
+    }
+  }catch(e){ /* sieťová chyba → ponechaj (offline tolerancia) */ }
+})();
 </script>
 
 <!-- Top bar -->
