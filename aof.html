@@ -362,6 +362,7 @@ if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.
     <button class="btn btn-outline btn-sm" onclick="exportAOFJson()" title="Stiahne aktuálnu AOF ako .json súbor pre zálohovanie">Export JSON</button>
     <button class="btn btn-outline btn-sm" onclick="document.getElementById('importJsonInput').click()" title="Načíta AOF z .json súboru (záloha)">Import JSON</button>
     <input type="file" id="importJsonInput" accept="application/json,.json" style="display:none" onchange="importAOFJson(event)">
+    <button class="btn btn-outline btn-sm" id="migrateBtn" onclick="migrateLocalToCloud()" style="display:none" title="Prenesie staršie analýzy uložené v tomto prehliadači do cloudu">Preniesť do cloudu</button>
   </div>
 
   <!-- ==================== STEP 1: Osobné údaje ==================== -->
@@ -3887,7 +3888,10 @@ function collectAOFData(){
   return data;
 }
 
-function saveAOF(){
+// Aktuálne otvorený cloudový záznam (UUID) — ak je nastavený, save robí update
+let currentCloudId = null;
+
+async function saveAOF(){
   // Validácia: meno klienta musí byť vyplnené
   const krstne = document.getElementById('k_meno').value.trim();
   const priezvisko = document.getElementById('k_priezvisko').value.trim();
@@ -3904,11 +3908,59 @@ function saveAOF(){
 
   const data = collectAOFData();
   const meno = data.name;
-  const key = 'aof_'+meno.replace(/\s+/g,'_')+'_'+Date.now();
-  localStorage.setItem(key, JSON.stringify(data));
-  // Vymaž autosave draft — manuálny save ho nahrádza
-  localStorage.removeItem(AUTOSAVE_KEY);
-  alert('AOF uložená: '+meno);
+
+  // 1) Lokálna kópia (offline záloha — hybrid)
+  try {
+    const key = 'aof_'+meno.replace(/\s+/g,'_')+'_'+Date.now();
+    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.removeItem(AUTOSAVE_KEY);
+  } catch(e) { /* localStorage plné/nedostupné — pokračuj na cloud */ }
+
+  // 2) Cloud (Supabase) — hlavné úložisko
+  try {
+    const saved = await aofCloudSave(meno, data, currentCloudId);
+    if (saved && saved.id) currentCloudId = saved.id;
+    alert('AOF uložená do cloudu: '+meno);
+  } catch(e) {
+    alert('AOF sa uložila lokálne, ale do cloudu sa nepodarilo uložiť:\n'+(e.message||e)+'\n\nSkontrolujte internet a skúste znova.');
+  }
+}
+
+// Zoznam starších lokálnych analýz (localStorage), okrem autosave draftu
+function listLocalAOFKeys(){
+  const keys = [];
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k && k.indexOf('aof_')===0 && k!==AUTOSAVE_KEY) keys.push(k);
+  }
+  return keys;
+}
+
+// Zobraz migračné tlačidlo, ak existujú staršie lokálne analýzy
+function refreshMigrateBtn(){
+  const btn = document.getElementById('migrateBtn');
+  if(!btn) return;
+  const n = listLocalAOFKeys().length;
+  if(n>0){ btn.style.display=''; btn.textContent = 'Preniesť do cloudu ('+n+')'; }
+  else { btn.style.display='none'; }
+}
+
+// Jednorazová migrácia: prenesie všetky lokálne analýzy do cloudu
+async function migrateLocalToCloud(){
+  const keys = listLocalAOFKeys();
+  if(keys.length===0){ alert('Žiadne lokálne analýzy na prenos.'); return; }
+  if(!confirm('Preniesť '+keys.length+' lokálnych analýz do cloudu?\n\nPo prenose budú dostupné na všetkých zariadeniach po prihlásení. Lokálne kópie zostanú zachované.')) return;
+  let ok=0, fail=0;
+  for(const k of keys){
+    try{
+      const data = JSON.parse(localStorage.getItem(k));
+      if(!data || !data.fields){ continue; }
+      await aofCloudSave(data.name || 'Bez mena', data, null);
+      ok++;
+    }catch(e){ fail++; }
+  }
+  alert('Prenesené do cloudu: '+ok+(fail?('\nNepodarilo sa: '+fail):''));
+  refreshMigrateBtn();
 }
 
 // Export aktuálneho AOFu ako JSON súbor (backup/transport medzi zariadeniami)
@@ -4029,12 +4081,41 @@ function showLoadSelect(){
   sel.style.display = 'inline-block';
 }
 
-function loadAOF(key){
+// Načítanie: rozlíši cloud UUID (z dashboardu) od lokálneho kľúča / autosave
+async function loadAOF(key){
   if(!key) return;
+  if (typeof isCloudId === 'function' && isCloudId(key)) {
+    // Cloud záznam
+    try {
+      const rec = await aofCloudGet(key);
+      if (rec && rec.data) {
+        currentCloudId = rec.id;
+        applyAOFData(rec.data);
+        alert('AOF načítaná z cloudu: ' + (rec.nazov || rec.data.name || ''));
+        goToStep(1);
+      }
+    } catch(e) {
+      alert('Chyba pri načítaní AOF z cloudu: ' + (e.message || e));
+    }
+    return;
+  }
+  // Lokálny kľúč (autosave alebo staršie localStorage záznamy)
   try{
     const data = JSON.parse(localStorage.getItem(key));
     if(!data) return;
+    applyAOFData(data);
+    if (key !== AUTOSAVE_KEY) localStorage.removeItem(AUTOSAVE_KEY);
+    alert('AOF načítaná: '+data.name);
+    goToStep(1);
+  }catch(e){
+    alert('Chyba pri načítaní AOF');
+  }
+}
 
+// Aplikuje dáta AOF do formulára (spoločné pre cloud aj lokálne načítanie)
+function applyAOFData(data){
+  if(!data) return;
+  {
     clientType = data.clientType || 'single';
     hasZmena = data.hasZmena !== undefined ? data.hasZmena : true;
     hasDeti = data.hasDeti !== undefined ? data.hasDeti : true;
@@ -4079,13 +4160,6 @@ function loadAOF(key){
       b.classList.toggle('active', (clientType==='single'&&i===0)||(clientType==='pair'&&i===1));
     });
 
-    // Po úspešnom načítaní vymaž autosave draft (už ho nepotrebujeme)
-    if (key !== AUTOSAVE_KEY) localStorage.removeItem(AUTOSAVE_KEY);
-
-    alert('AOF načítaná: '+data.name);
-    goToStep(1);
-  }catch(e){
-    alert('Chyba pri načítaní AOF');
   }
 }
 
@@ -4122,15 +4196,20 @@ document.addEventListener('DOMContentLoaded', function(){
   // Initial zabezpecenie
   updateZabezpecenie();
 
-  // Set username from session
-  const user = sessionStorage.getItem('vip_user');
-  if(user) document.getElementById('topUsername').textContent = user;
+  // Set username from cloud session
+  (async function(){
+    try { const u = await vipCurrentUser(); if(u) document.getElementById('topUsername').textContent = (u.email||'').split('@')[0]; } catch(e){}
+  })();
 
   // 1) Skontroluj URL ?load=<key> — otvorenie konkrétneho AOFu z dashboardu
   try {
     const params = new URLSearchParams(window.location.search);
     const loadKey = params.get('load');
-    if (loadKey && localStorage.getItem(loadKey)) {
+    if (loadKey && typeof isCloudId === 'function' && isCloudId(loadKey)) {
+      // Cloud záznam (UUID) z dashboardu
+      loadAOF(loadKey);
+      history.replaceState(null, '', window.location.pathname);
+    } else if (loadKey && localStorage.getItem(loadKey)) {
       loadAOF(loadKey);
       // Odstráň ?load z URL aby refresh nezopakoval load
       history.replaceState(null, '', window.location.pathname);

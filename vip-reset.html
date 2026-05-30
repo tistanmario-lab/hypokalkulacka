@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP Zóna | Nové heslo | Mário Tišťan</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#003049;--red:#AB0534;--silver:#989FA7;--sand:#ECEDED;--white:#fff;--green:#2e7d32;--muted:rgba(0,48,73,0.5);--border:rgba(0,48,73,0.1);--radius:20px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.login-container{width:100%;max-width:420px;padding:20px;}
+.login-card{background:var(--white);border-radius:var(--radius);padding:48px 40px;box-shadow:0 16px 48px rgba(0,48,73,0.08);text-align:center;}
+.login-logo{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy);text-decoration:none;margin-bottom:8px;display:block;}
+.login-logo span{color:var(--red);}
+.login-badge{display:inline-block;background:var(--navy);color:#fff;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:32px;}
+.login-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;}
+.login-sub{font-size:14px;color:var(--muted);margin-bottom:32px;line-height:1.6;}
+.input-group{margin-bottom:16px;text-align:left;}
+.input-group label{display:block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.input-group input{width:100%;padding:14px 16px;font-size:15px;font-family:'DM Sans',sans-serif;border:1px solid var(--border);border-radius:12px;background:var(--sand);color:var(--navy);outline:none;transition:border-color .2s;}
+.input-group input:focus{border-color:var(--navy);}
+.login-btn{width:100%;padding:16px;background:var(--red);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border:none;border-radius:12px;cursor:pointer;transition:background .2s;margin-top:8px;}
+.login-btn:hover{background:var(--navy);}
+.login-error{display:none;color:var(--red);font-size:13px;font-weight:500;margin-top:12px;}
+.login-ok{display:none;color:var(--green);font-size:13px;font-weight:500;margin-top:12px;}
+.login-footer{margin-top:24px;font-size:12px;color:var(--silver);}
+.login-footer a{color:var(--navy);text-decoration:none;font-weight:500;}
+.login-footer a:hover{color:var(--red);}
+@media (max-width:480px){.login-card{padding:36px 24px;}.input-group input{padding:14px 16px;font-size:16px;min-height:48px;}.login-btn{padding:14px;min-height:48px;}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="vip-cloud.js"></script>
+</head>
+<body>
+<div class="login-container">
+  <div class="login-card">
+    <a href="index.html" class="login-logo">Mário <span>Tišťan</span></a>
+    <div class="login-badge">VIP Zóna</div>
+    <h1 class="login-title">Nastavenie nového hesla</h1>
+    <p class="login-sub">Zadajte nové heslo k vášmu účtu.</p>
+
+    <form onsubmit="return doReset()">
+      <div class="input-group">
+        <label for="pass1">Nové heslo</label>
+        <input type="password" id="pass1" placeholder="Aspoň 8 znakov" autocomplete="new-password" minlength="8" required>
+      </div>
+      <div class="input-group">
+        <label for="pass2">Zopakujte heslo</label>
+        <input type="password" id="pass2" placeholder="Zopakujte nové heslo" autocomplete="new-password" minlength="8" required>
+      </div>
+      <button type="submit" class="login-btn">Uložiť nové heslo</button>
+    </form>
+
+    <div class="login-error" id="err"></div>
+    <div class="login-ok" id="ok"></div>
+
+    <div class="login-footer">
+      <a href="vip-login.html">&larr; Späť na prihlásenie</a>
+    </div>
+  </div>
+</div>
+
+<script>
+var canReset = false;
+// Pri otvorení z e-mailového odkazu Supabase nastaví dočasnú "recovery" reláciu
+(async function(){
+  var err = document.getElementById('err');
+  try{
+    var s = await window.sbc.auth.getSession();
+    if(s.data.session){ canReset = true; }
+    else {
+      // počkaj na spracovanie odkazu z URL
+      window.sbc.auth.onAuthStateChange(function(event){
+        if(event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN'){ canReset = true; }
+      });
+      setTimeout(async function(){
+        var s2 = await window.sbc.auth.getSession();
+        if(!s2.data.session && !canReset){
+          err.textContent = 'Odkaz na obnovu hesla je neplatný alebo vypršal. Požiadajte o nový na prihlasovacej stránke.';
+          err.style.display = 'block';
+        }
+      }, 1500);
+    }
+  }catch(e){}
+})();
+
+async function doReset(){
+  var p1 = document.getElementById('pass1').value;
+  var p2 = document.getElementById('pass2').value;
+  var err = document.getElementById('err');
+  var ok = document.getElementById('ok');
+  err.style.display='none'; ok.style.display='none';
+  if(p1 !== p2){ err.textContent='Heslá sa nezhodujú.'; err.style.display='block'; return false; }
+  if(p1.length < 8){ err.textContent='Heslo musí mať aspoň 8 znakov.'; err.style.display='block'; return false; }
+  try{
+    var r = await window.sbc.auth.updateUser({ password: p1 });
+    if(r.error){ err.textContent='Nepodarilo sa zmeniť heslo: '+r.error.message; err.style.display='block'; }
+    else {
+      ok.textContent='Heslo bolo zmenené. Presmerúvam na prihlásenie…';
+      ok.style.display='block';
+      setTimeout(function(){ window.location.href='vip-login.html'; }, 1800);
+    }
+  }catch(e){ err.textContent='Chyba: '+(e.message||e); err.style.display='block'; }
+  return false;
+}
+</script>
+</body>
+</html>
