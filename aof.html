@@ -318,13 +318,24 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
   body.presentation-mode .card{break-inside:avoid;box-shadow:none;}
 }
 </style>
+<script src="supabase.min.js"></script>
+<script src="vip-cloud.js"></script>
+<script>
+// Auth guard — počká na hydratáciu relácie (rieši blikanie), potom overí so serverom
+(async function(){
+  try{
+    var sess = await vipResolveSession();
+    if(!sess){ window.location.replace('vip-login.html'); return; }
+    var u = await window.sbc.auth.getUser();
+    if(!u || u.error || !u.data || !u.data.user){
+      try{ await window.sbc.auth.signOut(); }catch(e){}
+      window.location.replace('vip-login.html');
+    }
+  }catch(e){ /* sieťová chyba → ponechaj (offline tolerancia) */ }
+})();
+</script>
 </head>
 <body>
-
-<!-- Session Check -->
-<script>
-if(sessionStorage.getItem('vip_auth')!=='true'){window.location.href='vip-login.html';}
-</script>
 
 <!-- Top Bar -->
 <header class="vip-topbar">
