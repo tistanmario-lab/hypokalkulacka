@@ -320,9 +320,27 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 
   </div>
 
-  <!-- Posledné AOF záznamy -->
-  <h2 class="vip-section-title" id="recentAofTitle" style="display:none">Posledné AOF záznamy</h2>
-  <div class="vip-grid" id="recentAofGrid" style="display:none"></div>
+  <!-- Evidencia analýz (AOF) -->
+  <h2 class="vip-section-title" id="recentAofTitle" style="display:none">Evidencia analýz</h2>
+  <div id="aofEvidencia" style="display:none">
+    <div class="aof-toolbar">
+      <input type="text" id="aofSearch" class="aof-search" placeholder="Hľadať podľa mena klienta…" oninput="renderAofTable()">
+      <select id="aofSort" class="aof-sort" onchange="renderAofTable()">
+        <option value="updated">Najnovšie zmenené</option>
+        <option value="created">Najnovšie vytvorené</option>
+        <option value="name">Podľa mena (A–Z)</option>
+      </select>
+      <span class="aof-count" id="aofCount"></span>
+    </div>
+    <div class="aof-table-wrap">
+      <table class="aof-table">
+        <thead>
+          <tr><th>Klient / názov</th><th>Vytvorené</th><th>Posledná zmena</th><th style="text-align:right;">Akcie</th></tr>
+        </thead>
+        <tbody id="aofTableBody"></tbody>
+      </table>
+    </div>
+  </div>
 
   <!-- Rýchle linky -->
   <h2 class="vip-section-title">Rýchle linky</h2>
@@ -383,26 +401,102 @@ function escHtml(s){ return (s+'').replace(/[<>&"']/g, function(c){ return ({'<'
   }
   document.getElementById('statRevenue').textContent = thisMonthCount;
 
-  var top = items.slice(0, 8);
-  if (top.length > 0) {
-    var grid = document.getElementById('recentAofGrid');
-    var title = document.getElementById('recentAofTitle');
-    title.style.display = '';
-    grid.style.display = '';
-    top.forEach(function(it){
-      var dt = it.updated_at ? new Date(it.updated_at) : null;
-      var dateLabel = dt ? dt.toLocaleDateString('sk-SK', {day:'numeric', month:'short', year:'numeric'}) : '—';
-      var html = '<a href="aof.html?load=' + encodeURIComponent(it.id) + '" class="vip-card">' +
-                 '<div class="vip-card-icon"><i data-lucide="file-text"></i></div>' +
-                 '<h3>' + escHtml(it.nazov || 'Bez mena') + '</h3>' +
-                 '<p>Uložené: ' + dateLabel + '</p>' +
-                 '<span class="vip-card-status status-active">Otvoriť</span>' +
-                 '</a>';
-      grid.insertAdjacentHTML('beforeend', html);
-    });
+  // Evidencia: ulož dáta a vykresli tabuľku
+  window.__aofItems = items;
+  if (items.length > 0) {
+    document.getElementById('recentAofTitle').style.display = '';
+    document.getElementById('aofEvidencia').style.display = '';
+    renderAofTable();
   }
   if (window.lucide) lucide.createIcons();
 })();
+
+// Formátovanie dátumu (sk)
+function aofFmtDate(s){
+  if(!s) return '—';
+  var d = new Date(s);
+  if(isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('sk-SK', {day:'numeric', month:'short', year:'numeric'});
+}
+
+// Vykreslenie tabuľky evidencie (vyhľadávanie + triedenie)
+function renderAofTable(){
+  var items = (window.__aofItems || []).slice();
+  var q = (document.getElementById('aofSearch').value || '').trim().toLowerCase();
+  var sort = document.getElementById('aofSort').value;
+
+  if(q) items = items.filter(function(it){ return (it.nazov||'').toLowerCase().indexOf(q) > -1; });
+
+  items.sort(function(a,b){
+    if(sort === 'name') return (a.nazov||'').localeCompare(b.nazov||'', 'sk');
+    if(sort === 'created') return new Date(b.created_at||0) - new Date(a.created_at||0);
+    return new Date(b.updated_at||0) - new Date(a.updated_at||0); // updated (default)
+  });
+
+  var tbody = document.getElementById('aofTableBody');
+  var cnt = document.getElementById('aofCount');
+  cnt.textContent = items.length + (items.length === 1 ? ' analýza' : (items.length>=2 && items.length<=4 ? ' analýzy' : ' analýz'));
+
+  if(items.length === 0){
+    tbody.innerHTML = '<tr><td colspan="4" class="aof-empty">' + (q ? 'Žiadna analýza nezodpovedá hľadaniu.' : 'Zatiaľ žiadne uložené analýzy.') + '</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = items.map(function(it){
+    var id = encodeURIComponent(it.id);
+    return '<tr>' +
+      '<td class="aof-name">' + escHtml(it.nazov || 'Bez mena') + '</td>' +
+      '<td class="aof-date">' + aofFmtDate(it.created_at) + '</td>' +
+      '<td class="aof-date">' + aofFmtDate(it.updated_at) + '</td>' +
+      '<td><div class="aof-actions">' +
+        '<button class="aof-btn open" onclick="openAof(\'' + id + '\')">Otvoriť</button>' +
+        '<button class="aof-btn" onclick="renameAof(\'' + id + '\')">Premenovať</button>' +
+        '<button class="aof-btn del" onclick="deleteAof(\'' + id + '\')">Zmazať</button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function openAof(id){
+  window.location.href = 'aof.html?load=' + id;
+}
+
+async function renameAof(id){
+  id = decodeURIComponent(id);
+  var item = (window.__aofItems||[]).find(function(x){ return x.id === id; });
+  var stary = item ? item.nazov : '';
+  var novy = prompt('Nový názov analýzy (meno klienta):', stary);
+  if(novy === null) return;            // zrušené
+  novy = novy.trim();
+  if(!novy){ alert('Názov nemôže byť prázdny.'); return; }
+  if(novy === stary) return;
+  try{
+    await aofCloudRename(id, novy);
+    if(item) item.nazov = novy;        // aktualizuj lokálne dáta
+    renderAofTable();
+  }catch(e){
+    alert('Premenovanie zlyhalo: ' + (e.message || e));
+  }
+}
+
+async function deleteAof(id){
+  id = decodeURIComponent(id);
+  var item = (window.__aofItems||[]).find(function(x){ return x.id === id; });
+  var meno = item ? (item.nazov || 'Bez mena') : '';
+  if(!confirm('Naozaj zmazať analýzu „' + meno + '"?\n\nTáto akcia sa nedá vrátiť.')) return;
+  try{
+    await aofCloudDelete(id);
+    window.__aofItems = (window.__aofItems||[]).filter(function(x){ return x.id !== id; });
+    // aktualizuj štatistiky
+    var n = window.__aofItems.length;
+    document.getElementById('statClients').textContent = n;
+    document.getElementById('statPlans').textContent = n;
+    if(n === 0){ document.getElementById('aofEvidencia').style.display='none'; document.getElementById('recentAofTitle').style.display='none'; }
+    renderAofTable();
+  }catch(e){
+    alert('Mazanie zlyhalo: ' + (e.message || e));
+  }
+}
 
 // Odhlásenie — cloudová relácia (dáta zostávajú bezpečne v cloude)
 function doLogout(){ vipLogout(); }

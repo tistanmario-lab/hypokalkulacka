@@ -58,7 +58,7 @@ async function vipLogout(){
 // ── AOF cloud (CRUD) ────────────────────────────────────────
 async function aofCloudList(){
   var r = await window.sbc.from('aof_analyzy')
-    .select('id,nazov,updated_at')
+    .select('id,nazov,created_at,updated_at')
     .order('updated_at', { ascending: false });
   if(r.error) throw r.error;
   return r.data || [];
@@ -86,6 +86,13 @@ async function aofCloudSave(nazov, dataObj, id){
 async function aofCloudDelete(id){
   var r = await window.sbc.from('aof_analyzy').delete().eq('id', id);
   if(r.error) throw r.error;
+}
+// Premenovanie — zmení len názov, dáta analýzy ostávajú nedotknuté
+async function aofCloudRename(id, novyNazov){
+  var r = await window.sbc.from('aof_analyzy')
+    .update({ nazov: novyNazov }).eq('id', id).select().single();
+  if(r.error) throw r.error;
+  return r.data;
 }
 
 // Pomôcka: rozlíši cloud UUID od starého localStorage kľúča (aof_...)
