@@ -714,7 +714,7 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
       </div>
       <div id="investGroup" style="display:none;">
         <table class="dyn-table">
-          <thead><tr><th>Spoločnosť</th><th>Nasporená suma (€)</th><th>Mesačná suma (€)</th><th></th></tr></thead>
+          <thead><tr><th>Spoločnosť</th><th>Nasporená suma (€)</th><th>Mesačná suma (€)</th><th>Typ</th><th></th></tr></thead>
           <tbody id="dochInvestBody"></tbody>
         </table>
         <button type="button" class="btn-add" onclick="addDochInvest()">+ Pridať investíciu</button>
@@ -1579,7 +1579,7 @@ function toggleInvest(){
   document.getElementById('investGroup').style.display = on?'block':'none';
   if(on && document.querySelectorAll('#dochInvestBody .doch-inv-row').length===0) addDochInvest();
 }
-function addDochInvest(spol, nasp, suma){
+function addDochInvest(spol, nasp, suma, typ){
   const tb = document.getElementById('dochInvestBody');
   if(!tb) return;
   const tr = document.createElement('tr');
@@ -1587,11 +1587,13 @@ function addDochInvest(spol, nasp, suma){
   tr.innerHTML = '<td><input type="text" class="doch-inv-spol" placeholder="napr. Partners Investments..."></td>'+
     '<td><input type="number" class="doch-inv-nasp" value="0" min="0"></td>'+
     '<td><input type="number" class="doch-inv-suma" value="0" min="0"></td>'+
+    '<td><select class="doch-inv-typ"><option value="klasicky">Klasický fond</option><option value="etf">ETF</option></select></td>'+
     '<td><button type="button" class="remove-row" onclick="this.closest(\'tr\').remove()">&times;</button></td>';
   tb.appendChild(tr);
   if(spol!==undefined) tr.querySelector('.doch-inv-spol').value = spol;
   if(nasp!==undefined) tr.querySelector('.doch-inv-nasp').value = nasp;
   if(suma!==undefined) tr.querySelector('.doch-inv-suma').value = suma;
+  if(typ!==undefined) tr.querySelector('.doch-inv-typ').value = typ;
 }
 
 // ============================================================
@@ -2254,9 +2256,12 @@ const STRATEGIES = {
 };
 
 const INFLATION_RATE = 0.025;
+const FUND_TAX = 0.19; // daň z výnosu klasického podielového fondu; ETF (cenné papiere na regulovanom trhu) oslobodené po 1-ročnom časovom teste
 function calcRealValue(nominal, years){
   return Math.round(nominal / Math.pow(1 + INFLATION_RATE, years));
 }
+// Čistá hodnota klasického podielového fondu po zdanení výnosu (ETF = bez dane)
+function afterTaxFund(fv, invested){ const gain = Math.max(0, fv - invested); return Math.round(fv - gain*FUND_TAX); }
 
 function getStrategy(years){
   if(years >= 10) return STRATEGIES.dynamicka;
@@ -2700,6 +2705,13 @@ function buildProgramDetail(programId, state, strat, pmt, fv){
   html += `<div class="fp-rec-row"><span>Predpokladaná hodnota (nominálne)</span><span>${formatEUR(fv)}</span></div>`;
   const realFV = calcRealValue(fv, state.roky);
   html += `<div class="fp-rec-row" style="background:rgba(0,48,73,0.02);border-radius:6px;padding:4px 0;"><span>Reálna hodnota (dnešné €, −2,5 % inflácia)</span><span style="color:var(--muted);font-weight:600;">${formatEUR(realFV)}</span></div>`;
+  // Daňový rozdiel: klasický podielový fond (19 % daň z výnosu) vs ETF (oslobodený po 1-ročnom časovom teste)
+  const investedPD = pmt * state.roky * 12;
+  const taxPD = Math.round(Math.max(0, fv - investedPD) * FUND_TAX);
+  if(taxPD > 0){
+    html += `<div class="fp-rec-row"><span>V klasickom podielovom fonde (po 19 % dani z výnosu)</span><span style="color:var(--muted);">${formatEUR(fv - taxPD)}</span></div>`;
+    html += `<div class="info-box success" style="margin-top:8px;"><strong>Výhoda ETF:</strong> náš ETF je po 1-ročnom časovom teste <strong>oslobodený od dane z výnosu</strong> — oproti klasickému podielovému fondu klient ušetrí <strong>${formatEUR(taxPD)}</strong>.</div>`;
+  }
 
   // Fee calculation — cieľová suma = súčet vkladov (PMT × mesiace), nie cieľ po zhodnotení
   const cielovaSumaVkladov = pmt * state.roky * 12;
@@ -2850,20 +2862,28 @@ function buildFinancialPlan(){
     const inv = document.getElementById('doch_investicie').value === 'ano';
 
     // ── Prototyp: Súčasný stav vs. odporúčaný stav (GAP analýza) ──
-    let curSaved = 0, curMonthly = 0;
-    if(p2) curSaved += parseFloat(document.getElementById('doch_p2_suma').value)||0;
+    let curSaved = 0, curMonthly = 0, curProjFV = 0;
+    // Piliere (II./III.) — bez dane z výnosu fondu
+    let pillarSaved = 0, pillarMonthly = 0;
+    if(p2) pillarSaved += parseFloat(document.getElementById('doch_p2_suma').value)||0;
     if(p3){
-      curSaved += parseFloat(document.getElementById('doch_dds_nasporena').value)||0;
-      curMonthly += (parseFloat(document.getElementById('doch_dds_suma').value)||0) + (parseFloat(document.getElementById('doch_dds_zamestnavatel').value)||0);
+      pillarSaved += parseFloat(document.getElementById('doch_dds_nasporena').value)||0;
+      pillarMonthly += (parseFloat(document.getElementById('doch_dds_suma').value)||0) + (parseFloat(document.getElementById('doch_dds_zamestnavatel').value)||0);
     }
+    curProjFV += Math.round(pillarSaved*Math.pow(1+strat.rate, roky) + calcFV(pillarMonthly, strat.rate, roky));
+    curSaved += pillarSaved; curMonthly += pillarMonthly;
+    // Investície — klasický podielový fond zdanený 19 % z výnosu, ETF oslobodený (1-ročný časový test)
     if(inv){
       document.querySelectorAll('#dochInvestBody .doch-inv-row').forEach(function(r){
-        curSaved += parseFloat((r.querySelector('.doch-inv-nasp')||{}).value)||0;
-        curMonthly += parseFloat((r.querySelector('.doch-inv-suma')||{}).value)||0;
+        const rNasp = parseFloat((r.querySelector('.doch-inv-nasp')||{}).value)||0;
+        const rSuma = parseFloat((r.querySelector('.doch-inv-suma')||{}).value)||0;
+        const rTyp = (r.querySelector('.doch-inv-typ')||{}).value || 'klasicky';
+        const rProj = rNasp*Math.pow(1+strat.rate, roky) + calcFV(rSuma, strat.rate, roky);
+        const rInvested = rNasp + rSuma*roky*12;
+        curProjFV += (rTyp==='klasicky') ? afterTaxFund(rProj, rInvested) : Math.round(rProj);
+        curSaved += rNasp; curMonthly += rSuma;
       });
     }
-    // projekcia súčasných úspor + vkladov do dôchodku (rovnaký výnos ako odporúčaná stratégia)
-    const curProjFV = Math.round(curSaved*Math.pow(1+strat.rate, roky) + calcFV(curMonthly, strat.rate, roky));
     const shortfall = Math.max(0, cielSuma - curProjFV);
     const additionalMonthly = calcPMT(shortfall, strat.rate, roky);
     const recTotalMonthly = curMonthly + additionalMonthly;
@@ -4177,7 +4197,8 @@ function collectAOFData(){
   data.dochInvest = Array.from(document.querySelectorAll('#dochInvestBody .doch-inv-row')).map(r=>({
     spol: (r.querySelector('.doch-inv-spol')||{}).value || '',
     nasp: (r.querySelector('.doch-inv-nasp')||{}).value || '0',
-    suma: (r.querySelector('.doch-inv-suma')||{}).value || '0'
+    suma: (r.querySelector('.doch-inv-suma')||{}).value || '0',
+    typ: (r.querySelector('.doch-inv-typ')||{}).value || 'klasicky'
   }));
 
   // Sync zabezpečenie checkboxy
@@ -4456,7 +4477,7 @@ function applyAOFData(data){
     if(dochBody){
       dochBody.innerHTML = '';
       if(Array.isArray(data.dochInvest) && data.dochInvest.length){
-        data.dochInvest.forEach(function(it){ addDochInvest(it.spol, it.nasp, it.suma); });
+        data.dochInvest.forEach(function(it){ addDochInvest(it.spol, it.nasp, it.suma, it.typ); });
       } else if(data.fields && (data.fields.doch_invest_spolocnost || parseFloat(data.fields.doch_invest_nasporena)>0 || parseFloat(data.fields.doch_invest_suma)>0)){
         addDochInvest(data.fields.doch_invest_spolocnost||'', data.fields.doch_invest_nasporena||'0', data.fields.doch_invest_suma||'0');
       }
