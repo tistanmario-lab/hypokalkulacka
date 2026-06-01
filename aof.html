@@ -2834,7 +2834,7 @@ function buildFinancialPlan(){
     switchRezMode('partners'); // default
 
     if(deficit > 0){
-      fpState['rezervy'] = {type:'invest', label:'Rezervy', cielSuma:deficit, roky:5, origStrategy:'konzervativna', currentStrategy:'konzervativna', origPmt:rezPmt};
+      fpState['rezervy'] = {type:'invest', label:'Rezervy', cielSuma:deficit, roky:5, origStrategy:'konzervativna', currentStrategy:'konzervativna', origPmt:rezPmt, gap:{ciel:zelezna, saved:sumRezerv, monthly:0, projFV:Math.round(sumRezerv*Math.pow(1.02,5)), rate:0.02}};
       totalMesacne += rezPmt;
     }
   } else { fpSec1.style.display = 'none'; }
@@ -2955,7 +2955,7 @@ function buildFinancialPlan(){
     html += `</div></div>`;
 
     // Store state for interactive recalculation
-    fpState['dochodok'] = {type:'invest', label:'Dôchodok', cielSuma, roky, origStrategy:strat.key, currentStrategy:strat.key, origPmt:dochPmt};
+    fpState['dochodok'] = {type:'invest', label:'Dôchodok', cielSuma, roky, origStrategy:strat.key, currentStrategy:strat.key, origPmt:dochPmt, gap:{ciel:cielSuma, saved:curSaved, monthly:curMonthly, projFV:curProjFV, rate:strat.rate}};
 
     html += `<div id="fpDetail_dochodok">`;
     html += buildProgramDetail('dochodok', fpState['dochodok'], strat, dochPmt, dochFV);
@@ -3014,9 +3014,10 @@ function buildFinancialPlan(){
       const pmt = calcPMT(vz, s.rate, yrs);
       const fv = calcFV(pmt, s.rate, yrs);
       const id = 'child_vz_'+childIdx;
-      fpState[id] = {type:'invest', label:meno2+' — Vzdelanie', cielSuma:vz, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:pmt};
+      const gsVz = childSaved*(totT>0?vz/totT:1), gmVz = childMonthly*(totT>0?vz/totT:1);
+      fpState[id] = {type:'invest', label:meno2+' — Vzdelanie', cielSuma:vz, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:pmt, gap:{ciel:vz, saved:gsVz, monthly:gmVz, projFV:Math.round(gsVz*Math.pow(1+s.rate,yrs)+calcFV(gmVz,s.rate,yrs)), rate:s.rate}};
       detiHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">${meno2} — Vzdelanie</div>`;
-      detiHtml += gapCard(vz, yrs, childSaved*(totT>0?vz/totT:1), childMonthly*(totT>0?vz/totT:1), s.rate);
+      detiHtml += gapCard(vz, yrs, gsVz, gmVz, s.rate);
       detiHtml += `<div id="fpDetail_${id}">${buildProgramDetail(id, fpState[id], s, pmt, fv)}</div></div>`;
       totalMesacne += pmt;
       hasDetiPlan = true;
@@ -3027,9 +3028,10 @@ function buildFinancialPlan(){
       const pmt = calcPMT(st, s.rate, yrs);
       const fv = calcFV(pmt, s.rate, yrs);
       const id = 'child_st_'+childIdx;
-      fpState[id] = {type:'invest', label:meno2+' — Štart', cielSuma:st, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:pmt};
+      const gsSt = childSaved*(totT>0?st/totT:1), gmSt = childMonthly*(totT>0?st/totT:1);
+      fpState[id] = {type:'invest', label:meno2+' — Štart', cielSuma:st, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:pmt, gap:{ciel:st, saved:gsSt, monthly:gmSt, projFV:Math.round(gsSt*Math.pow(1+s.rate,yrs)+calcFV(gmSt,s.rate,yrs)), rate:s.rate}};
       detiHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">${meno2} — Štart do života</div>`;
-      detiHtml += gapCard(st, yrs, childSaved*(totT>0?st/totT:1), childMonthly*(totT>0?st/totT:1), s.rate);
+      detiHtml += gapCard(st, yrs, gsSt, gmSt, s.rate);
       detiHtml += `<div id="fpDetail_${id}">${buildProgramDetail(id, fpState[id], s, pmt, fv)}</div></div>`;
       totalMesacne += pmt;
       hasDetiPlan = true;
@@ -3149,9 +3151,9 @@ function buildFinancialPlan(){
         const pmt = calcPMT(suma, s.rate, yrs);
         const fv = calcFV(pmt, s.rate, yrs);
         const id = 'ciel_'+cielIdx;
-        fpState[id] = {type:'invest', label:name, cielSuma:suma, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:pmt};
         const cNasp = parseFloat(tr.querySelector('.ciel-nasporene')?.value)||0;
         const cMes = parseFloat(tr.querySelector('.ciel-mesacne')?.value)||0;
+        fpState[id] = {type:'invest', label:name, cielSuma:suma, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:pmt, gap:{ciel:suma, saved:cNasp, monthly:cMes, projFV:Math.round(cNasp*Math.pow(1+s.rate,yrs)+calcFV(cMes,s.rate,yrs)), rate:s.rate}};
         cieleHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">${name}</div>`;
         cieleHtml += gapCard(suma, yrs, cNasp, cMes, s.rate);
         cieleHtml += `<div id="fpDetail_${id}">${buildProgramDetail(id, fpState[id], s, pmt, fv)}</div></div>`;
@@ -3677,6 +3679,38 @@ async function generatePDF(){
     doc.line(margin+4, y, pageW-margin, y);
     y += 3;
   }
+  // GAP karta v PDF — 2 stĺpce: súčasný stav vs. odporúčaný stav
+  function pdfGapCard(g, roky){
+    if(!g || !g.ciel) return;
+    roky = Math.max(1, roky||5);
+    const rate=g.rate||0, curSaved=g.saved||0, curMonthly=g.monthly||0;
+    const curProjFV = (g.projFV!==undefined)?g.projFV:Math.round(curSaved*Math.pow(1+rate,roky)+calcFV(curMonthly,rate,roky));
+    const shortfall=Math.max(0, g.ciel-curProjFV);
+    const additionalMonthly=calcPMT(shortfall,rate,roky);
+    const recTotal=curMonthly+additionalMonthly;
+    checkPage(34);
+    const gp=3, colW=(contentW-gp)/2, boxH=25, by=y, xL=margin, xR=margin+colW+gp;
+    doc.setFillColor(238,239,240); doc.roundedRect(xL,by,colW,boxH,2,2,'F');
+    doc.setDrawColor(0,48,73); doc.setLineWidth(0.4); doc.setFillColor(247,249,251); doc.roundedRect(xR,by,colW,boxH,2,2,'FD'); doc.setLineWidth(0.2);
+    function bx(x,title,tc,rows){
+      doc.setFontSize(6.5); setBold(); doc.setTextColor(tc[0],tc[1],tc[2]); doc.text(title,x+2.5,by+3.6);
+      setNormal(); doc.setFontSize(7); doc.setTextColor(70,70,70); let ry=by+8.2;
+      rows.forEach(function(r){ doc.text(r[0],x+2.5,ry); doc.text(r[1],x+colW-2.5,ry,{align:'right'}); ry+=4; });
+    }
+    bx(xL,'Súčasný stav — ak nič nezmení',[120,127,135],[['Cieľ',formatEUR(g.ciel)],['Teraz odkladá',formatEUR(curMonthly)+'/mes'],['Už nasporené',formatEUR(curSaved)],['Projekcia o '+roky+' r.',formatEUR(curProjFV)]]);
+    bx(xR,'Odporúčaný stav — splní cieľ',[0,48,73],[['Cieľ',formatEUR(g.ciel)],['Odkladať spolu',formatEUR(recTotal)+'/mes'],(curMonthly>0&&additionalMonthly>0)?['Z toho navyše','+'+formatEUR(additionalMonthly)+'/mes']:['Dosiahne o '+roky+' r.',formatEUR(g.ciel)],['Splní cieľ','áno']]);
+    doc.setTextColor(0,48,73); doc.setFontSize(10);
+    y=by+boxH+2;
+    if(shortfall>0) addNote('Medzera: pri súčasnom tempe bude chýbať '+formatEUR(shortfall)+'. Stačí odkladať '+(curMonthly>0?'+':'')+formatEUR(additionalMonthly)+'/mes a cieľ je splnený.');
+  }
+  // Daňový rozdiel klasický fond vs ETF v PDF
+  function pdfTaxLine(fv, invested){
+    const tax=Math.round(Math.max(0,fv-invested)*FUND_TAX);
+    if(tax>0){
+      addLine('V klasickom fonde (po 19 % dani z výnosu)', formatEUR(fv-tax));
+      addNote('Výhoda ETF: oslobodený po 1-ročnom časovom teste — oproti klasickému fondu klient ušetrí '+formatEUR(tax)+'.');
+    }
+  }
 
   // ===== PAGE 1: AOF Summary =====
   addHeader('Analýza osobných financií', 'Kompletný prehľad finančnej situácie klienta');
@@ -3768,6 +3802,7 @@ async function generatePDF(){
     if(deficit > 0){
       const pmt = calcPMT(deficit, 0.02, 5);
       addSection(1, 'Rezervy — Fond krátkodobých rezerv');
+      if(fpState['rezervy'] && fpState['rezervy'].gap) pdfGapCard(fpState['rezervy'].gap, 5);
       addLine('Cieľová rezerva', formatEUR(zel));
       addLine('Chýbajúca suma', formatEUR(deficit));
       addLine('Zhodnotenie', '2 % p.a. (Konzervatívna)');
@@ -3798,6 +3833,7 @@ async function generatePDF(){
     const vklady = pmt * st.roky * 12;
     const fee = getEntryFee(vklady, st.currentStrategy);
     addSection(2, 'Dôchodok — Partners Investments');
+    if(st.gap) pdfGapCard(st.gap, st.roky);
     const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
     const dochFV = calcFV(pmt, s.rate, st.roky);
     addLine('Dôchodková medzera', formatEUR(medzera)+'/mes');
@@ -3807,6 +3843,7 @@ async function generatePDF(){
     addLine('Horizont', st.roky+' rokov');
     addLine('Mesačná investícia', formatEUR(pmt), true);
     addLine('Predpokladaná hodnota na konci', formatEUR(dochFV));
+    pdfTaxLine(dochFV, vklady);
     addLine('Cieľová suma (súčet vkladov)', formatEUR(vklady));
     if(fee) addLine('Vstupný poplatok', fee.pct+'% = '+formatEUR(fee.suma));
     // DSS info
@@ -3837,12 +3874,14 @@ async function generatePDF(){
     const vklady = pmt * st.roky * 12;
     const fee = getEntryFee(vklady, st.currentStrategy);
     addSection(secNum, st.label);
+    if(st.gap) pdfGapCard(st.gap, st.roky);
     addLine('Cieľová suma', formatEUR(st.cielSuma));
     addLine('Stratégia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
     addLine('Fond', s.fond);
     addLine('Horizont', st.roky+' rokov');
     addLine('Mesačná investícia', formatEUR(pmt), true);
     addLine('Predpokladaná hodnota na konci', formatEUR(fv));
+    pdfTaxLine(fv, vklady);
     addLine('Cieľová suma (súčet vkladov)', formatEUR(vklady));
     if(fee) addLine('Vstupný poplatok', fee.pct+'% = '+formatEUR(fee.suma));
     addNote('Poskytovateľ: Partners Investments — '+s.name+' stratégia');
