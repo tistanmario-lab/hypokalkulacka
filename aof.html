@@ -548,6 +548,7 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
           <div class="form-group"><label>Hodnota nehnuteľnosti (€)</label><input type="number" id="byv_hodnota" value="0" min="0" oninput="calcFinancovanie()"></div>
           <div class="form-group"><label>Vlastné zdroje / Hotovosť (€)</label><input type="number" id="byv_hotovost" value="0" min="0" oninput="calcFinancovanie()"></div>
           <div class="form-group"><label>Potrebné financovanie (€)</label><input type="number" id="byv_financovanie" class="computed" readonly></div>
+          <div class="form-group"><label>Mesačne odkladá na bývanie (€)</label><input type="number" id="byv_mesacne" value="0" min="0"></div>
         </div>
         <div class="form-row">
           <div class="form-group"><label>Očakávané preplatenie (€)</label><input type="number" id="byv_preplacana" value="0" class="computed" readonly></div>
@@ -828,7 +829,7 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
     <div class="card">
       <table class="dyn-table" id="cieleTable">
         <thead>
-          <tr><th>Typ cieľa</th><th>Suma (€)</th><th>Termín</th><th>Priorita</th><th></th></tr>
+          <tr><th>Typ cieľa</th><th>Suma (€)</th><th>Už nasporené (€)</th><th>Mesačne (€)</th><th>Termín</th><th>Priorita</th><th></th></tr>
         </thead>
         <tbody id="cieleBody"></tbody>
       </table>
@@ -1633,6 +1634,10 @@ function addChild(){
       <div class="form-row">
         <div class="form-group"><label>Výdavky spojené s narodením (€)</label><input type="number" class="child-narodenie" value="0" min="0"></div>
       </div>
+      <div class="form-row">
+        <div class="form-group"><label>Už nasporené pre dieťa (€)</label><input type="number" class="child-nasporene" value="0" min="0"></div>
+        <div class="form-group"><label>Mesačne odkladá na dieťa (€)</label><input type="number" class="child-mesacne" value="0" min="0"></div>
+      </div>
     </div>
     <div class="check-row"><input type="checkbox" class="fp-child" checked> Zaradiť do finančného plánu</div>`;
   container.appendChild(card);
@@ -1682,6 +1687,8 @@ function addCiel(){
   tr.innerHTML = `
     <td><input type="text" placeholder="napr. Auto, Dovolenka, Svadba..."></td>
     <td><input type="number" value="0" min="0"></td>
+    <td><input type="number" class="ciel-nasporene" value="0" min="0"></td>
+    <td><input type="number" class="ciel-mesacne" value="0" min="0"></td>
     <td><input type="date"></td>
     <td><select><option>Vysoká</option><option>Stredná</option><option>Nízka</option></select></td>
     <td><button class="remove-row" onclick="this.closest('tr').remove()">&times;</button></td>`;
@@ -1696,6 +1703,8 @@ function addCielHypoteka(){
   tr.innerHTML = `
     <td><input type="text" value="Rýchlejšie splatenie hypotéky" style="color:var(--red);font-weight:600;"></td>
     <td><input type="number" value="${zostatok}" min="0"></td>
+    <td><input type="number" class="ciel-nasporene" value="0" min="0"></td>
+    <td><input type="number" class="ciel-mesacne" value="0" min="0"></td>
     <td><input type="date"></td>
     <td><select><option selected>Vysoká</option><option>Stredná</option><option>Nízka</option></select></td>
     <td><button class="remove-row" onclick="this.closest('tr').remove()">&times;</button></td>`;
@@ -2722,6 +2731,43 @@ function calcFV(pmt, annualRate, years){
   return Math.round(pmt * (Math.pow(1 + r, n) - 1) / r);
 }
 
+// Znovupoužiteľná karta "Súčasný stav vs. odporúčaný stav" (GAP) pre akumulačné ciele
+function gapCard(cielSuma, roky, curSaved, curMonthly, rate){
+  cielSuma = Math.round(cielSuma||0); roky = Math.max(1, Math.round(roky||1));
+  curSaved = curSaved||0; curMonthly = curMonthly||0; rate = rate||0;
+  const curProjFV = Math.round(curSaved*Math.pow(1+rate, roky) + calcFV(curMonthly, rate, roky));
+  const shortfall = Math.max(0, cielSuma - curProjFV);
+  const additionalMonthly = calcPMT(shortfall, rate, roky);
+  const recTotalMonthly = curMonthly + additionalMonthly;
+  const R = (l,v,cls)=>`<div class="fp-rec-row"><span>${l}</span><span${cls?' class="'+cls+'"':''}>${v}</span></div>`;
+  let h = '<div style="margin:12px 0;">';
+  h += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Súčasný stav vs. odporúčanie</div>';
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">';
+  h += '<div style="padding:14px;background:rgba(152,159,167,0.10);border:1px solid var(--border);border-radius:12px;">';
+  h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--silver);margin-bottom:8px;">Súčasný stav — ak nič nezmení</div>';
+  h += R('Cieľ', formatEUR(cielSuma));
+  h += R('Teraz odkladá', formatEUR(curMonthly)+'/mes');
+  h += R('Už nasporené', formatEUR(curSaved));
+  h += R('Projekcia o '+roky+' r.', formatEUR(curProjFV));
+  h += '</div>';
+  h += '<div style="padding:14px;background:rgba(0,48,73,0.04);border:1.5px solid var(--navy);border-radius:12px;">';
+  h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--navy);margin-bottom:8px;">Odporúčaný stav — splní cieľ</div>';
+  h += R('Cieľ', formatEUR(cielSuma));
+  h += R('Odkladať spolu', formatEUR(recTotalMonthly)+'/mes', 'fp-rec-highlight');
+  if(additionalMonthly>0 && curMonthly>0) h += R('Z toho navyše', '+'+formatEUR(additionalMonthly)+'/mes', 'fp-rec-highlight');
+  h += `<div class="fp-rec-row"><span>Dosiahne o ${roky} r.</span><span style="color:var(--green);font-weight:700;">${formatEUR(cielSuma)} ✓</span></div>`;
+  h += '</div>';
+  h += '</div>';
+  if(shortfall>0){
+    const intro = (curSaved>0||curMonthly>0) ? ('pri súčasnom tempe bude chýbať <strong>'+formatEUR(shortfall)+'</strong>. ') : ('klient zatiaľ na tento cieľ nesporí. ');
+    h += '<div class="info-box warning" style="margin-top:10px;"><strong>Medzera:</strong> '+intro+'Stačí odkladať <strong>'+(curMonthly>0?'+':'')+formatEUR(additionalMonthly)+'/mes</strong> a cieľ je splnený.</div>';
+  } else {
+    h += '<div class="info-box success" style="margin-top:10px;">Pri súčasnom tempe klient cieľ <strong>splní</strong>.</div>';
+  }
+  h += '</div>';
+  return h;
+}
+
 function buildFinancialPlan(){
   fpState = {}; // reset
   const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Klient';
@@ -2756,12 +2802,7 @@ function buildFinancialPlan(){
     const rezPmt = calcPMT(deficit, 0.02, 5);
 
     let html = '';
-    html += `<div class="fp-rec" style="margin-bottom:16px;">`;
-    html += `<div class="fp-rec-row"><span>Cieľová rezerva</span><span>${formatEUR(zelezna)}</span></div>`;
-    html += `<div class="fp-rec-row"><span>Aktuálne nasporené</span><span>${formatEUR(sumRezerv)}</span></div>`;
-    html += `<div class="fp-rec-row"><span>Chýbajúca suma</span><span class="fp-rec-highlight">${formatEUR(deficit)}</span></div>`;
-    html += `<div class="fp-rec-row"><span>Horizont vytvorenia</span><span>5 rokov (60 mesiacov)</span></div>`;
-    html += '</div>';
+    html += gapCard(zelezna, 5, sumRezerv, 0, 0.02);
 
     // Vysvetlenie pre klienta — rezerva po dosiahnutí cieľa
     html += `<div style="margin-bottom:16px;padding:12px 14px;background:rgba(0,48,73,0.03);border-left:3px solid var(--navy);border-radius:8px;font-size:12px;line-height:1.55;color:var(--navy);">`;
@@ -2942,6 +2983,10 @@ function buildFinancialPlan(){
     const vzd = card.querySelector('.child-vzdelanie-date')?.value||'';
     const st = parseFloat(card.querySelector('.child-start')?.value)||0;
     const std = card.querySelector('.child-start-date')?.value||'';
+    // Súčasný stav pre dieťa — rozdelený na ciele (vzdelanie/štart) podľa pomeru cieľových súm
+    const childSaved = parseFloat(card.querySelector('.child-nasporene')?.value)||0;
+    const childMonthly = parseFloat(card.querySelector('.child-mesacne')?.value)||0;
+    const totT = ((vz>0&&vzd)?vz:0) + ((st>0&&std)?st:0);
 
     if(vz > 0 && vzd){
       const yrs = Math.max(1, Math.round((new Date(vzd)-today)/(365.25*24*3600000)));
@@ -2951,6 +2996,7 @@ function buildFinancialPlan(){
       const id = 'child_vz_'+childIdx;
       fpState[id] = {type:'invest', label:meno2+' — Vzdelanie', cielSuma:vz, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:pmt};
       detiHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">${meno2} — Vzdelanie</div>`;
+      detiHtml += gapCard(vz, yrs, childSaved*(totT>0?vz/totT:1), childMonthly*(totT>0?vz/totT:1), s.rate);
       detiHtml += `<div id="fpDetail_${id}">${buildProgramDetail(id, fpState[id], s, pmt, fv)}</div></div>`;
       totalMesacne += pmt;
       hasDetiPlan = true;
@@ -2963,6 +3009,7 @@ function buildFinancialPlan(){
       const id = 'child_st_'+childIdx;
       fpState[id] = {type:'invest', label:meno2+' — Štart', cielSuma:st, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:pmt};
       detiHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">${meno2} — Štart do života</div>`;
+      detiHtml += gapCard(st, yrs, childSaved*(totT>0?st/totT:1), childMonthly*(totT>0?st/totT:1), s.rate);
       detiHtml += `<div id="fpDetail_${id}">${buildProgramDetail(id, fpState[id], s, pmt, fv)}</div></div>`;
       totalMesacne += pmt;
       hasDetiPlan = true;
@@ -3013,6 +3060,20 @@ function buildFinancialPlan(){
       html += `<div class="fp-rec-row"><span>Lokalita</span><span>${lokalita}</span></div>`;
       html += `<div class="fp-rec-row"><span>Spôsob</span><span>${sposob}</span></div>`;
       html += '</div>';
+      // Súčasný stav vs. ak bude klient odkladať na bývanie (nižšia hypotéka)
+      const byvMes = parseFloat(document.getElementById('byv_mesacne').value)||0;
+      const byvHor = document.getElementById('byv_horizont').value;
+      if(byvMes>0 && byvHor){
+        const yrsB = Math.max(0, Math.round((new Date(byvHor)-today)/(365.25*24*3600000)));
+        const projZdroje = Math.round(hot + calcFV(byvMes, 0.02, yrsB));
+        const projFin = Math.max(0, val - projZdroje);
+        html += `<div class="fp-rec" style="margin-top:12px;"><div class="fp-rec-title">Ak bude odkladať na bývanie do termínu kúpy</div>`;
+        html += `<div class="fp-rec-row"><span>Mesačne odkladá</span><span>${formatEUR(byvMes)}/mes</span></div>`;
+        html += `<div class="fp-rec-row"><span>Vlastné zdroje o ${yrsB} r.</span><span>${formatEUR(projZdroje)}</span></div>`;
+        html += `<div class="fp-rec-row"><span>Potrebné financovanie</span><span class="fp-rec-highlight">${formatEUR(projFin)}</span></div>`;
+        html += '</div>';
+        if(projFin < fin) html += `<div class="info-box success" style="margin-top:8px;">Sporením <strong>${formatEUR(byvMes)}/mes</strong> zníži hypotéku z ${formatEUR(fin)} na <strong>${formatEUR(projFin)}</strong>.</div>`;
+      }
     }
     document.getElementById('fpByvanie').innerHTML = html;
   } else { fpSec4.style.display = 'none'; }
@@ -3069,7 +3130,10 @@ function buildFinancialPlan(){
         const fv = calcFV(pmt, s.rate, yrs);
         const id = 'ciel_'+cielIdx;
         fpState[id] = {type:'invest', label:name, cielSuma:suma, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:pmt};
+        const cNasp = parseFloat(tr.querySelector('.ciel-nasporene')?.value)||0;
+        const cMes = parseFloat(tr.querySelector('.ciel-mesacne')?.value)||0;
         cieleHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">${name}</div>`;
+        cieleHtml += gapCard(suma, yrs, cNasp, cMes, s.rate);
         cieleHtml += `<div id="fpDetail_${id}">${buildProgramDetail(id, fpState[id], s, pmt, fv)}</div></div>`;
         totalMesacne += pmt;
       } else {
