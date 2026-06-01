@@ -2335,17 +2335,22 @@ let fpState = {};
 let hypoSelByLabel = {}; // pamätá si vybranú mesačnú sumu na rýchlejšie splatenie (prežije reset fpState)
 
 function switchRezMode(mode){
-  const deficit = window._rezDeficit || 0;
+  const zelezna = window._rezZelezna || 0;
+  const sumRezerv = window._rezSumRezerv || 0;
   const modes = {
     bu:       {name:'Bežný účet', rate:0.00, desc:'0% zhodnotenie — peniaze len ležia', icon:ico('landmark'), btnClass:''},
     sporiak:  {name:'Sporiaci účet', rate:0.001, desc:'~0,1% p.a. — minimálne zhodnotenie', icon:ico('piggy-bank'), btnClass:''},
     partners: {name:'Partners Fond krátkodobých rezerv', rate:0.02, desc:'2% p.a. — konzervatívna stratégia', icon:ico('shield-check'), btnClass:'konz'}
   };
   const m = modes[mode];
-  const pmt = calcPMT(deficit, m.rate, 5);
-  const fv = calcFV(pmt, m.rate, 5);
+  // Existujúca rezerva sa zhodnocuje sadzbou daného nástroja; doplácame len chýbajúcu časť (zhoda s GAP kartou)
+  const projExisting = Math.round(sumRezerv * Math.pow(1+m.rate, 5));
+  const shortfall = Math.max(0, zelezna - projExisting);
+  const pmt = calcPMT(shortfall, m.rate, 5);
+  const newFV = calcFV(pmt, m.rate, 5);
+  const fv = projExisting + newFV;            // existujúce + nové ≈ cieľ
   const vklady = pmt * 60;
-  const zhodnotenie = fv - vklady;
+  const zhodnotenie = fv - sumRezerv - vklady;
 
   // Update buttons
   document.querySelectorAll('#fpSecRezervy .fp-strat-btn').forEach(btn => {
@@ -2360,7 +2365,8 @@ function switchRezMode(mode){
 
   html += '<div class="fp-rec" style="margin-top:12px;">';
   html += `<div class="fp-rec-row"><span>Predpokladané zhodnotenie</span><span>${(m.rate*100 < 1 ? (m.rate*100).toFixed(1) : Math.round(m.rate*100))} % p.a.</span></div>`;
-  html += `<div class="fp-rec-row"><span><strong>Potrebná mesačná suma</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(pmt)}</strong></span></div>`;
+  if(sumRezerv>0) html += `<div class="fp-rec-row"><span>Už nasporené (zhodnotí sa na)</span><span>${formatEUR(sumRezerv)} → ${formatEUR(projExisting)}</span></div>`;
+  html += `<div class="fp-rec-row"><span><strong>Potrebná mesačná suma${sumRezerv>0?' (navyše)':''}</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(pmt)}</strong></span></div>`;
   html += `<div class="fp-rec-row"><span>Súčet vašich vkladov za 5 rokov</span><span>${formatEUR(vklady)}</span></div>`;
   html += `<div class="fp-rec-row"><span>Zhodnotenie (výnos)</span><span style="color:${zhodnotenie>0?'var(--green)':'var(--muted)'};">${zhodnotenie > 0 ? '+'+formatEUR(zhodnotenie) : '0 €'}</span></div>`;
   html += `<div class="fp-rec-row"><span>Hodnota po 5 rokoch</span><span>${formatEUR(fv)}</span></div>`;
@@ -2372,7 +2378,8 @@ function switchRezMode(mode){
 
   // Comparison with Partners
   if(mode !== 'partners'){
-    const partnersPmt = calcPMT(deficit, 0.02, 5);
+    const partnersProj = Math.round(sumRezerv * Math.pow(1.02, 5));
+    const partnersPmt = calcPMT(Math.max(0, zelezna - partnersProj), 0.02, 5);
     const rozdiel = pmt - partnersPmt;
     html += '<div class="fp-impact" style="margin-top:12px;">';
     html += `<div class="fp-impact-card alt"><div class="fp-impact-label">${m.name}</div><div class="fp-impact-value">${formatEUR(pmt)}/mes</div><div style="font-size:11px;color:var(--muted);">${(m.rate*100 < 1 ? (m.rate*100).toFixed(1) : Math.round(m.rate*100))}% p.a.</div></div>`;
@@ -2444,13 +2451,6 @@ function renderInvestmentOverview(){
       realFv = roky>0 ? calcRealValue(fv, roky) : 0;
       cielTxt = formatEUR(state.zostatok);
       horizTxt = (c && c.found) ? (c.rokov + ' r.') : '—';
-    } else if(id === 'rezervy'){
-      // Rezervy ponechané v pôvodnej logike (deficit-based)
-      pmt = calcPMT(state.cielSuma, s.rate, state.roky);
-      fv = calcFV(pmt, s.rate, state.roky);
-      realFv = calcRealValue(fv, state.roky);
-      cielTxt = formatEUR(state.cielSuma);
-      horizTxt = state.roky + ' r.';
     } else {
       const pn = planNumbers(state);
       pmt = pn.pmt;                       // mesačne navyše (po zohľadnení existujúceho)
@@ -3881,33 +3881,32 @@ async function generatePDF(){
   const fpPdfItems = [];
   let totalPdf = 0;
 
-  // Reserves
-  if(document.getElementById('fp_rezervy').checked){
-    const deficit = Math.max(0, zel - sr);
-    if(deficit > 0){
-      const pmt = calcPMT(deficit, 0.02, 5);
-      addSection(1, 'Rezervy — Fond krátkodobých rezerv');
-      if(fpState['rezervy'] && fpState['rezervy'].gap) pdfGapCard(fpState['rezervy'].gap, 5);
-      addLine('Cieľová rezerva', formatEUR(zel));
-      addLine('Chýbajúca suma', formatEUR(deficit));
-      addLine('Zhodnotenie', '2 % p.a. (Konzervatívna)');
-      addLine('Horizont', '5 rokov');
-      addLine('Mesačná investícia', formatEUR(pmt), true);
-      addLine('Vstupný poplatok', '0 € (benefit pre klientov Partners)');
-      addNote('Poskytovateľ: Partners Asset Management — Fond krátkodobých rezerv');
-      y += 2;
-      // Comparison
-      const pmtBU = calcPMT(deficit, 0, 5);
-      const pmtSp = calcPMT(deficit, 0.001, 5);
-      addSubtitle('Porovnanie: kam odkladať rezervu?');
-      addLine('Bežný účet (0%)', formatEUR(pmtBU)+'/mes');
-      addLine('Sporiaci účet (0,1%)', formatEUR(pmtSp)+'/mes');
-      addLine('Partners Fond (2%)', formatEUR(pmt)+'/mes ✓', true);
-      addNote('Partners Fond krátkodobých rezerv — úspora '+formatEUR(pmtBU-pmt)+'/mes oproti bežnému účtu');
-      fpPdfItems.push({name:'Rezervy', pmt});
-      totalPdf += pmt;
-      y += 3;
-    }
+  // Reserves — gap-based (zhoda s obrazovkou + GAP kartou)
+  if(document.getElementById('fp_rezervy').checked && fpState['rezervy']){
+    const st = fpState['rezervy'];
+    const pn = planNumbers(st);
+    const projEx = st.gap ? (st.gap.projFV||0) : 0;
+    addSection(1, 'Rezervy — Fond krátkodobých rezerv');
+    if(st.gap) pdfGapCard(st.gap, 5);
+    addLine('Cieľová rezerva', formatEUR(zel));
+    if(sr>0) addLine('Už nasporené (zhodnotí sa na)', formatEUR(sr)+' → '+formatEUR(projEx));
+    addLine('Zhodnotenie', '2 % p.a. (Konzervatívna)');
+    addLine('Horizont', '5 rokov');
+    addLine('Mesačná investícia'+(sr>0?' (navyše)':''), pn.pmt>0?formatEUR(pn.pmt):'0 € — pokryté rastom rezervy', true);
+    addLine('Vstupný poplatok', '0 € (benefit pre klientov Partners)');
+    addNote('Poskytovateľ: Partners Asset Management — Fond krátkodobých rezerv');
+    y += 2;
+    // Comparison (existujúca rezerva rastie sadzbou daného nástroja)
+    const pmtBU = calcPMT(Math.max(0, zel - sr), 0, 5);
+    const pmtSp = calcPMT(Math.max(0, zel - Math.round(sr*Math.pow(1.001,5))), 0.001, 5);
+    addSubtitle('Porovnanie: kam odkladať rezervu?');
+    addLine('Bežný účet (0%)', formatEUR(pmtBU)+'/mes');
+    addLine('Sporiaci účet (0,1%)', formatEUR(pmtSp)+'/mes');
+    addLine('Partners Fond (2%)', formatEUR(pn.pmt)+'/mes ✓', true);
+    addNote('Partners Fond krátkodobých rezerv — úspora '+formatEUR(pmtBU-pn.pmt)+'/mes oproti bežnému účtu');
+    fpPdfItems.push({name:'Rezervy', pmt:pn.pmt});
+    totalPdf += pn.pmt;
+    y += 3;
   }
 
   // Retirement - uses current strategy from FP interactive selection
