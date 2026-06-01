@@ -42,7 +42,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);m
     <h1 class="login-title">Nastavenie nového hesla</h1>
     <p class="login-sub">Zadajte nové heslo k vášmu účtu.</p>
 
-    <form onsubmit="return doReset()">
+    <form onsubmit="event.preventDefault(); doReset(); return false;">
       <div class="input-group">
         <label for="pass1">Nové heslo</label>
         <input type="password" id="pass1" placeholder="Aspoň 8 znakov" autocomplete="new-password" minlength="8" required>
