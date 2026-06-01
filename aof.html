@@ -2238,6 +2238,7 @@ function buildStratSelector(programId, currentKey){
 
 // Stored FP state for interactive recalculation
 let fpState = {};
+let hypoSelByLabel = {}; // pamätá si vybranú mesačnú sumu na rýchlejšie splatenie (prežije reset fpState)
 
 function switchRezMode(mode){
   const deficit = window._rezDeficit || 0;
@@ -2294,6 +2295,79 @@ function switchRezMode(mode){
   }
 }
 
+// ── Rýchlejšie splatenie hypotéky: spoločné výpočty + výber sumy ──
+// Kedy hodnota investície dosiahne zostatok hypotéky (mesiac po mesiaci, max 30 r.)
+function hypoCrossover(zostatok, urokAnnual, mesacnaSplatka, investRateAnnual, mesInvest){
+  const urokMes = (urokAnnual||0)/12, investRate = (investRateAnnual||0)/12;
+  let hz = zostatok, iv = 0;
+  for(let m=1; m<=360; m++){
+    const istina = mesacnaSplatka - hz*urokMes;
+    hz = Math.max(0, hz - istina);
+    iv = (iv + mesInvest) * (1 + investRate);
+    if(iv >= hz && hz > 0){
+      return {found:true, mesiacov:m, rokov:Math.round(m/12*10)/10,
+        zostatokVtedy:Math.round(hz), investiciaVtedy:Math.round(iv),
+        vklady:mesInvest*m, zhodnotenie:Math.round(iv - mesInvest*m)};
+    }
+  }
+  return {found:false, mesiacov:0, rokov:0, zostatokVtedy:Math.round(zostatok), investiciaVtedy:0, vklady:0, zhodnotenie:0};
+}
+// Predvolená odporúčaná suma — prvý preset, ktorý sa pretne (preferuj 200 €/mes); 0 ak žiadny
+function hypoDefaultAmount(zostatok, urokAnnual, mesacnaSplatka, investRateAnnual){
+  const presets=[100,150,200,300,500];
+  let firstFound=null;
+  for(const a of presets){
+    if(hypoCrossover(zostatok, urokAnnual, mesacnaSplatka, investRateAnnual, a).found){
+      if(firstFound===null) firstFound=a;
+      if(a>=200) return a;
+    }
+  }
+  return firstFound!==null ? firstFound : 0;
+}
+// Klient klikol na sumu v tabuľke alternatív
+function selectHypoInvest(id, amount){
+  if(!fpState[id] || !fpState[id].isHypo) return;
+  fpState[id].selectedInvest = amount;
+  if(fpState[id].label) hypoSelByLabel[fpState[id].label] = amount; // ulož výber natrvalo
+  recalcHypoPayoff(id, fpState[id].currentStrategy);
+}
+// Jednotné vykreslenie prehľadu investícií + celkovej sumy + rozpočtu (zo stavu fpState)
+function renderInvestmentOverview(){
+  const tbody = document.getElementById('fpStrategieBody');
+  if(!tbody) return 0;
+  tbody.innerHTML = '';
+  let total = 0;
+  Object.entries(fpState).forEach(([id, state]) => {
+    if(state.type !== 'invest') return;
+    const s = STRATEGIES[state.currentStrategy];
+    let cielTxt, horizTxt, pmt, fv, realFv;
+    if(state.isHypo){
+      const amt = parseFloat(state.selectedInvest)||0;
+      const c = amt>0 ? hypoCrossover(state.zostatok, state.urok, state.mesacnaSplatka, s.rate, amt) : null;
+      pmt = amt;
+      fv = (c && c.found) ? c.investiciaVtedy : 0;
+      const roky = (c && c.found) ? c.rokov : 0;
+      realFv = roky>0 ? calcRealValue(fv, roky) : 0;
+      cielTxt = formatEUR(state.zostatok);
+      horizTxt = (c && c.found) ? (c.rokov + ' r.') : '—';
+    } else {
+      pmt = calcPMT(state.cielSuma, s.rate, state.roky);
+      fv = calcFV(pmt, s.rate, state.roky);
+      realFv = calcRealValue(fv, state.roky);
+      cielTxt = formatEUR(state.cielSuma);
+      horizTxt = state.roky + ' r.';
+    }
+    total += pmt;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${state.label}</td><td>${cielTxt}</td><td>${horizTxt}</td><td><span class="strat-badge ${s.badge}">${s.name}</span></td><td>${Math.round(s.rate*100)} %</td><td class="fp-rec-highlight">${formatEUR(pmt)}</td><td>${formatEUR(fv)}</td><td style="color:var(--muted);">${formatEUR(realFv)}</td><td>Partners Investments</td>`;
+    tbody.appendChild(tr);
+  });
+  const tfoot = document.getElementById('fpStrategieFoot');
+  if(tfoot) tfoot.innerHTML = `<tr><td colspan="5" style="text-align:right;">Celková mesačná investícia:</td><td class="fp-rec-highlight">${formatEUR(total)}</td><td colspan="3"></td></tr>`;
+  updateFPBudget(total);
+  return total;
+}
+
 function recalcHypoPayoff(id, stratKey){
   const state = fpState[id];
   if(!state || !state.isHypo) return;
@@ -2317,30 +2391,22 @@ function recalcHypoPayoff(id, stratKey){
   const maxMonths = 360; // max 30 years
   const table = []; // year snapshots
 
-  // Try different monthly investment amounts (50, 100, 150, 200, 300)
+  // Alternatívy mesačnej investície (klient si jednu vyberie klikom na riadok)
   const testAmounts = [50, 100, 150, 200, 300, 500];
   const results = [];
-
   testAmounts.forEach(mesInvest => {
-    let hz = zostatok;
-    let iv = 0;
-    let found = false;
-    for(let m = 1; m <= maxMonths; m++){
-      // Mortgage: zostatok klesá o splátku (istina)
-      const urokPlatba = hz * urokMes;
-      const istina = state.mesacnaSplatka - urokPlatba;
-      hz = Math.max(0, hz - istina);
-      // Investment: rastie
-      iv = (iv + mesInvest) * (1 + investRate);
-      if(iv >= hz && hz > 0 && !found){
-        found = true;
-        results.push({mesInvest, mesiacov:m, rokov:Math.round(m/12*10)/10, zostatokVtedy:Math.round(hz), investiciaVtedy:Math.round(iv), vklady:mesInvest*m, zhodnotenie:Math.round(iv-mesInvest*m)});
-      }
-    }
-    if(!found && mesInvest === testAmounts[0]){
+    const c = hypoCrossover(zostatok, state.urok, state.mesacnaSplatka, s.rate, mesInvest);
+    if(c.found){
+      results.push({mesInvest, mesiacov:c.mesiacov, rokov:c.rokov, zostatokVtedy:c.zostatokVtedy, investiciaVtedy:c.investiciaVtedy, vklady:c.vklady, zhodnotenie:c.zhodnotenie});
+    } else if(mesInvest === testAmounts[0]){
       results.push({mesInvest, mesiacov:0, rokov:0, zostatokVtedy:0, investiciaVtedy:0, vklady:0, zhodnotenie:0, note:'Hypotéka sa splatí skôr'});
     }
   });
+  // Zaisti platný výber (ak ešte nie je zvolený, použi odporúčanú sumu)
+  if(state.selectedInvest == null){
+    state.selectedInvest = (hypoSelByLabel[state.label] != null) ? hypoSelByLabel[state.label] : hypoDefaultAmount(zostatok, state.urok, state.mesacnaSplatka, s.rate);
+  }
+  hypoSelByLabel[state.label] = state.selectedInvest;
 
   let html = '';
   html += `<div class="fp-product"><div class="fp-product-icon invest">${ico('trending-up')}</div><div class="fp-product-info"><div class="fp-product-name">${s.fond}</div><div class="fp-product-desc">${s.typ} · ${Math.round(s.rate*100)}% p.a. · Investícia popri hypotéke</div></div></div>`;
@@ -2353,14 +2419,18 @@ function recalcHypoPayoff(id, stratKey){
 
   if(results.length > 0){
     html += '<div style="margin-top:12px;font-size:13px;font-weight:600;color:var(--navy);">Kedy sa investícia pretne so zostatkom hypotéky?</div>';
+    html += '<div style="font-size:12px;color:var(--muted);margin:2px 0 6px;">Kliknite na riadok so sumou, ktorú si klient vyberie — premietne sa do prehľadu investícií aj do celkového rozpočtu.</div>';
     html += '<table class="dyn-table" style="margin-top:8px;font-size:12px;"><thead><tr><th>Mesačná investícia</th><th>Pretne sa za</th><th>Zostatok hypotéky</th><th>Hodnota investície</th><th>Vaše vklady</th><th>Zhodnotenie</th></tr></thead><tbody>';
     results.forEach(r => {
       if(r.note){
         html += `<tr><td>${formatEUR(r.mesInvest)}</td><td colspan="5" style="color:var(--muted);">${r.note}</td></tr>`;
       } else {
         const fee = getEntryFee(r.vklady, stratKey);
-        html += `<tr><td><strong>${formatEUR(r.mesInvest)}</strong></td><td><strong>${r.rokov} r.</strong> (${r.mesiacov} mes.)</td><td>${formatEUR(r.zostatokVtedy)}</td><td style="color:var(--green);font-weight:600;">${formatEUR(r.investiciaVtedy)}</td><td>${formatEUR(r.vklady)}</td><td style="color:var(--green);">+${formatEUR(r.zhodnotenie)}</td></tr>`;
-        if(fee) html += `<tr><td></td><td colspan="5" style="font-size:11px;color:var(--orange);">Vstupný poplatok: ${fee.pct}% = ${formatEUR(fee.suma)}</td></tr>`;
+        const sel = (r.mesInvest === state.selectedInvest);
+        const selStyle = sel ? 'background:rgba(171,5,52,0.08);box-shadow:inset 3px 0 0 var(--red);' : '';
+        const selBadge = sel ? ' <span class="zab-priority p1" style="margin-left:6px;">vybrané</span>' : '';
+        html += `<tr onclick="selectHypoInvest('${id}', ${r.mesInvest})" style="cursor:pointer;${selStyle}" title="Kliknutím vyberiete túto sumu"><td><strong>${formatEUR(r.mesInvest)}</strong>${selBadge}</td><td><strong>${r.rokov} r.</strong> (${r.mesiacov} mes.)</td><td>${formatEUR(r.zostatokVtedy)}</td><td style="color:var(--green);font-weight:600;">${formatEUR(r.investiciaVtedy)}</td><td>${formatEUR(r.vklady)}</td><td style="color:var(--green);">+${formatEUR(r.zhodnotenie)}</td></tr>`;
+        if(fee) html += `<tr onclick="selectHypoInvest('${id}', ${r.mesInvest})" style="cursor:pointer;${sel?'background:rgba(171,5,52,0.04);':''}"><td></td><td colspan="5" style="font-size:11px;color:var(--orange);">Vstupný poplatok: ${fee.pct}% = ${formatEUR(fee.suma)}</td></tr>`;
       }
     });
     html += '</tbody></table>';
@@ -2368,8 +2438,8 @@ function recalcHypoPayoff(id, stratKey){
 
   html += '<div style="margin-top:12px;padding:10px 14px;background:rgba(0,48,73,0.03);border-radius:10px;font-size:12px;color:var(--muted);"><strong>Ako to funguje:</strong> Popri bežnom splácaní hypotéky investujete zvlášť. V momente, keď hodnota investície dosiahne zostatok na hypotéke, odkúpite investíciu a jednorazovo doplatíte hypotéku — čím ušetríte na úrokoch.</div>';
 
-  // ── Cross-over chart (best scenario = 200 €/mes or first found) ──
-  const bestResult = results.find(r => !r.note && r.mesiacov > 0) || results[0];
+  // ── Cross-over chart (zobraz scenár, ktorý si klient vybral) ──
+  const bestResult = results.find(r => r.mesInvest === state.selectedInvest && !r.note) || results.find(r => !r.note && r.mesiacov > 0) || results[0];
   if(bestResult && !bestResult.note){
     const chartInvest = bestResult.mesInvest;
     const chartLabels = [];
@@ -2444,6 +2514,8 @@ function recalcHypoPayoff(id, stratKey){
       });
     }, 50);
   }
+  // Premietni výber sumy do prehľadu investícií + celkového rozpočtu
+  renderInvestmentOverview();
 }
 
 function changeStrategy(programId, stratKey){
@@ -2465,29 +2537,8 @@ function changeStrategy(programId, stratKey){
 }
 
 function recalcFPTotal(){
-  let total = 0;
-  Object.values(fpState).forEach(state => {
-    if(state.type !== 'invest') return;
-    const s = STRATEGIES[state.currentStrategy];
-    total += calcPMT(state.cielSuma, s.rate, state.roky);
-  });
-
-  // Update total row in strategies table
-  const tbody = document.getElementById('fpStrategieBody');
-  tbody.innerHTML = '';
-  Object.entries(fpState).forEach(([id, state]) => {
-    if(state.type !== 'invest') return;
-    const s = STRATEGIES[state.currentStrategy];
-    const pmt = calcPMT(state.cielSuma, s.rate, state.roky);
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${state.label}</td><td>${formatEUR(state.cielSuma)}</td><td>${state.roky} r.</td><td><span class="strat-badge ${s.badge}">${s.name}</span></td><td>${Math.round(s.rate*100)} %</td><td class="fp-rec-highlight">${formatEUR(pmt)}</td><td>Partners Investments</td>`;
-    tbody.appendChild(tr);
-  });
-  const tfoot = document.getElementById('fpStrategieFoot');
-  tfoot.innerHTML = `<tr><td colspan="5" style="text-align:right;">Celková mesačná investícia:</td><td class="fp-rec-highlight">${formatEUR(total)}</td><td></td></tr>`;
-
-  // Update budget
-  updateFPBudget(total);
+  // Jednotné vykreslenie (9 stĺpcov, vrátane hypotéky a reálnej hodnoty)
+  renderInvestmentOverview();
 }
 
 function calcPoistne(){
@@ -2899,7 +2950,10 @@ function buildFinancialPlan(){
         cieleHtml += '</div>';
 
         // Store state
-        fpState[id] = {type:'invest', label:name, zostatok, urok, mesacnaSplatka, origStrategy:'dynamicka', currentStrategy:'dynamicka', isHypo:true};
+        const prevSel = (hypoSelByLabel[name] != null) ? hypoSelByLabel[name] : null;
+        const defSel = prevSel != null ? prevSel : hypoDefaultAmount(zostatok, urok, mesacnaSplatka, STRATEGIES['dynamicka'].rate);
+        hypoSelByLabel[name] = defSel; // ulož, nech prežije ďalšie prepočty
+        fpState[id] = {type:'invest', label:name, zostatok, urok, mesacnaSplatka, origStrategy:'dynamicka', currentStrategy:'dynamicka', isHypo:true, selectedInvest:defSel};
 
         // Calculate and render
         setTimeout(()=>recalcHypoPayoff(id, 'dynamicka'), 0);
@@ -3037,29 +3091,14 @@ function buildFinancialPlan(){
     document.getElementById('fpMajetok').innerHTML = majHtml;
   } else { fpSec7.style.display = 'none'; }
 
-  // ── PREHĽAD INVESTÍCIÍ ──
-  const tbody = document.getElementById('fpStrategieBody');
-  tbody.innerHTML = '';
-  Object.entries(fpState).forEach(([id, state]) => {
-    if(state.type !== 'invest') return;
-    const s = STRATEGIES[state.currentStrategy];
-    const pmt = calcPMT(state.cielSuma, s.rate, state.roky);
-    const fv = calcFV(pmt, s.rate, state.roky);
-    const realFv = calcRealValue(fv, state.roky);
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${state.label}</td><td>${formatEUR(state.cielSuma)}</td><td>${state.roky} r.</td><td><span class="strat-badge ${s.badge}">${s.name}</span></td><td>${Math.round(s.rate*100)} %</td><td class="fp-rec-highlight">${formatEUR(pmt)}</td><td>${formatEUR(fv)}</td><td style="color:var(--muted);">${formatEUR(realFv)}</td><td>Partners Investments</td>`;
-    tbody.appendChild(tr);
-  });
-  const tfoot = document.getElementById('fpStrategieFoot');
-  tfoot.innerHTML = `<tr><td colspan="5" style="text-align:right;">Celková mesačná investícia:</td><td class="fp-rec-highlight">${formatEUR(totalMesacne)}</td><td colspan="3"></td></tr>`;
-
-  // ── ROZPOČET ──
-  updateFPBudget(totalMesacne);
+  // ── PREHĽAD INVESTÍCIÍ + ROZPOČET ── (jednotné vykreslenie vrátane rýchlejšieho splatenia hypotéky)
+  renderInvestmentOverview();
 
   // ── RAST PORTFÓLIA ──
   buildPortfolioChart();
 
-  // ── TIMELINE ──
+  // ── TIMELINE ── (postav naživo, nech je naplnená aj bez návštevy Kroku 9)
+  buildTimeline();
   const origHTML = document.getElementById('timelineContainer').innerHTML;
   document.getElementById('fpTimeline').innerHTML = origHTML || '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
 }
@@ -3602,22 +3641,20 @@ async function generatePDF(){
     addLine('Úroková sadzba', (st.urok*100).toFixed(2)+' %');
     addLine('Mesačná splátka', formatEUR(st.mesacnaSplatka));
     addLine('Investičná stratégia', s.name+' ('+Math.round(s.rate*100)+' % p.a.)');
-    // Simulate crossover for default 200€/mes
-    const invRate = s.rate / 12;
-    const uMes = st.urok / 12;
-    const testAmts = [100, 200, 300];
-    testAmts.forEach(mesInv => {
-      let hzPdf = st.zostatok, ivPdf = 0, foundPdf = false;
-      for(let mm = 1; mm <= 360; mm++){
-        const uPdf = hzPdf * uMes;
-        hzPdf = Math.max(0, hzPdf - (st.mesacnaSplatka - uPdf));
-        ivPdf = (ivPdf + mesInv) * (1 + invRate);
-        if(ivPdf >= hzPdf && hzPdf > 0 && !foundPdf){
-          foundPdf = true;
-          addLine('Investícia '+formatEUR(mesInv)+'/mes', 'pretne sa za '+(mm/12).toFixed(1)+' r. — ušetrené na úrokoch');
-        }
+    const selAmt = parseFloat(st.selectedInvest)||0;
+    // Porovnanie alternatív (vybraná je zvýraznená)
+    [100, 200, 300].forEach(mesInv => {
+      const c = hypoCrossover(st.zostatok, st.urok, st.mesacnaSplatka, s.rate, mesInv);
+      if(c.found){
+        addLine('Investícia '+formatEUR(mesInv)+'/mes', 'pretne sa za '+c.rokov+' r.'+(mesInv===selAmt?' (vybrané)':''), mesInv===selAmt);
       }
     });
+    if(selAmt > 0){
+      const selC = hypoCrossover(st.zostatok, st.urok, st.mesacnaSplatka, s.rate, selAmt);
+      addLine('Vybraná mesačná investícia', formatEUR(selAmt)+'/mes'+(selC.found?(' — pretne sa za '+selC.rokov+' r.'):''), true);
+      fpPdfItems.push({name: st.label+' ('+formatEUR(selAmt)+'/mes)', pmt: selAmt});
+      totalPdf += selAmt;
+    }
     addNote('Princíp: Popri splácaní hypotéky investujeme. Keď investícia dosiahne zostatok, doplatíme hypotéku jednorazovo a ušetríme na úrokoch.');
     secNum++;
     y += 2;
@@ -3760,7 +3797,10 @@ async function generatePDF(){
           const yy = Math.min(yr, p.roky);
           const mm = yy * 12;
           const rr = p.rate / 12;
-          tVal += rr > 0 ? p.pmt * (Math.pow(1+rr, mm)-1)/rr : p.pmt * mm;
+          let val = rr > 0 ? p.pmt * (Math.pow(1+rr, mm)-1)/rr : p.pmt * mm;
+          // Fáza 2: po skončení vkladov sa hodnota ďalej zhodnocuje (rovnako ako na obrazovke)
+          if(yr > p.roky){ val *= Math.pow(1 + rr, (yr - p.roky) * 12); }
+          tVal += val;
           tDep += p.pmt * mm;
         });
         const profStr = tVal-tDep > 0 ? ' (+'+formatEUR(Math.round(tVal-tDep))+' zhodnotenie)' : '';
