@@ -503,8 +503,8 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
         <div style="margin:12px 0;">
           <label style="font-size:12px;font-weight:600;">Typ zmeny:</label>
           <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">
-            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_kupaByt"> Kúpa bytu</label>
-            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_kupaDom"> Kúpa domu/výstavba</label>
+            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_kupaByt" onchange="toggleKupa()"> Kúpa bytu</label>
+            <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_kupaDom" onchange="toggleKupa()"> Kúpa domu/výstavba</label>
             <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_rekon"> Rekonštrukcia</label>
             <label class="check-row" style="margin:0;"><input type="checkbox" id="ch_optim" onchange="toggleOptimalizacia()"> Optimalizácia</label>
           </div>
@@ -550,6 +550,21 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
           <div class="form-group"><label>Potrebné financovanie (€)</label><input type="number" id="byv_financovanie" class="computed" readonly></div>
           <div class="form-group"><label>Mesačne odkladá na bývanie (€)</label><input type="number" id="byv_mesacne" value="0" min="0"></div>
         </div>
+
+        <!-- Nový hypotekárny úver (pri kúpe bytu/domu) -->
+        <div id="novyUverSection" style="display:none;margin:8px 0 4px;padding:16px;background:var(--sand);border-radius:12px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Nový hypotekárny úver</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Výška úveru (€)</label>
+              <input type="number" id="byv_uver_suma" value="0" min="0" oninput="this.dataset.edited='1';calcNovyUver()">
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">Predvolené 80 % z kúpnej ceny — upravte podľa potreby.</div>
+            </div>
+            <div class="form-group"><label>Úroková sadzba (%)</label><input type="number" id="byv_uver_urok" value="4" min="0" step="0.01" oninput="calcNovyUver()"></div>
+            <div class="form-group"><label>Doba splácania (rokov)</label><input type="number" id="byv_uver_doba" value="30" min="1" oninput="calcNovyUver()"></div>
+          </div>
+        </div>
+
         <div class="form-row">
           <div class="form-group"><label>Očakávané preplatenie (€)</label><input type="number" id="byv_preplacana" value="0" class="computed" readonly></div>
           <div class="form-group"><label>Počet izieb</label><input type="number" id="byv_izby" min="1" value="3"></div>
@@ -1407,11 +1422,51 @@ function calcFinancovanie(){
   const h = parseFloat(document.getElementById('byv_hodnota').value)||0;
   const c = parseFloat(document.getElementById('byv_hotovost').value)||0;
   document.getElementById('byv_financovanie').value = Math.max(0, h-c);
+  // Pri kúpe: ak úver nie je ručne upravený, predvyplň 80 % z kúpnej ceny
+  const sumaEl = document.getElementById('byv_uver_suma');
+  const novy = document.getElementById('novyUverSection');
+  if(sumaEl && novy && novy.style.display!=='none' && sumaEl.dataset.edited!=='1'){
+    sumaEl.value = h>0 ? Math.round(h*0.8) : 0;
+  }
   calcPreplatenie();
 }
 
+// Nový hypotekárny úver pri kúpe — výber sumy (default 80 % z kúpnej ceny) + auto preplatenie
+function toggleKupa(){
+  const on = document.getElementById('ch_kupaByt').checked || document.getElementById('ch_kupaDom').checked;
+  const sec = document.getElementById('novyUverSection');
+  if(sec) sec.style.display = on ? 'block' : 'none';
+  if(on){
+    const sumaEl = document.getElementById('byv_uver_suma');
+    if(sumaEl && sumaEl.dataset.edited!=='1' && (parseFloat(sumaEl.value)||0)<=0){
+      const h = parseFloat(document.getElementById('byv_hodnota').value)||0;
+      if(h>0) sumaEl.value = Math.round(h*0.8);
+    }
+    calcNovyUver();
+  } else {
+    calcPreplatenie();
+  }
+}
+
+function calcNovyUver(){
+  const suma = parseFloat(document.getElementById('byv_uver_suma').value)||0;
+  const roky = parseFloat(document.getElementById('byv_uver_doba').value)||0;
+  let urok = parseFloat(document.getElementById('byv_uver_urok').value);
+  if(isNaN(urok) || urok<=0) urok = 3.5;
+  if(suma<=0 || roky<=0){ document.getElementById('byv_preplacana').value = 0; return; }
+  const r = (urok/100)/12, n = roky*12;
+  const splatka = (r>0) ? suma*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1) : suma/n;
+  document.getElementById('byv_preplacana').value = Math.round(splatka*n - suma);
+}
+
 function calcPreplatenie(){
-  // Výpočet očakávaného preplatenia pri priemernej sadzbe 3,5% p.a. počas celej doby splácania
+  // Nový úver (pri kúpe) má prednosť, ak je aktívny
+  const novy = document.getElementById('novyUverSection');
+  if(novy && novy.style.display!=='none' && (parseFloat(document.getElementById('byv_uver_suma').value)||0) > 0){
+    calcNovyUver();
+    return;
+  }
+  // Inak: očakávané preplatenie z optimalizácie existujúceho úveru (priemerná sadzba 3,5 % p.a.)
   const zostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
   const roky = parseFloat(document.getElementById('optim_doba').value)||0;
   if(zostatok <= 0 || roky <= 0){
@@ -1473,12 +1528,28 @@ function addRezerva(){
   const tbody = document.getElementById('rezervyBody');
   const tr = document.createElement('tr');
   tr.innerHTML = `
-    <td><select onchange="calcRezervy()"><option value="hotovost">Hotovosť</option><option value="bezny">Bežný účet</option><option value="sporiaci">Sporiaci účet</option><option value="fondy">Podielové fondy</option></select></td>
+    <td><select onchange="calcRezervy()"><option value="hotovost">Hotovosť</option><option value="bezny">Bežný účet</option><option value="sporiaci">Sporiaci účet</option><option value="fondy">Podielové fondy</option><option value="etf">ETF fondy</option></select></td>
     <td><input type="text" placeholder="Názov"></td>
     <td><input type="number" value="0" min="0" oninput="calcRezervy()"></td>
     <td><input type="number" value="0" step="0.1" min="0"></td>
     <td><button class="remove-row" onclick="this.closest('tr').remove();calcRezervy()">&times;</button></td>`;
   tbody.appendChild(tr);
+}
+
+// Do pohotovostnej rezervy sa rátajú len LIKVIDNÉ prostriedky (hotovosť, bežný/sporiaci účet) — nie fondy/ETF
+const RES_LIQUID = ['hotovost','bezny','sporiaci'];
+function sumLiquidReserves(){
+  let sum = 0;
+  document.querySelectorAll('#rezervyBody tr').forEach(function(tr){
+    const sel = tr.querySelector('select');
+    const typ = sel ? sel.value : '';
+    if(RES_LIQUID.indexOf(typ) === -1) return; // nelikvidné (fondy/ETF) sa do rezervy nerátajú
+    sum += parseFloat((tr.querySelectorAll('input[type=number]')[0]||{}).value)||0;
+  });
+  return sum;
+}
+function hasIlliquidReserves(){
+  return Array.from(document.querySelectorAll('#rezervyBody tr select')).some(function(sel){ return sel.value==='fondy' || sel.value==='etf'; });
 }
 
 function calcRezervy(){
@@ -1489,12 +1560,8 @@ function calcRezervy(){
   const zelezna = vlastna > 0 ? vlastna : odporucana;
   document.getElementById('zeleznaRezervaTxt').textContent = formatEUR(odporucana) + (vlastna > 0 ? ' (vlastný cieľ: '+formatEUR(vlastna)+')' : '');
 
-  let sum = 0;
-  document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
-    const inp = tr.querySelectorAll('input[type=number]')[0];
-    sum += parseFloat(inp?.value)||0;
-  });
-  document.getElementById('rezervySumTxt').textContent = formatEUR(sum);
+  const sum = sumLiquidReserves();
+  document.getElementById('rezervySumTxt').textContent = formatEUR(sum) + (hasIlliquidReserves() ? ' (do rezervy len likvidné)' : '');
 
   const diff = zelezna - sum;
   const box = document.getElementById('rezervyDiffBox');
@@ -2088,10 +2155,7 @@ function collectGoals(){
     const cisty = (parseFloat(document.getElementById('k_cisty').value)||0) + (clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0);
     const vlastnaCielova = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
     const cielova = vlastnaCielova > 0 ? vlastnaCielova : cisty*6;
-    let sum = 0;
-    document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
-      sum += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
-    });
+    const sum = sumLiquidReserves();
     const diff = cielova - sum;
     if(diff>0) goals.push({name:'Železná rezerva', suma:cielova, date:getDateIn(5)});
   }
@@ -2200,10 +2264,7 @@ function buildSummary(){
 
   // Rezerva chart
   const zelezna = (cisty+pCisty)*6;
-  let sumRezerv = 0;
-  document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
-    sumRezerv += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
-  });
+  const sumRezerv = sumLiquidReserves();
   if(chartRezervaInst) chartRezervaInst.destroy();
   chartRezervaInst = new Chart(document.getElementById('chartRezerva'),{
     type:'bar',
@@ -2890,10 +2951,7 @@ function buildFinancialPlan(){
       const vlastna = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
       return vlastna > 0 ? vlastna : (cisty + pCisty) * 6;
     })();
-    let sumRezerv = 0;
-    document.querySelectorAll('#rezervyBody tr').forEach(tr=>{
-      sumRezerv += parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
-    });
+    const sumRezerv = sumLiquidReserves();
     const deficit = Math.max(0, zelezna - sumRezerv);
 
     // Store for interactive comparison
@@ -3198,6 +3256,24 @@ function buildFinancialPlan(){
         html += '</div>';
         if(projFin < fin) html += `<div class="info-box success" style="margin-top:8px;">Sporením <strong>${formatEUR(byvMes)}/mes</strong> zníži hypotéku z ${formatEUR(fin)} na <strong>${formatEUR(projFin)}</strong>.</div>`;
       }
+    }
+    // Nový hypotekárny úver (pri kúpe bytu/domu) — výška úveru + splátka + preplatenie
+    const isKupa = document.getElementById('ch_kupaByt').checked || document.getElementById('ch_kupaDom').checked;
+    const uverSuma = parseFloat(document.getElementById('byv_uver_suma').value)||0;
+    if(isKupa && uverSuma > 0){
+      const uverUrok = parseFloat(document.getElementById('byv_uver_urok').value)||3.5;
+      const uverDoba = parseFloat(document.getElementById('byv_uver_doba').value)||30;
+      const preplat = parseFloat(document.getElementById('byv_preplacana').value)||0;
+      const rr = (uverUrok/100)/12, nn = uverDoba*12;
+      const splatka = (rr>0) ? uverSuma*(rr*Math.pow(1+rr,nn))/(Math.pow(1+rr,nn)-1) : uverSuma/nn;
+      html += '<div class="fp-rec" style="margin-top:12px;"><div class="fp-rec-title">Nový hypotekárny úver</div>';
+      html += `<div class="fp-rec-row"><span>Výška úveru</span><span class="fp-rec-highlight">${formatEUR(uverSuma)}</span></div>`;
+      html += `<div class="fp-rec-row"><span>Úroková sadzba</span><span>${uverUrok} % p.a.</span></div>`;
+      html += `<div class="fp-rec-row"><span>Doba splácania</span><span>${uverDoba} rokov</span></div>`;
+      html += `<div class="fp-rec-row"><span>Mesačná splátka</span><span>${formatEUR(Math.round(splatka))}</span></div>`;
+      html += `<div class="fp-rec-row"><span>Očakávané preplatenie (úroky za celú dobu)</span><span style="color:var(--red);font-weight:600;">${formatEUR(preplat)}</span></div>`;
+      html += '</div>';
+      html += '<div class="info-box"><strong>Tip:</strong> Porovnáme ponuky bánk a vybavíme hypotéku s lepšou sadzbou — aj malý rozdiel v úroku výrazne zníži preplatenie.</div>';
     }
     document.getElementById('fpByvanie').innerHTML = html;
   } else { fpSec4.style.display = 'none'; }
@@ -3851,6 +3927,15 @@ async function generatePDF(){
       const urok = document.getElementById('optim_urok').value||'—';
       addLine('Aktuálny úver ('+banka+')', zostatok+' pri '+urok+' %');
     }
+    const _isKupa = document.getElementById('ch_kupaByt').checked || document.getElementById('ch_kupaDom').checked;
+    const _uverSuma = parseFloat(document.getElementById('byv_uver_suma').value)||0;
+    if(_isKupa && _uverSuma > 0){
+      const _uUrok = parseFloat(document.getElementById('byv_uver_urok').value)||3.5;
+      const _uDoba = parseFloat(document.getElementById('byv_uver_doba').value)||30;
+      const _prepl = parseFloat(document.getElementById('byv_preplacana').value)||0;
+      addLine('Nový úver', formatEUR(_uverSuma)+' · '+_uUrok+' % · '+_uDoba+' r.');
+      addLine('Očakávané preplatenie (úroky)', formatEUR(_prepl), true);
+    }
   } else {
     addLine('Zmena bývania', 'Neplánuje');
   }
@@ -3861,10 +3946,9 @@ async function generatePDF(){
     const vlastna = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
     return vlastna > 0 ? vlastna : (cisty+pCisty2)*6;
   })();
-  let sr = 0;
-  document.querySelectorAll('#rezervyBody tr').forEach(tr=>{sr+=parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;});
+  const sr = sumLiquidReserves();
   addLine('Optimálna rezerva', formatEUR(zel));
-  addLine('Aktuálna rezerva', formatEUR(sr));
+  addLine('Aktuálna rezerva (likvidná)', formatEUR(sr));
   addLine('Chýbajúca suma', formatEUR(Math.max(0,zel-sr)), true);
   y += 3;
 
@@ -4651,6 +4735,11 @@ function applyAOFData(data){
     document.getElementById('partnerSection').style.display = clientType==='pair'?'block':'none';
     document.getElementById('zmenaSection').style.display = hasZmena?'block':'none';
     document.getElementById('detiSection').style.display = hasDeti?'block':'none';
+    // Obnov sekcie bývania (optimalizácia / kúpa nového úveru)
+    if(typeof toggleOptimalizacia==='function') toggleOptimalizacia();
+    var busEl = document.getElementById('byv_uver_suma');
+    if(busEl && (parseFloat(busEl.value)||0) > 0) busEl.dataset.edited = '1'; // nech sa uložená výška úveru neprepíše 80 %-ným defaultom
+    if(typeof toggleKupa==='function') toggleKupa();
 
     // Update toggles
     document.querySelectorAll('#step1 .toggle-group .toggle-btn').forEach((b,i)=>{
