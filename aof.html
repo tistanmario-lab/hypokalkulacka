@@ -1021,8 +1021,8 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
           </div>
           <div style="text-align:right;">
             <div style="font-size:11px;opacity:0.5;text-transform:uppercase;letter-spacing:.1em;">Vypracoval</div>
-            <div style="font-size:14px;font-weight:600;">Mário Tišťan</div>
-            <div style="font-size:11px;opacity:0.7;">Senior Consultant &bull; Partners Group SK</div>
+            <div style="font-size:14px;font-weight:600;" id="fpAdvisorName">Mário Tišťan</div>
+            <div style="font-size:11px;opacity:0.7;" id="fpAdvisorTitle">Senior Consultant &bull; Partners Group SK</div>
           </div>
         </div>
       </div>
@@ -1210,6 +1210,24 @@ let clientType = 'single'; // 'single' or 'pair'
 let hasDeti = true;
 let hasZmena = true;
 let childCounter = 0;
+
+// ── Poradca (autor finančného plánu) — určuje sa automaticky podľa prihláseného účtu ──
+const ADVISORS = {
+  default: {name:'Mário Tišťan',  title:'Senior Consultant', company:'Partners Group SK', email:'mario.tistan@partnersgroup.sk', phone:'+421 902 130 096', web:'www.mariotistan.sk'},
+  monika:  {name:'Monika Cupková', title:'Team Manager',      company:'Partners Group SK', email:'monika.cupkova@partnersgroup.sk', phone:'+421 915 865 958', web:''}
+};
+let currentAdvisor = ADVISORS.default;
+function resolveAdvisor(email){
+  const e = (email||'').toLowerCase();
+  if(e.indexOf('cupkova') > -1 || e.indexOf('cupková') > -1) return ADVISORS.monika;
+  return ADVISORS.default;
+}
+function getAdvisor(){ return currentAdvisor; }
+function applyAdvisorToUI(){
+  const a = getAdvisor();
+  const n = document.getElementById('fpAdvisorName');  if(n) n.textContent = a.name;
+  const t = document.getElementById('fpAdvisorTitle'); if(t) t.textContent = a.title + ' • ' + a.company;
+}
 
 // Logout — voliteľne vymaže uložené AOF záznamy klientov pred odhlásením
 function doLogout(){
@@ -2853,6 +2871,7 @@ function planNumbers(state){
 
 function buildFinancialPlan(){
   fpState = {}; // reset
+  applyAdvisorToUI(); // zabezpeč správneho autora v hlavičke plánu
   const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Klient';
   const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
   const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
@@ -3695,8 +3714,9 @@ async function generatePDF(){
     doc.text(subtitle,margin,28);
     doc.setFontSize(9);
     doc.text('Klient: '+meno+' | Vek: '+age+' | Dátum: '+todayStr, pageW-margin, 16, {align:'right'});
-    doc.text('Vypracoval: Mário Tišťan | Senior Consultant', pageW-margin, 24, {align:'right'});
-    doc.text('Partners Group SK | www.mariotistan.sk', pageW-margin, 32, {align:'right'});
+    const _advH = getAdvisor();
+    doc.text('Vypracoval: '+_advH.name+' | '+_advH.title, pageW-margin, 24, {align:'right'});
+    doc.text(_advH.company + (_advH.web ? (' | '+_advH.web) : ''), pageW-margin, 32, {align:'right'});
     y = 52;
     doc.setTextColor(0,48,73);
   }
@@ -4260,8 +4280,10 @@ async function generatePDF(){
     doc.setTextColor(255,255,255);
     doc.setFontSize(7.5);
     setNormal();
-    doc.text('Mário Tišťan | Senior Consultant | Partners Group SK', margin, py+5);
-    doc.text('mario.tistan@partnersgroup.sk | +421 902 130 096 | www.mariotistan.sk', margin, py+9);
+    const _advF = getAdvisor();
+    doc.text(_advF.name+' | '+_advF.title+' | '+_advF.company, margin, py+5);
+    const _advContact = [_advF.email, _advF.phone, _advF.web].filter(Boolean).join(' | ');
+    if(_advContact) doc.text(_advContact, margin, py+9);
     doc.text('Strana '+p+' z '+totalPages, pageW-margin, py+7, {align:'right'});
   }
 
@@ -4483,16 +4505,17 @@ function sendClientEmail(){
   }
   const subject = (document.getElementById('clientEmailSubject').value || 'Vaša osobná finančná analýza').trim();
   const klientMeno = (document.getElementById('k_meno').value + ' ' + document.getElementById('k_priezvisko').value).trim() || 'klient';
+  const _adv = getAdvisor();
+  const _sigContact = [ _adv.email && (_adv.email + (_adv.phone ? (' | '+_adv.phone) : '')), _adv.web ].filter(Boolean).join('\n');
   const body =
     'Dobrý deň,\n\n' +
     'v prílohe Vám zasielam Vašu osobnú finančnú analýzu (AOF), ktorú sme spolu pripravili. ' +
     'Dokument obsahuje prehľad Vašich príjmov, výdavkov, cieľov a odporúčaní pre budovanie majetku.\n\n' +
     'V prípade akýchkoľvek otázok ma neváhajte kontaktovať.\n\n' +
     'S pozdravom,\n' +
-    'Mário Tišťan\n' +
-    'Senior Consultant | Partners Group SK\n' +
-    'mario.tistan@partnersgroup.sk | +421 902 130 096\n' +
-    'www.mariotistan.sk';
+    _adv.name + '\n' +
+    _adv.title + ' | ' + _adv.company +
+    (_sigContact ? ('\n' + _sigContact) : '');
   const mailto = 'mailto:' + encodeURIComponent(email) +
                  '?subject=' + encodeURIComponent(subject) +
                  '&body=' + encodeURIComponent(body);
@@ -4664,7 +4687,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Set username from cloud session
   (async function(){
-    try { const u = await vipCurrentUser(); if(u) document.getElementById('topUsername').textContent = (u.email||'').split('@')[0]; } catch(e){}
+    try { const u = await vipCurrentUser(); if(u){ document.getElementById('topUsername').textContent = (u.email||'').split('@')[0]; currentAdvisor = resolveAdvisor(u.email); applyAdvisorToUI(); } } catch(e){}
   })();
 
   // 1) Skontroluj URL ?load=<key> — otvorenie konkrétneho AOFu z dashboardu
