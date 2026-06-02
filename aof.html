@@ -3892,11 +3892,19 @@ async function generatePDF(){
 
   addSection(6, 'Zabezpečenie príjmu');
   const vydavky = parseFloat(document.getElementById('zab_vydavky').value)||0;
-  addLine('Mesačné výdavky', formatEUR(vydavky));
+  addLine('Mesačné výdavky (krytie výpadku príjmu)', formatEUR(vydavky));
+  const _livingS = fpLivingCosts();
+  if(_livingS.val > 0 && !_livingS.estimated) addLine('Čisté životné náklady', formatEUR(_livingS.val));
+  // Kompaktný súhrn — celkové krytie pre prípad úmrtia (klient); detail v časti 6 plánu
+  let _deathK = 0, _anyRisk = false;
   document.querySelectorAll('.fp-zab-k:checked').forEach(cb=>{
-    const suma = parseFloat(cb.dataset.suma)||0;
-    if(suma > 0) addLine(cb.dataset.name, zabAmountLabel(suma, cb.dataset.unit||'mes'));
+    const suma = parseFloat(cb.dataset.suma)||0; if(suma > 0) _anyRisk = true;
+    const typ = cb.dataset.typ||'';
+    if(typ==='klesajuca' || typ==='fixna') _deathK += suma;
   });
+  if(_deathK > 0) addLine('Krytie pre prípad úmrtia (klient)', formatEUR(_deathK), true);
+  // Poznámku pridaj len ak je na strane miesto — inak by vytvorila takmer prázdnu stranu (detail je aj tak v časti 6 plánu)
+  if(_anyRisk && y < 248) addNote('Kompletná analýza rizík (PN, invalidita, kritické choroby, úraz), poistné sumy do zmluvy a priority sú v časti 6 finančného plánu.');
 
   // ===== PAGE 2: Financial Plan =====
   doc.addPage();
