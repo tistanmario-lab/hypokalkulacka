@@ -2807,15 +2807,15 @@ function gapCard(cielSuma, roky, curSaved, curMonthly, rate){
   let h = '<div style="margin:12px 0;">';
   h += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Súčasný stav vs. odporúčanie</div>';
   h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">';
-  h += '<div style="padding:14px;background:rgba(152,159,167,0.10);border:1px solid var(--border);border-radius:12px;">';
-  h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--silver);margin-bottom:8px;">Súčasný stav — ak nič nezmení</div>';
+  h += '<div style="padding:14px;background:rgba(230,81,0,0.06);border:1px solid rgba(230,81,0,0.30);border-left:4px solid var(--orange);border-radius:12px;">';
+  h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--orange);margin-bottom:8px;">Súčasný stav — ak nič nezmení</div>';
   h += R('Cieľ', formatEUR(cielSuma));
   h += R('Teraz odkladá', formatEUR(curMonthly)+'/mes');
   h += R('Už nasporené', formatEUR(curSaved));
   h += R('Projekcia o '+roky+' r.', formatEUR(curProjFV));
   h += '</div>';
-  h += '<div style="padding:14px;background:rgba(0,48,73,0.04);border:1.5px solid var(--navy);border-radius:12px;">';
-  h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--navy);margin-bottom:8px;">Odporúčaný stav — splní cieľ</div>';
+  h += '<div style="padding:14px;background:rgba(46,125,50,0.07);border:1px solid rgba(46,125,50,0.35);border-left:4px solid var(--green);border-radius:12px;">';
+  h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--green);margin-bottom:8px;">Odporúčaný stav — splní cieľ</div>';
   h += R('Cieľ', formatEUR(cielSuma));
   h += R('Odkladať spolu', formatEUR(recTotalMonthly)+'/mes', 'fp-rec-highlight');
   if(additionalMonthly>0 && curMonthly>0) h += R('Z toho navyše', '+'+formatEUR(additionalMonthly)+'/mes', 'fp-rec-highlight');
@@ -2970,16 +2970,16 @@ function buildFinancialPlan(){
     html += '<div style="margin-bottom:18px;">';
     html += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Súčasný stav vs. odporúčanie</div>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">';
-    html += '<div style="padding:14px;background:rgba(152,159,167,0.10);border:1px solid var(--border);border-radius:12px;">';
-    html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--silver);margin-bottom:8px;">Súčasný stav — ak nič nezmení</div>';
+    html += '<div style="padding:14px;background:rgba(230,81,0,0.06);border:1px solid rgba(230,81,0,0.30);border-left:4px solid var(--orange);border-radius:12px;">';
+    html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--orange);margin-bottom:8px;">Súčasný stav — ak nič nezmení</div>';
     html += `<div class="fp-rec-row"><span>Cieľ (renta, dnešné €)</span><span>${formatEUR(medzera)}/mes</span></div>`;
     html += `<div class="fp-rec-row"><span>Teraz odkladá</span><span>${formatEUR(curMonthly)}/mes</span></div>`;
     html += `<div class="fp-rec-row"><span>Už nasporené</span><span>${formatEUR(curSaved)}</span></div>`;
     html += `<div class="fp-rec-row"><span>Projekcia o ${roky} r.</span><span>${formatEUR(curProjFV)}</span></div>`;
     html += `<div class="fp-rec-row"><span>≈ renta (dnešné €)</span><span>${formatEUR(curRentaToday)}/mes</span></div>`;
     html += '</div>';
-    html += '<div style="padding:14px;background:rgba(0,48,73,0.04);border:1.5px solid var(--navy);border-radius:12px;">';
-    html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--navy);margin-bottom:8px;">Odporúčaný stav — splní cieľ</div>';
+    html += '<div style="padding:14px;background:rgba(46,125,50,0.07);border:1px solid rgba(46,125,50,0.35);border-left:4px solid var(--green);border-radius:12px;">';
+    html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--green);margin-bottom:8px;">Odporúčaný stav — splní cieľ</div>';
     html += `<div class="fp-rec-row"><span>Cieľ (renta, dnešné €)</span><span>${formatEUR(medzera)}/mes</span></div>`;
     html += `<div class="fp-rec-row"><span>Odkladať spolu</span><span class="fp-rec-highlight">${formatEUR(recTotalMonthly)}/mes</span></div>`;
     if(additionalMonthly>0) html += `<div class="fp-rec-row"><span>Z toho navyše</span><span class="fp-rec-highlight">+${formatEUR(additionalMonthly)}/mes</span></div>`;
@@ -3774,15 +3774,20 @@ async function generatePDF(){
     const recTotal=curMonthly+additionalMonthly;
     checkPage(34);
     const gp=3, colW=(contentW-gp)/2, boxH=25, by=y, xL=margin, xR=margin+colW+gp;
-    doc.setFillColor(238,239,240); doc.roundedRect(xL,by,colW,boxH,2,2,'F');
-    doc.setDrawColor(0,48,73); doc.setLineWidth(0.4); doc.setFillColor(247,249,251); doc.roundedRect(xR,by,colW,boxH,2,2,'FD'); doc.setLineWidth(0.2);
+    // Ľavé okno (Súčasný stav) — oranžová; pravé (Odporúčaný stav) — zelená
+    doc.setLineWidth(0.4);
+    doc.setDrawColor(230,81,0);  doc.setFillColor(253,240,231); doc.roundedRect(xL,by,colW,boxH,2,2,'FD');
+    doc.setDrawColor(46,125,50); doc.setFillColor(237,247,237); doc.roundedRect(xR,by,colW,boxH,2,2,'FD');
+    doc.setLineWidth(0.2);
+    doc.setFillColor(230,81,0);  doc.rect(xL,by+1.5,1.1,boxH-3,'F');
+    doc.setFillColor(46,125,50); doc.rect(xR,by+1.5,1.1,boxH-3,'F');
     function bx(x,title,tc,rows){
       doc.setFontSize(6.5); setBold(); doc.setTextColor(tc[0],tc[1],tc[2]); doc.text(title,x+2.5,by+3.6);
       setNormal(); doc.setFontSize(7); doc.setTextColor(70,70,70); let ry=by+8.2;
       rows.forEach(function(r){ doc.text(r[0],x+2.5,ry); doc.text(r[1],x+colW-2.5,ry,{align:'right'}); ry+=4; });
     }
-    bx(xL,'Súčasný stav — ak nič nezmení',[120,127,135],[['Cieľ',formatEUR(g.ciel)],['Teraz odkladá',formatEUR(curMonthly)+'/mes'],['Už nasporené',formatEUR(curSaved)],['Projekcia o '+roky+' r.',formatEUR(curProjFV)]]);
-    bx(xR,'Odporúčaný stav — splní cieľ',[0,48,73],[['Cieľ',formatEUR(g.ciel)],['Odkladať spolu',formatEUR(recTotal)+'/mes'],(curMonthly>0&&additionalMonthly>0)?['Z toho navyše','+'+formatEUR(additionalMonthly)+'/mes']:['Dosiahne o '+roky+' r.',formatEUR(g.ciel)],['Splní cieľ','áno']]);
+    bx(xL,'Súčasný stav — ak nič nezmení',[230,81,0],[['Cieľ',formatEUR(g.ciel)],['Teraz odkladá',formatEUR(curMonthly)+'/mes'],['Už nasporené',formatEUR(curSaved)],['Projekcia o '+roky+' r.',formatEUR(curProjFV)]]);
+    bx(xR,'Odporúčaný stav — splní cieľ',[46,125,50],[['Cieľ',formatEUR(g.ciel)],['Odkladať spolu',formatEUR(recTotal)+'/mes'],(curMonthly>0&&additionalMonthly>0)?['Z toho navyše','+'+formatEUR(additionalMonthly)+'/mes']:['Dosiahne o '+roky+' r.',formatEUR(g.ciel)],['Splní cieľ','áno']]);
     doc.setTextColor(0,48,73); doc.setFontSize(10);
     y=by+boxH+2;
     if(shortfall>0) addNote('Medzera: pri súčasnom tempe bude chýbať '+formatEUR(shortfall)+'. Stačí odkladať '+(curMonthly>0?'+':'')+formatEUR(additionalMonthly)+'/mes a cieľ je splnený.');
