@@ -376,6 +376,16 @@ function escHtml(s){ return (s+'').replace(/[<>&"']/g, function(c){ return ({'<'
 
 // Zobraz meno používateľa + načítaj zoznam AOF z cloudu
 (async function(){
+  // Evidenciu zobraz hneď so stavom "Načítavam…" (nech používateľ vidí spätnú väzbu)
+  document.getElementById('recentAofTitle').style.display = '';
+  document.getElementById('aofEvidencia').style.display = '';
+  window.__aofLoading = true;
+  renderAofTable();
+
+  // DÔLEŽITÉ: počkaj na hydratáciu relácie, inak aofCloudList beží bez prihlásenia
+  // a RLS vráti 0 záznamov (najmä na mobile, kde sa relácia obnovuje pomalšie).
+  await vipResolveSession();
+
   try{
     var user = await vipCurrentUser();
     if(user){
@@ -384,8 +394,8 @@ function escHtml(s){ return (s+'').replace(/[<>&"']/g, function(c){ return ({'<'
     }
   }catch(e){}
 
-  var items = [];
-  try { items = await aofCloudList(); } catch(e) { console.warn('AOF cloud list error', e); }
+  var items = [], listError = null;
+  try { items = await aofCloudList(); } catch(e) { listError = e; console.warn('AOF cloud list error', e); }
 
   var now = new Date();
   var currentMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
@@ -395,19 +405,15 @@ function escHtml(s){ return (s+'').replace(/[<>&"']/g, function(c){ return ({'<'
     if (dt && (dt.getFullYear() + '-' + (dt.getMonth() + 1)) === currentMonth) thisMonthCount++;
   });
 
-  if(items.length > 0){
-    document.getElementById('statClients').textContent = items.length;
-    document.getElementById('statPlans').textContent = items.length;
-  }
+  document.getElementById('statClients').textContent = items.length;
+  document.getElementById('statPlans').textContent = items.length;
   document.getElementById('statRevenue').textContent = thisMonthCount;
 
-  // Evidencia: ulož dáta a vykresli tabuľku
+  // Evidencia: ulož dáta a vykresli tabuľku (vždy — aj prázdnu / s chybou)
+  window.__aofLoading = false;
   window.__aofItems = items;
-  if (items.length > 0) {
-    document.getElementById('recentAofTitle').style.display = '';
-    document.getElementById('aofEvidencia').style.display = '';
-    renderAofTable();
-  }
+  window.__aofListError = listError;
+  renderAofTable();
   if (window.lucide) lucide.createIcons();
 })();
 
@@ -435,10 +441,14 @@ function renderAofTable(){
 
   var tbody = document.getElementById('aofTableBody');
   var cnt = document.getElementById('aofCount');
-  cnt.textContent = items.length + (items.length === 1 ? ' analýza' : (items.length>=2 && items.length<=4 ? ' analýzy' : ' analýz'));
+  cnt.textContent = window.__aofLoading ? '…' : (items.length + (items.length === 1 ? ' analýza' : (items.length>=2 && items.length<=4 ? ' analýzy' : ' analýz')));
 
   if(items.length === 0){
-    tbody.innerHTML = '<tr><td colspan="4" class="aof-empty">' + (q ? 'Žiadna analýza nezodpovedá hľadaniu.' : 'Zatiaľ žiadne uložené analýzy.') + '</td></tr>';
+    var emptyMsg;
+    if(window.__aofLoading) emptyMsg = 'Načítavam analýzy z cloudu…';
+    else if(window.__aofListError) emptyMsg = 'Nepodarilo sa načítať analýzy z cloudu. Skontrolujte pripojenie a obnovte stránku (⟳).';
+    else emptyMsg = q ? 'Žiadna analýza nezodpovedá hľadaniu.' : 'Zatiaľ žiadne uložené analýzy.';
+    tbody.innerHTML = '<tr><td colspan="4" class="aof-empty">' + emptyMsg + '</td></tr>';
     return;
   }
 

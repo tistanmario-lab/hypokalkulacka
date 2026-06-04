@@ -4655,6 +4655,8 @@ async function loadAOF(key){
   if (typeof isCloudId === 'function' && isCloudId(key)) {
     // Cloud záznam
     try {
+      // Počkaj na hydratáciu relácie, inak aofCloudGet beží bez prihlásenia (najmä na mobile)
+      if (typeof vipResolveSession === 'function') await vipResolveSession();
       const rec = await aofCloudGet(key);
       if (rec && rec.data) {
         currentCloudId = rec.id;
