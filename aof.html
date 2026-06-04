@@ -4457,6 +4457,7 @@ function collectAOFData(){
 
 // Aktuálne otvorený cloudový záznam (UUID) — ak je nastavený, save robí update
 let currentCloudId = null;
+let savingInProgress = false; // poistka proti dvojkliku / duplicitnému uloženiu
 
 async function saveAOF(){
   // Validácia: meno klienta musí byť vyplnené
@@ -4473,23 +4474,34 @@ async function saveAOF(){
     return;
   }
 
-  const data = collectAOFData();
-  const meno = data.name;
+  // Poistka proti dvojkliku: kým prebieha uloženie, ignoruj ďalšie kliknutia (inak vznikne duplikát)
+  if (savingInProgress) return;
+  savingInProgress = true;
+  const saveBtns = Array.from(document.querySelectorAll('button')).filter(function(b){ return /saveAOF\s*\(/.test(b.getAttribute('onclick')||''); });
+  saveBtns.forEach(function(b){ b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'wait'; });
 
-  // 1) Lokálna kópia (offline záloha — hybrid)
   try {
-    const key = 'aof_'+meno.replace(/\s+/g,'_')+'_'+Date.now();
-    localStorage.setItem(key, JSON.stringify(data));
-    localStorage.removeItem(AUTOSAVE_KEY);
-  } catch(e) { /* localStorage plné/nedostupné — pokračuj na cloud */ }
+    const data = collectAOFData();
+    const meno = data.name;
 
-  // 2) Cloud (Supabase) — hlavné úložisko
-  try {
-    const saved = await aofCloudSave(meno, data, currentCloudId);
-    if (saved && saved.id) currentCloudId = saved.id;
-    alert('AOF uložená do cloudu: '+meno);
-  } catch(e) {
-    alert('AOF sa uložila lokálne, ale do cloudu sa nepodarilo uložiť:\n'+(e.message||e)+'\n\nSkontrolujte internet a skúste znova.');
+    // 1) Lokálna kópia (offline záloha — hybrid)
+    try {
+      const key = 'aof_'+meno.replace(/\s+/g,'_')+'_'+Date.now();
+      localStorage.setItem(key, JSON.stringify(data));
+      localStorage.removeItem(AUTOSAVE_KEY);
+    } catch(e) { /* localStorage plné/nedostupné — pokračuj na cloud */ }
+
+    // 2) Cloud (Supabase) — hlavné úložisko (currentCloudId → update, inak nový záznam)
+    try {
+      const saved = await aofCloudSave(meno, data, currentCloudId);
+      if (saved && saved.id) currentCloudId = saved.id;
+      alert('AOF uložená do cloudu: '+meno);
+    } catch(e) {
+      alert('AOF sa uložila lokálne, ale do cloudu sa nepodarilo uložiť:\n'+(e.message||e)+'\n\nSkontrolujte internet a skúste znova.');
+    }
+  } finally {
+    savingInProgress = false;
+    saveBtns.forEach(function(b){ b.disabled = false; b.style.opacity = ''; b.style.cursor = ''; });
   }
 }
 
@@ -4626,6 +4638,7 @@ function startAutosave(){
       const priezvisko = document.getElementById('k_priezvisko').value.trim();
       if (!krstne && !priezvisko) return;
       const data = collectAOFData();
+      data.__cloudId = currentCloudId || null; // zapamätaj väzbu na cloud záznam, nech obnova pokračuje v aktualizácii
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
     } catch(e) { /* ignore */ }
   }, 30000);
@@ -4810,8 +4823,11 @@ document.addEventListener('DOMContentLoaded', function(){
           const dateStr = d && d.date ? new Date(d.date).toLocaleString('sk-SK') : '';
           if (confirm('Našiel som rozpracovaný AOF z predchádzajúcej relácie' + (d && d.name ? ' (' + d.name + ')' : '') + (dateStr ? ', uložený ' + dateStr : '') + '.\n\nOK = obnoviť\nZrušiť = začať nový AOF (rozpracovaný sa vymaže)')) {
             loadAOF(AUTOSAVE_KEY);
+            // Obnov väzbu na cloud záznam, nech ďalšie uloženie aktualizuje (nevytvorí duplikát)
+            if (d && d.__cloudId) currentCloudId = d.__cloudId;
           } else {
             localStorage.removeItem(AUTOSAVE_KEY);
+            currentCloudId = null; // nový AOF → ďalšie uloženie vytvorí nový záznam
           }
         } catch(e) { localStorage.removeItem(AUTOSAVE_KEY); }
       }
