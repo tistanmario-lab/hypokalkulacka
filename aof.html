@@ -4746,6 +4746,18 @@ function applyAOFData(data){
     if(data.zabKlientHTML) document.getElementById('zabBodyKlient').innerHTML = data.zabKlientHTML;
     if(data.zabPartnerHTML && document.getElementById('zabBodyPartner')) document.getElementById('zabBodyPartner').innerHTML = data.zabPartnerHTML;
 
+    // Poistka: ak sú v zázname reálne vyplnené deti, vždy ich zobraz (aj keby bol prepínač omylom na "Nie")
+    var _hasFilledChild = Array.from(document.querySelectorAll('#detiContainer .card')).some(function(c){
+      return (((c.querySelector('.child-meno')||{}).value)||'').trim() !== '' ||
+             (((c.querySelector('.child-dob')||{}).value)||'') !== '' ||
+             (parseFloat((c.querySelector('.child-vzdelanie')||{}).value)||0) > 0 ||
+             (parseFloat((c.querySelector('.child-start')||{}).value)||0) > 0 ||
+             (parseFloat((c.querySelector('.child-narodenie')||{}).value)||0) > 0 ||
+             (parseFloat((c.querySelector('.child-nasporene')||{}).value)||0) > 0 ||
+             (parseFloat((c.querySelector('.child-mesacne')||{}).value)||0) > 0;
+    });
+    if(_hasFilledChild) hasDeti = true;
+
     // Update UI state
     document.getElementById('partnerSection').style.display = clientType==='pair'?'block':'none';
     document.getElementById('zmenaSection').style.display = hasZmena?'block':'none';
@@ -4756,10 +4768,14 @@ function applyAOFData(data){
     if(busEl && (parseFloat(busEl.value)||0) > 0) busEl.dataset.edited = '1'; // nech sa uložená výška úveru neprepíše 80 %-ným defaultom
     if(typeof toggleKupa==='function') toggleKupa();
 
-    // Update toggles
+    // Update toggles — vizuálny stav aktívnych tlačidiel podľa načítaného stavu
     document.querySelectorAll('#step1 .toggle-group .toggle-btn').forEach((b,i)=>{
       b.classList.toggle('active', (clientType==='single'&&i===0)||(clientType==='pair'&&i===1));
     });
+    var _zmYes=document.getElementById('zmenaYes'), _zmNo=document.getElementById('zmenaNo');
+    if(_zmYes&&_zmNo){ _zmYes.classList.toggle('active', hasZmena); _zmNo.classList.toggle('active', !hasZmena); }
+    var _dtYes=document.getElementById('detiYes'), _dtNo=document.getElementById('detiNo');
+    if(_dtYes&&_dtNo){ _dtYes.classList.toggle('active', hasDeti); _dtNo.classList.toggle('active', !hasDeti); }
 
   }
 }
