@@ -218,6 +218,36 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
   color: var(--silver);
   border-top: 1px solid var(--border);
 }
+
+/* ── Evidencia analýz (AOF) ── */
+.aof-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
+.aof-newbtn { padding: 11px 16px; font-family: inherit; font-size: 13px; font-weight: 600; border: none; border-radius: 12px; background: var(--red); color: #fff; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background .2s; white-space: nowrap; }
+.aof-newbtn:hover { background: var(--navy); }
+.aof-search { flex: 1; min-width: 200px; padding: 11px 14px; font-family: inherit; font-size: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--white); color: var(--navy); outline: none; transition: border-color .2s; }
+.aof-search:focus { border-color: var(--navy); }
+.aof-sort { padding: 11px 14px; font-family: inherit; font-size: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--white); color: var(--navy); cursor: pointer; outline: none; }
+.aof-count { color: var(--muted); font-size: 13px; margin-left: auto; white-space: nowrap; }
+.aof-table-wrap { background: var(--white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.aof-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.aof-table thead th { text-align: left; padding: 14px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: rgba(0,48,73,0.03); border-bottom: 1px solid var(--border); white-space: nowrap; }
+.aof-table tbody td { padding: 13px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.aof-table tbody tr:last-child td { border-bottom: none; }
+.aof-table tbody tr { transition: background .15s; }
+.aof-table tbody tr:hover { background: rgba(0,48,73,0.025); }
+.aof-name { font-weight: 600; color: var(--navy); }
+.aof-date { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.aof-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.aof-btn { padding: 7px 13px; font-family: inherit; font-size: 13px; font-weight: 500; border: 1px solid var(--border); border-radius: 9px; background: var(--white); color: var(--navy); cursor: pointer; transition: all .15s; }
+.aof-btn:hover { border-color: var(--navy); }
+.aof-btn.open { background: var(--navy); color: #fff; border-color: var(--navy); }
+.aof-btn.open:hover { background: #004a73; }
+.aof-btn.del:hover { border-color: var(--red); color: var(--red); }
+.aof-empty { text-align: center; padding: 32px 16px; color: var(--muted); font-size: 14px; }
+@media (max-width: 600px) {
+  .aof-count { margin-left: 0; }
+  .aof-table-wrap { overflow-x: auto; }
+  .aof-table { min-width: 520px; }
+}
 </style>
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <script src="supabase.min.js"></script>
@@ -324,6 +354,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
   <h2 class="vip-section-title" id="recentAofTitle" style="display:none">Evidencia analýz</h2>
   <div id="aofEvidencia" style="display:none">
     <div class="aof-toolbar">
+      <a href="aof.html" class="aof-newbtn">+ Nová analýza</a>
       <input type="text" id="aofSearch" class="aof-search" placeholder="Hľadať podľa mena klienta…" oninput="renderAofTable()">
       <select id="aofSort" class="aof-sort" onchange="renderAofTable()">
         <option value="updated">Najnovšie zmenené</option>
@@ -501,8 +532,7 @@ async function deleteAof(id){
     var n = window.__aofItems.length;
     document.getElementById('statClients').textContent = n;
     document.getElementById('statPlans').textContent = n;
-    if(n === 0){ document.getElementById('aofEvidencia').style.display='none'; document.getElementById('recentAofTitle').style.display='none'; }
-    renderAofTable();
+    renderAofTable(); // sekcia ostáva viditeľná so správou „Zatiaľ žiadne uložené analýzy."
   }catch(e){
     alert('Mazanie zlyhalo: ' + (e.message || e));
   }
