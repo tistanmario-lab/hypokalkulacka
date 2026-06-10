@@ -653,9 +653,10 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
       <div class="form-row">
         <div class="form-group"><label>Kedy by ste chceli ísť do dôchodku? (vek)</label><input type="number" id="doch_vek" value="65" min="50" max="75" oninput="calcDochodok()"></div>
         <div class="form-group"><label>Rokov do dôchodku</label><input type="text" id="doch_roky" class="computed" readonly></div>
+        <div class="form-group"><label>Odpracované roky pri odchode (poistenie)</label><input type="number" id="doch_roky_poistenia" min="0" max="51" oninput="this.dataset.edited='1';calcDochodok()"><div style="font-size:11px;color:var(--muted);margin-top:4px;">Roky dôchodkového poistenia spolu. Predvyplní sa odhadom (vek dôchodku − 20); upravte podľa reálnej kariéry (štúdium, materská, práca v zahraničí).</div></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Očakávaný štátny dôchodok (€/mes)</label><input type="number" id="doch_statny" value="0" min="0" oninput="calcDochodok()"></div>
+        <div class="form-group"><label>Očakávaný štátny dôchodok (€/mes)</label><input type="number" id="doch_statny" value="0" min="0" oninput="this.dataset.edited='1';calcDochodok()"></div>
         <div class="form-group"><label>Želaný mesačný dôchodok (€)</label><input type="number" id="doch_potrebny" value="0" min="0" oninput="calcDochodok()"></div>
         <div class="form-group"><label>Koľko Vám bude chýbať (€/mes)</label><input type="number" id="doch_medzera" class="computed" readonly></div>
       </div>
@@ -735,7 +736,7 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
       </div>
 
       <div class="info-box">
-        <strong>Sociálna poisťovňa:</strong> Pole „Očakávaný štátny dôchodok" sa predvyplní len orientačným odhadom (zamestnanec ≈ 50 % hrubého príjmu, SZČO ≈ minimálny dôchodok). <strong>Prepíšte ho reálnou sumou</strong> z portálu Sociálnej poisťovne (rozpis dôchodkových práv), ak ju klient má.
+        <strong>Sociálna poisťovňa:</strong> Pole „Očakávaný štátny dôchodok" sa predvyplní orientačným odhadom podľa vzorca Soc. poisťovne (osobný mzdový bod × odpracované roky × aktuálna dôchodková hodnota). Je to len odhad — pre presný plán ho <strong>prepíšte reálnou sumou</strong> z „Informatívneho výpočtu dôchodku" (elektronický účet poistenca v Sociálnej poisťovni).
       </div>
 
       <div class="check-row"><input type="checkbox" id="fp_dochodok" checked> Zaradiť do finančného plánu</div>
@@ -1613,15 +1614,7 @@ function updateDochodok(){
   const praca = document.getElementById('k_praca').value;
   const isSzco = praca === 'szco';
 
-  // Auto-fill state pension estimate
-  if(parseFloat(document.getElementById('doch_statny').value)===0){
-    if(isSzco){
-      // SZČO platiaca z min. vymeriavacieho základu: minimálny dôchodok ~ 390 €/mes (2025)
-      document.getElementById('doch_statny').value = 390;
-    } else {
-      document.getElementById('doch_statny').value = Math.round(hruby * 0.5);
-    }
-  }
+  // Štátny dôchodok rieši calcDochodok() — odhad POMB × roky poistenia × ADH, kým ho poradca ručne neprepíše
   if(parseFloat(document.getElementById('doch_potrebny').value)===0){
     document.getElementById('doch_potrebny').value = Math.round(cisty);
   }
@@ -1652,13 +1645,38 @@ function calcDochodok(){
   const roky = Math.max(0, dochVek - age);
   document.getElementById('doch_roky').value = roky;
 
-  const statny = parseFloat(document.getElementById('doch_statny').value)||0;
+  // Odpracované roky poistenia — default (vek dôchodku − začiatok kariéry ~20 r.), editovateľné
+  const rpEl = document.getElementById('doch_roky_poistenia');
+  if(rpEl && rpEl.dataset.edited !== '1'){
+    rpEl.value = Math.max(0, dochVek - SP.START_WORK_AGE);
+  }
+
+  // Auto-odhad štátneho dôchodku (kým ho poradca ručne neprepíše) — POMB × roky poistenia × ADH
+  const sEl = document.getElementById('doch_statny');
+  if(sEl && sEl.dataset.edited !== '1'){
+    sEl.value = odhadStatnyDochodok();
+  }
+
+  const statny = parseFloat(sEl ? sEl.value : 0)||0;
   const potrebny = parseFloat(document.getElementById('doch_potrebny').value)||0;
   const medzera = potrebny - statny;
   document.getElementById('doch_medzera').value = Math.max(0, medzera);
+}
 
-  // Strategy calculation (used in summary)
-  // Removed inline strategy card — strategy is shown in summary only
+// Orientačný odhad štátneho STAROBNÉHO dôchodku v dnešných € podľa vzorca Sociálnej poisťovne:
+//   dôchodok ≈ POMB × roky dôchodkového poistenia × ADH
+//   POMB = osobný mzdový bod = hrubý / priemerná mzda (clamp 0,3–3); SZČO z min. vymeriavacieho základu.
+// Je to len odhad (predpokladá súvislú kariéru, nezohľadňuje valorizáciu/solidárny strop).
+function odhadStatnyDochodok(){
+  const isSzco = document.getElementById('k_praca').value === 'szco';
+  const hruby = parseFloat(document.getElementById('k_hruby').value)||0;
+  const base = isSzco ? SP.SZCO_BASE : hruby;
+  const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
+  const rpEl = document.getElementById('doch_roky_poistenia');
+  const roky = rpEl ? (parseInt(rpEl.value)||0) : Math.max(0, dochVek - SP.START_WORK_AGE);
+  if(base <= 0 || roky <= 0) return 0;
+  const POMB = Math.max(0.3, Math.min(3, base / SP.AVG_WAGE));
+  return Math.round(POMB * roky * SP.ADH);
 }
 
 function togglePilier2(){
@@ -4783,6 +4801,13 @@ function applyAOFData(data){
              (parseFloat((c.querySelector('.child-mesacne')||{}).value)||0) > 0;
     });
     if(_hasFilledChild) hasDeti = true;
+
+    // Dôchodok: uložené hodnoty ber ako ručne nastavené, nech ich nový auto-odhad neprepíše
+    // (zachová pôvodné čísla v starších analýzach — odhad sa dotkne len prázdnych polí).
+    var _ds = document.getElementById('doch_statny');
+    if(_ds && (parseFloat(_ds.value)||0) > 0) _ds.dataset.edited = '1';
+    var _drp = document.getElementById('doch_roky_poistenia');
+    if(_drp && (parseFloat(_drp.value)||0) > 0) _drp.dataset.edited = '1';
 
     // Update UI state
     document.getElementById('partnerSection').style.display = clientType==='pair'?'block':'none';
