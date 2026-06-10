@@ -437,7 +437,7 @@ footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
   .calc-cta-title { font-size: 18px; }
 }
 </style>
-<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -482,7 +482,7 @@ footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
     <div class="hero-photo">
       <div class="photo-accent"></div>
       <div class="photo-frame">
-        <img src="hero-mario.jpg" alt="Mário Tišťan - Senior Consultant Partners Group SK">
+        <img src="hero-mario.jpg" alt="Mário Tišťan - Senior Consultant Partners Group SK" loading="eager" fetchpriority="high">
         <div class="photo-badge">
           <div class="badge-num">2016</div>
           <div class="badge-txt">Rok začiatku</div>
@@ -870,6 +870,7 @@ footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
       </div>
       <div class="fade-up">
         <form action="https://formspree.io/f/mdawjqak" method="POST">
+          <input type="hidden" name="_subject" value="Web — kontaktný formulár (mariotistan.sk)">
           <div class="form-group">
             <label class="form-label" for="f-meno">Meno</label>
             <input type="text" name="meno" id="f-meno" class="form-input" placeholder="Ján Novák" required>

@@ -3,17 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YF1E1SN7J8"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YF1E1SN7J8');</script>
+<meta name="robots" content="noindex, nofollow">
+<!-- Bez Google Analytics: ide o súkromný interný nástroj s údajmi klientov (meno klienta je v titulku/URL) — netrackujeme. -->
 <title>Analýza osobných financií | VIP Zóna | Mário Tišťan</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
 :root {
   --navy: #003049;
@@ -736,7 +735,7 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
       </div>
 
       <div class="info-box">
-        <strong>Sociálna poisťovňa:</strong> Orientačná výška dôchodku sa počíta ako cca 50 % z hrubého príjmu. Pre presné informácie navštívte portál Sociálnej poisťovne.
+        <strong>Sociálna poisťovňa:</strong> Pole „Očakávaný štátny dôchodok" sa predvyplní len orientačným odhadom (zamestnanec ≈ 50 % hrubého príjmu, SZČO ≈ minimálny dôchodok). <strong>Prepíšte ho reálnou sumou</strong> z portálu Sociálnej poisťovne (rozpis dôchodkových práv), ak ju klient má.
       </div>
 
       <div class="check-row"><input type="checkbox" id="fp_dochodok" checked> Zaradiť do finančného plánu</div>
@@ -1244,21 +1243,19 @@ function applyAdvisorToUI(){
   const t = document.getElementById('fpAdvisorTitle'); if(t) t.textContent = a.title + ' • ' + a.company;
 }
 
-// Logout — voliteľne vymaže uložené AOF záznamy klientov pred odhlásením
-function doLogout(){
+// Logout — ukončí cloudovú reláciu (signOut) a voliteľne vymaže lokálne AOF záznamy
+async function doLogout(){
   var aofKeys = Object.keys(localStorage).filter(function(k){ return k.indexOf('aof_') === 0; });
   if (aofKeys.length > 0) {
-    if (!confirm('Odhlásiť a zmazať aj ' + aofKeys.length + ' uložených AOF záznamov klientov z tohto prehliadača?\n\nOK = vymazať a odhlásiť\nZrušiť = iba odhlásiť (záznamy zostanú)')) {
-      sessionStorage.removeItem('vip_auth');
-      sessionStorage.removeItem('vip_user');
-      location.href='vip-login.html';
-      return;
+    if (confirm('Odhlásiť a zmazať aj ' + aofKeys.length + ' lokálnych AOF záznamov z tohto prehliadača?\n\nOK = vymazať a odhlásiť\nZrušiť = iba odhlásiť (lokálne kópie zostanú v prehliadači)')) {
+      aofKeys.forEach(function(k){ localStorage.removeItem(k); });
     }
-    aofKeys.forEach(function(k){ localStorage.removeItem(k); });
   }
-  sessionStorage.removeItem('vip_auth');
-  sessionStorage.removeItem('vip_user');
-  location.href='vip-login.html';
+  // DÔLEŽITÉ: ukonči Supabase reláciu — inak by relácia ostala aktívna v localStorage
+  // a po „odhlásení" by stačilo zadať URL nástroja a používateľ je opäť dnu.
+  if (typeof vipLogout === 'function') { await vipLogout(); return; }
+  try { if (window.sbc) await window.sbc.auth.signOut(); } catch(e) {}
+  window.location.replace('vip-login.html');
 }
 
 // Lucide SVG icon helper — returns inline SVG string for use in innerHTML
@@ -1794,7 +1791,9 @@ function addCiel(){
 }
 
 function addCielHypoteka(){
-  const zostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
+  // Prednostne zostatok z optimalizácie existujúceho úveru; ak nie je, použi výšku nového úveru pri kúpe
+  let zostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
+  if(zostatok <= 0) zostatok = parseFloat(document.getElementById('byv_uver_suma').value)||0;
   const tbody = document.getElementById('cieleBody');
   const tr = document.createElement('tr');
   tr.style.background = 'rgba(171,5,52,0.03)';
@@ -1808,7 +1807,7 @@ function addCielHypoteka(){
     <td><button class="remove-row" onclick="this.closest('tr').remove()">&times;</button></td>`;
   tbody.appendChild(tr);
   if(zostatok === 0){
-    alert('Zostatok na hypotéke nie je vyplnený. Vráťte sa do kroku 2 (Nové bývanie → Optimalizácia) a vyplňte zostatok.');
+    alert('Zostatok hypotéky / výška úveru nie je vyplnená. Vráťte sa do kroku 2 (Nové bývanie) a vyplňte buď zostatok pri Optimalizácii, alebo výšku úveru pri Kúpe — sumu cieľa potom môžete upraviť ručne.');
   }
 }
 
@@ -3294,9 +3293,20 @@ function buildFinancialPlan(){
 
       if(isHypo){
         // Špeciálna logika: investujeme popri hypotéke, kým sa investícia nepretne so zostatkom
-        const zostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
-        const urok = (parseFloat(document.getElementById('optim_urok').value)||3.5) / 100;
-        const mesacnaSplatka = parseFloat(document.getElementById('optim_splatka').value)||0;
+        let zostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
+        let urok = (parseFloat(document.getElementById('optim_urok').value)||3.5) / 100;
+        let mesacnaSplatka = parseFloat(document.getElementById('optim_splatka').value)||0;
+        // Fallback na nový úver pri kúpe, ak optimalizácia existujúceho úveru nie je vyplnená
+        if(zostatok <= 0){
+          const nuSuma = parseFloat(document.getElementById('byv_uver_suma').value)||0;
+          if(nuSuma > 0){
+            zostatok = nuSuma;
+            urok = (parseFloat(document.getElementById('byv_uver_urok').value)||3.5) / 100;
+            const nuDoba = parseFloat(document.getElementById('byv_uver_doba').value)||30;
+            const rr = urok/12, nn = nuDoba*12;
+            if(mesacnaSplatka <= 0) mesacnaSplatka = (rr>0) ? nuSuma*(rr*Math.pow(1+rr,nn))/(Math.pow(1+rr,nn)-1) : nuSuma/nn;
+          }
+        }
         const id = 'ciel_'+cielIdx;
 
         cieleHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:8px;">${ico('home',16)} ${name}</div>`;
@@ -4457,7 +4467,9 @@ function collectAOFData(){
 
 // Aktuálne otvorený cloudový záznam (UUID) — ak je nastavený, save robí update
 let currentCloudId = null;
-let savingInProgress = false; // poistka proti dvojkliku / duplicitnému uloženiu
+let currentCloudName = null;   // meno klienta v otvorenom zázname — poistka proti prepísaniu cudzieho záznamu
+let savingInProgress = false;  // poistka proti dvojkliku / duplicitnému uloženiu
+let aofDirty = false;          // sú v rozpracovanej analýze neuložené zmeny?
 
 async function saveAOF(){
   // Validácia: meno klienta musí byť vyplnené
@@ -4492,9 +4504,19 @@ async function saveAOF(){
     } catch(e) { /* localStorage plné/nedostupné — pokračuj na cloud */ }
 
     // 2) Cloud (Supabase) — hlavné úložisko (currentCloudId → update, inak nový záznam)
+    // Poistka proti prepísaniu cudzieho záznamu: ak je otvorený existujúci cloud záznam,
+    // ale meno klienta sa medzitým zmenilo (poradca začal nového klienta bez reloadu),
+    // over zámer — inak by update prepísal pôvodného klienta.
+    let saveId = currentCloudId;
+    const _norm = function(s){ return (s||'').trim().toLowerCase().replace(/\s+/g,' '); };
+    if (currentCloudId && currentCloudName && _norm(meno) !== _norm(currentCloudName)) {
+      const updateOrig = confirm('Máte otvorenú uloženú analýzu „'+currentCloudName+'", ale meno klienta je teraz „'+meno+'".\n\nOK = aktualizovať pôvodný záznam („'+currentCloudName+'")\nZrušiť = uložiť ako NOVÚ analýzu („'+meno+'")');
+      if (!updateOrig) saveId = null; // nová analýza → insert
+    }
     try {
-      const saved = await aofCloudSave(meno, data, currentCloudId);
-      if (saved && saved.id) currentCloudId = saved.id;
+      const saved = await aofCloudSave(meno, data, saveId);
+      if (saved && saved.id) { currentCloudId = saved.id; currentCloudName = meno; }
+      aofDirty = false;
       alert('AOF uložená do cloudu: '+meno);
     } catch(e) {
       alert('AOF sa uložila lokálne, ale do cloudu sa nepodarilo uložiť:\n'+(e.message||e)+'\n\nSkontrolujte internet a skúste znova.');
@@ -4576,6 +4598,8 @@ function importAOFJson(evt){
         alert('Súbor nie je platný AOF JSON.');
         return;
       }
+      // Bezpečnosť: súbor je z nedôveryhodného zdroja — očisti serializované HTML fragmenty
+      if (typeof sanitizeAofData === 'function') sanitizeAofData(data);
       // Ulož do localStorage pod novým kľúčom a načítaj cez loadAOF (re-using existujúcej logiky)
       const meno = (data.name || 'Import').replace(/\s+/g,'_');
       const key = 'aof_' + meno + '_' + Date.now();
@@ -4639,6 +4663,7 @@ function startAutosave(){
       if (!krstne && !priezvisko) return;
       const data = collectAOFData();
       data.__cloudId = currentCloudId || null; // zapamätaj väzbu na cloud záznam, nech obnova pokračuje v aktualizácii
+      data.__cloudName = currentCloudName || null; // a meno klienta v zázname (poistka proti prepísaniu po obnove)
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
     } catch(e) { /* ignore */ }
   }, 30000);
@@ -4673,6 +4698,7 @@ async function loadAOF(key){
       const rec = await aofCloudGet(key);
       if (rec && rec.data) {
         currentCloudId = rec.id;
+        currentCloudName = rec.nazov || (rec.data && rec.data.name) || null;
         applyAOFData(rec.data);
         alert('AOF načítaná z cloudu: ' + (rec.nazov || rec.data.name || ''));
         goToStep(1);
@@ -4777,6 +4803,7 @@ function applyAOFData(data){
     var _dtYes=document.getElementById('detiYes'), _dtNo=document.getElementById('detiNo');
     if(_dtYes&&_dtNo){ _dtYes.classList.toggle('active', hasDeti); _dtNo.classList.toggle('active', !hasDeti); }
 
+    aofDirty = false; // čerstvo načítané dáta nie sú neuložená zmena
   }
 }
 
@@ -4813,6 +4840,22 @@ document.addEventListener('DOMContentLoaded', function(){
   // Initial zabezpecenie
   updateZabezpecenie();
 
+  // Označ neuložené zmeny (poistka proti strate rozpracovanej práce pri zatvorení karty)
+  document.addEventListener('input', function(){ aofDirty = true; }, true);
+  document.addEventListener('change', function(){ aofDirty = true; }, true);
+  window.addEventListener('beforeunload', function(e){
+    var menoFilled = document.getElementById('k_meno').value.trim() || document.getElementById('k_priezvisko').value.trim();
+    if(aofDirty && menoFilled && !savingInProgress){ e.preventDefault(); e.returnValue = ''; return ''; }
+  });
+  // Delegovaný fallback pre tlačidlá odstránenia riadku — funguje aj po sanitizácii importu,
+  // keď sa z importovaných riadkov odstránia inline onclick handlery.
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('.remove-row, .rm');
+    if(!b || b.getAttribute('onclick')) return; // legitímne riadky majú vlastný onclick — nezasahuj
+    var tr = b.closest('tr'), card = b.closest('.card');
+    if(tr) tr.remove(); else if(card) card.remove();
+  });
+
   // Set username from cloud session
   (async function(){
     try { const u = await vipCurrentUser(); if(u){ document.getElementById('topUsername').textContent = (u.email||'').split('@')[0]; currentAdvisor = resolveAdvisor(u.email); applyAdvisorToUI(); } } catch(e){}
@@ -4841,6 +4884,7 @@ document.addEventListener('DOMContentLoaded', function(){
             loadAOF(AUTOSAVE_KEY);
             // Obnov väzbu na cloud záznam, nech ďalšie uloženie aktualizuje (nevytvorí duplikát)
             if (d && d.__cloudId) currentCloudId = d.__cloudId;
+            if (d && d.__cloudName) currentCloudName = d.__cloudName;
           } else {
             localStorage.removeItem(AUTOSAVE_KEY);
             currentCloudId = null; // nový AOF → ďalšie uloženie vytvorí nový záznam

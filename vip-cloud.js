@@ -99,3 +99,36 @@ async function aofCloudRename(id, novyNazov){
 function isCloudId(v){
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
 }
+
+// ── Sanitizácia importovaných AOF dát ───────────────────────
+// AOF ukladá serializované HTML fragmenty (tabuľky, karty detí…). Pri NAČÍTANÍ Z CUDZIEHO
+// SÚBORU (.json) sú tieto fragmenty nedôveryhodné — môžu obsahovať vložený kód, ktorý by sa
+// vykonal v prihlásenej VIP relácii. Preto z nich odstránime nebezpečné prvky a event-handlery.
+// Vlastné cloudové záznamy (písané appkou) sa nesanitizujú — ostávajú plne interaktívne.
+function sanitizeAofHTMLString(html){
+  if(!html || typeof html !== 'string') return html || '';
+  try{
+    var docp = new DOMParser().parseFromString('<div id="__sanroot">'+html+'</div>', 'text/html');
+    var root = docp.getElementById('__sanroot');
+    if(!root) return '';
+    var BAD = ['SCRIPT','IFRAME','OBJECT','EMBED','LINK','META','BASE','STYLE','SVG','IMG','VIDEO','AUDIO','SOURCE','FORM','MATH','IMAGE','USE','FOREIGNOBJECT','APPLET','FRAME','FRAMESET'];
+    Array.prototype.slice.call(root.querySelectorAll('*')).forEach(function(el){
+      if(BAD.indexOf((el.tagName||'').toUpperCase()) > -1){ if(el.parentNode) el.parentNode.removeChild(el); return; } // toUpperCase: SVG prvky majú tagName malými písmenami
+      Array.prototype.slice.call(el.attributes).forEach(function(a){
+        var n = a.name.toLowerCase(), v = (a.value||'').toLowerCase().replace(/\s+/g,'');
+        if(n.indexOf('on') === 0) el.removeAttribute(a.name);                                  // onerror, onclick, oninput…
+        else if((n==='href'||n==='src'||n==='xlink:href'||n==='formaction'||n==='action') &&
+                (v.indexOf('javascript:')===0 || v.indexOf('data:')===0)) el.removeAttribute(a.name);
+        else if(n==='style' && v.indexOf('expression(')>-1) el.removeAttribute(a.name);
+      });
+    });
+    return root.innerHTML;
+  }catch(e){ return ''; } // ak sa nedá bezpečne rozparsovať, radšej zahoď obsah fragmentu
+}
+function sanitizeAofData(data){
+  if(!data || typeof data !== 'object') return data;
+  ['familyHTML','rezervyHTML','majetokHTML','cieleHTML','detiHTML','zabKlientHTML','zabPartnerHTML'].forEach(function(k){
+    if(typeof data[k] === 'string') data[k] = sanitizeAofHTMLString(data[k]);
+  });
+  return data;
+}
