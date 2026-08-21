@@ -276,7 +276,7 @@ footer{font-size:10px;padding:16px 10px}
         <input type="range" class="blue-range" min="200" max="3000" step="10" value="750" id="statePensionR">
       </div>
       <div class="info-row">
-        Máš <a href="blog-dochodkova-prognoza.html" style="color:#AB0534;font-weight:700">dôchodkovú prognózu</a>? Zadaj sumu z nej (odporúčam základný scenár) — je už v dnešných cenách. Priemerný dôchodok v SR je cca <span>650 &#8364;</span>
+        Máš <a href="blog-dochodkova-prognoza.html" style="color:#AB0534;font-weight:700">dôchodkovú prognózu</a>? Zadaj sumu z nej. Priemerný dôchodok v SR je cca <span>650 &#8364;</span>
       </div>
 
       <div class="field">
@@ -294,13 +294,13 @@ footer{font-size:10px;padding:16px 10px}
       </div>
 
       <div class="divider" style="margin:16px 0"></div>
-      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,48,73,0.5);margin-bottom:8px">Typ renty</div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,48,73,0.5);margin-bottom:8px">Ako dlho majú úspory vydržať?</div>
       <div class="freq-btns">
-        <button class="freq-btn active" id="btnRenta20" onclick="setRentaType('20')">20-ročná renta</button>
-        <button class="freq-btn" id="btnRentaInf" onclick="setRentaType('inf')">Nekonečná renta</button>
+        <button class="freq-btn active" id="btnRenta20" onclick="setRentaType('20')">20 rokov dôchodku</button>
+        <button class="freq-btn" id="btnRentaInf" onclick="setRentaType('inf')">Navždy (z výnosov)</button>
       </div>
       <div class="info-row" id="rentaInfo" style="margin-top:8px;font-size:10px">
-        Portfólio sa vyčerpá za 20 rokov na dôchodku.
+        Úspory postupne čerpáš a vydržia 20 rokov na dôchodku.
       </div>
     </div>
 
@@ -330,7 +330,7 @@ footer{font-size:10px;padding:16px 10px}
         <input type="range" min="0" max="1000" step="10" value="0" id="monthlyInvestR">
       </div>
       <div class="info-row" style="border-left-color:#003049">
-        Si sporiteľ v II. pilieri? Tvoja prognóza ho už zahŕňa — úspory z II. piliera sem nezadávaj druhýkrát.
+        Úspory z II. piliera sem nepíš — ak máš prognózu zo Sociálnej poisťovne, tá ich už zahŕňa.
       </div>
 
       <div class="field">
@@ -356,6 +356,9 @@ footer{font-size:10px;padding:16px 10px}
           </div>
         </div>
         <input type="range" class="blue-range" min="1" max="15" step="0.5" value="7" id="returnRateR">
+      </div>
+      <div class="info-row" style="border-left-color:#003049">
+        Koľko % ročne v priemere zarobia tvoje investície. 7 % ≈ dlhodobý priemer svetových akciových fondov; opatrnejší odhad 4–5 %.
       </div>
 
       <div class="field">
@@ -407,9 +410,9 @@ footer{font-size:10px;padding:16px 10px}
       <div class="cbox">
         <div class="cbox-tag red">Tvoja situ&#225;cia</div>
         <div class="cbox-title red">Aktu&#225;lna pr&#237;prava</div>
-        <div class="cbox-stat-lbl">Portf&#243;lio pri d&#244;chodku</div>
+        <div class="cbox-stat-lbl">Nasporen&#233; pri d&#244;chodku</div>
         <div class="cbox-stat-val" id="currentPortfolio">0 &#8364;</div>
-        <div class="cbox-stat-lbl">Mesa&#269;n&#253; pr&#237;jem z portf&#243;lia</div>
+        <div class="cbox-stat-lbl">Mesa&#269;n&#253; pr&#237;jem z &#250;spor</div>
         <div class="cbox-stat-val" id="currentMonthlyIncome" style="font-size:18px">0 &#8364;</div>
         <div style="height:1px;background:rgba(0,48,73,0.08);margin:12px 0"></div>
         <div class="cbox-stat-lbl">Pokryje medzeru na</div>
@@ -418,23 +421,23 @@ footer{font-size:10px;padding:16px 10px}
       <div class="cbox">
         <div class="cbox-tag navy">Odpor&#250;&#269;anie</div>
         <div class="cbox-title navy">Odporúčaná príprava</div>
-        <div class="cbox-stat-lbl">Potrebn&#233; portf&#243;lio</div>
+        <div class="cbox-stat-lbl">Potrebn&#225; nasporen&#225; suma</div>
         <div class="cbox-stat-val navy" id="neededPortfolio">0 &#8364;</div>
         <div class="cbox-stat-lbl">Mesa&#269;ne investova&#357;</div>
         <div class="cbox-stat-val green" id="neededMonthly">0 &#8364;</div>
         <div style="height:1px;background:rgba(0,48,73,0.08);margin:12px 0"></div>
-        <div class="cbox-stat-lbl">To je z tvojho pr&#237;jmu</div>
+        <div class="cbox-stat-lbl">Z tvojho pr&#237;jmu je to</div>
         <div class="cbox-stat-val" id="neededPercent" style="font-size:18px">0 %</div>
       </div>
     </div>
 
     <!-- CHART -->
     <div class="chart-panel">
-      <div class="chart-title">Rast portf&#243;lia v &#269;ase</div>
+      <div class="chart-title">Rast tvojich &#250;spor v &#269;ase</div>
       <div class="chart-legend">
         <div class="legend-item"><div class="legend-dot" style="background:rgba(152,159,167,0.5)"></div>Aktu&#225;lna pr&#237;prava</div>
         <div class="legend-item"><div class="legend-dot" style="background:#AB0534"></div>Odpor&#250;&#269;an&#225; pr&#237;prava</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#003049;height:2px;width:20px;border-top:2px dashed #003049;background:none"></div>Potrebn&#233; portf&#243;lio</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#003049;height:2px;width:20px;border-top:2px dashed #003049;background:none"></div>Potrebn&#225; suma</div>
       </div>
       <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
     </div>
@@ -481,7 +484,7 @@ footer{font-size:10px;padding:16px 10px}
       </div>
 
       <div class="out-row">
-        <div class="out-head"><span>Aktu&#225;lna pr&#237;prava</span><span style="color:#989FA7" id="outCurrentVal">portf&#243;lio 0 &#8364;</span></div>
+        <div class="out-head"><span>Aktu&#225;lna pr&#237;prava</span><span style="color:#989FA7" id="outCurrentVal">nasporen&#233; 0 &#8364;</span></div>
         <div class="out-bar"><div class="out-bar-a" id="outCurrentBarPension" style="width:50%"></div><div class="out-bar-b" id="outCurrentBarInvest" style="width:0%"></div></div>
         <div class="out-note" id="outCurrentNote">&#8212;</div>
       </div>
@@ -583,7 +586,7 @@ function setRentaType(t){
   rentaType=t;
   document.getElementById('btnRenta20').className='freq-btn'+(t==='20'?' active':'');
   document.getElementById('btnRentaInf').className='freq-btn'+(t==='inf'?' active':'');
-  document.getElementById('rentaInfo').textContent=t==='20'?'Portfólio sa vyčerpá za 20 rokov na dôchodku.':'Žiješ z výnosov, istina sa nikdy neminie.';
+  document.getElementById('rentaInfo').textContent=t==='20'?'Úspory postupne čerpáš a vydržia 20 rokov na dôchodku.':'Žiješ len z výnosov — úspory sa nikdy neminú.';
   calc();
 }
 
@@ -658,10 +661,10 @@ function calc(){
   if(replEl){
     if(replacePct<66){
       replEl.style.borderLeftColor='#AB0534';
-      replEl.innerHTML='Štátny dôchodok nahradí <strong>'+replacePct+' %</strong> tvojho čistého príjmu. Pod hranicou ~⅔ to bez vlastnej prípravy znamená citeľný pokles životnej úrovne.';
+      replEl.innerHTML='Štátny dôchodok ti nahradí <strong>'+replacePct+' %</strong> čistého príjmu — menej než dve tretiny. Bez vlastnej prípravy to znamená citeľný pokles životnej úrovne.';
     } else {
       replEl.style.borderLeftColor='#2a9d8f';
-      replEl.innerHTML='Štátny dôchodok nahradí <strong>'+replacePct+' %</strong> tvojho čistého príjmu — nad orientačnou hranicou ~⅔. Over si, či suma sedí s tvojou prognózou.';
+      replEl.innerHTML='Štátny dôchodok ti nahradí <strong>'+replacePct+' %</strong> čistého príjmu — viac než dve tretiny. Over si, či suma sedí s tvojou prognózou.';
     }
   }
 
@@ -742,7 +745,7 @@ function calc(){
 
   var currentTotalMonthly=statePension+currentMonthlyFromPortfolio;
   var currentPctOfDesired=desiredIncome>0?Math.round(currentTotalMonthly/desiredIncome*100):0;
-  document.getElementById('outCurrentVal').textContent='portfólio '+fmt(currentPortfolio)+', mesačne +'+fmt(currentMonthlyFromPortfolio);
+  document.getElementById('outCurrentVal').textContent='nasporené '+fmt(currentPortfolio)+', mesačne +'+fmt(currentMonthlyFromPortfolio);
   document.getElementById('outCurrentBarPension').style.width=Math.min(100,pensionPctOfDesired)+'%';
   var investPctBar=Math.min(100-Math.min(100,pensionPctOfDesired),Math.max(0,currentPctOfDesired-pensionPctOfDesired));
   document.getElementById('outCurrentBarInvest').style.width=investPctBar+'%';
@@ -799,7 +802,7 @@ function buildChart(age,retireAge,savings,monthlyInvest,neededMonthly,monthlyRat
           fill:true
         },
         {
-          label:'Potrebné portfólio',
+          label:'Potrebná suma',
           data:targetLine,
           borderColor:'#003049',
           borderWidth:2,
@@ -932,12 +935,12 @@ function submitPdfForm(){
       '<div style="display:flex;gap:16px;margin-bottom:20px;">'+
         '<div style="flex:1;background:rgba(171,5,52,0.05);border-radius:14px;padding:18px 20px;">'+
           '<div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#AB0534;margin-bottom:12px;">Aktuálna príprava</div>'+
-          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Portfólio pri dôchodku</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Nasporené pri dôchodku</div>'+
           '<div style="font-size:20px;font-weight:800;margin-bottom:8px;">'+fmt(currentPortfolio)+'</div>'+
         '</div>'+
         '<div style="flex:1;background:rgba(0,48,73,0.05);border-radius:14px;padding:18px 20px;">'+
           '<div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#003049;margin-bottom:12px;">Odporúčanie</div>'+
-          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Potrebné portfólio</div>'+
+          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Potrebná nasporená suma</div>'+
           '<div style="font-size:20px;font-weight:800;margin-bottom:8px;">'+fmt(neededPortfolio)+'</div>'+
           '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Mesačne investovať</div>'+
           '<div style="font-size:20px;font-weight:800;color:#AB0534;">'+fmt(neededMonthly)+'</div>'+
