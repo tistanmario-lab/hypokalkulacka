@@ -208,6 +208,14 @@ footer{font-size:10px;padding:16px 10px}
   </div>
 </header>
 
+<!-- Prepojenie na článok o dôchodkovej prognóze -->
+<div style="max-width:1100px;margin:14px auto 0;padding:0 16px">
+  <a href="blog-dochodkova-prognoza.html" style="display:flex;align-items:center;gap:12px;background:#ECEDED;border-left:4px solid #AB0534;border-radius:0 14px 14px 0;padding:12px 16px;text-decoration:none;color:#003049;font-size:13px;line-height:1.5">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#AB0534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+    <span><strong>Dostal si dôchodkovú prognózu zo Sociálnej poisťovne?</strong> Zadaj sumu z nej do poľa „Očakávaný štátny dôchodok" — je už v dnešných cenách. <span style="color:#AB0534;font-weight:700;text-decoration:underline">Ako prognózu čítať →</span></span>
+  </a>
+</div>
+
 <div class="main" id="calcArea">
   <!-- LEFT COLUMN -->
   <div>
@@ -265,10 +273,10 @@ footer{font-size:10px;padding:16px 10px}
             <span style="font-size:11px;font-weight:800;color:#003049">&#8364;</span>
           </div>
         </div>
-        <input type="range" class="blue-range" min="200" max="1500" step="10" value="750" id="statePensionR">
+        <input type="range" class="blue-range" min="200" max="3000" step="10" value="750" id="statePensionR">
       </div>
       <div class="info-row">
-        Priemern&#253; d&#244;chodok na Slovensku je cca <span>650 &#8364;</span>
+        Máš <a href="blog-dochodkova-prognoza.html" style="color:#AB0534;font-weight:700">dôchodkovú prognózu</a>? Zadaj sumu z nej (odporúčam základný scenár) — je už v dnešných cenách. Priemerný dôchodok v SR je cca <span>650 &#8364;</span>
       </div>
 
       <div class="field">
@@ -321,6 +329,9 @@ footer{font-size:10px;padding:16px 10px}
         </div>
         <input type="range" min="0" max="1000" step="10" value="0" id="monthlyInvestR">
       </div>
+      <div class="info-row" style="border-left-color:#003049">
+        Si sporiteľ v II. pilieri? Tvoja prognóza ho už zahŕňa — úspory z II. piliera sem nezadávaj druhýkrát.
+      </div>
 
       <div class="field">
         <div class="field-row">
@@ -333,7 +344,7 @@ footer{font-size:10px;padding:16px 10px}
         <input type="range" class="gold-range" min="0" max="500" step="5" value="0" id="pillar3R">
       </div>
       <div class="info-row" style="border-left-color:#989FA7">
-        Da&#328;ov&#253; bonus: max 180 &#8364;/rok. Zamestn&#225;vate&#318; &#269;asto prispieva rovnak&#250; sumu.
+        Da&#328;ov&#253; bonus: max 180 &#8364;/rok. Zamestn&#225;vate&#318; &#269;asto prispieva rovnak&#250; sumu. Prognóza 3. pilier zatiaľ neobsahuje (pribudne od 2028) — sem patrí.
       </div>
 
       <div class="field">
@@ -385,6 +396,10 @@ footer{font-size:10px;padding:16px 10px}
 
     <div class="info-row warn">
       Ro&#269;ne ti bude ch&#253;ba&#357; <span id="gapYearly">7 200 &#8364;</span>
+    </div>
+
+    <div class="info-row" id="replacementInfo" style="border-left-color:#003049;margin-top:8px">
+      Miera náhrady sa dopočíta automaticky.
     </div>
 
     <!-- COMPARE -->
@@ -526,20 +541,34 @@ function syncPair(nId,rId,min,max){
 syncPair('age','ageR',18,60);
 syncPair('retireAge','retireAgeR',55,70);
 syncPair('income','incomeR',500,10000);
-syncPair('statePension','statePensionR',200,1500);
+syncPair('statePension','statePensionR',200,3000);
 syncPair('desiredIncome','desiredIncomeR',300,5000);
 
-// Auto-update: štátny dôchodok = 50% príjmu, želaný = 80% príjmu
+// Ručne zadané hodnoty (napr. suma z dôchodkovej prognózy) označíme,
+// aby ich auto-odhad z príjmu už NIKDY neprepísal.
+['statePension','statePensionR','desiredIncome','desiredIncomeR'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){
+    var t=(id.indexOf('statePension')===0)?'statePension':'desiredIncome';
+    document.getElementById(t).dataset.edited='1';
+  });
+});
+
+// Auto-odhad z príjmu: štátny dôchodok = 50 % príjmu, želaný = 80 % príjmu.
+// Platí len kým hodnoty neupravíš ručne — zadanú prognózu neprepisujeme.
 function updatePensionFromIncome(){
   var inc=parseFloat(document.getElementById('income').value)||1500;
-  var pension=Math.round(inc*0.5/10)*10;
-  pension=Math.max(200,Math.min(1500,pension));
-  document.getElementById('statePension').value=pension;
-  document.getElementById('statePensionR').value=pension;
-  var desired=Math.round(inc/50)*50;
-  desired=Math.max(300,Math.min(5000,desired));
-  document.getElementById('desiredIncome').value=desired;
-  document.getElementById('desiredIncomeR').value=desired;
+  if(document.getElementById('statePension').dataset.edited!=='1'){
+    var pension=Math.round(inc*0.5/10)*10;
+    pension=Math.max(200,Math.min(3000,pension));
+    document.getElementById('statePension').value=pension;
+    document.getElementById('statePensionR').value=pension;
+  }
+  if(document.getElementById('desiredIncome').dataset.edited!=='1'){
+    var desired=Math.round(inc*0.8/50)*50;
+    desired=Math.max(300,Math.min(5000,desired));
+    document.getElementById('desiredIncome').value=desired;
+    document.getElementById('desiredIncomeR').value=desired;
+  }
   calc();
 }
 document.getElementById('income').addEventListener('input',updatePensionFromIncome);
@@ -579,7 +608,7 @@ function calc(){
   var age=parseInt(document.getElementById('age').value)||30;
   var retireAge=parseInt(document.getElementById('retireAge').value)||65;
   var income=parseFloat(document.getElementById('income').value)||1500;
-  var statePension=parseFloat(document.getElementById('statePension').value)||600;
+  var statePension=parseFloat(document.getElementById('statePension').value)||750;
   var desiredIncome=parseFloat(document.getElementById('desiredIncome').value)||1200;
   var savings=parseFloat(document.getElementById('savings').value)||0;
   var monthlyInvest=parseFloat(document.getElementById('monthlyInvest').value)||0;
@@ -622,6 +651,19 @@ function calc(){
   document.getElementById('gapBarGap').style.width=gapPct+'%';
   document.getElementById('gapLblPension').textContent=fmt(statePension);
   document.getElementById('gapLblGap').textContent=fmt(gap);
+
+  // Miera náhrady: koľko % čistého príjmu nahradí štátny dôchodok (rýchly test ~2/3)
+  var replacePct=income>0?Math.round(statePension/income*100):0;
+  var replEl=document.getElementById('replacementInfo');
+  if(replEl){
+    if(replacePct<66){
+      replEl.style.borderLeftColor='#AB0534';
+      replEl.innerHTML='Štátny dôchodok nahradí <strong>'+replacePct+' %</strong> tvojho čistého príjmu. Pod hranicou ~⅔ to bez vlastnej prípravy znamená citeľný pokles životnej úrovne.';
+    } else {
+      replEl.style.borderLeftColor='#2a9d8f';
+      replEl.innerHTML='Štátny dôchodok nahradí <strong>'+replacePct+' %</strong> tvojho čistého príjmu — nad orientačnou hranicou ~⅔. Over si, či suma sedí s tvojou prognózou.';
+    }
+  }
 
   // Current portfolio at retirement
   var currentPortfolio=futureValue(savings,totalMonthlyInvest,monthlyRate,monthsToRetire);
@@ -826,7 +868,7 @@ function submitPdfForm(){
   var age=parseInt(document.getElementById('age').value)||30;
   var retireAge=parseInt(document.getElementById('retireAge').value)||65;
   var income=parseFloat(document.getElementById('income').value)||1500;
-  var statePension=parseFloat(document.getElementById('statePension').value)||600;
+  var statePension=parseFloat(document.getElementById('statePension').value)||750;
   var desiredIncome=parseFloat(document.getElementById('desiredIncome').value)||1200;
   var savings=parseFloat(document.getElementById('savings').value)||0;
   var monthlyInvest=parseFloat(document.getElementById('monthlyInvest').value)||0;
