@@ -611,7 +611,7 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
       <div class="card-title" style="margin-top:20px;">Aktuálne rezervy</div>
       <table class="dyn-table" id="rezervyTable">
         <thead>
-          <tr><th>Typ</th><th>Názov</th><th>Suma (€)</th><th>Výnos %</th><th></th></tr>
+          <tr><th>Typ</th><th>Názov</th><th>Aktuálny stav (€)</th><th>Mesačne (€)</th><th>Výnos %</th><th></th></tr>
         </thead>
         <tbody id="rezervyBody"></tbody>
       </table>
@@ -1515,6 +1515,7 @@ function addRezerva(){
     <td><select onchange="calcRezervy()"><option value="hotovost">Hotovosť</option><option value="bezny">Bežný účet</option><option value="sporiaci">Sporiaci účet</option><option value="fondy">Podielové fondy</option><option value="etf">ETF fondy</option></select></td>
     <td><input type="text" placeholder="Názov"></td>
     <td><input type="number" value="0" min="0" oninput="calcRezervy()"></td>
+    <td><input type="number" class="rez-mesacne" value="0" min="0" oninput="calcRezervy()" title="Koľko sem klient aktuálne mesačne odkladá"></td>
     <td><input type="number" value="0" step="0.1" min="0"></td>
     <td><button class="remove-row" onclick="this.closest('tr').remove();calcRezervy()">&times;</button></td>`;
   tbody.appendChild(tr);
@@ -1535,6 +1536,16 @@ function sumLiquidReserves(){
 function hasIlliquidReserves(){
   return Array.from(document.querySelectorAll('#rezervyBody tr select')).some(function(sel){ return sel.value==='fondy' || sel.value==='etf'; });
 }
+// Súčasné mesačné odkladanie do LIKVIDNÝCH rezerv (stĺpec „Mesačne")
+function rezMonthlyLiquid(){
+  let sum = 0;
+  document.querySelectorAll('#rezervyBody tr').forEach(function(tr){
+    const sel = tr.querySelector('select');
+    if(!sel || RES_LIQUID.indexOf(sel.value) === -1) return;
+    sum += parseFloat((tr.querySelector('.rez-mesacne')||{}).value)||0;
+  });
+  return sum;
+}
 
 function calcRezervy(){
   const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
@@ -1545,7 +1556,8 @@ function calcRezervy(){
   document.getElementById('zeleznaRezervaTxt').textContent = formatEUR(odporucana) + (vlastna > 0 ? ' (vlastný cieľ: '+formatEUR(vlastna)+')' : '');
 
   const sum = sumLiquidReserves();
-  document.getElementById('rezervySumTxt').textContent = formatEUR(sum) + (hasIlliquidReserves() ? ' (do rezervy len likvidné)' : '');
+  const mesacneUz = rezMonthlyLiquid();
+  document.getElementById('rezervySumTxt').textContent = formatEUR(sum) + (mesacneUz>0 ? ' · odkladá '+formatEUR(mesacneUz)+'/mes' : '') + (hasIlliquidReserves() ? ' (do rezervy len likvidné)' : '');
 
   const diff = zelezna - sum;
   const box = document.getElementById('rezervyDiffBox');
@@ -1575,14 +1587,18 @@ function calcRezervy(){
     planInfo.innerHTML = '<strong>Vaša rezerva je dostatočná!</strong>';
     planInfo.className = 'info-box success';
   } else {
-    // PMT formula: PMT = FV * r / ((1+r)^n - 1)
-    const r = 0.02 / 12; // 2% p.a. monthly
-    const n = 60; // 5 years in months
-    const pmt = deficit * r / (Math.pow(1 + r, n) - 1);
-    const mesacna = Math.round(pmt);
-    document.getElementById('rez_mesacna').value = mesacna;
-    planInfo.innerHTML = 'Pri mesačnej investícii <strong>' + formatEUR(mesacna) + '</strong> cez Partners Fond krátkodobých rezerv dosiahnete cieľovú rezervu <strong>' + formatEUR(Math.round(zelezna)) + '</strong> za 5 rokov.';
-    planInfo.className = 'info-box';
+    // Existujúca rezerva aj súčasné mesačné odkladanie sa zhodnocujú 2 % p.a. — dopočítavame len sumu NAVYŠE
+    const projected = sum * Math.pow(1.02, 5) + calcFV(mesacneUz, 0.02, 5);
+    const shortfall = Math.max(0, zelezna - projected);
+    const navyse = calcPMT(shortfall, 0.02, 5);
+    document.getElementById('rez_mesacna').value = navyse;
+    if(shortfall <= 0){
+      planInfo.innerHTML = 'Už odkladáte <strong>' + formatEUR(mesacneUz) + '/mes</strong> — pri tomto tempe dosiahnete cieľovú rezervu <strong>' + formatEUR(Math.round(zelezna)) + '</strong> do 5 rokov.';
+      planInfo.className = 'info-box success';
+    } else {
+      planInfo.innerHTML = (mesacneUz>0 ? 'Už odkladáte <strong>'+formatEUR(mesacneUz)+'/mes</strong>. ' : '') + 'Pri mesačnej investícii <strong>' + formatEUR(navyse) + (mesacneUz>0?' navyše':'') + '</strong> cez Partners Fond krátkodobých rezerv dosiahnete cieľovú rezervu <strong>' + formatEUR(Math.round(zelezna)) + '</strong> za 5 rokov.';
+      planInfo.className = 'info-box';
+    }
   }
 }
 
@@ -2426,20 +2442,21 @@ let hypoSelByLabel = {}; // pamätá si vybranú mesačnú sumu na rýchlejšie 
 function switchRezMode(mode){
   const zelezna = window._rezZelezna || 0;
   const sumRezerv = window._rezSumRezerv || 0;
+  const mesUz = window._rezMesacne || 0;
   const modes = {
     bu:       {name:'Bežný účet', rate:0.00, desc:'0% zhodnotenie — peniaze len ležia', icon:ico('landmark'), btnClass:''},
     sporiak:  {name:'Sporiaci účet', rate:0.001, desc:'~0,1% p.a. — minimálne zhodnotenie', icon:ico('piggy-bank'), btnClass:''},
     partners: {name:'Partners Fond krátkodobých rezerv', rate:0.02, desc:'2% p.a. — konzervatívna stratégia', icon:ico('shield-check'), btnClass:'konz'}
   };
   const m = modes[mode];
-  // Existujúca rezerva sa zhodnocuje sadzbou daného nástroja; doplácame len chýbajúcu časť (zhoda s GAP kartou)
-  const projExisting = Math.round(sumRezerv * Math.pow(1+m.rate, 5));
+  // Existujúca rezerva + súčasné mesačné odkladanie sa zhodnocujú sadzbou nástroja; doplácame len chýbajúce NAVYŠE
+  const projExisting = Math.round(sumRezerv * Math.pow(1+m.rate, 5) + calcFV(mesUz, m.rate, 5));
   const shortfall = Math.max(0, zelezna - projExisting);
   const pmt = calcPMT(shortfall, m.rate, 5);
   const newFV = calcFV(pmt, m.rate, 5);
   const fv = projExisting + newFV;            // existujúce + nové ≈ cieľ
   const vklady = pmt * 60;
-  const zhodnotenie = fv - sumRezerv - vklady;
+  const zhodnotenie = fv - sumRezerv - mesUz*60 - vklady;
 
   // Update buttons
   document.querySelectorAll('#fpSecRezervy .fp-strat-btn').forEach(btn => {
@@ -2454,8 +2471,8 @@ function switchRezMode(mode){
 
   html += '<div class="fp-rec" style="margin-top:12px;">';
   html += `<div class="fp-rec-row"><span>Predpokladané zhodnotenie</span><span>${(m.rate*100 < 1 ? (m.rate*100).toFixed(1) : Math.round(m.rate*100))} % p.a.</span></div>`;
-  if(sumRezerv>0) html += `<div class="fp-rec-row"><span>Už nasporené (zhodnotí sa na)</span><span>${formatEUR(sumRezerv)} → ${formatEUR(projExisting)}</span></div>`;
-  html += `<div class="fp-rec-row"><span><strong>Potrebná mesačná suma${sumRezerv>0?' (navyše)':''}</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(pmt)}</strong></span></div>`;
+  if(sumRezerv>0 || mesUz>0) html += `<div class="fp-rec-row"><span>${mesUz>0?'Nasporené + súčasné odkladanie (o 5 r.)':'Už nasporené (zhodnotí sa na)'}</span><span>${formatEUR(sumRezerv)}${mesUz>0?' + '+formatEUR(mesUz)+'/mes':''} → ${formatEUR(projExisting)}</span></div>`;
+  html += `<div class="fp-rec-row"><span><strong>Potrebná mesačná suma${(sumRezerv>0||mesUz>0)?' (navyše)':''}</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(pmt)}</strong></span></div>`;
   html += `<div class="fp-rec-row"><span>Súčet vašich vkladov za 5 rokov</span><span>${formatEUR(vklady)}</span></div>`;
   html += `<div class="fp-rec-row"><span>Zhodnotenie (výnos)</span><span style="color:${zhodnotenie>0?'var(--green)':'var(--muted)'};">${zhodnotenie > 0 ? '+'+formatEUR(zhodnotenie) : '0 €'}</span></div>`;
   html += `<div class="fp-rec-row"><span>Hodnota po 5 rokoch</span><span>${formatEUR(fv)}</span></div>`;
@@ -2467,7 +2484,7 @@ function switchRezMode(mode){
 
   // Comparison with Partners
   if(mode !== 'partners'){
-    const partnersProj = Math.round(sumRezerv * Math.pow(1.02, 5));
+    const partnersProj = Math.round(sumRezerv * Math.pow(1.02, 5) + calcFV(mesUz, 0.02, 5));
     const partnersPmt = calcPMT(Math.max(0, zelezna - partnersProj), 0.02, 5);
     const rozdiel = pmt - partnersPmt;
     html += '<div class="fp-impact" style="margin-top:12px;">';
@@ -2962,17 +2979,20 @@ function buildFinancialPlan(){
       return vlastna > 0 ? vlastna : (cisty + pCisty) * 6;
     })();
     const sumRezerv = sumLiquidReserves();
+    const rezMes = rezMonthlyLiquid();
     const deficit = Math.max(0, zelezna - sumRezerv);
 
     // Store for interactive comparison
     window._rezDeficit = deficit;
     window._rezZelezna = zelezna;
     window._rezSumRezerv = sumRezerv;
+    window._rezMesacne = rezMes;
 
-    const rezPmt = calcPMT(deficit, 0.02, 5);
+    const rezProj = Math.round(sumRezerv*Math.pow(1.02,5) + calcFV(rezMes, 0.02, 5));
+    const rezPmt = calcPMT(Math.max(0, zelezna - rezProj), 0.02, 5);
 
     let html = '';
-    html += gapCard(zelezna, 5, sumRezerv, 0, 0.02);
+    html += gapCard(zelezna, 5, sumRezerv, rezMes, 0.02);
 
     // Vysvetlenie pre klienta — rezerva po dosiahnutí cieľa
     html += `<div style="margin-bottom:16px;padding:12px 14px;background:rgba(0,48,73,0.03);border-left:3px solid var(--navy);border-radius:8px;font-size:12px;line-height:1.55;color:var(--navy);">`;
@@ -2992,7 +3012,7 @@ function buildFinancialPlan(){
     switchRezMode('partners'); // default
 
     if(deficit > 0){
-      fpState['rezervy'] = {type:'invest', label:'Rezervy', cielSuma:deficit, roky:5, origStrategy:'konzervativna', currentStrategy:'konzervativna', origPmt:rezPmt, gap:{ciel:zelezna, saved:sumRezerv, monthly:0, projFV:Math.round(sumRezerv*Math.pow(1.02,5)), rate:0.02}};
+      fpState['rezervy'] = {type:'invest', label:'Rezervy', cielSuma:deficit, roky:5, origStrategy:'konzervativna', currentStrategy:'konzervativna', origPmt:rezPmt, gap:{ciel:zelezna, saved:sumRezerv, monthly:rezMes, projFV:rezProj, rate:0.02}};
       totalMesacne += rezPmt;
     }
   } else { fpSec1.style.display = 'none'; }
@@ -4028,8 +4048,9 @@ async function generatePDF(){
     const projEx = st.gap ? (st.gap.projFV||0) : 0;
     addSection(1, 'Rezervy — Fond krátkodobých rezerv');
     if(st.gap) pdfGapCard(st.gap, 5);
+    const _rm = st.gap ? (st.gap.monthly||0) : 0;
     addLine('Cieľová rezerva', formatEUR(zel));
-    if(sr>0) addLine('Už nasporené (zhodnotí sa na)', formatEUR(sr)+' → '+formatEUR(projEx));
+    if(sr>0 || _rm>0) addLine('Nasporené'+(_rm>0?' + súčasné odkladanie':'')+' (o 5 r.)', formatEUR(sr)+(_rm>0?' + '+formatEUR(_rm)+'/mes':'')+' → '+formatEUR(projEx));
     addLine('Zhodnotenie', '2 % p.a. (Konzervatívna)');
     addLine('Horizont', '5 rokov');
     addLine('Mesačná investícia'+(sr>0?' (navyše)':''), pn.pmt>0?formatEUR(pn.pmt):'0 € — pokryté rastom rezervy', true);
@@ -4037,8 +4058,8 @@ async function generatePDF(){
     addNote('Poskytovateľ: Partners Asset Management — Fond krátkodobých rezerv');
     y += 2;
     // Comparison (existujúca rezerva rastie sadzbou daného nástroja)
-    const pmtBU = calcPMT(Math.max(0, zel - sr), 0, 5);
-    const pmtSp = calcPMT(Math.max(0, zel - Math.round(sr*Math.pow(1.001,5))), 0.001, 5);
+    const pmtBU = calcPMT(Math.max(0, zel - (sr + _rm*60)), 0, 5);
+    const pmtSp = calcPMT(Math.max(0, zel - Math.round(sr*Math.pow(1.001,5) + calcFV(_rm,0.001,5))), 0.001, 5);
     addSubtitle('Porovnanie: kam odkladať rezervu?');
     addLine('Bežný účet (0%)', formatEUR(pmtBU)+'/mes');
     addLine('Sporiaci účet (0,1%)', formatEUR(pmtSp)+'/mes');
@@ -4764,6 +4785,13 @@ function applyAOFData(data){
     // Restore dynamic content
     if(data.familyHTML) document.getElementById('familyBody').innerHTML = data.familyHTML;
     if(data.rezervyHTML) document.getElementById('rezervyBody').innerHTML = data.rezervyHTML;
+    // Spätná kompatibilita: starším uloženým riadkom rezerv doplň stĺpec „Mesačne (€)"
+    document.querySelectorAll('#rezervyBody tr').forEach(function(tr){
+      if(tr.querySelector('.rez-mesacne') || tr.children.length !== 5) return;
+      var td = document.createElement('td');
+      td.innerHTML = '<input type="number" class="rez-mesacne" value="0" min="0" oninput="calcRezervy()" title="Koľko sem klient aktuálne mesačne odkladá">';
+      tr.insertBefore(td, tr.children[3]); // za Aktuálny stav, pred Výnos %
+    });
     if(data.majetokHTML) document.getElementById('majetokBody').innerHTML = data.majetokHTML;
     if(data.cieleHTML) document.getElementById('cieleBody').innerHTML = data.cieleHTML;
     if(data.detiHTML) document.getElementById('detiContainer').innerHTML = data.detiHTML;
