@@ -580,6 +580,24 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
       </div>
     </div>
 
+    <!-- Aktuálne úvery a záväzky (nezávislé od plánovanej zmeny bývania) -->
+    <div class="card">
+      <div class="card-title">Aktuálne úvery a záväzky</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+        Všetky úvery klienta — hypotéka, spotrebné, stavebné sporenie (medziúver), leasing.
+        <strong>Úver zadaný vyššie v „Optimalizácii" sem už nepridávajte</strong> (rátal by sa dvakrát).<br>
+        Pri stavebnom sporení zadajte do „Nasporené" sporiacu časť — reálny dlh = zostatok − nasporené.
+      </div>
+      <table class="dyn-table" id="uveryTable">
+        <thead>
+          <tr><th>Názov / banka</th><th>Typ</th><th>Zostatok (€)</th><th>Nasporené (€)</th><th>Úrok %</th><th>Splátka (€)</th><th>Koniec</th><th></th></tr>
+        </thead>
+        <tbody id="uveryBody"></tbody>
+      </table>
+      <button class="btn-add" onclick="addUver()" style="margin-top:12px;">+ Pridať úver</button>
+      <div id="uverySuhrn" class="info-box" style="display:none;margin-top:14px;"></div>
+    </div>
+
     <div class="card">
       <div class="card-title">Poznámky</div>
       <div class="form-group"><textarea id="pozn_step2" rows="3" placeholder="Vaše poznámky k tomuto programu..."></textarea></div>
@@ -598,14 +616,22 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
 
     <div class="card">
       <div class="card-title">Železná rezerva</div>
-      <div class="info-box success">
-        Odporúčaná výška rezervy (6&times; čistý mesačný príjem): <strong id="zeleznaRezervaTxt">0 €</strong>
-      </div>
-      <div class="form-row" style="margin-top:12px;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Z čoho počítať rezervu</label>
+          <select id="rez_zaklad" onchange="calcRezervy()">
+            <option value="vydavky">6× mesačné výdavky (odporúčané)</option>
+            <option value="prijem">6× čistý mesačný príjem</option>
+          </select>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Výdavky sú realistickejšie — rezerva má pokryť to, čo klient <strong>musí</strong> platiť, nie to, čo zarobí. Sumu výdavkov zadávate v Kroku 8.</div>
+        </div>
         <div class="form-group">
           <label>Vlastná cieľová výška rezervy (€) <span style="font-weight:400;color:var(--muted);">— nechajte 0 pre odporúčanú</span></label>
           <input type="number" id="rez_vlastna_cielova" value="0" min="0" oninput="calcRezervy()">
         </div>
+      </div>
+      <div class="info-box success" style="margin-top:12px;">
+        Odporúčaná výška rezervy: <strong id="zeleznaRezervaTxt">0 €</strong>
       </div>
 
       <div class="card-title" style="margin-top:20px;">Aktuálne rezervy</div>
@@ -658,7 +684,7 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
       </div>
       <div class="form-row">
         <div class="form-group"><label>Očakávaný štátny dôchodok (€/mes)</label><input type="number" id="doch_statny" value="0" min="0" oninput="this.dataset.edited='1';calcDochodok()"><div style="font-size:11px;color:var(--muted);margin-top:4px;">Ak má klient <strong>dôchodkovú prognózu zo Sociálnej poisťovne</strong>, zadajte sumu z nej — je už v dnešných cenách. Inak sa použije odhad.</div><label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;margin-top:6px;cursor:pointer;"><input type="checkbox" id="doch_prognoza" style="width:15px;height:15px;accent-color:var(--navy);" onchange="if(this.checked){document.getElementById('doch_statny').dataset.edited='1';}calcDochodok()"> Suma je z dôchodkovej prognózy SP</label></div>
-        <div class="form-group"><label>Želaný mesačný dôchodok (€)</label><input type="number" id="doch_potrebny" value="0" min="0" oninput="calcDochodok()"></div>
+        <div class="form-group"><label>Želaný mesačný dôchodok (€)</label><input type="number" id="doch_potrebny" value="0" min="0" oninput="this.dataset.edited='1';calcDochodok()"><div style="font-size:11px;color:var(--muted);margin-top:4px;">Spýtajte sa klienta: <em>„Koľko by ti malo mesačne chodiť, aby si nemusel pracovať?"</em> Predvyplnené je 100 % dnešného čistého príjmu — prepíšte jeho odpoveďou.</div></div>
         <div class="form-group"><label>Koľko Vám bude chýbať (€/mes)</label><input type="number" id="doch_medzera" class="computed" readonly></div>
       </div>
     </div>
@@ -851,7 +877,7 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
       </table>
       <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
         <button class="btn-add" onclick="addCiel()">+ Pridať cieľ</button>
-        <button class="btn-add" onclick="addCielHypoteka()" style="border-color:var(--red);color:var(--red);">+ Rýchlejšie splatenie hypotéky</button>
+        <button class="btn-add" onclick="addCielHypoteka()" style="border-color:var(--red);color:var(--red);">+ Rýchlejšie splatenie úverov</button>
       </div>
       <div class="check-row" style="margin-top:16px;"><input type="checkbox" id="fp_ciele" checked> Zaradiť do finančného plánu</div>
     </div>
@@ -907,6 +933,29 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
         <strong>Celkové mesačné výdavky</strong> (hore) slúžia na <strong>analýzu výpadku príjmu</strong> — zadajte sem <strong>všetko</strong>, čo musí byť pri výpadku kryté: bežný chod, splátky, poistky aj investície.<br>
         <strong>Čisté životné náklady</strong> slúžia na <strong>mesačný rozpočet</strong> finančného plánu — len bežný chod, aby sa splátky/poistné/investície nerátali dvakrát.<br>
         <strong>Spotrebné dlhy</strong> = pôžičky a úvery <strong>mimo hypotéky</strong> (tá je krytá samostatne klesajúcou poistnou sumou).
+      </div>
+    </div>
+
+    <!-- Čo už klient má uzatvorené -->
+    <div class="card">
+      <div class="card-title">Čo už klient má — existujúce poistenie</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Zadajte poistné sumy z existujúcej zmluvy. Vo finančnom pláne sa potom zobrazí porovnanie <strong>„má / potrebuje / rozdiel"</strong>.</div>
+      <div class="check-row" style="margin-bottom:12px;"><input type="checkbox" id="zab_ex_ma" onchange="toggleExPoistenie()"> Klient už má životné/rizikové poistenie</div>
+      <div id="exPoistenieSection" style="display:none;">
+        <div class="form-row">
+          <div class="form-group"><label>Poisťovňa</label><input type="text" id="zab_ex_poistovna" placeholder="napr. NN, Generali"></div>
+          <div class="form-group"><label>Mesačné poistné (€)</label><input type="number" id="zab_ex_poistne" value="0" min="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Úmrtie — poistná suma (€)</label><input type="number" id="zab_ex_smrt" value="0" min="0"></div>
+          <div class="form-group"><label>Invalidita — poistná suma (€)</label><input type="number" id="zab_ex_inval" value="0" min="0"></div>
+          <div class="form-group"><label>Invalidita — mesačná renta (€)</label><input type="number" id="zab_ex_inval_renta" value="0" min="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Kritické choroby (€)</label><input type="number" id="zab_ex_kch" value="0" min="0"></div>
+          <div class="form-group"><label>Trvalé následky úrazu (€)</label><input type="number" id="zab_ex_uraz" value="0" min="0"></div>
+          <div class="form-group"><label>Denné odškodné (€/deň)</label><input type="number" id="zab_ex_denna" value="0" min="0"></div>
+        </div>
       </div>
     </div>
 
@@ -1493,6 +1542,106 @@ function toggleOptimUver(){
   document.getElementById('optimUverSection').style.display = (val && val.value === 'uver') ? 'block' : 'none';
 }
 
+// ── Aktuálne úvery a záväzky (viac úverov naraz) ──────────────
+const UVER_TYPY = [['hypoteka','Hypotéka'],['spotrebny','Spotrebný úver'],['stavebny','Stavebné sporenie / medziúver'],['leasing','Leasing'],['kreditka','Kreditná karta / povolené prečerpanie'],['ine','Iné']];
+function addUver(nazov, typ, zostatok, sporenie, urok, splatka, koniec){
+  const tb = document.getElementById('uveryBody');
+  if(!tb) return;
+  const tr = document.createElement('tr');
+  tr.className = 'uver-row';
+  tr.innerHTML =
+    '<td><input type="text" class="uv-nazov" placeholder="napr. PSS, VÚB" oninput="calcUvery()"></td>'+
+    '<td><select class="uv-typ" onchange="calcUvery()">'+UVER_TYPY.map(function(t){return '<option value="'+t[0]+'">'+t[1]+'</option>';}).join('')+'</select></td>'+
+    '<td><input type="number" class="uv-zostatok" value="0" min="0" oninput="calcUvery()"></td>'+
+    '<td><input type="number" class="uv-sporenie" value="0" min="0" oninput="calcUvery()" title="Sporiaca časť pri stavebnom sporení — odpočíta sa od dlhu"></td>'+
+    '<td><input type="number" class="uv-urok" value="0" min="0" step="0.01" oninput="calcUvery()"></td>'+
+    '<td><input type="number" class="uv-splatka" value="0" min="0" oninput="calcUvery()"></td>'+
+    '<td><input type="number" class="uv-koniec" min="2026" max="2080" placeholder="rok" oninput="calcUvery()"></td>'+
+    '<td><button type="button" class="remove-row" onclick="this.closest(\'tr\').remove();calcUvery()">&times;</button></td>';
+  tb.appendChild(tr);
+  if(nazov!==undefined) tr.querySelector('.uv-nazov').value = nazov;
+  if(typ!==undefined) tr.querySelector('.uv-typ').value = typ;
+  if(zostatok!==undefined) tr.querySelector('.uv-zostatok').value = zostatok;
+  if(sporenie!==undefined) tr.querySelector('.uv-sporenie').value = sporenie;
+  if(urok!==undefined) tr.querySelector('.uv-urok').value = urok;
+  if(splatka!==undefined) tr.querySelector('.uv-splatka').value = splatka;
+  if(koniec!==undefined) tr.querySelector('.uv-koniec').value = koniec;
+  calcUvery();
+}
+// Súhrn všetkých úverov: tabuľka + úver z „Optimalizácie" (aby sa nič nestratilo)
+function sumUvery(){
+  const rows = [];
+  document.querySelectorAll('#uveryBody .uver-row').forEach(function(tr){
+    const zost = parseFloat((tr.querySelector('.uv-zostatok')||{}).value)||0;
+    const spor = parseFloat((tr.querySelector('.uv-sporenie')||{}).value)||0;
+    const dlh = Math.max(0, zost - spor);
+    if(zost <= 0) return;
+    rows.push({
+      nazov: ((tr.querySelector('.uv-nazov')||{}).value||'Úver').trim() || 'Úver',
+      typ: (tr.querySelector('.uv-typ')||{}).value || 'ine',
+      zostatok: zost, sporenie: spor, dlh: dlh,
+      urok: (parseFloat((tr.querySelector('.uv-urok')||{}).value)||0)/100,
+      splatka: parseFloat((tr.querySelector('.uv-splatka')||{}).value)||0,
+      koniec: parseInt((tr.querySelector('.uv-koniec')||{}).value)||0
+    });
+  });
+  // Úver z Optimalizácie (ak je vyplnený) — pridaj ako ďalší záznam
+  const oz = parseFloat((document.getElementById('optim_zostatok')||{}).value)||0;
+  if(oz > 0){
+    const doba = parseInt((document.getElementById('optim_doba')||{}).value)||0;
+    rows.push({
+      nazov: ((document.getElementById('optim_banka')||{}).value||'Úver')+' (optimalizácia)',
+      typ: (document.getElementById('optim_typ_uveru')||{}).value || 'hypoteka',
+      zostatok: oz, sporenie: 0, dlh: oz,
+      urok: (parseFloat((document.getElementById('optim_urok')||{}).value)||0)/100,
+      splatka: parseFloat((document.getElementById('optim_splatka')||{}).value)||0,
+      koniec: doba>0 ? (new Date().getFullYear()+doba) : 0
+    });
+  }
+  const dlh = rows.reduce(function(s,r){ return s+r.dlh; },0);
+  const splatka = rows.reduce(function(s,r){ return s+r.splatka; },0);
+  // vážený priemer sadzby podľa výšky dlhu
+  const wRate = dlh>0 ? rows.reduce(function(s,r){ return s + r.urok*r.dlh; },0)/dlh : 0;
+  const koniec = rows.reduce(function(m,r){ return Math.max(m, r.koniec||0); },0);
+  return {rows, dlh, splatka, rate: wRate, koniec};
+}
+function calcUvery(){
+  const u = sumUvery();
+  const box = document.getElementById('uverySuhrn');
+  if(box){
+    if(u.rows.length === 0){ box.style.display='none'; }
+    else {
+      box.style.display='block';
+      box.className = 'info-box warning';
+      box.innerHTML = '<strong>Spolu:</strong> dlh <strong>'+formatEUR(u.dlh)+'</strong> · mesačné splátky <strong>'+formatEUR(u.splatka)+'</strong>'
+        + (u.rate>0 ? ' · priemerná sadzba <strong>'+(u.rate*100).toFixed(2)+' %</strong>' : '')
+        + (u.koniec>0 ? ' · posledná splatnosť <strong>'+u.koniec+'</strong>' : '');
+    }
+  }
+  if(typeof updateZabezpecenie === 'function' && document.getElementById('zabBodyKlient')) updateZabezpecenie();
+}
+
+function toggleExPoistenie(){
+  const on = document.getElementById('zab_ex_ma').checked;
+  document.getElementById('exPoistenieSection').style.display = on ? 'block' : 'none';
+}
+// Existujúce krytie klienta — pre porovnanie „má / potrebuje / rozdiel" v pláne
+function exPoistenie(){
+  const g = id => parseFloat((document.getElementById(id)||{}).value)||0;
+  const ma = (document.getElementById('zab_ex_ma')||{}).checked;
+  return {
+    ma: !!ma,
+    poistovna: ((document.getElementById('zab_ex_poistovna')||{}).value||'').trim(),
+    poistne: g('zab_ex_poistne'),
+    smrt: g('zab_ex_smrt'),
+    inval: g('zab_ex_inval'),
+    invalRenta: g('zab_ex_inval_renta'),
+    kch: g('zab_ex_kch'),
+    uraz: g('zab_ex_uraz'),
+    denna: g('zab_ex_denna')
+  };
+}
+
 function togglePoistMajetok(){
   document.getElementById('poistMajetokSection').style.display = document.getElementById('ch_poistenie_nehnut').checked ? 'block' : 'none';
 }
@@ -1500,11 +1649,24 @@ function togglePoistMajetok(){
 // ============================================================
 // STEP 3: Rezervy
 // ============================================================
+// Cieľová výška pohotovostnej rezervy — 6× výdavky (default) alebo 6× čistý príjem; vlastný cieľ má prednosť
+function rezervaCiel(){
+  const vlastna = parseFloat((document.getElementById('rez_vlastna_cielova')||{}).value)||0;
+  const cisty = (parseFloat(document.getElementById('k_cisty').value)||0) + (clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0);
+  const vyd = parseFloat((document.getElementById('zab_vydavky')||{}).value)||0;
+  const mode = (document.getElementById('rez_zaklad')||{}).value || 'vydavky';
+  const useVyd = (mode === 'vydavky' && vyd > 0);
+  const odporucana = useVyd ? vyd*6 : cisty*6;
+  return {
+    ciel: vlastna > 0 ? vlastna : odporucana,
+    odporucana: odporucana,
+    vlastna: vlastna,
+    popis: useVyd ? '6× mesačné výdavky ('+formatEUR(vyd)+')' : '6× čistý príjem ('+formatEUR(cisty)+')',
+    fallback: (mode === 'vydavky' && vyd <= 0)
+  };
+}
+
 function updateRezervy(){
-  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
-  const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
-  const zelezna = (cisty + pCisty) * 6;
-  document.getElementById('zeleznaRezervaTxt').textContent = formatEUR(zelezna);
   calcRezervy();
 }
 
@@ -1548,12 +1710,11 @@ function rezMonthlyLiquid(){
 }
 
 function calcRezervy(){
-  const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
-  const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
-  const odporucana = (cisty + pCisty) * 6;
-  const vlastna = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
-  const zelezna = vlastna > 0 ? vlastna : odporucana;
-  document.getElementById('zeleznaRezervaTxt').textContent = formatEUR(odporucana) + (vlastna > 0 ? ' (vlastný cieľ: '+formatEUR(vlastna)+')' : '');
+  const rc = rezervaCiel();
+  const zelezna = rc.ciel;
+  document.getElementById('zeleznaRezervaTxt').textContent = formatEUR(rc.odporucana) + ' — ' + rc.popis
+    + (rc.vlastna > 0 ? ' · vlastný cieľ: '+formatEUR(rc.vlastna) : '')
+    + (rc.fallback ? ' · doplňte výdavky v Kroku 8' : '');
 
   const sum = sumLiquidReserves();
   const mesacneUz = rezMonthlyLiquid();
@@ -1617,8 +1778,9 @@ function updateDochodok(){
   const isSzco = praca === 'szco';
 
   // Štátny dôchodok rieši calcDochodok() — odhad POMB × roky poistenia × ADH, kým ho poradca ručne neprepíše
-  if(parseFloat(document.getElementById('doch_potrebny').value)===0){
-    document.getElementById('doch_potrebny').value = Math.round(cisty);
+  const _potEl = document.getElementById('doch_potrebny');
+  if(_potEl && _potEl.dataset.edited !== '1' && parseFloat(_potEl.value)===0){
+    _potEl.value = Math.round(cisty);
   }
 
   // SZČO info box
@@ -1744,8 +1906,10 @@ function addChild(){
       </div>
       <div class="form-row">
         <div class="form-group"><label>Štart do života (€)</label><input type="number" class="child-start" value="0" min="0"></div>
+        <div class="form-group"><label>Odovzdať vo veku (rokov)</label><input type="number" class="child-start-age" min="15" max="35" placeholder="napr. 20" onchange="calcChildTargetDate(this)"></div>
         <div class="form-group"><label>Termín štartu</label><input type="date" class="child-start-date"></div>
       </div>
+      <div style="font-size:11px;color:var(--muted);margin:-6px 0 10px;">Cieľovú sumu nemusíte vyplniť — ak necháte <strong>Štart do života = 0</strong> a zadáte len mesačnú sumu a termín, plán ukáže, <strong>koľko z tej sumy vznikne</strong>.</div>
       <div class="form-row">
         <div class="form-group"><label>Výdavky spojené s narodením (€)</label><input type="number" class="child-narodenie" value="0" min="0"></div>
       </div>
@@ -1766,6 +1930,19 @@ function calcChildAge(inp){
   const m = today.getMonth()-birth.getMonth();
   if(m<0||(m===0&&today.getDate()<birth.getDate())) age--;
   inp.closest('.card').querySelector('.child-vek').value = Math.max(0,age);
+}
+
+// „Odovzdať vo veku X" → dopočíta termín z dátumu narodenia dieťaťa
+function calcChildTargetDate(inp){
+  const card = inp.closest('.card');
+  if(!card) return;
+  const dob = (card.querySelector('.child-dob')||{}).value;
+  const vek = parseInt(inp.value)||0;
+  if(!dob || vek<=0) return;
+  const d = new Date(dob);
+  d.setFullYear(d.getFullYear() + vek);
+  const target = card.querySelector('.child-start-date');
+  if(target) target.value = d.toISOString().split('T')[0];
 }
 
 function getChildStrategy(dateStr){
@@ -1811,14 +1988,14 @@ function addCiel(){
 }
 
 function addCielHypoteka(){
-  // Prednostne zostatok z optimalizácie existujúceho úveru; ak nie je, použi výšku nového úveru pri kúpe
-  let zostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
+  // Všetky úvery spolu (tabuľka + optimalizácia); ak nie sú, použi výšku nového úveru pri kúpe
+  let zostatok = (typeof sumUvery === 'function') ? sumUvery().dlh : 0;
   if(zostatok <= 0) zostatok = parseFloat(document.getElementById('byv_uver_suma').value)||0;
   const tbody = document.getElementById('cieleBody');
   const tr = document.createElement('tr');
   tr.style.background = 'rgba(171,5,52,0.03)';
   tr.innerHTML = `
-    <td><input type="text" value="Rýchlejšie splatenie hypotéky" style="color:var(--red);font-weight:600;"></td>
+    <td><input type="text" value="Rýchlejšie splatenie úverov" style="color:var(--red);font-weight:600;"></td>
     <td><input type="number" value="${zostatok}" min="0"></td>
     <td><input type="number" class="ciel-nasporene" value="0" min="0"></td>
     <td><input type="number" class="ciel-mesacne" value="0" min="0"></td>
@@ -1933,8 +2110,10 @@ function buildZabTable(prefix, bodyId){
   const krytie = krytieMode==='opt' ? cisty : vydavky;
   const vek = parseInt(document.getElementById(prefix+'_vek').value)||35;
   const retireAge = parseInt(document.getElementById('doch_vek')?.value)||65;
-  const optimZostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
-  const optimSplatnost = parseInt(document.getElementById('optim_doba')?.value)||0;
+  // Všetky úvery klienta (tabuľka v Kroku 2 + úver z Optimalizácie)
+  const _uv = (typeof sumUvery === 'function') ? sumUvery() : {dlh:0, splatka:0, koniec:0, rows:[]};
+  const optimZostatok = _uv.dlh;
+  const optimSplatnost = _uv.koniec>0 ? Math.max(0, _uv.koniec - new Date().getFullYear()) : (parseInt(document.getElementById('optim_doba')?.value)||0);
 
   const tbody = document.getElementById(bodyId);
 
@@ -1954,9 +2133,8 @@ function buildZabTable(prefix, bodyId){
     tbody.appendChild(infoTr);
   }
 
-  const splatkaHypo = parseFloat(document.getElementById('optim_splatka')?.value)||0;
   const splatkaUver = parseFloat(document.getElementById('zab_uver_splatka')?.value)||0;
-  const debtPayment = splatkaHypo + splatkaUver;   // mesačné splátky úverov (hypotéka + spotrebné)
+  const debtPayment = _uv.splatka + splatkaUver;   // mesačné splátky všetkých úverov
   // Splátky úverov sú súčasťou výdavkov — vo vizuáli ich len vyznačíme (do výšky výdavkov), NEpripočítavame ku krytiu
 
   // Poistiteľné riziká s mesačnou rentou (PN + invalidita); splátka úverov vyznačená v krytí
@@ -2011,10 +2189,11 @@ function buildZabTable(prefix, bodyId){
   const dependent = hasDependents(prefix);
   const twoYr = cisty*24;
 
-  // Úmrtie — krytie hypotéky (klesajúca PS)
+  // Úmrtie — krytie úverov (klesajúca PS) — všetky úvery spolu
   if(optimZostatok > 0){
-    addPsRow(tbody, prefix, 'Úmrtie — krytie hypotéky', optimZostatok,
-      `Klesajúca poistná suma · ${optimSplatnost>0?optimSplatnost+' rokov':'podľa splatnosti'}`, 1, 'klesajuca', prevEdit, optimSplatnost);
+    const _uvPopis = _uv.rows.length>1 ? (_uv.rows.length+' úvery spolu') : (_uv.rows[0] ? _uv.rows[0].nazov : '');
+    addPsRow(tbody, prefix, 'Úmrtie — krytie úverov', optimZostatok,
+      `Klesajúca poistná suma · ${_uvPopis}${optimSplatnost>0?' · '+optimSplatnost+' rokov':''}`, 1, 'klesajuca', prevEdit, optimSplatnost);
   }
 
   // Úmrtie — krytie rodiny / pohrebné (schválená metodika)
@@ -2178,8 +2357,7 @@ function collectGoals(){
   // Step 3: Rezervy
   if(document.getElementById('fp_rezervy').checked){
     const cisty = (parseFloat(document.getElementById('k_cisty').value)||0) + (clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0);
-    const vlastnaCielova = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
-    const cielova = vlastnaCielova > 0 ? vlastnaCielova : cisty*6;
+    const cielova = rezervaCiel().ciel;
     const sum = sumLiquidReserves();
     const diff = cielova - sum;
     if(diff>0) goals.push({name:'Železná rezerva', suma:cielova, date:getDateIn(5)});
@@ -2288,7 +2466,7 @@ function buildSummary(){
   document.getElementById('summRozpocet').innerHTML = rozpHtml;
 
   // Rezerva chart
-  const zelezna = (cisty+pCisty)*6;
+  const zelezna = rezervaCiel().ciel;
   const sumRezerv = sumLiquidReserves();
   if(chartRezervaInst) chartRezervaInst.destroy();
   chartRezervaInst = new Chart(document.getElementById('chartRezerva'),{
@@ -2778,7 +2956,7 @@ function fpLivingCosts(){
   const zivotne = parseFloat((document.getElementById('zab_zivotne')||{}).value)||0;
   if(zivotne > 0) return {val: zivotne, estimated: false};
   const vyd = parseFloat((document.getElementById('zab_vydavky')||{}).value)||0;
-  const spl = parseFloat((document.getElementById('optim_splatka')||{}).value)||0;
+  const spl = (typeof sumUvery === 'function' ? sumUvery().splatka : 0) + (parseFloat((document.getElementById('zab_uver_splatka')||{}).value)||0);
   return {val: Math.max(0, vyd - spl), estimated: true};
 }
 
@@ -2786,7 +2964,7 @@ function updateFPBudget(totalMesacne){
   const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
   const pCisty = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
   const living = fpLivingCosts();
-  const splatka = parseFloat(document.getElementById('optim_splatka').value)||0;
+  const splatka = sumUvery().splatka + (parseFloat((document.getElementById('zab_uver_splatka')||{}).value)||0);
   const poistne = calcPoistne();
   // Životné náklady / splátka / investície / poistné sa rátajú samostatne (žiadne dvojité počítanie)
   const volne = (cisty + pCisty) - living.val - splatka - totalMesacne - poistne;
@@ -2794,7 +2972,7 @@ function updateFPBudget(totalMesacne){
   let rozpHtml = '<div class="fp-rec">';
   rozpHtml += `<div class="fp-rec-row"><span>Čistý mesačný príjem</span><span>${formatEUR(cisty + pCisty)}</span></div>`;
   rozpHtml += `<div class="fp-rec-row"><span>Životné náklady (bežný chod)${living.estimated?' — odhad':''}</span><span>${formatEUR(living.val)}</span></div>`;
-  if(splatka > 0) rozpHtml += `<div class="fp-rec-row"><span>Splátka hypotéky</span><span>${formatEUR(splatka)}</span></div>`;
+  if(splatka > 0) rozpHtml += `<div class="fp-rec-row"><span>Splátky úverov</span><span>${formatEUR(splatka)}</span></div>`;
   rozpHtml += `<div class="fp-rec-row"><span>Investície podľa finančného plánu</span><span class="fp-rec-highlight">${formatEUR(totalMesacne)}</span></div>`;
   if(poistne > 0) rozpHtml += `<div class="fp-rec-row"><span>Poistné (orientačný odhad)</span><span>${formatEUR(poistne)}</span></div>`;
   rozpHtml += `<div class="fp-rec-row"><span><strong>Voľné prostriedky</strong></span><span style="color:${volne>=0?'var(--green)':'var(--red)'};font-weight:700;font-size:15px;"><strong>${formatEUR(volne)}</strong></span></div>`;
@@ -2816,7 +2994,7 @@ function updateFPBudget(totalMesacne){
   const chartData = [living.val];
   const chartLabels = ['Životné náklady'];
   const chartColors = ['#989FA7'];
-  if(splatka > 0){ chartData.push(splatka); chartLabels.push('Splátka hypotéky'); chartColors.push('#4D4D4D'); }
+  if(splatka > 0){ chartData.push(splatka); chartLabels.push('Splátky úverov'); chartColors.push('#4D4D4D'); }
   chartData.push(totalMesacne); chartLabels.push('Investície (FP)'); chartColors.push('#AB0534');
   if(poistne > 0){ chartData.push(poistne); chartLabels.push('Poistné (odhad)'); chartColors.push('#e65100'); }
   chartData.push(Math.max(0,volne)); chartLabels.push('Voľné prostriedky'); chartColors.push('#003049');
@@ -2938,6 +3116,29 @@ function gapCard(cielSuma, roky, curSaved, curMonthly, rate){
   return h;
 }
 
+// Karta pre režim „koľko viem dávať" — klient nemá cieľovú sumu, len mesačnú investíciu
+function projCard(mesacne, roky, saved, rate){
+  roky = Math.max(1, Math.round(roky||1));
+  const fromNew = calcFV(mesacne, rate, roky);
+  const fromOld = Math.round((saved||0) * Math.pow(1+rate, roky));
+  const total = fromNew + fromOld;
+  const vklady = mesacne*roky*12 + (saved||0);
+  const vynos = Math.max(0, total - vklady);
+  const real = calcRealValue(total, roky);
+  let h = '<div style="margin:12px 0;">';
+  h += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Čo vznikne z tejto mesačnej sumy</div>';
+  h += '<div style="padding:14px;background:rgba(46,125,50,0.07);border:1px solid rgba(46,125,50,0.35);border-left:4px solid var(--green);border-radius:12px;">';
+  h += `<div class="fp-rec-row"><span>Odkladá</span><span class="fp-rec-highlight">${formatEUR(mesacne)}/mes</span></div>`;
+  if(saved>0) h += `<div class="fp-rec-row"><span>Už nasporené</span><span>${formatEUR(saved)}</span></div>`;
+  h += `<div class="fp-rec-row"><span>Horizont</span><span>${roky} rokov</span></div>`;
+  h += `<div class="fp-rec-row"><span>Vloží spolu</span><span>${formatEUR(vklady)}</span></div>`;
+  h += `<div class="fp-rec-row"><span>Zhodnotenie</span><span style="color:var(--green);font-weight:600;">+${formatEUR(vynos)}</span></div>`;
+  h += `<div class="fp-rec-row"><span><strong>Bude mať o ${roky} r.</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(total)}</strong></span></div>`;
+  h += `<div class="fp-rec-row"><span>Reálna hodnota (dnešné €)</span><span style="color:var(--muted);">${formatEUR(real)}</span></div>`;
+  h += '</div></div>';
+  return h;
+}
+
 // Jednotné "odporúčané čísla" pre cieľ — zohľadňujú už existujúce úspory (GAP).
 //  pmt     = koľko treba MESAČNE DOINVESTOVAŤ navyše (nové peniaze)
 //  totalFV = projekcia existujúcich úspor + nové vklady ≈ cieľ
@@ -2974,10 +3175,7 @@ function buildFinancialPlan(){
   const fpSec1 = document.getElementById('fpSecRezervy');
   if(document.getElementById('fp_rezervy').checked){
     fpSec1.style.display = 'block';
-    const zelezna = (() => {
-      const vlastna = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
-      return vlastna > 0 ? vlastna : (cisty + pCisty) * 6;
-    })();
+    const zelezna = rezervaCiel().ciel;
     const sumRezerv = sumLiquidReserves();
     const rezMes = rezMonthlyLiquid();
     const deficit = Math.max(0, zelezna - sumRezerv);
@@ -3221,6 +3419,22 @@ function buildFinancialPlan(){
       totalMesacne += pmt;
       hasDetiPlan = true;
     }
+    // Režim „koľko viem dávať" — klient nemá cieľovú sumu, len mesačnú investíciu + termín
+    if(st <= 0 && vz <= 0 && childMonthly > 0 && std){
+      const yrs = Math.max(1, Math.round((new Date(std)-today)/(365.25*24*3600000)));
+      const s = getStrategy(yrs);
+      const id = 'child_plan_'+childIdx;
+      const projOld = Math.round(childSaved*Math.pow(1+s.rate,yrs));
+      const cielFV = projOld + calcFV(childMonthly, s.rate, yrs);
+      fpState[id] = {type:'invest', label:meno2+' — Štart do života', cielSuma:cielFV, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:childMonthly, contribMode:true,
+                     gap:{ciel:cielFV, saved:childSaved, monthly:0, projFV:projOld, rate:s.rate}};
+      detiHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">${meno2} — Štart do života</div>`;
+      detiHtml += projCard(childMonthly, yrs, childSaved, s.rate);
+      detiHtml += `<div id="fpDetail_${id}">${buildProgramDetail(id, fpState[id], s, childMonthly, calcFV(childMonthly,s.rate,yrs))}</div></div>`;
+      totalMesacne += childMonthly;
+      hasDetiPlan = true;
+    }
+
     const narodenie = parseFloat(card.querySelector('.child-narodenie')?.value)||0;
     if(narodenie > 0){
       detiHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">${meno2} — Výdavky spojené s narodením</div>`;
@@ -3320,16 +3534,19 @@ function buildFinancialPlan(){
       const name = tr.querySelectorAll('input[type=text]')[0]?.value||'Cieľ';
       const suma = parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
       const dt = tr.querySelector('input[type=date]')?.value||'';
-      if(suma <= 0) return;
+      const cMesRow = parseFloat(tr.querySelector('.ciel-mesacne')?.value)||0;
+      // Cieľ sa zaráta buď s cieľovou sumou, alebo v režime „koľko viem dávať" (mesačná suma + termín)
+      if(suma <= 0 && !(cMesRow > 0 && dt)) return;
       hasCiele = true;
-      const isHypo = name.toLowerCase().includes('splatenie hypotéky') || name.toLowerCase().includes('splatenie hypo');
+      const isHypo = name.toLowerCase().includes('splatenie hypotéky') || name.toLowerCase().includes('splatenie hypo') || name.toLowerCase().includes('splatenie úverov');
 
       if(isHypo){
         // Špeciálna logika: investujeme popri hypotéke, kým sa investícia nepretne so zostatkom
-        let zostatok = parseFloat(document.getElementById('optim_zostatok').value)||0;
-        let urok = (parseFloat(document.getElementById('optim_urok').value)||3.5) / 100;
-        let mesacnaSplatka = parseFloat(document.getElementById('optim_splatka').value)||0;
-        // Fallback na nový úver pri kúpe, ak optimalizácia existujúceho úveru nie je vyplnená
+        const _uvAll = sumUvery();
+        let zostatok = _uvAll.dlh;                                    // všetky úvery spolu
+        let urok = _uvAll.rate > 0 ? _uvAll.rate : 0.035;             // vážená priemerná sadzba
+        let mesacnaSplatka = _uvAll.splatka;                          // súčet splátok
+        // Fallback na nový úver pri kúpe, ak klient zatiaľ žiadne úvery nemá
         if(zostatok <= 0){
           const nuSuma = parseFloat(document.getElementById('byv_uver_suma').value)||0;
           if(nuSuma > 0){
@@ -3343,7 +3560,14 @@ function buildFinancialPlan(){
         const id = 'ciel_'+cielIdx;
 
         cieleHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:8px;">${ico('home',16)} ${name}</div>`;
-        cieleHtml += '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Princíp: Popri splácaní hypotéky pravidelne investujeme. Keď hodnota investície dosiahne zostatok na hypotéke, odkúpime investíciu a doplatíme hypotéku.</div>';
+        cieleHtml += '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Princíp: Popri splácaní úverov pravidelne investujeme. Keď hodnota investície dosiahne zostatok dlhu, odkúpime investíciu a úvery jednorazovo doplatíme.</div>';
+        if(_uvAll.rows.length > 0){
+          cieleHtml += '<div class="fp-rec" style="margin-bottom:10px;"><div class="fp-rec-title">Úvery zahrnuté do výpočtu</div>';
+          _uvAll.rows.forEach(function(r){
+            cieleHtml += `<div class="fp-rec-row"><span>${r.nazov}${r.sporenie>0?' <span style="color:var(--muted);font-size:11px;">(zostatok '+formatEUR(r.zostatok)+' − nasporené '+formatEUR(r.sporenie)+')</span>':''}</span><span>${formatEUR(r.dlh)}${r.urok>0?' · '+(r.urok*100).toFixed(2)+' %':''}${r.splatka>0?' · '+formatEUR(r.splatka)+'/mes':''}</span></div>`;
+          });
+          cieleHtml += `<div class="fp-rec-row"><span><strong>Spolu</strong></span><span class="fp-rec-highlight"><strong>${formatEUR(_uvAll.dlh)}</strong> · ${(urok*100).toFixed(2)} % priem. · ${formatEUR(mesacnaSplatka)}/mes</span></div></div>`;
+        }
 
         // Strategy selector
         cieleHtml += '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Investičná stratégia</div>';
@@ -3379,6 +3603,20 @@ function buildFinancialPlan(){
         cieleHtml += gapCard(suma, yrs, cNasp, cMes, s.rate);
         cieleHtml += `<div id="fpDetail_${id}">${buildProgramDetail(id, fpState[id], s, pmt, fv)}</div></div>`;
         totalMesacne += pmt;
+      } else if(suma <= 0 && cMesRow > 0 && dt){
+        // Režim „koľko viem dávať" — cieľ dopočítame z mesačnej sumy
+        const yrs = Math.max(1, Math.round((new Date(dt)-today)/(365.25*24*3600000)));
+        const s = getStrategy(yrs);
+        const id = 'ciel_'+cielIdx;
+        const cNasp = parseFloat(tr.querySelector('.ciel-nasporene')?.value)||0;
+        const projOld = Math.round(cNasp*Math.pow(1+s.rate,yrs));
+        const cielFV = projOld + calcFV(cMesRow, s.rate, yrs);
+        fpState[id] = {type:'invest', label:name, cielSuma:cielFV, roky:yrs, origStrategy:s.key, currentStrategy:s.key, origPmt:cMesRow, contribMode:true,
+                       gap:{ciel:cielFV, saved:cNasp, monthly:0, projFV:projOld, rate:s.rate}};
+        cieleHtml += `<div style="margin-bottom:16px;"><div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">${name}</div>`;
+        cieleHtml += projCard(cMesRow, yrs, cNasp, s.rate);
+        cieleHtml += `<div id="fpDetail_${id}">${buildProgramDetail(id, fpState[id], s, cMesRow, calcFV(cMesRow,s.rate,yrs))}</div></div>`;
+        totalMesacne += cMesRow;
       } else {
         cieleHtml += '<div class="fp-rec">';
         cieleHtml += `<div class="fp-rec-title">${name}</div>`;
@@ -3402,7 +3640,7 @@ function buildFinancialPlan(){
     fpSec6.style.display = 'block';
     let zabHtml = '';
     function getZabProduct(name){
-      if(name.includes('Úmrtie') && name.includes('hypotéky')) return {icon:ico('home'), product:'Rizikové životné poistenie', detail:'Klesajúca poistná suma, naviazaná na splatnosť hypotéky'};
+      if(name.includes('Úmrtie') && (name.includes('úverov') || name.includes('hypotéky'))) return {icon:ico('home'), product:'Rizikové životné poistenie', detail:'Klesajúca poistná suma, naviazaná na splatnosť úverov'};
       if(name.includes('Úmrtie') && name.includes('rodiny')) return {icon:ico('users'), product:'Rizikové životné poistenie', detail:'Fixná poistná suma pre zabezpečenie rodiny'};
       if(name.includes('pohrebné')) return {icon:ico('users'), product:'Rizikové životné poistenie', detail:'Krytie pohrebných nákladov'};
       if(name.includes('Kritické')) return {icon:ico('heart-pulse'), product:'Poistenie kritických chorôb', detail:'Jednorazová výplata pri diagnóze (min. 10× čistý mes. príjem)'};
@@ -3479,6 +3717,46 @@ function buildFinancialPlan(){
     }
     if(zabCheckedK.length>0) zabHtml += renderPerson('Klient', zabCheckedK, 'k');
     if(zabCheckedP.length>0) zabHtml += renderPerson('Partner/ka', zabCheckedP, 'p');
+
+    // ── Porovnanie: čo klient UŽ má vs. čo potrebuje ──
+    const _ex = exPoistenie();
+    if(_ex.ma){
+      const need = {smrt:0, inval:0, kch:0, uraz:0, denna:0};
+      document.querySelectorAll('.fp-zab-k:checked').forEach(function(cb){
+        const s = parseFloat(cb.dataset.suma)||0, n = cb.dataset.name||'', t = cb.dataset.typ||'';
+        if(t==='klesajuca' || t==='fixna') need.smrt += s;
+        else if(t==='inval') need.inval = Math.max(need.inval, s);
+        else if(n.indexOf('Kritické')>-1) need.kch = s;
+        else if(n.indexOf('Trvalé následky')>-1) need.uraz = s;
+        else if(cb.dataset.unit==='den') need.denna = Math.max(need.denna, s);
+      });
+      const riadky = [
+        ['Úmrtie', _ex.smrt, need.smrt, ''],
+        ['Invalidita', _ex.inval, need.inval, _ex.invalRenta>0 ? ('+ renta '+formatEUR(_ex.invalRenta)+'/mes') : ''],
+        ['Kritické choroby', _ex.kch, need.kch, ''],
+        ['Trvalé následky úrazu', _ex.uraz, need.uraz, ''],
+        ['Denné odškodné', _ex.denna, need.denna, '€/deň']
+      ].filter(function(r){ return r[1]>0 || r[2]>0; });
+      if(riadky.length){
+        zabHtml += `<div style="font-size:14px;font-weight:700;color:var(--navy);margin:20px 0 10px;">Čo už máte vs. čo potrebujete${_ex.poistovna?' — '+_ex.poistovna:''}</div>`;
+        zabHtml += `<table class="zab-ps-table"><thead><tr><th>Riziko</th><th style="text-align:right;">Máte dnes</th><th style="text-align:right;">Potrebujete</th><th style="text-align:right;">Rozdiel</th></tr></thead><tbody>`;
+        riadky.forEach(function(r){
+          const jeDen = r[3]==='€/deň';
+          const fmtv = v => jeDen ? (Math.round(v)+' €/deň') : formatEUR(v);
+          const rozdiel = r[2] - r[1];
+          const txt = rozdiel > 0
+            ? '<span style="color:var(--red);font-weight:700;">chýba '+fmtv(rozdiel)+'</span>'
+            : '<span style="color:var(--green);font-weight:700;">kryté ✓</span>';
+          zabHtml += `<tr><td>${r[0]}${(r[3]&&!jeDen)?'<div class="zab-sub">'+r[3]+'</div>':''}</td><td style="text-align:right;">${fmtv(r[1])}</td><td style="text-align:right;">${fmtv(r[2])}</td><td style="text-align:right;">${txt}</td></tr>`;
+        });
+        zabHtml += `</tbody></table>`;
+        if(_ex.poistne>0) zabHtml += `<div style="font-size:12px;color:var(--muted);margin-top:6px;">Za súčasné poistenie platíte <strong>${formatEUR(_ex.poistne)}/mes</strong>.</div>`;
+        const chyba = riadky.some(function(r){ return r[2]-r[1] > 0; });
+        zabHtml += chyba
+          ? '<div class="info-box warning" style="margin-top:10px;">Časť rizík nie je krytá v plnej výške — pri riziku označenom „chýba" odporúčame doplniť poistnú sumu.</div>'
+          : '<div class="info-box success" style="margin-top:10px;">Všetky kľúčové riziká máte kryté v odporúčanej výške — netreba nič dopoisťovať.</div>';
+      }
+    }
 
     zabHtml += '<div class="info-box" style="margin-top:12px;"><strong>Krátkodobé výpadky (výpoveď, materská dovolenka):</strong> riešime <strong>pohotovostnou rezervou</strong>, nie poistením — na tieto riziká poistenie nie je dostupné/efektívne.</div>';
 
@@ -3985,10 +4263,7 @@ async function generatePDF(){
   y += 3;
 
   addSection(3, 'Rezervy');
-  const zel = (() => {
-    const vlastna = parseFloat(document.getElementById('rez_vlastna_cielova').value)||0;
-    return vlastna > 0 ? vlastna : (cisty+pCisty2)*6;
-  })();
+  const zel = rezervaCiel().ciel;
   const sr = sumLiquidReserves();
   addLine('Optimálna rezerva', formatEUR(zel));
   addLine('Aktuálna rezerva (likvidná)', formatEUR(sr));
@@ -4188,7 +4463,7 @@ async function generatePDF(){
 
   // Budget breakdown — životné náklady / splátka / investície / poistné samostatne (bez dvojitého počítania)
   const poistne = calcPoistne();
-  const splatka = parseFloat(document.getElementById('optim_splatka').value)||0;
+  const splatka = sumUvery().splatka + (parseFloat((document.getElementById('zab_uver_splatka')||{}).value)||0);
   const living = fpLivingCosts();
   const volne = (cisty + pCisty2) - living.val - splatka - totalPdf - poistne;
 
@@ -4196,7 +4471,7 @@ async function generatePDF(){
   addSubtitle('Mesačný rozpočet po nastavení finančného plánu');
   addLine('Čistý mesačný príjem', formatEUR(cisty + pCisty2));
   addLineAlt('Životné náklady (bežný chod)'+(living.estimated?' — odhad':''), formatEUR(living.val));
-  if(splatka > 0) addLine('Splátka hypotéky', formatEUR(splatka));
+  if(splatka > 0) addLine('Splátky úverov', formatEUR(splatka));
   addLineAlt('Investície podľa finančného plánu', formatEUR(totalPdf));
   if(poistne > 0) addLine('Poistné (orientačný odhad)', formatEUR(poistne));
 
@@ -4281,6 +4556,32 @@ async function generatePDF(){
     }
     if(zabItemsK.length>0) pdfZabPerson('— Klient —', zabItemsK, 'k');
     if(zabItemsP.length>0) pdfZabPerson('— Partner/ka —', zabItemsP, 'p');
+    // Porovnanie s existujúcim poistením
+    const _exP = exPoistenie();
+    if(_exP.ma){
+      const nd = {smrt:0, inval:0, kch:0, uraz:0, denna:0};
+      document.querySelectorAll('.fp-zab-k:checked').forEach(function(cb){
+        const s = parseFloat(cb.dataset.suma)||0, n = cb.dataset.name||'', t = cb.dataset.typ||'';
+        if(t==='klesajuca'||t==='fixna') nd.smrt += s;
+        else if(t==='inval') nd.inval = Math.max(nd.inval, s);
+        else if(n.indexOf('Kritické')>-1) nd.kch = s;
+        else if(n.indexOf('Trvalé následky')>-1) nd.uraz = s;
+        else if(cb.dataset.unit==='den') nd.denna = Math.max(nd.denna, s);
+      });
+      const pary = [['Úmrtie',_exP.smrt,nd.smrt,0],['Invalidita',_exP.inval,nd.inval,0],['Kritické choroby',_exP.kch,nd.kch,0],['Trvalé následky úrazu',_exP.uraz,nd.uraz,0],['Denné odškodné',_exP.denna,nd.denna,1]].filter(p=>p[1]>0||p[2]>0);
+      if(pary.length){
+        checkPage(12 + pary.length*6);
+        addSubtitle('Čo už máte vs. čo potrebujete'+(_exP.poistovna?' — '+_exP.poistovna:''));
+        pary.forEach(function(p,i){
+          const f = v => p[3] ? (Math.round(v)+' €/deň') : formatEUR(v);
+          const roz = p[2]-p[1];
+          const txt = f(p[1])+' → potreba '+f(p[2])+(roz>0 ? ' · chýba '+f(roz) : ' · kryté');
+          if(i%2===0) addLineAlt(p[0], txt); else addLine(p[0], txt, roz>0);
+        });
+        if(_exP.poistne>0) addNote('Za súčasné poistenie klient platí '+formatEUR(_exP.poistne)+'/mes.');
+        y += 2;
+      }
+    }
     addNote('Krátkodobé výpadky (výpoveď, materská dovolenka) — riešime pohotovostnou rezervou, nie poistením.');
     const cK = parseFloat(document.getElementById('k_cisty').value)||0;
     const cP = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
@@ -4459,7 +4760,7 @@ function collectAOFData(){
 
   // Synchronizuj napísané hodnoty a vybrané možnosti (<select>) do atribútov,
   // inak ich innerHTML serializácia nezachytí (typ rezervy, sumy, názvy by sa stratili).
-  ['familyBody','rezervyBody','majetokBody','cieleBody','detiContainer'].forEach(function(cid){
+  ['familyBody','rezervyBody','majetokBody','cieleBody','detiContainer','uveryBody'].forEach(function(cid){
     var c = document.getElementById(cid); if(!c) return;
     c.querySelectorAll('input').forEach(function(inp){
       if(inp.type==='checkbox' || inp.type==='radio'){ if(inp.checked) inp.setAttribute('checked','checked'); else inp.removeAttribute('checked'); }
@@ -4477,6 +4778,18 @@ function collectAOFData(){
   data.majetokHTML = document.getElementById('majetokBody').innerHTML;
   data.cieleHTML = document.getElementById('cieleBody').innerHTML;
   data.detiHTML = document.getElementById('detiContainer').innerHTML;
+  // Úvery — ako štruktúrované dáta (odolnejšie než HTML)
+  data.uvery = Array.from(document.querySelectorAll('#uveryBody .uver-row')).map(function(r){
+    return {
+      nazov: (r.querySelector('.uv-nazov')||{}).value || '',
+      typ: (r.querySelector('.uv-typ')||{}).value || 'ine',
+      zostatok: (r.querySelector('.uv-zostatok')||{}).value || '0',
+      sporenie: (r.querySelector('.uv-sporenie')||{}).value || '0',
+      urok: (r.querySelector('.uv-urok')||{}).value || '0',
+      splatka: (r.querySelector('.uv-splatka')||{}).value || '0',
+      koniec: (r.querySelector('.uv-koniec')||{}).value || ''
+    };
+  });
 
   // Investície k dôchodku (dynamický zoznam)
   data.dochInvest = Array.from(document.querySelectorAll('#dochInvestBody .doch-inv-row')).map(r=>({
@@ -4796,6 +5109,14 @@ function applyAOFData(data){
     if(data.cieleHTML) document.getElementById('cieleBody').innerHTML = data.cieleHTML;
     if(data.detiHTML) document.getElementById('detiContainer').innerHTML = data.detiHTML;
 
+    // Úvery (dynamický zoznam)
+    var uvBody = document.getElementById('uveryBody');
+    if(uvBody){
+      uvBody.innerHTML = '';
+      if(Array.isArray(data.uvery)) data.uvery.forEach(function(u){ addUver(u.nazov, u.typ, u.zostatok, u.sporenie, u.urok, u.splatka, u.koniec); });
+      if(typeof calcUvery === 'function') calcUvery();
+    }
+
     // Investície k dôchodku (dynamický zoznam) + spätná kompatibilita so starým jedným záznamom
     var dochBody = document.getElementById('dochInvestBody');
     if(dochBody){
@@ -4838,6 +5159,8 @@ function applyAOFData(data){
     document.getElementById('detiSection').style.display = hasDeti?'block':'none';
     // Obnov sekcie bývania (optimalizácia / kúpa nového úveru)
     if(typeof toggleOptimalizacia==='function') toggleOptimalizacia();
+    if(typeof toggleExPoistenie==='function' && document.getElementById('zab_ex_ma')) toggleExPoistenie();
+    if(typeof calcUvery==='function') calcUvery();
     var busEl = document.getElementById('byv_uver_suma');
     if(busEl && (parseFloat(busEl.value)||0) > 0) busEl.dataset.edited = '1'; // nech sa uložená výška úveru neprepíše 80 %-ným defaultom
     if(typeof toggleKupa==='function') toggleKupa();
