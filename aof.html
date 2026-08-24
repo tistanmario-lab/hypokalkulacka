@@ -302,7 +302,7 @@ body.presentation-mode .fp-tabs,
 body.presentation-mode #tabSuhrn{display:none!important;}
 body.presentation-mode main{margin:0;padding:0;}
 body.presentation-mode .step{display:none!important;}
-body.presentation-mode #step10{display:block!important;max-width:920px;margin:0 auto;padding:24px 16px 80px;}
+body.presentation-mode #step9{display:block!important;max-width:920px;margin:0 auto;padding:24px 16px 80px;}
 body.presentation-mode #tabPlan{display:block!important;}
 body.presentation-mode #tabPlan.fp-tab-content{opacity:1;}
 .pres-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--navy);color:#fff;padding:10px 20px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
@@ -312,10 +312,10 @@ body.presentation-mode .pres-bar{display:flex;}
 .pres-bar-btn{padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
 .pres-bar-btn:hover{background:rgba(255,255,255,0.15);}
 .pres-bar-btn.red{background:var(--red);border-color:var(--red);}
-body.presentation-mode #step10>.card:first-child{margin-top:60px;}
+body.presentation-mode #step9>.card:first-child{margin-top:60px;}
 @media print{
   .pres-bar{display:none!important;}
-  body.presentation-mode #step10{padding:0;}
+  body.presentation-mode #step9{padding:0;}
   body.presentation-mode .card{break-inside:avoid;box-shadow:none;}
 }
 </style>
@@ -353,10 +353,10 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
 <div class="progress-wrapper">
   <div class="progress-inner">
     <div class="progress-bar-bg">
-      <div class="progress-bar-fill" id="progressFill" style="width:10%"></div>
+      <div class="progress-bar-fill" id="progressFill" style="width:11%"></div>
     </div>
     <div class="progress-steps" id="progressSteps"></div>
-    <div class="progress-info">Krok <span id="currentStepNum">1</span> z 10: <strong id="currentStepName">Osobné údaje</strong> &mdash; <span id="progressPct">10</span>% dokončených</div>
+    <div class="progress-info">Krok <span id="currentStepNum">1</span> z 9: <strong id="currentStepName">Osobné údaje</strong> &mdash; <span id="progressPct">11</span>% dokončených</div>
   </div>
 </div>
 
@@ -457,6 +457,7 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
         <tbody id="familyBody"></tbody>
       </table>
       <button class="btn-add" onclick="addFamilyMember()" style="margin-top:12px;">+ Pridať člena rodiny</button>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">Sem patria napr. rodičia či ďalší členovia domácnosti. Deti netreba zadávať tu — majú vlastný Krok 5 aj s cieľmi.</div>
     </div>
 
     <div class="card">
@@ -656,7 +657,7 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
         <div class="form-group"><label>Odpracované roky pri odchode (poistenie)</label><input type="number" id="doch_roky_poistenia" min="0" max="51" oninput="this.dataset.edited='1';calcDochodok()"><div style="font-size:11px;color:var(--muted);margin-top:4px;">Roky dôchodkového poistenia spolu. Predvyplní sa odhadom (vek dôchodku − 20); upravte podľa reálnej kariéry (štúdium, materská, práca v zahraničí).</div></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Očakávaný štátny dôchodok (€/mes)</label><input type="number" id="doch_statny" value="0" min="0" oninput="this.dataset.edited='1';calcDochodok()"></div>
+        <div class="form-group"><label>Očakávaný štátny dôchodok (€/mes)</label><input type="number" id="doch_statny" value="0" min="0" oninput="this.dataset.edited='1';calcDochodok()"><div style="font-size:11px;color:var(--muted);margin-top:4px;">Ak má klient <strong>dôchodkovú prognózu zo Sociálnej poisťovne</strong>, zadajte sumu z nej — je už v dnešných cenách. Inak sa použije odhad.</div><label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;margin-top:6px;cursor:pointer;"><input type="checkbox" id="doch_prognoza" style="width:15px;height:15px;accent-color:var(--navy);" onchange="if(this.checked){document.getElementById('doch_statny').dataset.edited='1';}calcDochodok()"> Suma je z dôchodkovej prognózy SP</label></div>
         <div class="form-group"><label>Želaný mesačný dôchodok (€)</label><input type="number" id="doch_potrebny" value="0" min="0" oninput="calcDochodok()"></div>
         <div class="form-group"><label>Koľko Vám bude chýbať (€/mes)</label><input type="number" id="doch_medzera" class="computed" readonly></div>
       </div>
@@ -944,26 +945,12 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
     </div>
   </div>
 
-  <!-- ==================== STEP 9: Časová os ==================== -->
+  <!-- Časová os je súčasťou Súhrnu aj Finančného plánu — skrytý kontajner slúži na výpočet -->
+  <div id="timelineContainer" style="display:none"></div>
+
+  <!-- ==================== STEP 9: Súhrn & Finančný plán (vrátane časovej osi) ==================== -->
   <div class="step" id="step9">
-    <h2 class="step-header">9. Budovanie majetku — Časová os</h2>
-    <p class="step-subtitle">Prehľad všetkých cieľov zaradených do finančného plánu</p>
-
-    <div class="card">
-      <div id="timelineContainer">
-        <div class="info-box">Zaradením cieľov do finančného plánu (zaškrtnutím v predchádzajúcich krokoch) sa tu zobrazí vaša osobná finančná časová os.</div>
-      </div>
-    </div>
-
-    <div class="step-nav">
-      <button class="btn btn-outline" onclick="goToStep(8)">&larr; Späť</button>
-      <button class="btn btn-primary" onclick="goToStep(10)">Ďalej &rarr;</button>
-    </div>
-  </div>
-
-  <!-- ==================== STEP 10: Súhrn & Finančný plán ==================== -->
-  <div class="step" id="step10">
-    <h2 class="step-header">10. Súhrn a Finančný plán</h2>
+    <h2 class="step-header">9. Súhrn a Finančný plán</h2>
     <p class="step-subtitle">Kompletný prehľad vašej finančnej analýzy a odporúčania</p>
 
     <!-- Tab Navigation -->
@@ -1200,7 +1187,7 @@ body.presentation-mode #step10>.card:first-child{margin-top:60px;}
     </div>
 
     <div class="step-nav">
-      <button class="btn btn-outline" onclick="goToStep(9)">&larr; Späť</button>
+      <button class="btn btn-outline" onclick="goToStep(8)">&larr; Späť</button>
       <div></div>
     </div>
   </div>
@@ -1280,7 +1267,7 @@ function ico(name, size){
 
 const stepNames = [
   'Osobné údaje','Nové bývanie','Rezervy','Dôchodok','Deti',
-  'Majetok','Iné ciele','Zabezpečenie','Časová os','Súhrn'
+  'Majetok','Iné ciele','Zabezpečenie','Súhrn'
 ];
 
 // Init progress steps
@@ -1299,12 +1286,12 @@ const stepNames = [
 // NAVIGATION
 // ============================================================
 function goToStep(n){
-  if(n<1||n>10) return;
+  if(n<1||n>9) return;
   document.getElementById('step'+currentStep).classList.remove('active');
   currentStep = n;
   document.getElementById('step'+n).classList.add('active');
   // Progress
-  const pct = n*10;
+  const pct = Math.round(n*100/9);
   document.getElementById('progressFill').style.width = pct+'%';
   document.getElementById('currentStepNum').textContent = n;
   document.getElementById('progressPct').textContent = pct;
@@ -1321,8 +1308,7 @@ function goToStep(n){
   if(n===3) updateRezervy();
   if(n===4) updateDochodok();
   if(n===8) updateZabezpecenie();
-  if(n===9) buildTimeline();
-  if(n===10) buildSummary();
+  if(n===9) buildSummary();
 }
 
 // ============================================================
@@ -1864,12 +1850,12 @@ function zabInvalid(hrubyM, vek, retireAge, pokles){
   return Math.round(d);
 }
 function zabAmountLabel(suma,u){ return formatEUR(suma)+(u==='jednorazovo' ? ' jednorazovo' : (u==='den' ? '/deň' : '/mes')); }
-function zabTypLabel(u){ return u==='jednorazovo' ? 'jednorazová PS' : (u==='den' ? 'denná dávka' : 'mesačná renta'); }
+function zabTypLabel(u){ return u==='jednorazovo' ? 'jednorazová poistná suma' : (u==='den' ? 'denná dávka' : 'mesačná výplata'); }
 // Prepočet mesačného výpadku príjmu na poistnú sumu do zmluvy podľa typu rizika
 //  - invalidita: klesajúca PS = 200× mesačný výpadok (príjem aj dávka SP rastú, aktíva narastajú)
 //  - PN: denná dávka = mesačný výpadok / 30
 function zabRentaToPS(kind, gap){
-  if(kind==='inval') return { ps: Math.round(gap*200), unit:'jednorazovo', typ:'inval', label: formatEUR(Math.round(gap*200))+' klesajúca PS' };
+  if(kind==='inval') return { ps: Math.round(gap*200), unit:'jednorazovo', typ:'inval', label: formatEUR(Math.round(gap*200))+' klesajúca poistná suma' };
   if(kind==='pn')    return { ps: Math.round(gap/30),  unit:'den',         typ:'',      label: formatEUR(Math.round(gap/30))+' /deň' };
   return { ps: Math.round(gap), unit:'mes', typ:'', label: formatEUR(Math.round(gap))+'/mes' };
 }
@@ -1882,10 +1868,10 @@ function zabPsLabel(suma, unit, typ){
 }
 function zabPsTypeLabel(unit, typ){
   if(unit==='den') return 'denná dávka';
-  if(typ==='klesajuca' || typ==='inval') return 'klesajúca PS';
-  if(typ==='fixna') return 'fixná PS';
-  if(unit==='jednorazovo') return 'jednorazová PS';
-  return 'mesačná renta';
+  if(typ==='klesajuca' || typ==='inval') return 'klesajúca poistná suma';
+  if(typ==='fixna') return 'fixná poistná suma';
+  if(unit==='jednorazovo') return 'jednorazová poistná suma';
+  return 'mesačná výplata';
 }
 
 // Je niekto ekonomicky závislý od príjmu danej osoby?
@@ -2006,7 +1992,7 @@ function buildZabTable(prefix, bodyId){
   // Úmrtie — krytie hypotéky (klesajúca PS)
   if(optimZostatok > 0){
     addPsRow(tbody, prefix, 'Úmrtie — krytie hypotéky', optimZostatok,
-      `Klesajúca PS · ${optimSplatnost>0?optimSplatnost+' rokov':'podľa splatnosti'}`, 1, 'klesajuca', prevEdit, optimSplatnost);
+      `Klesajúca poistná suma · ${optimSplatnost>0?optimSplatnost+' rokov':'podľa splatnosti'}`, 1, 'klesajuca', prevEdit, optimSplatnost);
   }
 
   // Úmrtie — krytie rodiny / pohrebné (schválená metodika)
@@ -2019,7 +2005,7 @@ function buildZabTable(prefix, bodyId){
     const parts = [];
     if(dlhy>0) parts.push('Dlhy '+formatEUR(dlhy));
     if(dependent) parts.push('2-ročný príjem '+formatEUR(twoYr));
-    deathSub = 'Fixná PS · '+(parts.join(' + ')||'—');
+    deathSub = 'Fixná poistná suma · '+(parts.join(' + ')||'—');
   }
   addPsRow(tbody, prefix, deathLabel, psDeath, deathSub, 1, 'fixna', prevEdit);
 
@@ -2364,7 +2350,8 @@ function buildSummary(){
   }
   document.getElementById('summZabezpecenie').innerHTML = zabHtml;
 
-  // Timeline in summary — reuse buildTimeline logic
+  // Timeline in summary — postav ju nanovo (samostatný Krok 9 už neexistuje)
+  buildTimeline();
   const origContainer = document.getElementById('timelineContainer');
   const origHTML = origContainer.innerHTML;
   document.getElementById('summTimeline').innerHTML = origHTML || '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
@@ -2557,7 +2544,7 @@ function renderInvestmentOverview(){
     }
     total += pmt;
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${state.label}</td><td>${cielTxt}</td><td>${horizTxt}</td><td><span class="strat-badge ${s.badge}">${s.name}</span></td><td>${Math.round(s.rate*100)} %</td><td class="fp-rec-highlight">${formatEUR(pmt)}</td><td>${formatEUR(fv)}</td><td style="color:var(--muted);">${formatEUR(realFv)}</td><td>Partners Investments</td>`;
+    tr.innerHTML = `<td>${state.label}</td><td>${cielTxt}</td><td>${horizTxt}</td><td><span class="strat-badge ${s.badge}">${s.name}</span></td><td>${Math.round(s.rate*100)} %</td><td class="fp-rec-highlight">${formatEUR(pmt)}</td><td>${formatEUR(fv)}</td><td style="color:var(--muted);">${formatEUR(realFv)}</td><td>${id==='rezervy' ? 'Partners Asset Management' : 'Partners Investments'}</td>`;
     tbody.appendChild(tr);
   });
   const tfoot = document.getElementById('fpStrategieFoot');
@@ -3066,23 +3053,23 @@ function buildFinancialPlan(){
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">';
     html += '<div style="padding:14px;background:rgba(230,81,0,0.06);border:1px solid rgba(230,81,0,0.30);border-left:4px solid var(--orange);border-radius:12px;">';
     html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--orange);margin-bottom:8px;">Súčasný stav — ak nič nezmení</div>';
-    html += `<div class="fp-rec-row"><span>Cieľ (renta, dnešné €)</span><span>${formatEUR(medzera)}/mes</span></div>`;
+    html += `<div class="fp-rec-row"><span>Cieľ: mesačne navyše (dnešné €)</span><span>${formatEUR(medzera)}/mes</span></div>`;
     html += `<div class="fp-rec-row"><span>Teraz odkladá</span><span>${formatEUR(curMonthly)}/mes</span></div>`;
     html += `<div class="fp-rec-row"><span>Už nasporené</span><span>${formatEUR(curSaved)}</span></div>`;
     html += `<div class="fp-rec-row"><span>Projekcia o ${roky} r.</span><span>${formatEUR(curProjFV)}</span></div>`;
-    html += `<div class="fp-rec-row"><span>≈ renta (dnešné €)</span><span>${formatEUR(curRentaToday)}/mes</span></div>`;
+    html += `<div class="fp-rec-row"><span>≈ mesačne navyše (dnešné €)</span><span>${formatEUR(curRentaToday)}/mes</span></div>`;
     html += '</div>';
     html += '<div style="padding:14px;background:rgba(46,125,50,0.07);border:1px solid rgba(46,125,50,0.35);border-left:4px solid var(--green);border-radius:12px;">';
     html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--green);margin-bottom:8px;">Odporúčaný stav — splní cieľ</div>';
-    html += `<div class="fp-rec-row"><span>Cieľ (renta, dnešné €)</span><span>${formatEUR(medzera)}/mes</span></div>`;
+    html += `<div class="fp-rec-row"><span>Cieľ: mesačne navyše (dnešné €)</span><span>${formatEUR(medzera)}/mes</span></div>`;
     html += `<div class="fp-rec-row"><span>Odkladať spolu</span><span class="fp-rec-highlight">${formatEUR(recTotalMonthly)}/mes</span></div>`;
     if(additionalMonthly>0) html += `<div class="fp-rec-row"><span>Z toho navyše</span><span class="fp-rec-highlight">+${formatEUR(additionalMonthly)}/mes</span></div>`;
     html += `<div class="fp-rec-row"><span>Dosiahne o ${roky} r.</span><span>${formatEUR(cielSuma)}</span></div>`;
-    html += `<div class="fp-rec-row"><span>≈ renta (dnešné €)</span><span style="color:var(--green);font-weight:700;">${formatEUR(medzera)}/mes ✓</span></div>`;
+    html += `<div class="fp-rec-row"><span>≈ mesačne navyše (dnešné €)</span><span style="color:var(--green);font-weight:700;">${formatEUR(medzera)}/mes ✓</span></div>`;
     html += '</div>';
     html += '</div>';
     if(shortfall > 0){
-      html += `<div class="info-box warning" style="margin-top:10px;"><strong>Medzera:</strong> pri súčasnom tempe bude klientovi chýbať <strong>${formatEUR(shortfall)}</strong> (≈ ${formatEUR(gapRentaToday)}/mes renty). Stačí odkladať <strong>+${formatEUR(additionalMonthly)}/mes</strong> a cieľ je splnený.</div>`;
+      html += `<div class="info-box warning" style="margin-top:10px;"><strong>Medzera:</strong> pri súčasnom tempe bude klientovi chýbať <strong>${formatEUR(shortfall)}</strong> (≈ ${formatEUR(gapRentaToday)}/mes príjmu navyše). Stačí odkladať <strong>+${formatEUR(additionalMonthly)}/mes</strong> a cieľ je splnený.</div>`;
     } else {
       html += `<div class="info-box success" style="margin-top:10px;">Pri súčasnom tempe klient cieľ <strong>splní</strong> — netreba zvyšovať vklady.</div>`;
     }
@@ -3116,6 +3103,7 @@ function buildFinancialPlan(){
     }
 
     html += `<div style="font-size:13px;font-weight:600;margin-bottom:4px;">Dôchodková medzera: <span class="fp-rec-highlight">${formatEUR(medzera)}/mes</span> <span style="color:var(--muted);font-weight:400;font-size:11px;">(v dnešných cenách)</span></div>`;
+    html += `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Štátny dôchodok ${formatEUR(parseFloat(document.getElementById('doch_statny').value)||0)}/mes — ${((document.getElementById('doch_prognoza')||{}).checked)?'<strong>z dôchodkovej prognózy Sociálnej poisťovne</strong> (v dnešných cenách)':'orientačný odhad; presnú sumu má klient v dôchodkovej prognóze zo Sociálnej poisťovne'}.</div>`;
     html += `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(0,48,73,0.03);border-radius:10px;border:1px solid var(--border);">`;
     html += `<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px;">Cieľová suma na 20 rokov na dôchodku</div>`;
     html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">`;
@@ -3154,7 +3142,7 @@ function buildFinancialPlan(){
       html += `<div style="font-size:12px;color:var(--muted);">= ${formatEUR(realMes)}/mes na 20 rokov</div>`;
       html += `<div style="font-size:10px;color:var(--muted);margin-top:4px;">cieľ: ${formatEUR(realCielSuma)} · <strong style="color:${pctColor};">${pctReal}%</strong></div>`;
       html += '</div></div>';
-      html += '<div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;"><strong>Vysvetlenie:</strong> Nominálna hodnota je suma, ktorú reálne uvidíte na účte. Reálna hodnota ukazuje kúpnu silu v dnešných cenách — koľko si za tieto peniaze budete vedieť dovoliť. Cieľ je nastavený tak, aby vám reálna mesačná renta pokryla dôchodkovú medzeru aj po inflácii 2,5 % p.a.</div>';
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;"><strong>Vysvetlenie:</strong> Nominálna hodnota je suma, ktorú reálne uvidíte na účte. Reálna hodnota ukazuje kúpnu silu v dnešných cenách — koľko si za tieto peniaze budete vedieť dovoliť. Cieľ je nastavený tak, aby vám reálny mesačný príjem navyše pokryl dôchodkovú medzeru aj po inflácii 2,5 % p.a.</div>';
       html += '</div>';
     }
 
@@ -3217,6 +3205,7 @@ function buildFinancialPlan(){
   });
   if(hasDetiPlan){
     fpSec3.style.display = 'block';
+    detiHtml += `<div class="info-box" style="margin-top:4px;">Stratégiu detských cieľov pri blížiacom sa termíne <strong>prehodnotíme na konzervatívnejšiu</strong> — už nasporenú sumu chránime pred výkyvmi trhu.</div>`;
     document.getElementById('fpDeti').innerHTML = detiHtml;
   } else { fpSec3.style.display = 'none'; }
 
@@ -3387,8 +3376,8 @@ function buildFinancialPlan(){
     fpSec6.style.display = 'block';
     let zabHtml = '';
     function getZabProduct(name){
-      if(name.includes('Úmrtie') && name.includes('hypotéky')) return {icon:ico('home'), product:'Rizikové životné poistenie', detail:'Klesajúca PS, naviazaná na splatnosť hypotéky'};
-      if(name.includes('Úmrtie') && name.includes('rodiny')) return {icon:ico('users'), product:'Rizikové životné poistenie', detail:'Fixná PS pre zabezpečenie rodiny'};
+      if(name.includes('Úmrtie') && name.includes('hypotéky')) return {icon:ico('home'), product:'Rizikové životné poistenie', detail:'Klesajúca poistná suma, naviazaná na splatnosť hypotéky'};
+      if(name.includes('Úmrtie') && name.includes('rodiny')) return {icon:ico('users'), product:'Rizikové životné poistenie', detail:'Fixná poistná suma pre zabezpečenie rodiny'};
       if(name.includes('pohrebné')) return {icon:ico('users'), product:'Rizikové životné poistenie', detail:'Krytie pohrebných nákladov'};
       if(name.includes('Kritické')) return {icon:ico('heart-pulse'), product:'Poistenie kritických chorôb', detail:'Jednorazová výplata pri diagnóze (min. 10× čistý mes. príjem)'};
       if(name.includes('Trvalé následky')) return {icon:ico('alert-triangle'), product:'Úrazové poistenie — trvalé následky', detail:'Progresívne plnenie pri trvalom poškodení'};
@@ -3444,7 +3433,7 @@ function buildFinancialPlan(){
       }
       items.forEach(it=>{
         const prod = getZabProduct(it.name);
-        const unitTxt = it.unit==='den'?'/deň':((it.typ==='klesajuca'||it.typ==='inval')?'klesajúca PS':(it.unit==='jednorazovo'?'jednorazovo':'/mes'));
+        const unitTxt = it.unit==='den'?'/deň':((it.typ==='klesajuca'||it.typ==='inval')?'klesajúca poistná suma':(it.unit==='jednorazovo'?'jednorazovo':'/mes'));
         h += `<div class="fp-product"><div class="fp-product-icon protect">${prod.icon}</div><div class="fp-product-info"><div class="fp-product-name">${it.name} ${prioLabel[it.prio]}</div><div class="fp-product-desc">${prod.detail}</div></div><div style="text-align:right;min-width:110px;"><div style="font-size:15px;font-weight:700;color:var(--red);">${formatEUR(it.suma)}</div><div style="font-size:11px;color:var(--muted);">${unitTxt}</div></div></div>`;
       });
       // Tabuľka poistných súm do zmluvy
@@ -3472,7 +3461,7 @@ function buildFinancialPlan(){
     const cistyP = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
     const prijemSum = cistyK + cistyP;
     if(prijemSum>0){
-      zabHtml += `<div class="fp-rec" style="margin-top:14px;"><div class="fp-rec-title">Orientačná cieľová zóna mesačného poistného</div><div class="fp-rec-row"><span>5–10 % čistého príjmu (${formatEUR(prijemSum)})</span><span class="fp-rec-highlight">${formatEUR(Math.round(prijemSum*0.05))} – ${formatEUR(Math.round(prijemSum*0.10))}/mes</span></div><div style="font-size:11px;color:var(--muted);margin-top:6px;">* Orientačné. Presné poistné závisí od veku, zdravotného stavu a konkrétnej poisťovne — upresní sa v individuálnej ponuke.</div></div>`;
+      zabHtml += `<div class="fp-rec" style="margin-top:14px;"><div class="fp-rec-title">Orientačná cieľová zóna mesačného poistného</div><div class="fp-rec-row"><span>5–10 % čistého príjmu (${formatEUR(prijemSum)})</span><span class="fp-rec-highlight">${formatEUR(Math.round(prijemSum*0.05))} – ${formatEUR(Math.round(prijemSum*0.10))}/mes</span></div><div class="fp-rec-row"><span>V rozpočte tohto plánu počítame</span><span>${formatEUR(calcPoistne())}/mes</span></div><div style="font-size:11px;color:var(--muted);margin-top:6px;">* Orientačné. Presné poistné závisí od veku, zdravotného stavu a konkrétnej poisťovne — upresní sa v individuálnej ponuke.</div></div>`;
     }
     zabHtml += '<div class="info-box success" style="margin-top:12px;"><strong>Poistenie riešime cez:</strong> Partners Poisťovňa, NN, Allianz, MetLife, Generali</div>';
     document.getElementById('fpZabezpecenie').innerHTML = zabHtml;
@@ -3982,7 +3971,7 @@ async function generatePDF(){
 
   addSection(4, 'Dôchodok');
   addLine('Roky do dôchodku', document.getElementById('doch_roky').value||'—');
-  addLine('Štátny dôchodok', formatEUR(parseFloat(document.getElementById('doch_statny').value)||0)+'/mes');
+  addLine('Štátny dôchodok', formatEUR(parseFloat(document.getElementById('doch_statny').value)||0)+'/mes'+(((document.getElementById('doch_prognoza')||{}).checked)?' (z prognózy SP)':' (odhad)'));
   addLine('Želaný dôchodok', formatEUR(parseFloat(document.getElementById('doch_potrebny').value)||0)+'/mes');
   addLine('Medzera', formatEUR(parseFloat(document.getElementById('doch_medzera').value)||0)+'/mes', true);
   if(pracaVal === 'szco'){
