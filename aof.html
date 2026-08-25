@@ -5108,6 +5108,19 @@ function applyAOFData(data){
     if(data.majetokHTML) document.getElementById('majetokBody').innerHTML = data.majetokHTML;
     if(data.cieleHTML) document.getElementById('cieleBody').innerHTML = data.cieleHTML;
     if(data.detiHTML) document.getElementById('detiContainer').innerHTML = data.detiHTML;
+    // Spätná kompatibilita: starším kartám detí doplň pole „Odovzdať vo veku"
+    document.querySelectorAll('#detiContainer .card').forEach(function(c){
+      if(c.querySelector('.child-start-age')) return;
+      var dateInp = c.querySelector('.child-start-date');
+      if(!dateInp) return;
+      var grp = dateInp.closest('.form-group');
+      if(!grp || !grp.parentNode) return;
+      var nw = document.createElement('div');
+      nw.className = 'form-group';
+      nw.innerHTML = '<label>Odovzdať vo veku (rokov)</label><input type="number" class="child-start-age" min="15" max="35" placeholder="napr. 20" onchange="calcChildTargetDate(this)">';
+      grp.parentNode.insertBefore(nw, grp);
+    });
+
 
     // Úvery (dynamický zoznam)
     var uvBody = document.getElementById('uveryBody');
