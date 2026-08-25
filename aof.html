@@ -957,6 +957,22 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
           <div class="form-group"><label>Trvalé následky úrazu (€)</label><input type="number" id="zab_ex_uraz" value="0" min="0"></div>
           <div class="form-group"><label>Denné odškodné (€/deň)</label><input type="number" id="zab_ex_denna" value="0" min="0"></div>
         </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Čo so zmluvou po finančnom pláne?</label>
+            <select id="zab_ex_rozhodnutie">
+              <option value="doplnit">Ponechať a doplniť chýbajúce krytie</option>
+              <option value="ponechat">Ponechať bez zmeny</option>
+              <option value="nahradit">Nahradiť novou zmluvou</option>
+            </select>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;">Podľa toho rozpočet ráta buď súčasné poistné, alebo poistné po úprave.</div>
+          </div>
+          <div class="form-group">
+            <label>Poistné po realizácii plánu (€/mes)</label>
+            <input type="number" id="zab_ex_ciel_poistne" value="0" min="0">
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;">Nechajte 0 pre orientačný odhad. Po ponuke z poisťovne sem zadajte reálnu sumu.</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2382,7 +2398,10 @@ function collectGoals(){
     const dochVek = parseInt(document.getElementById('doch_vek').value)||65;
     const age = parseInt(document.getElementById('k_vek').value)||30;
     const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
-    goals.push({name:'Dôchodok', suma:medzera*12*20, date:getDateInYears(dochVek-age)});
+    const _rokyD = Math.max(1, dochVek - age);
+    // Rovnaká suma ako v pláne — nominálne v čase dôchodku (inak by časová os ukazovala iné číslo)
+    const _cielD = Math.round(medzera*12*20*Math.pow(1+INFLATION_RATE, _rokyD));
+    goals.push({name:'Dôchodok', suma:_cielD, date:getDateInYears(dochVek-age)});
   }
 
   // Step 5: Deti
@@ -2411,8 +2430,21 @@ function collectGoals(){
     document.querySelectorAll('#cieleBody tr').forEach(tr=>{
       const name = tr.querySelectorAll('input[type=text]')[0]?.value||'Cieľ';
       const suma = parseFloat(tr.querySelectorAll('input[type=number]')[0]?.value)||0;
-      const dt = tr.querySelector('input[type=date]')?.value||'—';
-      if(suma>0) goals.push({name, suma, date:dt});
+      let dt = tr.querySelector('input[type=date]')?.value||'—';
+      let sumaG = suma;
+      // Rýchlejšie splatenie úverov: termín aj suma podľa vypočítaného pretnutia investície s dlhom
+      const _nl = name.toLowerCase();
+      if(_nl.includes('splatenie hypotéky') || _nl.includes('splatenie hypo') || _nl.includes('splatenie úverov')){
+        const st = Object.values(fpState).find(function(x){ return x && x.isHypo; });
+        if(st){
+          const sRate = (STRATEGIES[st.currentStrategy]||STRATEGIES.dynamicka).rate;
+          const amt = parseFloat(st.selectedInvest)||0;
+          const c = amt>0 ? hypoCrossover(st.zostatok, st.urok, st.mesacnaSplatka, sRate, amt) : null;
+          sumaG = st.zostatok;
+          if(c && c.found) dt = getDateInYears(Math.max(1, Math.round(c.rokov)));
+        }
+      }
+      if(sumaG>0) goals.push({name, suma:sumaG, date:dt});
     });
   }
 
@@ -2718,9 +2750,9 @@ function hypoDefaultAmount(zostatok, urokAnnual, mesacnaSplatka, investRateAnnua
   for(const a of presets){
     if(hypoCrossover(zostatok, urokAnnual, mesacnaSplatka, investRateAnnual, a).found){
       if(firstFound===null) firstFound=a;
-      if(a>=200) return a;
     }
   }
+  // Predvolíme najnižšiu sumu, ktorá sa pretne — nech plán neukazuje sumu, na ktorú klient nemá
   return firstFound!==null ? firstFound : 0;
 }
 // Klient klikol na sumu v tabuľke alternatív
@@ -2942,6 +2974,20 @@ function recalcFPTotal(){
 }
 
 function calcPoistne(){
+  // Ak poradca zadal konkrétne poistné po realizácii plánu, má prednosť
+  const _ciel = parseFloat((document.getElementById('zab_ex_ciel_poistne')||{}).value)||0;
+  if(_ciel > 0) return Math.round(_ciel);
+  const _ex = (typeof exPoistenie === 'function') ? exPoistenie() : {ma:false, poistne:0};
+  const _rozh = (document.getElementById('zab_ex_rozhodnutie')||{}).value || 'doplnit';
+  // Zmluva ostáva bez zmeny → rátame reálne poistné, ktoré klient platí dnes
+  if(_ex.ma && _rozh === 'ponechat' && _ex.poistne > 0) return Math.round(_ex.poistne);
+  const _pausal = calcPoistnePausal();
+  // Doplnenie krytia: poistné nemôže klesnúť pod to, čo platí dnes
+  if(_ex.ma && _rozh === 'doplnit' && _ex.poistne > 0) return Math.max(Math.round(_ex.poistne), _pausal);
+  return _pausal; // nová zmluva alebo klient zatiaľ nič nemá
+}
+
+function calcPoistnePausal(){
   // Orientačný odhad poistného: 5% z čistého príjmu + 2,5% navyše ak má hypotéku
   // Poistné sa upresní v individuálnej ponuke
   const cisty = parseFloat(document.getElementById('k_cisty').value)||0;
@@ -3777,6 +3823,13 @@ function buildFinancialPlan(){
         });
         zabHtml += `</tbody></table>`;
         if(_ex.poistne>0) zabHtml += `<div style="font-size:12px;color:var(--muted);margin-top:6px;">Za súčasné poistenie platíte <strong>${formatEUR(_ex.poistne)}/mes</strong>.</div>`;
+        const _rozhV = (document.getElementById('zab_ex_rozhodnutie')||{}).value || 'doplnit';
+        const _rozhTxt = {
+          doplnit: 'Súčasnú zmluvu <strong>ponechávame a dopĺňame</strong> chýbajúce krytie.',
+          ponechat: 'Súčasnú zmluvu <strong>ponechávame bez zmeny</strong>.',
+          nahradit: 'Súčasnú zmluvu odporúčame <strong>nahradiť novou</strong> — súčasné poistné v rozpočte ďalej nerátame.'
+        }[_rozhV];
+        zabHtml += `<div class="fp-rec" style="margin-top:10px;"><div class="fp-rec-title">Ďalší postup so zmluvou</div><div style="font-size:13px;">${_rozhTxt}</div><div class="fp-rec-row" style="margin-top:6px;"><span>Poistné v rozpočte plánu</span><span class="fp-rec-highlight">${formatEUR(calcPoistne())}/mes</span></div></div>`;
         const chyba = riadky.some(function(r){ return r[2]-r[1] > 0; });
         zabHtml += chyba
           ? '<div class="info-box warning" style="margin-top:10px;">Časť rizík nie je krytá v plnej výške — pri riziku označenom „chýba" odporúčame doplniť poistnú sumu.</div>'
