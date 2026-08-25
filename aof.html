@@ -5213,6 +5213,25 @@ function applyAOFData(data){
     var _dtYes=document.getElementById('detiYes'), _dtNo=document.getElementById('detiNo');
     if(_dtYes&&_dtNo){ _dtYes.classList.toggle('active', hasDeti); _dtNo.classList.toggle('active', !hasDeti); }
 
+    // Ručne zadané hodnoty si po načítaní udrž — inak by ich auto-odhad prepísal
+    ['doch_statny','doch_potrebny','doch_miera','doch_roky_poistenia'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && (parseFloat(el.value)||0) > 0) el.dataset.edited = '1';
+    });
+    ['zab_zavisly_k','zab_zavisly_p'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && el.checked) el.dataset.edited = '1';
+    });
+
+    // Prepočítaj odvodené hodnoty, nech plán nepracuje so zastaranými číslami (napr. dôchodková medzera)
+    try{
+      if(typeof calcUvery === 'function') calcUvery();
+      if(typeof calcPreplatenie === 'function') calcPreplatenie();
+      if(typeof calcRezervy === 'function') calcRezervy();
+      if(typeof calcDochodok === 'function') calcDochodok();
+      if(typeof updateZabezpecenie === 'function') updateZabezpecenie();
+    }catch(e){ console.warn('prepocet po nacitani', e); }
+
     aofDirty = false; // čerstvo načítané dáta nie sú neuložená zmena
   }
 }
