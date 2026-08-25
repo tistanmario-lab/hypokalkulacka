@@ -684,6 +684,7 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
       </div>
       <div class="form-row">
         <div class="form-group"><label>Očakávaný štátny dôchodok (€/mes)</label><input type="number" id="doch_statny" value="0" min="0" oninput="this.dataset.edited='1';calcDochodok()"><div style="font-size:11px;color:var(--muted);margin-top:4px;">Ak má klient <strong>dôchodkovú prognózu zo Sociálnej poisťovne</strong>, zadajte sumu z nej — je už v dnešných cenách. Inak sa použije odhad.</div><label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;margin-top:6px;cursor:pointer;"><input type="checkbox" id="doch_prognoza" style="width:15px;height:15px;accent-color:var(--navy);" onchange="if(this.checked){document.getElementById('doch_statny').dataset.edited='1';}calcDochodok()"> Suma je z dôchodkovej prognózy SP</label></div>
+        <div class="form-group"><label>Miera náhrady z prognózy (%)</label><input type="number" id="doch_miera" value="0" min="0" max="100" step="0.1" oninput="this.dataset.edited='1';calcMieraNahrady()"><div style="font-size:11px;color:var(--muted);margin-top:4px;">Percento z dôchodkovej prognózy („...bude predstavovať približne XX % z Vašich hrubých príjmov"). Dôchodok sa dopočíta <strong>z dnešnej hrubej mzdy</strong> — konzervatívnejší základ pre plán.</div></div>
         <div class="form-group"><label>Želaný mesačný dôchodok (€)</label><input type="number" id="doch_potrebny" value="0" min="0" oninput="this.dataset.edited='1';calcDochodok()"><div style="font-size:11px;color:var(--muted);margin-top:4px;">Spýtajte sa klienta: <em>„Koľko by ti malo mesačne chodiť, aby si nemusel pracovať?"</em> Predvyplnené je 100 % dnešného čistého príjmu — prepíšte jeho odpoveďou.</div></div>
         <div class="form-group"><label>Koľko Vám bude chýbať (€/mes)</label><input type="number" id="doch_medzera" class="computed" readonly></div>
       </div>
@@ -1815,13 +1816,23 @@ function calcDochodok(){
     rpEl.value = Math.max(0, dochVek - SP.START_WORK_AGE);
   }
 
-  // Auto-odhad štátneho dôchodku (kým ho poradca ručne neprepíše) — POMB × roky poistenia × ADH
   const sEl = document.getElementById('doch_statny');
-  if(sEl && sEl.dataset.edited !== '1'){
+  const mEl = document.getElementById('doch_miera');
+  const hrubyM = parseFloat(document.getElementById('k_hruby').value)||0;
+  if(mEl && mEl.dataset.edited === '1' && (parseFloat(mEl.value)||0) > 0 && hrubyM > 0 && sEl){
+    // Miera náhrady je vedúci údaj — dôchodok počítame z dnešnej hrubej mzdy
+    sEl.value = Math.round(hrubyM * (parseFloat(mEl.value)||0) / 100);
+    sEl.dataset.edited = '1';
+  } else if(sEl && sEl.dataset.edited !== '1'){
+    // Auto-odhad štátneho dôchodku (kým ho poradca ručne neprepíše) — POMB × roky poistenia × ADH
     sEl.value = odhadStatnyDochodok();
   }
 
   const statny = parseFloat(sEl ? sEl.value : 0)||0;
+  // Ak poradca mieru náhrady nezadal, dopočítaj ju zo sumy (pre argument klientovi)
+  if(mEl && mEl.dataset.edited !== '1'){
+    mEl.value = hrubyM > 0 ? Math.round(statny / hrubyM * 1000) / 10 : 0;
+  }
   const potrebny = parseFloat(document.getElementById('doch_potrebny').value)||0;
   const medzera = potrebny - statny;
   document.getElementById('doch_medzera').value = Math.max(0, medzera);
@@ -1842,6 +1853,9 @@ function odhadStatnyDochodok(){
   const POMB = pombAdjusted(base); // vrátane § 63 krátenia nad 1,25-násobok priemernej mzdy
   return Math.round(POMB * roky * SP.ADH);
 }
+
+// Miera náhrady → dôchodok z dnešnej hrubej mzdy
+function calcMieraNahrady(){ calcDochodok(); }
 
 function togglePilier2(){
   document.getElementById('pilier2Group').style.display = document.getElementById('doch_pilier2').value==='ano'?'block':'none';
@@ -3327,7 +3341,19 @@ function buildFinancialPlan(){
     }
 
     html += `<div style="font-size:13px;font-weight:600;margin-bottom:4px;">Dôchodková medzera: <span class="fp-rec-highlight">${formatEUR(medzera)}/mes</span> <span style="color:var(--muted);font-weight:400;font-size:11px;">(v dnešných cenách)</span></div>`;
-    html += `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Štátny dôchodok ${formatEUR(parseFloat(document.getElementById('doch_statny').value)||0)}/mes — ${((document.getElementById('doch_prognoza')||{}).checked)?'<strong>z dôchodkovej prognózy Sociálnej poisťovne</strong> (v dnešných cenách)':'orientačný odhad; presnú sumu má klient v dôchodkovej prognóze zo Sociálnej poisťovne'}.</div>`;
+    const _statnyVal = parseFloat(document.getElementById('doch_statny').value)||0;
+    const _hrubyVal = parseFloat(document.getElementById('k_hruby').value)||0;
+    const _miera = parseFloat((document.getElementById('doch_miera')||{}).value)||0;
+    const _zProg = ((document.getElementById('doch_prognoza')||{}).checked);
+    html += `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Štátny dôchodok ${formatEUR(_statnyVal)}/mes — ${_zProg?'<strong>z dôchodkovej prognózy Sociálnej poisťovne</strong> (I. pilier)':'orientačný odhad; presnú sumu má klient v dôchodkovej prognóze zo Sociálnej poisťovne'}.</div>`;
+    if(_miera > 0){
+      const _nizka = _miera < 50;
+      html += `<div class="info-box${_nizka?' warning':''}" style="margin-bottom:12px;">`;
+      html += `<strong>Miera náhrady: ${_miera} %</strong> — štátny dôchodok nahradí ${_miera} % vášho hrubého príjmu.`;
+      html += _nizka ? ' Je to <strong>pod hranicou 50 %</strong>, čo znamená citeľný pokles životnej úrovne bez vlastného zabezpečenia.' : ' Aj tak odporúčame vlastné zabezpečenie — prognóza platí pri nezmenených pravidlách a nepretržitej kariére.';
+      html += `<div style="font-size:11px;margin-top:6px;opacity:.85;">Počítané z dnešnej hrubej mzdy${_hrubyVal>0?' ('+formatEUR(_hrubyVal)+')':''}. Ide o <strong>I. pilier</strong> — na II. pilier v pláne nespoliehame, berieme ho ako prípadný bonus navyše. Poznámka: z dôchodku sa neplatia odvody ani spravidla daň, takže čistá miera náhrady je vyššia než uvedená hrubá.</div>`;
+      html += `</div>`;
+    }
     html += `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(0,48,73,0.03);border-radius:10px;border:1px solid var(--border);">`;
     html += `<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px;">Cieľová suma na 20 rokov na dôchodku</div>`;
     html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">`;
