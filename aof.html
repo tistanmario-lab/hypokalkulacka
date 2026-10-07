@@ -308,16 +308,25 @@ body{font-family:'Graphik',Arial,Helvetica,sans-serif;background:var(--sand);col
    DOKUMENT PRE KLIENTA — obrazovka aj tlač / PDF (Partners brand)
    ============================================================ */
 /* Obálka: červená plocha, biely rám s prerušením vpravo dole, biele logo vpravo dole vnútri rámu */
-.doc-cover{position:relative;background:var(--red)!important;color:#fff;border:none!important;padding:0!important;min-height:230px;overflow:hidden;}
-.doc-cover .pg-frame{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
-.doc-cover .pg-frame path{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;}
+.doc-cover{--fx:14px;position:relative;background:var(--red)!important;color:#fff;border:none!important;padding:0!important;min-height:230px;overflow:hidden;}
+/* Rám: biela linka hrúbky X, stred linky 1,5X od okraja, rádius 20 px */
+.doc-cover::before{content:'';position:absolute;inset:var(--fx);border:var(--fx) solid #fff;border-radius:calc(20px + var(--fx) / 2);pointer-events:none;}
+/* Prerušenie v strede pravého dolného rohu. Rez je 2X od stredu oblúka po linke (oblúk r=20 má
+   polovicu dĺžky 15,708 px) → rez je 3,5X + 4,292 px od okraja; zaoblené konce (krúžky X) skrátia
+   medzeru na 3X. Červený štvorec zakryje roh od vonkajšej hrany po rez (o 2 px väčší proti švom). */
+.doc-cover::after{content:'';position:absolute;pointer-events:none;background:var(--red);
+  right:calc(var(--fx) - 2px);bottom:calc(var(--fx) - 2px);
+  width:calc(2.5 * var(--fx) + 6.292px);height:calc(2.5 * var(--fx) + 6.292px);}
+.doc-cover .pg-cap{position:absolute;z-index:1;width:var(--fx);height:var(--fx);border-radius:50%;background:#fff;pointer-events:none;}
+.doc-cover .pg-cap.b{right:calc(3 * var(--fx) + 4.292px);bottom:var(--fx);}
+.doc-cover .pg-cap.r{right:var(--fx);bottom:calc(3 * var(--fx) + 4.292px);}
 .doc-cover-inner{position:relative;z-index:1;text-align:center;padding:calc(var(--fx,14px)*3.4) calc(var(--fx,14px)*4) calc(var(--fx,14px)*5.6);}
 .doc-cover-kicker{font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;}
 .doc-cover-title{font-size:34px;font-weight:600;letter-spacing:-.015em;line-height:1.15;margin:10px 0 6px;}
 .doc-cover-date{font-size:14px;}
 .doc-cover-meta{font-size:12.5px;margin-top:14px;}
 .doc-cover-meta strong{font-weight:600;}
-.doc-cover-logo{position:absolute;z-index:1;width:auto;height:calc(var(--fx,14px)*2);right:calc(var(--fx,14px)*3.2);bottom:calc(var(--fx,14px)*3);}
+.doc-cover-logo{position:absolute;z-index:2;width:auto;height:calc(var(--fx,14px)*2);right:calc(var(--fx,14px)*3.2);bottom:calc(var(--fx,14px)*3);}
 /* Záver: kontakt + upozornenie */
 .doc-contact{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-top:20px;padding:22px 26px;border-radius:var(--radius);background:var(--sand);}
 .doc-contact-kicker{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
@@ -361,9 +370,15 @@ body.presentation-mode .pres-bar{display:flex;}
 @media(max-width:600px){
   body.presentation-mode .aof-main{padding:118px 10px 40px;}
   body.presentation-mode #step9{padding:14px;border-radius:14px;}
+  .doc-cover{--fx:9px;}
   .doc-cover-title{font-size:26px;}
   .doc-contact{flex-direction:column;align-items:flex-start;}
   .pres-bar{padding:8px 12px;}
+  .pres-bar-actions{width:100%;}
+  .pres-bar-check{width:100%;margin:0;}
+  .pres-bar-btn{flex:1;}
+  /* široké tabuľky plánu (prehľad investícií, varianty) — posun do strany namiesto roztiahnutia stránky */
+  #tabPlan table, #tabSuhrn table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 }
 
 /* Tlač / Uložiť ako PDF — A4 */
@@ -379,6 +394,8 @@ body.presentation-mode .pres-bar{display:flex;}
   body.presentation-mode .fp-rec,
   body.presentation-mode .fp-product,
   body.presentation-mode .fp-impact,
+  body.presentation-mode .fp-compare,
+  body.presentation-mode .zab-bars,
   body.presentation-mode table,
   body.presentation-mode .chart-container,
   body.presentation-mode .zab-bar-block,
@@ -387,7 +404,11 @@ body.presentation-mode .pres-bar{display:flex;}
   body.presentation-mode .doc-contact,
   body.presentation-mode .timeline-v-item{break-inside:avoid;}
   body.presentation-mode .fp-section-header,
+  body.presentation-mode .fp-compare-label,
   body.presentation-mode .card-title{break-after:avoid;}
+  /* polia (napr. štartovacia suma) v dokumente ako bežný text, nie formulár */
+  body.presentation-mode #tabPlan input[type=number],
+  body.presentation-mode #tabPlan input[type=text]{border:none!important;background:transparent!important;padding:0!important;font-weight:600;color:var(--gray);}
   body.presentation-mode .fp-strat-btn:not([class*="active-"]){display:none!important;}
   body.presentation-mode #btnChartNom,
   body.presentation-mode #btnChartReal,
@@ -1182,7 +1203,7 @@ body.presentation-mode .pres-bar{display:flex;}
 
       <!-- FP Header — obálka dokumentu v brande Partners (rám s prerušením + logo) -->
       <div class="card doc-cover" id="fpCover">
-        <svg class="pg-frame" aria-hidden="true"><path d=""/></svg>
+        <span class="pg-cap b" aria-hidden="true"></span><span class="pg-cap r" aria-hidden="true"></span>
         <div class="doc-cover-inner">
           <div class="doc-cover-kicker">Osobný finančný plán</div>
           <div class="doc-cover-title" id="fpKlientName">Klient</div>
@@ -1398,7 +1419,7 @@ body.presentation-mode .pres-bar{display:flex;}
 
 <script>
 // Grafy v brande Partners: Graphik (fallback Arial), text Partners sivou
-if(window.Chart){ Chart.defaults.font.family = "'Graphik', Arial, Helvetica, sans-serif"; Chart.defaults.color = '#4D4D4D'; }
+if(window.Chart){ Chart.defaults.font.family = "'Graphik', Arial, Helvetica, sans-serif"; Chart.defaults.color = '#4D4D4D'; Chart.defaults.animation = false; }
 
 // ============================================================
 // GLOBAL STATE
@@ -3694,8 +3715,8 @@ function gapCard(cielSuma, roky, curSaved, curMonthly, rate){
   const recTotalMonthly = curMonthly + additionalMonthly;
   const R = (l,v,cls)=>`<div class="fp-rec-row"><span>${l}</span><span${cls?' class="'+cls+'"':''}>${v}</span></div>`;
   let h = '<div style="margin:12px 0;">';
-  h += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Súčasný stav vs. odporúčanie</div>';
-  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">';
+  h += '<div class="fp-compare-label" style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Súčasný stav vs. odporúčanie</div>';
+  h += '<div class="fp-compare" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">';
   h += '<div style="padding:14px;background:rgba(205,109,128,0.06);border:1px solid rgba(205,109,128,0.30);border-left:4px solid var(--orange);border-radius:12px;">';
   h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--orange);margin-bottom:8px;">Súčasný stav — ak nič nezmení</div>';
   h += R('Cieľ', formatEUR(cielSuma));
@@ -3772,7 +3793,9 @@ function buildFinancialPlan(){
   const age = parseInt(document.getElementById('k_vek').value)||30;
   const today = new Date();
 
-  document.getElementById('fpKlientName').textContent = meno;
+  // Pár: na obálke obaja (napr. „Ján Novák a Eva Nováková“)
+  const _pMeno = clientType==='pair' ? (document.getElementById('p_meno').value+' '+document.getElementById('p_priezvisko').value).trim() : '';
+  document.getElementById('fpKlientName').textContent = _pMeno ? (meno + ' a ' + _pMeno) : meno;
   const _fpDate = document.getElementById('fpDocDate');
   if(_fpDate) _fpDate.textContent = new Date().toLocaleDateString('sk-SK', {day:'numeric', month:'long', year:'numeric'});
 
@@ -3889,8 +3912,8 @@ function buildFinancialPlan(){
     let html = '';
     // GAP karta — súčasný stav vs. odporúčanie
     html += '<div style="margin-bottom:18px;">';
-    html += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Súčasný stav vs. odporúčanie</div>';
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">';
+    html += '<div class="fp-compare-label" style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Súčasný stav vs. odporúčanie</div>';
+    html += '<div class="fp-compare" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">';
     html += '<div style="padding:14px;background:rgba(205,109,128,0.06);border:1px solid rgba(205,109,128,0.30);border-left:4px solid var(--orange);border-radius:12px;">';
     html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--orange);margin-bottom:8px;">Súčasný stav — ak nič nezmení</div>';
     html += `<div class="fp-rec-row"><span>Cieľ: mesačne navyše (dnešné €)</span><span>${formatEUR(medzera)}/mes</span></div>`;
@@ -4552,7 +4575,6 @@ function buildFinancialPlan(){
   document.getElementById('fpTimeline').innerHTML = origHTML || '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
   renumberFPSections();
   applyAdvisorToUI();
-  setTimeout(drawPgFrames, 0);
 }
 
 // Portfolio chart state for toggle
@@ -4764,50 +4786,19 @@ function openPresentation(){
   document.getElementById('tabPlan').classList.add('active');
   const ws = document.getElementById('docWithSummary');
   toggleDocSummary(!!(ws && ws.checked));
-  setTimeout(()=>{ if(_portfolioData) renderPortfolioChart(_portfolioView); drawPgFrames(); }, 100);
+  setTimeout(()=>{ if(_portfolioData) renderPortfolioChart(_portfolioView); }, 100);
   window.scrollTo(0,0);
 }
 
 function closePresentation(){
   document.body.classList.remove('presentation-mode', 'doc-with-summary');
   window.scrollTo(0,0);
-  setTimeout(drawPgFrames, 50);
 }
 
 // Súhrn analýzy (východisková situácia) ako úvodná časť dokumentu — voliteľné
 function toggleDocSummary(on){
   document.body.classList.toggle('doc-with-summary', !!on);
   if(on && typeof buildSummary === 'function') buildSummary();
-}
-
-// Rám — hlavný grafický prvok Partners: zaoblený obdĺžnik (rádius 20 px), zaoblené konce linky,
-// prerušenie dĺžky 3X v strede pravého dolného rohu. X = 1/16 kratšej strany (digital).
-function drawPgFrame(el){
-  const svg = el && el.querySelector('.pg-frame'); if(!svg) return;
-  const path = svg.querySelector('path');
-  const w = el.clientWidth, h = el.clientHeight; if(!w || !h) return;
-  const X = Math.max(6, Math.min(14, Math.round(Math.min(w, h) / 16)));
-  el.style.setProperty('--fx', X + 'px');
-  svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
-  const ins = 1.5 * X, r = 20;
-  const L = ins, T = ins, R = w - ins, B = h - ins;
-  const k = r / Math.SQRT2, mx = R - r + k, my = B - r + k; // stred oblúka pravého dolného rohu
-  const d = 'M' + mx + ' ' + my +
-    ' A' + r + ' ' + r + ' 0 0 1 ' + (R - r) + ' ' + B + ' L' + (L + r) + ' ' + B +
-    ' A' + r + ' ' + r + ' 0 0 1 ' + L + ' ' + (B - r) + ' L' + L + ' ' + (T + r) +
-    ' A' + r + ' ' + r + ' 0 0 1 ' + (L + r) + ' ' + T + ' L' + (R - r) + ' ' + T +
-    ' A' + r + ' ' + r + ' 0 0 1 ' + R + ' ' + (T + r) + ' L' + R + ' ' + (B - r) +
-    ' A' + r + ' ' + r + ' 0 0 1 ' + mx + ' ' + my;
-  path.setAttribute('d', d);
-  path.setAttribute('stroke-width', X);
-  const P = path.getTotalLength(), G = 4 * X; // 3X viditeľnej medzery + X na zaoblené konce
-  path.setAttribute('stroke-dasharray', (P - G) + ' ' + G);
-  path.setAttribute('stroke-dashoffset', -G / 2);
-}
-function drawPgFrames(){ document.querySelectorAll('.doc-cover').forEach(drawPgFrame); }
-if(window.ResizeObserver){
-  const _pgRO = new ResizeObserver(drawPgFrames);
-  document.querySelectorAll('.doc-cover').forEach(function(el){ _pgRO.observe(el); });
 }
 
 // Sekcie plánu číslujeme podľa toho, ktoré sú zobrazené (bez dier 1, 2, 4…)
@@ -4831,15 +4822,13 @@ function docFileName(){
 function setDocPrintFooter(){
   const a = getAdvisor();
   const q = t => '"' + String(t).replace(/["\\]/g, '\\$&') + '"';
-  const left = [a.name, a.title, a.company].filter(Boolean).join(' · ');
-  const right = [a.phone, a.email].filter(Boolean).join(' · ');
+  const left = [a.name + ', ' + a.company, a.phone, a.email].filter(Boolean).join('  ·  ');
   const box = "font-family:'Graphik',Arial,sans-serif;font-size:7.5pt;color:#989FA7;";
   let st = document.getElementById('docPrintFooterCss');
   if(!st){ st = document.createElement('style'); st.id = 'docPrintFooterCss'; document.head.appendChild(st); }
   st.textContent = '@page{' +
-    '@bottom-left{content:' + q(left) + ';' + box + '}' +
-    '@bottom-center{content:' + q(right) + ';' + box + '}' +
-    '@bottom-right{content:"Strana " counter(page) " z " counter(pages);' + box + '}}';
+    '@bottom-left{content:' + q(left) + ';width:78%;' + box + '}' +
+    '@bottom-right{content:"Strana " counter(page) " z " counter(pages);width:22%;text-align:right;' + box + '}}';
 }
 
 let _docTitleBackup = null;
@@ -4848,12 +4837,13 @@ function printClientDoc(){
   setDocPrintFooter();
   if(_docTitleBackup === null) _docTitleBackup = document.title;
   document.title = docFileName();
-  setTimeout(function(){ drawPgFrames(); window.print(); }, 200);
+  setTimeout(function(){ window.print(); }, 200);
 }
-window.addEventListener('beforeprint', drawPgFrames);
+window.addEventListener('beforeprint', function(){
+  if(window.Chart && Chart.instances) Object.values(Chart.instances).forEach(function(c){ try{ c.resize(); }catch(e){} });
+});
 window.addEventListener('afterprint', function(){
   if(_docTitleBackup !== null){ document.title = _docTitleBackup; _docTitleBackup = null; }
-  setTimeout(drawPgFrames, 50);
 });
 
 // ============================================================
