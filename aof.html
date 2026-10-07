@@ -745,6 +745,30 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
           </div>
           <div class="form-group"><label>Mesačná suma DDS (€)</label><input type="number" id="doch_dds_suma" value="0" min="0"></div>
           <div class="form-group"><label>Príspevok zamestnávateľa (€/mes)</label><input type="number" id="doch_dds_zamestnavatel" value="0" min="0"></div>
+          <div class="form-group"><label>Očakávané zhodnotenie (% p.a.)</label><input type="number" id="doch_dds_urok" value="" min="0" max="15" step="0.1" placeholder="podľa fondu" title="Nechajte prázdne — použije sa sadzba podľa typu fondu (indexový 7 %, akciový 6 %, zmiešaný 4 %, dlhopisový 2 %)"></div>
+        </div>
+        <div class="check-row"><input type="checkbox" id="doch_dds_novy"><label for="doch_dds_novy">Zakladáme v rámci tohto plánu (nová zmluva) — mesačná suma sa započíta do rozpočtu plánu</label></div>
+      </div>
+
+      <!-- Model výplaty na dôchodku -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Model výplaty na dôchodku</label>
+          <select id="doch_vyplata" onchange="toggleVyplata()">
+            <option value="vycerpanie">Postupné vyčerpanie (20 rokov)</option>
+            <option value="dividenda">Dividendová renta — kapitál ostáva</option>
+          </select>
+        </div>
+        <div class="form-group" id="dividendaGroup" style="display:none;">
+          <label>Dividendový výnos (% p.a.)</label>
+          <input type="number" id="doch_dividenda" value="6" min="1" max="12" step="0.1" oninput="updateDochodok()">
+        </div>
+        <div class="form-group">
+          <label>Nová investícia cez</label>
+          <select id="doch_produkt">
+            <option value="dis">DIS — dlhodobé investičné sporenie (OCP)</option>
+            <option value="etf">ETF / cenné papiere (OCP)</option>
+          </select>
         </div>
       </div>
 
@@ -1150,10 +1174,22 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
         <div id="fpByvanie"></div>
       </div>
 
+      <!-- FP: 5. Úvery a cesta z dlhov -->
+      <div class="card fp-section" id="fpSecUvery" style="margin-top:20px;display:none;">
+        <div class="fp-section-header">
+          <span class="fp-section-num">5</span>
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">Úvery a cesta z dlhov</div>
+            <div style="font-size:12px;color:var(--muted);">Partners Investments — program na skoršie splatenie</div>
+          </div>
+        </div>
+        <div id="fpUvery"></div>
+      </div>
+
       <!-- FP: 5. Iné ciele -->
       <div class="card fp-section" id="fpSecCiele" style="margin-top:20px;display:none;">
         <div class="fp-section-header">
-          <span class="fp-section-num">5</span>
+          <span class="fp-section-num">6</span>
           <div>
             <div class="card-title" style="margin-bottom:2px;">Iné ciele</div>
             <div style="font-size:12px;color:var(--muted);">Partners Investments</div>
@@ -1165,7 +1201,7 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
       <!-- FP: 6. Zabezpečenie príjmu -->
       <div class="card fp-section" id="fpSecZabezpecenie" style="margin-top:20px;display:none;">
         <div class="fp-section-header">
-          <span class="fp-section-num">6</span>
+          <span class="fp-section-num">7</span>
           <div>
             <div class="card-title" style="margin-bottom:2px;">Zabezpečenie príjmu</div>
             <div style="font-size:12px;color:var(--muted);">Partners Poisťovňa, NN, Allianz, MetLife, Generali</div>
@@ -1177,7 +1213,7 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
       <!-- FP: 7. Ochrana majetku -->
       <div class="card fp-section" id="fpSecMajetok" style="margin-top:20px;display:none;">
         <div class="fp-section-header">
-          <span class="fp-section-num">7</span>
+          <span class="fp-section-num">8</span>
           <div>
             <div class="card-title" style="margin-bottom:2px;">Ochrana majetku</div>
             <div style="font-size:12px;color:var(--muted);">Uniqa, Colonnade, ČSOB poisťovňa, Allianz</div>
@@ -1194,6 +1230,12 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
           <tbody id="fpStrategieBody"></tbody>
           <tfoot id="fpStrategieFoot"></tfoot>
         </table>
+      </div>
+
+      <!-- FP: Vstupné poplatky — varianty cieľových súm -->
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title">Vstupné poplatky — ako začať s nižším nákladom</div>
+        <div id="fpStartVarianty"></div>
       </div>
 
       <!-- FP: Rast investičného portfólia -->
@@ -1223,7 +1265,8 @@ body.presentation-mode #step9>.card:first-child{margin-top:60px;}
     </div>
 
     <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
-      <button class="btn btn-red" onclick="generatePDF()">Generovať PDF</button>
+      <button class="btn btn-red" onclick="generatePDFKratky()">PDF pre klienta (krátke)</button>
+      <button class="btn btn-outline" onclick="generatePDF()">PDF podrobné</button>
       <button class="btn btn-primary" onclick="openPresentation()">Otvoriť prezentáciu</button>
       <button class="btn btn-outline" onclick="openClientEmailModal()">Pripraviť email klientovi</button>
       <button class="btn btn-outline" onclick="saveAOF()">Uložiť AOF</button>
@@ -1876,6 +1919,28 @@ function calcMieraNahrady(){ calcDochodok(); }
 function togglePilier2(){
   document.getElementById('pilier2Group').style.display = document.getElementById('doch_pilier2').value==='ano'?'block':'none';
 }
+function toggleVyplata(){
+  var el = document.getElementById('doch_vyplata');
+  var g = document.getElementById('dividendaGroup');
+  if(g) g.style.display = (el && el.value === 'dividenda') ? 'flex' : 'none';
+  if(typeof updateDochodok === 'function') updateDochodok();
+}
+// Očakávané zhodnotenie III. piliera — ručne zadaná sadzba má prednosť pred typom fondu
+function ddsRate(){
+  var manual = parseFloat((document.getElementById('doch_dds_urok')||{}).value);
+  if(!isNaN(manual) && manual > 0) return manual/100;
+  var fond = (document.getElementById('doch_dds_fond')||{}).value || 'dlhopisovy';
+  var map = {indexovy:0.07, akciovy:0.06, zmiesany:0.04, dlhopisovy:0.02};
+  return (map[fond] !== undefined) ? map[fond] : 0.04;
+}
+// Dividendový výnos na dôchodku (podiel z kapitálu vyplácaný ročne)
+function dividendRate(){
+  var v = parseFloat((document.getElementById('doch_dividenda')||{}).value);
+  return (!isNaN(v) && v > 0) ? v/100 : 0.06;
+}
+function isDividendMode(){
+  return ((document.getElementById('doch_vyplata')||{}).value || 'vycerpanie') === 'dividenda';
+}
 function toggleDDS(){
   document.getElementById('ddsGroup').style.display = document.getElementById('doch_pilier3').value==='ano'?'block':'none';
 }
@@ -2253,13 +2318,31 @@ function buildZabTable(prefix, bodyId){
   const dennaName = 'Denná dávka (PN / hospitalizácia)';
   const dennaEdited = prevEdit[dennaName]!==undefined;
   const dennaVal = dennaEdited ? (parseFloat(prevEdit[dennaName])||0) : 15;
+  // Odporúčame ju, kým klient nemá vytvorenú rezervu (výpadok príjmu vtedy nemá z čoho dorovnať)
+  // alebo je SZČO bez nemocenského. Poradca vie zaškrtnutie kedykoľvek prepnúť.
+  let nizkaRezerva = false;
+  try{ nizkaRezerva = sumLiquidReserves() < rezervaCiel().ciel; }catch(e){}
+  const dennaOn = dennaEdited ? (dennaVal > 0) : (isSzco || nizkaRezerva);
+  const dennaSub = isSzco
+    ? 'SZČO bez nemocenského — odporúčané'
+    : (nizkaRezerva ? 'Odporúčané, kým nie je vytvorená rezerva — pri výpadku príjmu nie je z čoho dorovnať' : 'Individuálne — najmä pri nízkych rezervách alebo manuálnej práci');
   const trD = document.createElement('tr');
   trD.innerHTML =
-    `<td>${dennaName}<div class="zab-sub">Individuálne — najmä pri nízkych rezervách alebo SZČO bez nemocenského</div></td>`+
+    `<td>${dennaName}<div class="zab-sub">${dennaSub}</div></td>`+
     `<td colspan="2" class="zab-sub">Denné odškodné (€/deň)</td>`+
     `<td><input type="number" min="0" class="zab-davka-override${dennaEdited?' edited':''}" data-mode="ps" data-row="${dennaName}"${dennaEdited?' data-edited="1"':''} value="${Math.round(dennaVal)}" oninput="recomputeZab(this)"></td>`+
-    `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${dennaName}" data-suma="${Math.round(dennaVal)}" data-unit="den" data-priority="3" ${isSzco?'checked':''}></td>`;
+    `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${dennaName}" data-suma="${Math.round(dennaVal)}" data-unit="den" data-priority="3" onchange="syncZabCheck(this)" ${dennaOn?'checked':''}></td>`;
   tbody.appendChild(trD);
+  // Zaškrtnutia poradcu musia prežiť uloženie — checked ako atribút, nie len ako vlastnosť
+  tbody.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    if(!cb.getAttribute('onchange')) cb.setAttribute('onchange','syncZabCheck(this)');
+    syncZabCheck(cb);
+  });
+}
+
+// Premietne stav zaškrtnutia do atribútu, aby sa uložil spolu s HTML tabuľky
+function syncZabCheck(cb){
+  if(cb.checked) cb.setAttribute('checked','checked'); else cb.removeAttribute('checked');
 }
 
 // Pridá riadok s jednorazovou poistnou sumou (editovateľná PS)
@@ -2297,10 +2380,10 @@ function recomputeZab(inp){
         gapCell.innerHTML = '0 € '+ico('check',14);
       }
     }
-    if(cb){ cb.dataset.suma = conv.ps; cb.dataset.davka = davka; if(kind==='pn'||kind==='inval'){ cb.dataset.unit = conv.unit; cb.dataset.typ = conv.typ; } cb.checked = gap>0; }
+    if(cb){ cb.dataset.suma = conv.ps; cb.dataset.davka = davka; if(kind==='pn'||kind==='inval'){ cb.dataset.unit = conv.unit; cb.dataset.typ = conv.typ; } cb.checked = gap>0; syncZabCheck(cb); }
   } else {
     const ps = parseFloat(inp.value)||0;
-    if(cb){ cb.dataset.suma = ps; }
+    if(cb){ cb.dataset.suma = ps; if(ps<=0) cb.checked = false; syncZabCheck(cb); }
   }
 }
 
@@ -2399,8 +2482,10 @@ function collectGoals(){
     const age = parseInt(document.getElementById('k_vek').value)||30;
     const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
     const _rokyD = Math.max(1, dochVek - age);
-    // Rovnaká suma ako v pláne — nominálne v čase dôchodku (inak by časová os ukazovala iné číslo)
-    const _cielD = Math.round(medzera*12*20*Math.pow(1+INFLATION_RATE, _rokyD));
+    // Rovnaká suma ako v pláne — nominálne v čase dôchodku (inak by časová os ukazovala iné číslo).
+    // Model výplaty musí sedieť: vyčerpanie za 20 rokov vs. dividendová renta z kapitálu.
+    const _realD = isDividendMode() ? (medzera*12/dividendRate()) : (medzera*12*20);
+    const _cielD = Math.round(_realD*Math.pow(1+INFLATION_RATE, _rokyD));
     goals.push({name:'Dôchodok', suma:_cielD, date:getDateInYears(dochVek-age)});
   }
 
@@ -2414,6 +2499,18 @@ function collectGoals(){
     const std = card.querySelector('.child-start-date')?.value||'';
     if(vz>0) goals.push({name:meno+' — Vzdelanie', suma:vz, date:vzd||'—'});
     if(st>0) goals.push({name:meno+' — Štart', suma:st, date:std||'—'});
+    // Režim „od mesačnej sumy" — cieľová suma nie je zadaná, dopočíta sa z odkladanej sumy
+    if(vz<=0 && st<=0 && std){
+      const mes = parseFloat(card.querySelector('.child-mesacne')?.value)||0;
+      const nasp = parseFloat(card.querySelector('.child-nasporene')?.value)||0;
+      if(mes>0 || nasp>0){
+        const rokyD = Math.max(1, Math.round((new Date(std) - new Date())/(365.25*24*3600000)));
+        const stratK = {'Konzervatívna':'konzervativna','Vyvážená':'vyvazena','Dynamická':'dynamicka'}[getChildStrategy(std)] || 'vyvazena';
+        const rateD = (STRATEGIES[stratK]||STRATEGIES.vyvazena).rate;
+        const sumaD = Math.round(calcFV(mes, rateD, rokyD) + nasp*Math.pow(1+rateD, rokyD));
+        if(sumaD>0) goals.push({name:meno+' — Štart do života', suma:sumaD, date:std});
+      }
+    }
   });
 
   // Step 6: Majetok
@@ -2446,6 +2543,17 @@ function collectGoals(){
       }
       if(sumaG>0) goals.push({name, suma:sumaG, date:dt});
     });
+  }
+
+  // Úverový program — rok, keď je klient bez dlhov
+  const _up = fpState[UVER_PROG_ID];
+  if(_up && _up.isHypo){
+    const _s = STRATEGIES[_up.currentStrategy] || STRATEGIES.vyvazena;
+    const _amt = parseFloat(_up.selectedInvest)||0;
+    const _c = _amt>0 ? hypoCross(_up, _s.rate, _amt) : null;
+    if(_c && _c.found){
+      goals.push({name:'Bez dlhov — úvery doplatené', suma:_up.zostatok, date:getDateInYears(Math.max(1, Math.ceil(_c.mesiacov/12)))});
+    }
   }
 
   // Step 8: Zabezpečenie (priebežné, bez dátumu)
@@ -2639,6 +2747,18 @@ function getEntryFeePercent(cielovaSuma, stratKey){
   return tiers[tiers.length-1].pct;
 }
 
+// Minimálny zmluvný horizont podľa stratégie (v mesiacoch).
+// Dynamickú stratégiu nemožno podpísať s horizontom pod 10 rokov — cieľová suma,
+// a teda aj vstupný poplatok, sa preto počíta minimálne z tohto počtu mesiacov.
+const MIN_ZMLUVNE_MESIACE = { dynamicka: 120 };
+function zmluvneMesiace(stratKey, mesiace){
+  return Math.max(mesiace||0, MIN_ZMLUVNE_MESIACE[stratKey]||0);
+}
+// Vstupný poplatok z cieľovej sumy = mesačná suma × zmluvný počet mesiacov
+function entryFeeFor(mesacne, mesiace, stratKey){
+  return getEntryFee((mesacne||0) * zmluvneMesiace(stratKey, mesiace), stratKey);
+}
+
 function getEntryFee(cielovaSuma, stratKey){
   if(cielovaSuma <= 0) return null;
   const pct = getEntryFeePercent(cielovaSuma, stratKey);
@@ -2821,12 +2941,18 @@ function renderInvestmentOverview(){
   tbody.innerHTML = '';
   let total = 0;
   Object.entries(fpState).forEach(([id, state]) => {
-    if(state.type !== 'invest') return;
-    const s = STRATEGIES[state.currentStrategy];
+    if(!state || state.type !== 'invest') return;
+    const s = STRATEGIES[state.currentStrategy] || STRATEGIES.vyvazena;
     let cielTxt, horizTxt, pmt, fv, realFv;
-    if(state.isHypo){
+    if(state.fixedMonthly != null){
+      pmt = state.fixedMonthly;
+      fv = state.fixedFV || 0;
+      realFv = calcRealValue(fv, state.roky||1);
+      cielTxt = formatEUR(fv);
+      horizTxt = (state.roky||1) + ' r.';
+    } else if(state.isHypo){
       const amt = parseFloat(state.selectedInvest)||0;
-      const c = amt>0 ? hypoCrossover(state.zostatok, state.urok, state.mesacnaSplatka, s.rate, amt) : null;
+      const c = amt>0 ? hypoCross(state, s.rate, amt) : null;
       pmt = amt;
       fv = (c && c.found) ? c.investiciaVtedy : 0;
       const roky = (c && c.found) ? c.rokov : 0;
@@ -2842,14 +2968,272 @@ function renderInvestmentOverview(){
       horizTxt = state.roky + ' r.';
     }
     total += pmt;
+    let uzOdklada = (!state.isHypo && state.fixedMonthly == null && state.gap && (state.gap.monthly||0) > 0) ? state.gap.monthly : 0;
+    // III. pilier zakladaný v rámci plánu je vlastný riadok tabuľky — nezapočítavaj ho ako „už odkladá"
+    if(state.ddsNovyMonthly > 0) uzOdklada = Math.max(0, uzOdklada - state.ddsNovyMonthly);
+    const pmtTxt = uzOdklada > 0
+      ? `${formatEUR(pmt)}<div class="zab-sub">spolu ${formatEUR(pmt + uzOdklada)} vrátane ${formatEUR(uzOdklada)}, ktoré už odkladá</div>`
+      : formatEUR(pmt);
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${state.label}</td><td>${cielTxt}</td><td>${horizTxt}</td><td><span class="strat-badge ${s.badge}">${s.name}</span></td><td>${Math.round(s.rate*100)} %</td><td class="fp-rec-highlight">${formatEUR(pmt)}</td><td>${formatEUR(fv)}</td><td style="color:var(--muted);">${formatEUR(realFv)}</td><td>${id==='rezervy' ? 'Partners Asset Management' : 'Partners Investments'}</td>`;
+    tr.innerHTML = `<td>${state.label}</td><td>${cielTxt}</td><td>${horizTxt}</td><td><span class="strat-badge ${s.badge}">${s.name}</span></td><td>${Math.round(s.rate*100)} %</td><td class="fp-rec-highlight">${pmtTxt}</td><td>${formatEUR(fv)}</td><td style="color:var(--muted);">${formatEUR(realFv)}</td><td>${state.poskytovatel ? state.poskytovatel : (id==='rezervy' ? 'Partners Asset Management' : 'Partners Investments')}</td>`;
     tbody.appendChild(tr);
   });
   const tfoot = document.getElementById('fpStrategieFoot');
   if(tfoot) tfoot.innerHTML = `<tr><td colspan="5" style="text-align:right;">Celková mesačná investícia:</td><td class="fp-rec-highlight">${formatEUR(total)}</td><td colspan="3"></td></tr>`;
   updateFPBudget(total);
+  renderStartVarianty();
+  refreshTimeline();
   return total;
+}
+
+// Prekreslí časovú os a premietne ju do plánu aj do súhrnu
+function refreshTimeline(){
+  try{
+    buildTimeline();
+    const src = document.getElementById('timelineContainer');
+    if(!src) return;
+    const html = src.innerHTML || '<div style="font-size:13px;color:var(--muted);">Žiadne ciele zaradené</div>';
+    const fp = document.getElementById('fpTimeline'); if(fp) fp.innerHTML = html;
+    const sm = document.getElementById('summTimeline'); if(sm) sm.innerHTML = html;
+  }catch(e){ console.warn('refreshTimeline', e); }
+}
+
+// ============================================================
+// FP sekcia 5 — Úvery a cesta z dlhov
+// Program pravidelného investovania, ktorý sa v momente pretnutia s dlhom
+// použije na jednorazové doplatenie všetkých úverov.
+// ============================================================
+const UVER_PROG_ID = 'uverprogram';
+
+function uverProgramPresets(){
+  // Tri varianty podľa toho, koľko klientovi po ostatných programoch reálne ostáva
+  let ineInvesticie = 0;
+  Object.entries(fpState).forEach(function(e){
+    const st = e[1];
+    if(!st || st.type !== 'invest' || e[0] === UVER_PROG_ID) return;
+    if(st.fixedMonthly != null){ ineInvesticie += st.fixedMonthly; }
+    else if(st.isHypo){ ineInvesticie += parseFloat(st.selectedInvest)||0; }
+    else { try{ ineInvesticie += planNumbers(st).pmt||0; }catch(err){} }
+  });
+  const cisty = (parseFloat((document.getElementById('k_cisty')||{}).value)||0)
+              + (clientType==='pair' ? (parseFloat((document.getElementById('p_cisty')||{}).value)||0) : 0);
+  const splatky = sumUvery().splatka;
+  const volne = cisty - splatky - fpLivingCosts().val - calcPoistne() - ineInvesticie;
+  if(volne >= 260) return [100,150,200];
+  if(volne >= 160) return [50,100,150];
+  return [30,50,100];
+}
+
+function buildUveryPlan(){
+  const sec = document.getElementById('fpSecUvery');
+  if(!sec) return;
+  const u = (typeof sumUvery === 'function') ? sumUvery() : null;
+  // Ak už rovnaký program beží ako cieľ v Kroku 7 („Splatenie úverov"), nezdvojujeme ho
+  const uzJeVCieloch = Object.entries(fpState).some(function(e){ return e[1] && e[1].isHypo && e[0] !== UVER_PROG_ID; });
+  if(!u || u.dlh <= 0 || u.splatka <= 0 || uzJeVCieloch){
+    sec.style.display = 'none';
+    delete fpState[UVER_PROG_ID];
+    return;
+  }
+  sec.style.display = 'block';
+  const roky = Math.max(1, Math.round((uverySim(u.rows, 0, 0)||{mesiacovDoKonca:120}).mesiacovDoKonca/12));
+  const stratKey = (fpState[UVER_PROG_ID] && fpState[UVER_PROG_ID].currentStrategy) || getStrategy(roky).key;
+  fpState[UVER_PROG_ID] = Object.assign({}, fpState[UVER_PROG_ID], {
+    type:'invest', isHypo:true, label:'Skoršie splatenie úverov',
+    rows:u.rows, zostatok:u.dlh, urok:u.rate, mesacnaSplatka:u.splatka,
+    roky:roky, currentStrategy:stratKey
+  });
+  recalcUveryPayoff(stratKey);
+}
+
+function changeUverStrategy(stratKey){
+  if(!fpState[UVER_PROG_ID]) return;
+  fpState[UVER_PROG_ID].selectedInvest = null; // prepočítaj odporúčanie pre novú stratégiu
+  recalcUveryPayoff(stratKey);
+}
+
+function selectUverInvest(amount){
+  if(!fpState[UVER_PROG_ID]) return;
+  fpState[UVER_PROG_ID].selectedInvest = amount;
+  hypoSelByLabel[fpState[UVER_PROG_ID].label] = amount;
+  recalcUveryPayoff(fpState[UVER_PROG_ID].currentStrategy);
+}
+
+function recalcUveryPayoff(stratKey){
+  const state = fpState[UVER_PROG_ID];
+  if(!state) return;
+  state.currentStrategy = stratKey;
+  const s = STRATEGIES[stratKey];
+  const presets = uverProgramPresets();
+  if(state.selectedInvest == null){
+    const zapam = hypoSelByLabel[state.label];
+    // predvoľ najnižší variant — plán nemá ukazovať sumu, na ktorú klient nemusí mať
+    state.selectedInvest = (zapam != null && presets.indexOf(zapam) >= 0) ? zapam : presets[0];
+  }
+
+  const bez = hypoCross(state, s.rate, 0);
+  const sel = hypoCross(state, s.rate, parseFloat(state.selectedInvest)||0);
+
+  let html = '';
+
+  // ── Prehľad všetkých úverov ──
+  html += '<div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;">Vaše úvery dnes</div>';
+  html += '<table class="dyn-table" style="font-size:12px;"><thead><tr><th>Úver</th><th>Zostatok</th><th>Sadzba</th><th>Splátka</th><th>Koniec</th></tr></thead><tbody>';
+  state.rows.forEach(function(r){
+    const drahy = (r.urok||0) >= 0.07;
+    html += '<tr><td><strong>'+r.nazov+'</strong>'+(drahy?' <span class="zab-priority p1" style="margin-left:6px;">najdrahší</span>':'')+'</td>'+
+            '<td>'+formatEUR(r.dlh)+'</td>'+
+            '<td'+(drahy?' style="color:var(--red);font-weight:700;"':'')+'>'+((r.urok||0)*100).toFixed(2)+' %</td>'+
+            '<td>'+formatEUR(r.splatka)+'</td>'+
+            '<td>'+(r.koniec||'—')+'</td></tr>';
+  });
+  html += '</tbody><tfoot><tr><td><strong>Spolu</strong></td><td class="fp-rec-highlight">'+formatEUR(state.zostatok)+'</td><td>⌀ '+(state.urok*100).toFixed(2)+' %</td><td class="fp-rec-highlight">'+formatEUR(state.mesacnaSplatka)+'</td><td></td></tr></tfoot></table>';
+
+  // ── Východiskový stav ──
+  html += '<div class="fp-rec" style="margin-top:14px;"><div class="fp-rec-title">Ak nič nezmeníte</div>';
+  html += '<div class="fp-rec-row"><span>Posledný úver splatený v roku</span><span><strong>'+(bez.rokKonca||'—')+'</strong> (o '+bez.rokovDoKonca+' r.)</span></div>';
+  html += '<div class="fp-rec-row"><span>Na úrokoch celkovo zaplatíte</span><span style="color:var(--red);font-weight:700;font-size:15px;">'+formatEUR(bez.urokyDoKonca)+'</span></div>';
+  html += '</div>';
+
+  // ── Stratégia programu ──
+  html += '<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--navy);">Investičná stratégia programu</div>';
+  html += '<div class="fp-strat-selector">';
+  Object.values(STRATEGIES).forEach(function(st){
+    const act = st.key === stratKey ? ' active-'+st.badge : '';
+    html += '<button class="fp-strat-btn'+act+'" onclick="changeUverStrategy(\''+st.key+'\')">'+st.name+' ('+Math.round(st.rate*100)+'% p.a.)</button>';
+  });
+  html += '</div>';
+  html += '<div class="fp-product" style="margin-top:10px;"><div class="fp-product-icon invest">'+ico('trending-up')+'</div><div class="fp-product-info"><div class="fp-product-name">'+s.fond+'</div><div class="fp-product-desc">'+s.typ+' · '+Math.round(s.rate*100)+'% p.a. · Program beží popri bežných splátkach</div></div></div>';
+
+  // ── Tri varianty ──
+  html += '<div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--navy);">Tri varianty — vyberte si</div>';
+  html += '<div style="font-size:12px;color:var(--muted);margin:2px 0 8px;">Kliknutím na variant ho premietnete do prehľadu investícií aj do celkového rozpočtu.</div>';
+  html += '<table class="dyn-table" style="font-size:12px;"><thead><tr><th>Mesačne</th><th>Bez dlhov v roku</th><th>Skôr o</th><th>Ušetríte na úrokoch</th><th>Vložíte spolu</th><th>Hodnota programu</th><th>Vstupný poplatok</th></tr></thead><tbody>';
+  presets.forEach(function(a){
+    const c = hypoCross(state, s.rate, a);
+    const je = (a === state.selectedInvest);
+    const rowStyle = je ? 'background:rgba(171,5,52,0.08);box-shadow:inset 3px 0 0 var(--red);' : '';
+    const badge = je ? ' <span class="zab-priority p1" style="margin-left:6px;">vybrané</span>' : '';
+    if(!c.found){
+      html += '<tr onclick="selectUverInvest('+a+')" style="cursor:pointer;'+rowStyle+'"><td><strong>'+formatEUR(a)+'</strong>'+badge+'</td><td colspan="6" style="color:var(--muted);">Pri tejto sume sa program nestihne pretnúť s dlhom — úvery dobehnú v riadnom termíne.</td></tr>';
+      return;
+    }
+    const skor = Math.max(0, Math.round((bez.mesiacovDoKonca - c.mesiacov)/12*10)/10);
+    const fee = entryFeeFor(a, c.mesiacov, stratKey);
+    html += '<tr onclick="selectUverInvest('+a+')" style="cursor:pointer;'+rowStyle+'" title="Kliknutím vyberiete tento variant">'+
+            '<td><strong>'+formatEUR(a)+'</strong>'+badge+'</td>'+
+            '<td><strong>'+c.rokPretnutia+'</strong></td>'+
+            '<td>'+skor+' r.</td>'+
+            '<td style="color:var(--green);font-weight:700;">'+formatEUR(c.uspora)+'</td>'+
+            '<td>'+formatEUR(c.vklady)+'</td>'+
+            '<td>'+formatEUR(c.investiciaVtedy)+'</td>'+
+            '<td style="color:var(--orange);">'+(fee ? fee.pct+' % = '+formatEUR(fee.suma) : '—')+'</td></tr>';
+  });
+  html += '</tbody></table>';
+
+  // ── Vybraný variant ──
+  if(sel.found){
+    const feeSel = entryFeeFor(parseFloat(state.selectedInvest)||0, sel.mesiacov, stratKey);
+    html += '<div class="fp-rec" style="margin-top:14px;border-left:3px solid var(--green);"><div class="fp-rec-title">Vybraný variant — '+formatEUR(parseFloat(state.selectedInvest)||0)+'/mes</div>';
+    html += '<div class="fp-rec-row"><span>Bez dlhov už v roku</span><span class="fp-rec-highlight" style="font-size:15px;"><strong>'+sel.rokPretnutia+'</strong> (o '+sel.rokov+' r.)</span></div>';
+    html += '<div class="fp-rec-row"><span>Oproti riadnemu splácaniu skôr o</span><span>'+Math.max(0, Math.round((bez.mesiacovDoKonca - sel.mesiacov)/12*10)/10)+' rokov</span></div>';
+    html += '<div class="fp-rec-row"><span>Ušetríte na úrokoch</span><span style="color:var(--green);font-weight:700;font-size:15px;">'+formatEUR(sel.uspora)+'</span></div>';
+    html += '<div class="fp-rec-row"><span>Vaše vklady spolu</span><span>'+formatEUR(sel.vklady)+'</span></div>';
+    html += '<div class="fp-rec-row"><span>Z toho zhodnotenie</span><span style="color:var(--green);">+'+formatEUR(sel.zhodnotenie)+'</span></div>';
+    html += '<div class="fp-rec-row"><span>Hodnota programu v tom roku</span><span class="fp-rec-highlight">'+formatEUR(sel.investiciaVtedy)+'</span></div>';
+    html += '<div class="fp-rec-row"><span>Zostatok dlhu v tom roku</span><span>'+formatEUR(sel.zostatokVtedy)+'</span></div>';
+    if(feeSel){
+      const _mz = zmluvneMesiace(stratKey, sel.mesiacov);
+      const _pozn = _mz > sel.mesiacov ? ' <span class="zab-sub">cieľovka na '+Math.round(_mz/12)+' r. — min. pre dynamickú</span>' : '';
+      html += '<div class="fp-rec-row"><span>Vstupný poplatok (jednorazová úhrada)'+_pozn+'</span><span style="color:var(--orange);">'+feeSel.pct+' % = '+formatEUR(feeSel.suma)+'</span></div>';
+    }
+    html += '<div class="fp-rec-row"><span>Splátky po splatení sa uvoľnia</span><span style="color:var(--green);font-weight:700;">'+formatEUR(state.mesacnaSplatka)+'/mes</span></div>';
+    html += '</div>';
+  }
+
+  html += '<div style="margin-top:12px;padding:10px 14px;background:rgba(0,48,73,0.03);border-radius:10px;font-size:12px;color:var(--muted);"><strong>Ako to funguje:</strong> Úvery ostávajú tak, ako sú — splácate ich ďalej v riadnych splátkach. Popri tom si zvlášť odkladáte do investičného programu. V momente, keď hodnota programu dosiahne zostatok všetkých úverov, program odpredáte a úvery jednorazovo doplatíte. Tým prestanete platiť ďalšie úroky a mesačná splátka '+formatEUR(state.mesacnaSplatka)+' sa vám uvoľní na iné ciele.</div>';
+  html += '<div style="margin-top:8px;font-size:11px;color:var(--muted);">Výpočet predpokladá riadne splácanie podľa dnešných sadzieb a priemerné zhodnotenie '+Math.round(s.rate*100)+' % p.a. Skutočný výnos sa môže líšiť; pri poklese trhu sa moment splatenia posunie. Pred predčasným splatením overíme poplatok banky za mimoriadnu splátku.</div>';
+
+  document.getElementById('fpUvery').innerHTML = html;
+  renderInvestmentOverview();
+}
+
+// ============================================================
+// Varianty cieľových súm — nižšia cieľovka = nižší vstupný poplatok na štarte.
+// Cieľovú sumu vieme neskôr navýšiť; poplatok z navýšenia sa dopláca až vtedy.
+// ============================================================
+const START_MES_DEFAULT = 30;
+
+function programVarianty(){
+  const startBase = parseFloat((document.getElementById('fp_start_suma')||{}).value) || START_MES_DEFAULT;
+  const out = [];
+  Object.entries(fpState).forEach(function(e){
+    const id = e[0], st = e[1];
+    if(!st || st.type !== 'invest') return;
+    let planMes = 0, mesiace = 0, noFee = false, stratKey = st.currentStrategy || 'vyvazena';
+    if(st.fixedMonthly != null){
+      planMes = st.fixedMonthly; mesiace = (st.roky||1)*12; noFee = !!st.noFee;
+    } else if(st.isHypo){
+      const rate = (STRATEGIES[stratKey]||STRATEGIES.vyvazena).rate;
+      const amt = parseFloat(st.selectedInvest)||0;
+      const c = amt>0 ? hypoCross(st, rate, amt) : null;
+      planMes = amt; mesiace = (c && c.found) ? c.mesiacov : (st.roky||1)*12;
+    } else {
+      const pn = planNumbers(st);
+      planMes = pn.pmt; mesiace = pn.roky*12;
+      if(id === 'rezervy') noFee = true; // Partners Fond krátkodobých rezerv — bez vstupného poplatku
+    }
+    if(planMes <= 0 || mesiace <= 0) return;
+    const startMes = Math.min(planMes, startBase); // horizont ostáva, mení sa len mesačná suma
+    const feeOf = function(mes){
+      if(noFee) return {pct:0, suma:0};
+      const f = entryFeeFor(mes, mesiace, stratKey);
+      return f || {pct:0, suma:0};
+    };
+    const mesiaceZ = noFee ? mesiace : zmluvneMesiace(stratKey, mesiace);
+    out.push({id:id, label:st.label, mesiace:mesiace, mesiaceZ:mesiaceZ, noFee:noFee,
+      plan:{mes:planMes, ciel:planMes*mesiaceZ, fee:feeOf(planMes)},
+      start:{mes:startMes, ciel:startMes*mesiaceZ, fee:feeOf(startMes)}});
+  });
+  return out;
+}
+
+function renderStartVarianty(){
+  const box = document.getElementById('fpStartVarianty');
+  if(!box) return;
+  const v = programVarianty();
+  const platene = v.filter(function(x){ return !x.noFee; });
+  if(platene.length === 0){ box.innerHTML = ''; return; }
+  const sum = function(k){ return v.reduce(function(a,x){ return a + x[k].fee.suma; }, 0); };
+  const sumMes = function(k){ return v.reduce(function(a,x){ return a + x[k].mes; }, 0); };
+  const startBase = parseFloat((document.getElementById('fp_start_suma')||{}).value) || START_MES_DEFAULT;
+
+  let h = '';
+  h += '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6;">Vstupný poplatok sa počíta z <strong>cieľovej sumy</strong> programu (mesačná suma × počet mesiacov). Horizonty ostávajú rovnaké — na štarte znížime len mesačnú sumu v zmluve, a keď bude vytvorená rezerva, cieľovú sumu navýšime na plnú.</div>';
+  h += '<div class="form-row" style="margin-bottom:12px;"><div class="form-group" style="max-width:230px;"><label>Štartovacia suma na program (€/mes)</label><input type="number" id="fp_start_suma" value="'+startBase+'" min="10" max="200" step="5" oninput="renderStartVarianty()"></div></div>';
+  h += '<table class="dyn-table" style="font-size:12px;"><thead><tr>'+
+       '<th rowspan="2">Program</th><th rowspan="2" style="text-align:right;">Horizont</th>'+
+       '<th colspan="3" style="text-align:center;border-left:1px solid var(--border);">Plná verzia</th>'+
+       '<th colspan="3" style="text-align:center;border-left:1px solid var(--border);background:rgba(171,5,52,0.05);">Štart '+formatEUR(startBase)+'/mes</th></tr>'+
+       '<tr><th style="text-align:right;border-left:1px solid var(--border);">€/mes</th><th style="text-align:right;">Cieľová suma</th><th style="text-align:right;">Poplatok</th>'+
+       '<th style="text-align:right;border-left:1px solid var(--border);background:rgba(171,5,52,0.05);">€/mes</th><th style="text-align:right;background:rgba(171,5,52,0.05);">Cieľová suma</th><th style="text-align:right;background:rgba(171,5,52,0.05);">Poplatok</th></tr></thead><tbody>';
+  v.forEach(function(x){
+    const f = function(o){ return x.noFee ? '0 €' : (o.fee.pct+' % = '+formatEUR(o.fee.suma)); };
+    const rovnake = x.start.mes === x.plan.mes;
+    h += '<tr><td><strong>'+x.label+'</strong>'+(x.noFee?'<div class="zab-sub">bez vstupného poplatku</div>':(rovnake?'<div class="zab-sub">už je pod štartovacou sumou — nemení sa</div>':''))+'</td>'+
+         '<td style="text-align:right;">'+Math.round(x.mesiace/12*10)/10+' r.'+(x.mesiaceZ>x.mesiace?'<div class="zab-sub">zmluva '+Math.round(x.mesiaceZ/12)+' r. (min. pre dynamickú)</div>':'<div class="zab-sub">'+x.mesiace+' mes.</div>')+'</td>'+
+         '<td style="text-align:right;border-left:1px solid var(--border);">'+formatEUR(x.plan.mes)+'</td><td style="text-align:right;">'+formatEUR(x.plan.ciel)+'</td><td style="text-align:right;">'+f(x.plan)+'</td>'+
+         '<td style="text-align:right;border-left:1px solid var(--border);background:rgba(171,5,52,0.05);">'+formatEUR(x.start.mes)+'</td><td style="text-align:right;background:rgba(171,5,52,0.05);">'+formatEUR(x.start.ciel)+'</td><td style="text-align:right;background:rgba(171,5,52,0.05);">'+f(x.start)+'</td></tr>';
+  });
+  h += '</tbody><tfoot><tr><td colspan="2"><strong>Spolu</strong></td>'+
+       '<td style="text-align:right;border-left:1px solid var(--border);">'+formatEUR(sumMes('plan'))+'</td><td></td><td style="text-align:right;" class="fp-rec-highlight">'+formatEUR(sum('plan'))+'</td>'+
+       '<td style="text-align:right;border-left:1px solid var(--border);background:rgba(171,5,52,0.05);">'+formatEUR(sumMes('start'))+'</td><td style="background:rgba(171,5,52,0.05);"></td><td style="text-align:right;background:rgba(171,5,52,0.05);" class="fp-rec-highlight">'+formatEUR(sum('start'))+'</td></tr></tfoot></table>';
+  const uspora = sum('plan') - sum('start');
+  if(uspora > 0){
+    h += '<div class="info-box success" style="margin-top:10px;">Pri štartovacej verzii zaplatíte na vstupných poplatkoch <strong>'+formatEUR(sum('start'))+'</strong> namiesto <strong>'+formatEUR(sum('plan'))+'</strong> — na začiatku teda o <strong>'+formatEUR(uspora)+'</strong> menej.</div>';
+  }
+  h += '<div style="margin-top:8px;font-size:11px;color:var(--muted);line-height:1.5;">Dynamickú stratégiu možno podpísať najskôr na <strong>10 rokov</strong> — pri kratšom cieli sa cieľová suma počíta z 10-ročného horizontu. Mesačne môžete posielať aj plnú sumu — nižšia je len <strong>zmluvná cieľová suma</strong>, z ktorej sa počíta poplatok. Pri neskoršom navýšení sa doplatí poplatok z navýšenej časti, takže celkovo zaplatíte podobne — rozdiel je v tom, <strong>kedy</strong> to zaplatíte. Odporúčame začať nižšie, kým nie je vytvorená rezerva.</div>';
+  box.innerHTML = h;
 }
 
 function recalcHypoPayoff(id, stratKey){
@@ -2922,7 +3306,7 @@ function recalcHypoPayoff(id, stratKey){
       if(r.note){
         html += `<tr><td>${formatEUR(r.mesInvest)}</td><td colspan="4" style="color:var(--muted);">${r.note}</td></tr>`;
       } else {
-        const fee = getEntryFee(r.vklady, stratKey);
+        const fee = entryFeeFor(r.mesInvest, r.mesiacov, stratKey);
         const sel = (r.mesInvest === state.selectedInvest);
         const selStyle = sel ? 'background:rgba(171,5,52,0.08);box-shadow:inset 3px 0 0 var(--red);' : '';
         const selBadge = sel ? ' <span class="zab-priority p1" style="margin-left:6px;">vybrané</span>' : '';
@@ -3041,7 +3425,7 @@ function recalcFPTotal(){
 function calcPoistne(){
   // Ak poradca zadal konkrétne poistné po realizácii plánu, má prednosť
   const _ciel = parseFloat((document.getElementById('zab_ex_ciel_poistne')||{}).value)||0;
-  if(_ciel > 0) return Math.round(_ciel);
+  if(_ciel > 0) return Math.round(_ciel*100)/100; // presná suma z ponuky, aj s centmi
   const _ex = (typeof exPoistenie === 'function') ? exPoistenie() : {ma:false, poistne:0};
   const _rozh = (document.getElementById('zab_ex_rozhodnutie')||{}).value || 'doplnit';
   // Zmluva ostáva bez zmeny → rátame reálne poistné, ktoré klient platí dnes
@@ -3091,6 +3475,7 @@ function updateFPBudget(totalMesacne){
   const living = fpLivingCosts();
   const splatka = sumUvery().splatka + (parseFloat((document.getElementById('zab_uver_splatka')||{}).value)||0);
   const poistne = calcPoistne();
+  const presnePoistne = (parseFloat((document.getElementById('zab_ex_ciel_poistne')||{}).value)||0) > 0;
   // Životné náklady / splátka / investície / poistné sa rátajú samostatne (žiadne dvojité počítanie)
   const volne = (cisty + pCisty) - living.val - splatka - totalMesacne - poistne;
 
@@ -3099,8 +3484,8 @@ function updateFPBudget(totalMesacne){
   rozpHtml += `<div class="fp-rec-row"><span>Životné náklady (bežný chod)${living.estimated?' — odhad':''}</span><span>${formatEUR(living.val)}</span></div>`;
   if(splatka > 0) rozpHtml += `<div class="fp-rec-row"><span>Splátky úverov</span><span>${formatEUR(splatka)}</span></div>`;
   rozpHtml += `<div class="fp-rec-row"><span>Investície podľa finančného plánu</span><span class="fp-rec-highlight">${formatEUR(totalMesacne)}</span></div>`;
-  if(poistne > 0) rozpHtml += `<div class="fp-rec-row"><span>Poistné (orientačný odhad)</span><span>${formatEUR(poistne)}</span></div>`;
-  rozpHtml += `<div class="fp-rec-row"><span><strong>Voľné prostriedky</strong></span><span style="color:${volne>=0?'var(--green)':'var(--red)'};font-weight:700;font-size:15px;"><strong>${formatEUR(volne)}</strong></span></div>`;
+  if(poistne > 0) rozpHtml += `<div class="fp-rec-row"><span>Poistné${presnePoistne?'':' (orientačný odhad)'}</span><span>${formatEUR2(poistne)}</span></div>`;
+  rozpHtml += `<div class="fp-rec-row"><span><strong>Voľné prostriedky</strong></span><span style="color:${volne>=0?'var(--green)':'var(--red)'};font-weight:700;font-size:15px;"><strong>${formatEUR2(volne)}</strong></span></div>`;
   if(volne < 0) rozpHtml += `<div style="margin-top:8px;padding:8px 12px;background:rgba(171,5,52,0.06);border-radius:8px;font-size:12px;color:var(--red);">${ico('alert-triangle',14)} Mesačné náklady presahujú dostupné prostriedky. Zvážte úpravu stratégie alebo cieľových súm.</div>`;
   // Upozornenie ak nie sú zadané životné náklady
   if(living.val === 0 && (cisty + pCisty) > 0){
@@ -3110,7 +3495,9 @@ function updateFPBudget(totalMesacne){
   } else if(living.estimated){
     rozpHtml += `<div style="margin-top:8px;font-size:11px;color:var(--muted);">* Životné náklady sú odhadnuté z celkových výdavkov (mínus splátka). Pre presný rozpočet vyplňte „Čisté životné náklady" v Kroku 8.</div>`;
   }
-  if(poistne > 0) rozpHtml += `<div style="margin-top:4px;font-size:11px;color:var(--muted);">* Poistné je orientačný odhad. Presná suma bude stanovená na základe individuálnej ponuky.</div>`;
+  if(poistne > 0) rozpHtml += presnePoistne
+    ? `<div style="margin-top:4px;font-size:11px;color:var(--muted);">* Poistné podľa konkrétnej ponuky poisťovne po navýšení krytia.</div>`
+    : `<div style="margin-top:4px;font-size:11px;color:var(--muted);">* Poistné je orientačný odhad. Presná suma bude stanovená na základe individuálnej ponuky.</div>`;
   rozpHtml += '</div>';
   document.getElementById('fpRozpocetSummary').innerHTML = rozpHtml;
 
@@ -3172,11 +3559,13 @@ function buildProgramDetail(programId, state, strat, pmt, fv){
   const taxPD = Math.round(Math.max(0, pn.newFV - pn.vklady) * FUND_TAX);
   if(taxPD > 0){
     html += `<div class="fp-rec-row"><span>Táto investícia v klasickom fonde (po 19 % dani z výnosu)</span><span style="color:var(--muted);">${formatEUR(pn.newFV - taxPD)}</span></div>`;
-    html += `<div class="info-box success" style="margin-top:8px;"><strong>Výhoda ETF:</strong> náš ETF je po 1-ročnom časovom teste <strong>oslobodený od dane z výnosu</strong> — oproti klasickému podielovému fondu klient ušetrí <strong>${formatEUR(taxPD)}</strong>.</div>`;
+    html += (state.produkt === 'dis')
+      ? `<div class="info-box success" style="margin-top:8px;"><strong>Výhoda DIS:</strong> dlhodobé investičné sporenie je po splnení 15-ročnej doby <strong>oslobodené od dane z výnosu aj od zdravotných odvodov</strong> — oproti klasickému podielovému fondu klient ušetrí <strong>${formatEUR(taxPD)}</strong>.</div>`
+      : `<div class="info-box success" style="margin-top:8px;"><strong>Výhoda ETF:</strong> náš ETF je po 1-ročnom časovom teste <strong>oslobodený od dane z výnosu</strong> — oproti klasickému podielovému fondu klient ušetrí <strong>${formatEUR(taxPD)}</strong>.</div>`;
   }
 
   // Fee — vstupný poplatok zo súčtu nových vkladov
-  const fee = getEntryFee(pn.vklady, state.currentStrategy);
+  const fee = entryFeeFor(pn.pmt, pn.roky*12, state.currentStrategy);
   if(fee !== null && pn.vklady > 0){
     html += `<div class="fp-fee-row"><span>Cieľová suma (súčet vkladov)</span><span>${formatEUR(pn.vklady)}</span></div>`;
     html += `<div class="fp-fee-row"><span>Vstupný poplatok (jednorazová úhrada)</span><span>${fee.pct}% = ${formatEUR(fee.suma)}</span></div>`;
@@ -3350,9 +3739,17 @@ function buildFinancialPlan(){
     // Klient potrebuje "medzera €/mes (v dnešných cenách)" počas 20 rokov dôchodku.
     // Aby kúpna sila vystačila, cieľ musí byť v NOMINÁLNYCH eurách v čase dôchodku
     // — preto inflačne navyšujeme cieľovú sumu o (1+infl)^roky.
-    const realCielSuma = Math.round(medzera * 12 * 20); // v dnešných €
+    const _divMode = isDividendMode();
+    const _divRate = dividendRate();
+    // Vyčerpanie: kapitál sa počas 20 rokov minie.  Dividenda: kapitál ostáva a vypláca sa z neho podiel.
+    const _rokovVyplaty = 20;
+    const realCielSuma = _divMode
+      ? Math.round(medzera * 12 / _divRate)          // kapitál, z ktorého dividenda pokryje medzeru (dnešné €)
+      : Math.round(medzera * 12 * _rokovVyplaty);    // v dnešných €
     const cielSuma = Math.round(realCielSuma * Math.pow(1 + INFLATION_RATE, roky)); // nominálne v čase dôchodku
     const nomMedzeraMonthly = Math.round(medzera * Math.pow(1 + INFLATION_RATE, roky)); // nominálny mesačný príjem o N rokov
+    // Prepočet kapitálu na mesačný príjem podľa zvoleného modelu
+    const kapitalNaMesiac = function(kap){ return Math.round(_divMode ? (kap * _divRate / 12) : (kap / (_rokovVyplaty*12))); };
     const strat = getStrategy(roky);
     const dochPmt = calcPMT(cielSuma, strat.rate, roky);
     const dochFV = calcFV(dochPmt, strat.rate, roky);
@@ -3364,6 +3761,7 @@ function buildFinancialPlan(){
 
     // ── Prototyp: Súčasný stav vs. odporúčaný stav (GAP analýza) ──
     let curSaved = 0, curMonthly = 0, curProjFV = 0;
+    let _ddsFV = 0, _ddsMon = 0, _ddsRate = 0;
     // Piliere — bez dane z výnosu fondu
     // II. pilier: NEZAPOČÍTAVAME do projekcie (riziko zmien/znárodnenia systému) — berieme ho ako bonus navyše
     const p2Suma = p2 ? (parseFloat(document.getElementById('doch_p2_suma').value)||0) : 0;
@@ -3371,10 +3769,10 @@ function buildFinancialPlan(){
     if(p3){
       const ddsNasp = parseFloat(document.getElementById('doch_dds_nasporena').value)||0;
       const ddsMon = (parseFloat(document.getElementById('doch_dds_suma').value)||0) + (parseFloat(document.getElementById('doch_dds_zamestnavatel').value)||0);
-      const ddsFond = (document.getElementById('doch_dds_fond')||{}).value || 'dlhopisovy';
-      const ddsRateMap = {indexovy:0.07, akciovy:0.06, zmiesany:0.04, dlhopisovy:0.02};
-      const ddsRate = (ddsRateMap[ddsFond]!==undefined) ? ddsRateMap[ddsFond] : 0.04;
-      curProjFV += Math.round(ddsNasp*Math.pow(1+ddsRate, roky) + calcFV(ddsMon, ddsRate, roky));
+      const _dr = ddsRate();
+      _ddsFV = Math.round(ddsNasp*Math.pow(1+_dr, roky) + calcFV(ddsMon, _dr, roky));
+      _ddsMon = ddsMon; _ddsRate = _dr;
+      curProjFV += _ddsFV;
       curSaved += ddsNasp; curMonthly += ddsMon;
     }
     // Investície — klasický podielový fond zdanený 19 % z výnosu, ETF oslobodený (1-ročný časový test)
@@ -3392,7 +3790,7 @@ function buildFinancialPlan(){
     const shortfall = Math.max(0, cielSuma - curProjFV);
     const additionalMonthly = calcPMT(shortfall, strat.rate, roky);
     const recTotalMonthly = curMonthly + additionalMonthly;
-    const curRentaToday = Math.round((curProjFV/240) / Math.pow(1+INFLATION_RATE, roky)); // kúpna sila renty dnes
+    const curRentaToday = Math.round(kapitalNaMesiac(curProjFV) / Math.pow(1+INFLATION_RATE, roky)); // kúpna sila renty dnes
     const gapRentaToday = Math.max(0, medzera - curRentaToday);
 
     let html = '';
@@ -3466,14 +3864,25 @@ function buildFinancialPlan(){
       html += `</div>`;
     }
     html += `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(0,48,73,0.03);border-radius:10px;border:1px solid var(--border);">`;
-    html += `<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px;">Cieľová suma na 20 rokov na dôchodku</div>`;
+    html += `<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px;">${_divMode ? ('Potrebný kapitál pre dividendu '+(_divRate*100).toFixed(1).replace('.0','')+' % p.a.') : 'Cieľová suma na 20 rokov na dôchodku'}</div>`;
     html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">`;
     html += `<div><span style="color:var(--muted);">V dnešných €:</span> <strong>${formatEUR(realCielSuma)}</strong><div style="font-size:10px;color:var(--muted);margin-top:2px;">kúpna sila ${formatEUR(medzera)}/mes</div></div>`;
     html += `<div><span style="color:var(--muted);">Nominálne (vek ${dochVek}):</span> <strong style="color:var(--red);">${formatEUR(cielSuma)}</strong><div style="font-size:10px;color:var(--muted);margin-top:2px;">po inflácii 2,5 % p.a. · ${formatEUR(nomMedzeraMonthly)}/mes</div></div>`;
-    html += `</div></div>`;
+    html += `</div>`;
+    if(_divMode) html += `<div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">Pri tomto modeli sa <strong>kapitál nemíňa</strong> — vypláca sa z neho ${(_divRate*100).toFixed(1).replace('.0','')} % ročne a zvyšok ostáva investovaný (a po vás dedičom). Renta je preto doživotná, nie na 20 rokov.</div>`;
+    html += `</div>`;
 
     // Store state for interactive recalculation
-    fpState['dochodok'] = {type:'invest', label:'Dôchodok', cielSuma, roky, origStrategy:strat.key, currentStrategy:strat.key, origPmt:dochPmt, gap:{ciel:cielSuma, saved:curSaved, monthly:curMonthly, projFV:curProjFV, rate:strat.rate}};
+    // III. pilier zakladaný v rámci plánu je nová platba — musí byť v rozpočte aj v prehľade programov
+    const _ddsNovy = !!((document.getElementById('doch_dds_novy')||{}).checked) && _ddsMon > 0;
+    if(_ddsNovy){
+      fpState['dds'] = {type:'invest', label:'III. pilier — '+((document.getElementById('doch_dds_spolocnost')||{}).value || 'DDS'),
+        fixedMonthly:_ddsMon, fixedFV:_ddsFV, fixedRate:_ddsRate, roky:roky, noFee:true,
+        currentStrategy: _ddsRate>=0.065 ? 'dynamicka' : (_ddsRate>=0.035 ? 'vyvazena' : 'konzervativna'),
+        poskytovatel: (document.getElementById('doch_dds_spolocnost')||{}).value || 'DDS'};
+    } else { delete fpState['dds']; }
+    const _produkt = (document.getElementById('doch_produkt')||{}).value || 'dis';
+    fpState['dochodok'] = {type:'invest', label:'Dôchodok' + (_produkt==='dis' ? ' — DIS' : ''), cielSuma, roky, origStrategy:strat.key, currentStrategy:strat.key, origPmt:dochPmt, produkt:_produkt, ddsNovyMonthly:(_ddsNovy?_ddsMon:0), gap:{ciel:cielSuma, saved:curSaved, monthly:curMonthly, projFV:curProjFV, rate:strat.rate}};
 
     html += `<div id="fpDetail_dochodok">`;
     html += buildProgramDetail('dochodok', fpState['dochodok'], strat, dochPmt, dochFV);
@@ -3484,8 +3893,9 @@ function buildFinancialPlan(){
       const pnDoch = planNumbers(fpState['dochodok']);
       const dochTotalFV = pnDoch.totalFV;
       const realDochFV = calcRealValue(dochTotalFV, roky);
-      const nomMes = Math.round(dochTotalFV / (20 * 12));
-      const realMes = Math.round(realDochFV / (20 * 12));
+      const nomMes = kapitalNaMesiac(dochTotalFV);
+      const realMes = kapitalNaMesiac(realDochFV);
+      const _vyplLabel = _divMode ? ('/mes dividenda ('+(_divRate*100).toFixed(1).replace('.0','')+' % p.a.)') : '/mes na 20 rokov';
       const pctReal = realCielSuma > 0 ? Math.round((realDochFV / realCielSuma) * 100) : 0;
       const pctColor = pctReal >= 95 ? 'var(--green)' : (pctReal >= 70 ? '#e65100' : 'var(--red)');
       html += '<div style="margin-top:20px;padding:16px;background:linear-gradient(135deg,rgba(0,48,73,0.03),rgba(171,5,52,0.03));border-radius:12px;border:1px solid var(--border);">';
@@ -3494,17 +3904,72 @@ function buildFinancialPlan(){
       html += '<div style="text-align:center;padding:12px;background:#fff;border-radius:10px;border:1px solid var(--border);">';
       html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Nominálna hodnota</div>';
       html += `<div style="font-size:22px;font-weight:700;color:var(--navy);margin:6px 0;">${formatEUR(dochTotalFV)}</div>`;
-      html += `<div style="font-size:12px;color:var(--muted);">= ${formatEUR(nomMes)}/mes na 20 rokov</div>`;
+      html += `<div style="font-size:12px;color:var(--muted);">= ${formatEUR(nomMes)}${_vyplLabel}</div>`;
       html += `<div style="font-size:10px;color:var(--muted);margin-top:4px;">cieľ: ${formatEUR(cielSuma)}</div>`;
       html += '</div>';
       html += '<div style="text-align:center;padding:12px;background:#fff;border-radius:10px;border:1px solid var(--border);">';
       html += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Reálna hodnota (dnešné €)</div>';
       html += `<div style="font-size:22px;font-weight:700;color:var(--red);margin:6px 0;">${formatEUR(realDochFV)}</div>`;
-      html += `<div style="font-size:12px;color:var(--muted);">= ${formatEUR(realMes)}/mes na 20 rokov</div>`;
+      html += `<div style="font-size:12px;color:var(--muted);">= ${formatEUR(realMes)}${_vyplLabel}</div>`;
       html += `<div style="font-size:10px;color:var(--muted);margin-top:4px;">cieľ: ${formatEUR(realCielSuma)} · <strong style="color:${pctColor};">${pctReal}%</strong></div>`;
       html += '</div></div>';
-      html += '<div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;"><strong>Vysvetlenie:</strong> Nominálna hodnota je suma, ktorú reálne uvidíte na účte. Reálna hodnota ukazuje kúpnu silu v dnešných cenách — koľko si za tieto peniaze budete vedieť dovoliť. Cieľ je nastavený tak, aby vám reálny mesačný príjem navyše pokryl dôchodkovú medzeru aj po inflácii 2,5 % p.a.</div>';
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5;"><strong>Vysvetlenie:</strong> Nominálna hodnota je suma, ktorú reálne uvidíte na účte. Reálna hodnota ukazuje kúpnu silu v dnešných cenách — koľko si za tieto peniaze budete vedieť dovoliť. Cieľ je nastavený tak, aby vám reálny mesačný príjem navyše pokryl dôchodkovú medzeru aj po inflácii 2,5 % p.a.'
+        + (_divMode ? ' Pri dividendovom modeli sa vypláca podiel z kapitálu — ak by ste chceli, aby renta rástla s infláciou, časť dividendy je potrebné ďalej reinvestovať.' : '') + '</div>';
       html += '</div>';
+    }
+
+    // ── Z čoho sa poskladá dôchodok — podiel jednotlivých zdrojov ──
+    if(cielSuma > 0){
+      const _pnD = planNumbers(fpState['dochodok']);
+      const _infl = Math.pow(1 + INFLATION_RATE, roky);
+      const _dnes = function(nomKapital){ return Math.round(kapitalNaMesiac(nomKapital) / _infl); }; // €/mes v dnešných cenách
+      const _statny = parseFloat(document.getElementById('doch_statny').value)||0;
+      const _ineExist = Math.max(0, curProjFV - _ddsFV);
+      const zdroje = [];
+      if(_statny > 0) zdroje.push({n:'I. pilier — štátny dôchodok', d:'zo Sociálnej poisťovne', mes:_statny, kap:null});
+      if(_ddsFV > 0){
+        const _sp = (document.getElementById('doch_dds_spolocnost').value||'III. pilier');
+        zdroje.push({n:'III. pilier (DDS) — '+_sp, d:formatEUR(_ddsMon)+'/mes · '+(_ddsRate*100).toFixed(1).replace('.0','')+' % p.a.', mes:_dnes(_ddsFV), kap:_ddsFV});
+      }
+      if(_ineExist > 0) zdroje.push({n:'Existujúce investície', d:'podľa Kroku 4', mes:_dnes(_ineExist), kap:_ineExist});
+      if(_pnD.newFV > 0){
+        const _pn2 = (_produkt==='dis') ? 'DIS — dlhodobé investičné sporenie (OCP)' : 'ETF / cenné papiere (OCP)';
+        zdroje.push({n:'Nová investícia — '+_pn2, d:formatEUR(_pnD.pmt)+'/mes · '+Math.round(STRATEGIES[fpState['dochodok'].currentStrategy].rate*100)+' % p.a.', mes:_dnes(_pnD.newFV), kap:_pnD.newFV, nova:true});
+      }
+      const _spolu = zdroje.reduce(function(a,z){ return a + z.mes; }, 0);
+      if(_spolu > 0 && zdroje.length > 1){
+        html += '<div style="margin-top:20px;">';
+        html += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">Z čoho sa poskladá váš dôchodok</div>';
+        html += '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Všetko v dnešných cenách — aby sa dalo porovnať s dnešnou mzdou.</div>';
+        html += '<table class="dyn-table" style="font-size:12px;"><thead><tr><th>Zdroj</th><th style="text-align:right;">Mesačne (dnešné €)</th><th style="text-align:right;">Podiel</th></tr></thead><tbody>';
+        zdroje.forEach(function(z){
+          const pct = Math.round(z.mes/_spolu*100);
+          html += '<tr'+(z.nova?' style="background:rgba(46,125,50,0.05);"':'')+'>'+
+                  '<td><strong>'+z.n+'</strong><div class="zab-sub">'+z.d+(z.kap?(' · kapitál '+formatEUR(z.kap)):'')+'</div></td>'+
+                  '<td style="text-align:right;font-weight:700;'+(z.nova?'color:var(--green);':'')+'">'+formatEUR(z.mes)+'</td>'+
+                  '<td style="text-align:right;">'+pct+' %</td></tr>';
+        });
+        html += '</tbody><tfoot><tr><td><strong>Spolu</strong></td><td style="text-align:right;" class="fp-rec-highlight">'+formatEUR(_spolu)+'</td><td style="text-align:right;">100 %</td></tr></tfoot></table>';
+        const _hruby = parseFloat(document.getElementById('k_hruby').value)||0;
+        if(_hruby > 0){
+          const _mieraSpolu = Math.round(_spolu/_hruby*100);
+          const _mieraStat = Math.round(_statny/_hruby*100);
+          html += '<div class="info-box success" style="margin-top:10px;">Zo samotného štátu by ste mali <strong>'+_mieraStat+' %</strong> dnešnej hrubej mzdy. S týmto plánom sa dostanete na <strong>'+_mieraSpolu+' %</strong> — teda '+formatEUR(_spolu)+'/mes v dnešných cenách namiesto '+formatEUR(_statny)+'.</div>';
+        }
+        // Daňová výhoda novej investície vyčíslená v eurách
+        const _vynos = Math.max(0, _pnD.newFV - _pnD.vklady);
+        const _dan = Math.round(_vynos * FUND_TAX);
+        if(_dan > 0){
+          html += '<div class="fp-rec" style="margin-top:10px;"><div class="fp-rec-title">Daňová výhoda '+(_produkt==='dis'?'DIS':'ETF')+'</div>';
+          html += '<div class="fp-rec-row"><span>Vaše vklady spolu</span><span>'+formatEUR(_pnD.vklady)+'</span></div>';
+          html += '<div class="fp-rec-row"><span>Z toho zhodnotenie (výnos)</span><span style="color:var(--green);font-weight:600;">+'+formatEUR(_vynos)+'</span></div>';
+          html += '<div class="fp-rec-row"><span>Daň 19 % v klasickom podielovom fonde</span><span style="color:var(--red);">'+formatEUR(_dan)+'</span></div>';
+          html += '<div class="fp-rec-row"><span><strong>'+(_produkt==='dis'?'V DIS neplatíte nič — ušetríte':'V ETF neplatíte nič — ušetríte')+'</strong></span><span style="color:var(--green);font-weight:700;font-size:15px;">'+formatEUR(_dan)+'</span></div>';
+          html += '</div>';
+          if(_produkt==='dis') html += '<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;">Podmienkou oslobodenia je držba minimálne 15 rokov a ročný vklad do 3 000 €. Váš horizont je '+roky+' rokov a vklad '+formatEUR((_pnD.pmt||0)*12)+'/rok — podmienky sú splnené.</div>';
+        }
+        html += '</div>';
+      }
     }
 
     document.getElementById('fpDochodok').innerHTML = html;
@@ -3662,7 +4127,10 @@ function buildFinancialPlan(){
     document.getElementById('fpByvanie').innerHTML = html;
   } else { fpSec4.style.display = 'none'; }
 
-  // ── 5. INÉ CIELE ── (interaktívna zmena stratégie)
+  // ── 5. ÚVERY A CESTA Z DLHOV ──
+  buildUveryPlan();
+
+  // ── 6. INÉ CIELE ── (interaktívna zmena stratégie)
   const fpSec5 = document.getElementById('fpSecCiele');
   if(document.getElementById('fp_ciele').checked){
     let cieleHtml = '';
@@ -3895,11 +4363,32 @@ function buildFinancialPlan(){
           ponechat: 'Súčasnú zmluvu <strong>ponechávame bez zmeny</strong>.',
           nahradit: 'Súčasnú zmluvu odporúčame <strong>nahradiť novou</strong> — súčasné poistné v rozpočte ďalej nerátame.'
         }[_rozhV];
-        zabHtml += `<div class="fp-rec" style="margin-top:10px;"><div class="fp-rec-title">Ďalší postup so zmluvou</div><div style="font-size:13px;">${_rozhTxt}</div><div class="fp-rec-row" style="margin-top:6px;"><span>Poistné v rozpočte plánu</span><span class="fp-rec-highlight">${formatEUR(calcPoistne())}/mes</span></div></div>`;
-        const chyba = riadky.some(function(r){ return r[2]-r[1] > 0; });
-        zabHtml += chyba
-          ? '<div class="info-box warning" style="margin-top:10px;">Časť rizík nie je krytá v plnej výške — pri riziku označenom „chýba" odporúčame doplniť poistnú sumu.</div>'
-          : '<div class="info-box success" style="margin-top:10px;">Všetky kľúčové riziká máte kryté v odporúčanej výške — netreba nič dopoisťovať.</div>';
+        zabHtml += `<div class="fp-rec" style="margin-top:10px;"><div class="fp-rec-title">Ďalší postup so zmluvou</div><div style="font-size:13px;">${_rozhTxt}</div><div class="fp-rec-row" style="margin-top:6px;"><span>Poistné v rozpočte plánu</span><span class="fp-rec-highlight">${formatEUR2(calcPoistne())}/mes</span></div></div>`;
+        // Konkrétny zoznam, čo dopoistiť — nech klient aj poradca vedia, čo presne sa mení
+        const chybaRiadky = riadky.filter(function(r){ return r[2]-r[1] > 0; });
+        if(chybaRiadky.length){
+          if(_rozhV === 'nahradit'){
+            zabHtml += '<div class="fp-rec" style="margin-top:10px;border-left:3px solid var(--orange);"><div class="fp-rec-title">Nová zmluva má pokryť</div>';
+            riadky.filter(function(r){ return r[2] > 0; }).forEach(function(r){
+              const jeDen = r[3]==='€/deň';
+              zabHtml += '<div class="fp-rec-row"><span>'+r[0]+'</span><span class="fp-rec-highlight">'+(jeDen ? (Math.round(r[2])+' €/deň') : formatEUR(r[2]))+'</span></div>';
+            });
+            zabHtml += '</div>';
+          } else {
+            zabHtml += '<div class="fp-rec" style="margin-top:10px;border-left:3px solid var(--orange);"><div class="fp-rec-title">Čo konkrétne dopoistiť'+(_ex.poistovna?' do zmluvy '+_ex.poistovna:'')+'</div>';
+            chybaRiadky.forEach(function(r){
+              const jeDen = r[3]==='€/deň';
+              const rozdiel = r[2]-r[1];
+              const akcia = r[1] > 0 ? 'navýšiť o' : 'doplniť';
+              const suma = jeDen ? (Math.round(rozdiel)+' €/deň') : formatEUR(rozdiel);
+              const nova = jeDen ? (Math.round(r[2])+' €/deň') : formatEUR(r[2]);
+              zabHtml += '<div class="fp-rec-row"><span>'+r[0]+' — '+akcia+' <strong>'+suma+'</strong></span><span class="fp-rec-highlight">nová poistná suma '+nova+'</span></div>';
+            });
+            zabHtml += '</div>';
+          }
+        } else {
+          zabHtml += '<div class="info-box success" style="margin-top:10px;">Všetky kľúčové riziká máte kryté v odporúčanej výške — netreba nič dopoisťovať.</div>';
+        }
       }
     }
 
@@ -3910,7 +4399,7 @@ function buildFinancialPlan(){
     const cistyP = clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0;
     const prijemSum = cistyK + cistyP;
     if(prijemSum>0){
-      zabHtml += `<div class="fp-rec" style="margin-top:14px;"><div class="fp-rec-title">Orientačná cieľová zóna mesačného poistného</div><div class="fp-rec-row"><span>5–10 % čistého príjmu (${formatEUR(prijemSum)})</span><span class="fp-rec-highlight">${formatEUR(Math.round(prijemSum*0.05))} – ${formatEUR(Math.round(prijemSum*0.10))}/mes</span></div><div class="fp-rec-row"><span>V rozpočte tohto plánu počítame</span><span>${formatEUR(calcPoistne())}/mes</span></div><div style="font-size:11px;color:var(--muted);margin-top:6px;">* Orientačné. Presné poistné závisí od veku, zdravotného stavu a konkrétnej poisťovne — upresní sa v individuálnej ponuke.</div></div>`;
+      zabHtml += `<div class="fp-rec" style="margin-top:14px;"><div class="fp-rec-title">Orientačná cieľová zóna mesačného poistného</div><div class="fp-rec-row"><span>5–10 % čistého príjmu (${formatEUR(prijemSum)})</span><span class="fp-rec-highlight">${formatEUR(Math.round(prijemSum*0.05))} – ${formatEUR(Math.round(prijemSum*0.10))}/mes</span></div><div class="fp-rec-row"><span>V rozpočte tohto plánu počítame</span><span>${formatEUR2(calcPoistne())}/mes</span></div><div style="font-size:11px;color:var(--muted);margin-top:6px;">* Orientačné. Presné poistné závisí od veku, zdravotného stavu a konkrétnej poisťovne — upresní sa v individuálnej ponuke.</div></div>`;
     }
     zabHtml += '<div class="info-box success" style="margin-top:12px;"><strong>Poistenie riešime cez:</strong> Partners Poisťovňa, NN, Allianz, MetLife, Generali</div>';
     document.getElementById('fpZabezpecenie').innerHTML = zabHtml;
@@ -4193,6 +4682,584 @@ function closePresentation(){
   document.body.classList.remove('presentation-mode');
   window.scrollTo(0,0);
 }
+// ============================================================
+// PDF pre klienta — krátka verzia v brande Partners
+// Farebnosť: Partners červená #AB0534, sivá #4D4D4D, strieborná #989FA7,
+// svetlo sivá #ECEDED. Doplnkové farby len ako nálepky/zvýraznenie.
+// Rám (hlavný grafický element) je na titulnom bloku prvej strany.
+// Font: DM Sans — Graphik nie je k dispozícii a jsPDF potrebuje vložený TTF
+// so slovenskou diakritikou (Arial ju v PDF nezobrazí správne).
+// ============================================================
+async function generatePDFKratky(){
+  buildFinancialPlan();
+
+  let fontLoaded = false;
+  try {
+    const [regResp, boldResp] = await Promise.all([
+      fetch('fonts/dm-sans-regular.ttf'),
+      fetch('fonts/dm-sans-bold.ttf')
+    ]);
+    if(regResp.ok && boldResp.ok){
+      window._fontRegB64 = arrayBufferToBase64(await regResp.arrayBuffer());
+      window._fontBoldB64 = arrayBufferToBase64(await boldResp.arrayBuffer());
+      fontLoaded = true;
+    }
+  } catch(e){ console.warn('Font loading failed, using fallback', e); }
+
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF('p','mm','a4');
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 15;
+  const contentW = pageW - 2*margin;
+  let y = 15;
+  const fontName = fontLoaded ? 'DMSans' : undefined;
+  if(fontLoaded){
+    doc.addFileToVFS('DMSans-Regular.ttf', window._fontRegB64);
+    doc.addFileToVFS('DMSans-Bold.ttf', window._fontBoldB64);
+    doc.addFont('DMSans-Regular.ttf', 'DMSans', 'normal');
+    doc.addFont('DMSans-Bold.ttf', 'DMSans', 'bold');
+    doc.setFont('DMSans');
+  }
+
+  // ── Brand Partners ──
+  const RED=[171,5,52], REDL=[205,109,128], SILVER=[152,159,167], GREY=[77,77,77],
+        LGREY=[236,237,237], WHITE=[255,255,255],
+        LGREEN=[203,217,196], YELLOW=[255,243,176];
+  const R = 2.6; // rádius zaoblenia (20 px)
+  const setN=()=>doc.setFont(fontName,'normal');
+  const setB=()=>doc.setFont(fontName,'bold');
+  const col=(c)=>doc.setTextColor(c[0],c[1],c[2]);
+  const fill=(c)=>doc.setFillColor(c[0],c[1],c[2]);
+  const stroke=(c)=>doc.setDrawColor(c[0],c[1],c[2]);
+
+  const meno = (document.getElementById('k_meno').value+' '+document.getElementById('k_priezvisko').value).trim()||'Klient';
+  const age = parseInt(document.getElementById('k_vek').value)||30;
+  const todayStr = new Date().toLocaleDateString('sk-SK');
+  const adv = getAdvisor();
+  const cisty = (parseFloat(document.getElementById('k_cisty').value)||0)
+              + (clientType==='pair'?(parseFloat(document.getElementById('p_cisty').value)||0):0);
+
+  function newPage(){ doc.addPage(); y = 26; pageChrome(); }
+  function need(h){ if(y+h > pageH-18){ newPage(); return true; } return false; }
+
+  // Logo — textová značka (súbor loga nie je v projekte)
+  function logoMark(x, yy, size, color){
+    doc.setFontSize(size); setB(); col(color);
+    doc.text('PARTNERS', x, yy);
+    const w = doc.getTextWidth('PARTNERS');
+    fill(color); doc.circle(x + w + size*0.16, yy - size*0.06, size*0.09, 'F');
+    return w + size*0.3;
+  }
+
+  // Kolontitul + číslo strany (strany 2+)
+  function pageChrome(){
+    doc.setFontSize(7.5); setN(); col(SILVER);
+    doc.text('Finančný plán  ·  '+meno, margin, 13);
+    doc.text(todayStr, pageW-margin, 13, {align:'right'});
+    stroke(LGREY); doc.setLineWidth(0.3);
+    doc.line(margin, 16, pageW-margin, 16);
+  }
+
+  // Titulný blok s rámom (hlavný grafický element značky)
+  function coverBlock(){
+    const bandH = 62;
+    fill(RED); doc.rect(0, 0, pageW, bandH, 'F');
+    // Rám: zaoblený obdĺžnik s prerušením v strede pravého dolného rohu
+    const X = 4.2;                 // hrúbka ramena rámu (prispôsobená výške bloku)
+    const inset = 1.5*X;
+    const fx = inset, fy = inset, fw = pageW - 2*inset, fh = bandH - 2*inset;
+    stroke(WHITE); doc.setLineWidth(X); doc.setLineCap('round');
+    const brk = 3*X;               // dĺžka prerušenia
+    const rr = 6;
+    // horná hrana
+    doc.line(fx+rr, fy, fx+fw-rr, fy);
+    // ľavá hrana
+    doc.line(fx, fy+rr, fx, fy+fh-rr);
+    // spodná hrana (prerušená pri pravom dolnom rohu)
+    doc.line(fx+rr, fy+fh, fx+fw-rr-brk, fy+fh);
+    // pravá hrana (prerušená pri pravom dolnom rohu)
+    doc.line(fx+fw, fy+rr, fx+fw, fy+fh-rr-brk*0.45);
+    // rohy
+    doc.setLineWidth(X);
+    const arc = function(cx, cy, r, a0, a1){
+      const steps = 10; let px=null;
+      for(let i=0;i<=steps;i++){
+        const a = a0 + (a1-a0)*i/steps;
+        const nx = cx + r*Math.cos(a), ny = cy + r*Math.sin(a);
+        if(px) doc.line(px[0], px[1], nx, ny);
+        px = [nx, ny];
+      }
+    };
+    arc(fx+rr, fy+rr, rr, Math.PI, 1.5*Math.PI);          // ľavý horný
+    arc(fx+fw-rr, fy+rr, rr, 1.5*Math.PI, 2*Math.PI);      // pravý horný
+    arc(fx+rr, fy+fh-rr, rr, 0.5*Math.PI, Math.PI);        // ľavý dolný
+    doc.setLineCap('butt'); doc.setLineWidth(0.2);
+
+    // Obsah titulného bloku
+    col(WHITE);
+    doc.setFontSize(24); setB();
+    doc.text('Finančný plán', margin+11, 29);
+    doc.setFontSize(10.5); setN();
+    doc.text(meno + '   ·   ' + age + ' rokov   ·   ' + todayStr, margin+11, 38);
+    doc.setFontSize(8.5);
+    doc.text(adv.name + '  ·  ' + adv.title, margin+11, 47);
+    doc.text(adv.company + (adv.web ? ('  ·  '+adv.web) : ''), margin+11, 52.5);
+    logoMark(pageW - margin - 40, 52, 12.5, WHITE);
+    y = bandH + 11;
+    col(GREY);
+  }
+
+  function bar(title){
+    need(15);
+    fill(RED); doc.roundedRect(margin, y-5, contentW, 8.6, R, R, 'F');
+    col(WHITE); doc.setFontSize(9.6); setB();
+    doc.text(title, margin+4.5, y+0.8);
+    col(GREY); y += 11; doc.setFontSize(9); setN();
+  }
+
+  function kv(label, value, opt){
+    opt = opt||{};
+    need(6.5);
+    if(opt.alt){ fill(LGREY); doc.rect(margin, y-3.6, contentW, 6, 'F'); }
+    doc.setFontSize(opt.small?8:9); setN(); col(opt.mutedLabel?SILVER:GREY);
+    doc.text(label, margin+3, y);
+    if(opt.strong){ setB(); col(opt.color||RED); doc.setFontSize(opt.small?8.5:10); }
+    else if(opt.color){ col(opt.color); }
+    doc.text(String(value), pageW-margin-3, y, {align:'right'});
+    col(GREY); setN(); doc.setFontSize(9);
+    y += opt.small?5.2:6;
+  }
+
+  function sub(text){
+    need(9); y += 1.5;
+    doc.setFontSize(9.5); setB(); col(RED);
+    doc.text(text, margin+3, y);
+    col(GREY); setN(); doc.setFontSize(9); y += 5.5;
+  }
+
+  function note(text){
+    doc.setFontSize(7.5); col(SILVER); setN();
+    const lines = doc.splitTextToSize(text, contentW-6);
+    need(lines.length*3.4+3);
+    doc.text(lines, margin+3, y);
+    y += lines.length*3.4 + 2.5;
+    col(GREY); doc.setFontSize(9);
+  }
+
+  // Karta so zvýraznením — svetlo sivé pozadie, červené rameno vľavo
+  function box(title, lines, accent){
+    accent = accent||RED;
+    const h = 9 + lines.length*5.4 + 3;
+    need(h+4);
+    fill(LGREY); doc.roundedRect(margin, y-4, contentW, h, R, R, 'F');
+    fill(accent); doc.rect(margin, y-4+R, 1.6, h-2*R, 'F');
+    doc.setFontSize(9.5); setB(); col(accent); doc.text(title, margin+6, y+1.5);
+    col(GREY); setN(); doc.setFontSize(9);
+    let yy = y + 8;
+    lines.forEach(function(l){
+      setN(); doc.setFontSize(8.7); col(GREY);
+      doc.text(l[0], margin+6, yy);
+      setB(); col(l[2]||GREY);
+      doc.text(String(l[1]), pageW-margin-5, yy, {align:'right'});
+      col(GREY); setN();
+      yy += 5.4;
+    });
+    y += h + 3;
+    doc.setFontSize(9);
+  }
+
+  // Nálepka — doplnková farba, zaoblený tvar
+  function sticker(text, x, yy, bg){
+    doc.setFontSize(7.6); setB();
+    const w = doc.getTextWidth(text) + 5;
+    fill(bg); doc.roundedRect(x-w, yy-3.5, w, 5, 1.8, 1.8, 'F');
+    col(GREY); doc.text(text, x-w/2, yy, {align:'center'});
+    setN(); doc.setFontSize(8.3);
+  }
+
+  function tableHead(cols, widths){
+    need(9);
+    fill(LGREY); doc.rect(margin, y-4, contentW, 6.5, 'F');
+    doc.setFontSize(7.6); setB(); col(GREY);
+    let x = margin+3;
+    cols.forEach(function(c,i){
+      doc.text(c, i===0 ? x : x+widths[i]-3, y, i===0?undefined:{align:'right'});
+      x += widths[i];
+    });
+    y += 7; setN(); doc.setFontSize(8.3);
+  }
+  function tableRow(cells, widths, opt){
+    opt = opt||{};
+    need(6);
+    if(opt.alt){ doc.setFillColor(248,248,248); doc.rect(margin, y-3.6, contentW, 5.6, 'F'); }
+    let x = margin+3;
+    cells.forEach(function(c,i){
+      if(i===0){ setB(); col(GREY); } else { setN(); col(opt.colors&&opt.colors[i]?opt.colors[i]:GREY); }
+      doc.text(String(c), i===0 ? x : x+widths[i]-3, y, i===0?undefined:{align:'right'});
+      x += widths[i];
+    });
+    setN(); col(GREY);
+    y += 5.6;
+  }
+  function tableTotal(cells, widths){
+    need(7);
+    fill(RED); doc.rect(margin, y-3.8, contentW, 6.2, 'F');
+    col(WHITE); setB(); doc.setFontSize(8.4);
+    let x = margin+3;
+    cells.forEach(function(c,i){
+      if(c==='') { x += widths[i]; return; }
+      doc.text(String(c), i===0 ? x : x+widths[i]-3, y, i===0?undefined:{align:'right'});
+      x += widths[i];
+    });
+    col(GREY); setN(); doc.setFontSize(9); y += 8;
+  }
+
+  // ══════════════ STRANA 1 ══════════════
+  coverBlock();
+
+  const uv = sumUvery();
+  const living = fpLivingCosts();
+  const poistne = calcPoistne();
+  const rezC = rezervaCiel();
+  const rezMa = sumLiquidReserves();
+  const exP = (typeof exPoistenie==='function') ? exPoistenie() : {ma:false};
+
+  bar('Kde ste dnes');
+  kv('Čistý mesačný príjem', formatEUR(cisty), {alt:true});
+  kv('Bežné životné náklady'+(living.estimated?' (odhad)':''), formatEUR(living.val));
+  if(uv.dlh>0){
+    kv('Úvery — zostatok', formatEUR(uv.dlh), {alt:true});
+    kv('Úvery — mesačná splátka', formatEUR(uv.splatka));
+  }
+  kv('Finančná rezerva', formatEUR(rezMa)+' z odporúčaných '+formatEUR(rezC.ciel), {alt:true, color: rezMa>=rezC.ciel?GREY:RED});
+  if(exP.ma) kv('Životné poistenie', (exP.poistovna||'—')+'  ·  '+formatEUR2(exP.poistne)+'/mes');
+
+  let totalInvest = 0;
+  Object.entries(fpState).forEach(function(e){
+    const st = e[1]; if(!st || st.type!=='invest') return;
+    if(st.fixedMonthly != null) totalInvest += st.fixedMonthly;
+    else if(st.isHypo) totalInvest += parseFloat(st.selectedInvest)||0;
+    else { try{ totalInvest += planNumbers(st).pmt||0; }catch(err){} }
+  });
+  const volne = cisty - living.val - uv.splatka - totalInvest - poistne;
+
+  bar('Mesačný rozpočet plánu');
+  kv('Čistý príjem', formatEUR(cisty), {alt:true});
+  kv('Životné náklady', '− '+formatEUR(living.val));
+  if(uv.splatka>0) kv('Splátky úverov', '− '+formatEUR(uv.splatka), {alt:true});
+  kv('Programy podľa plánu', '− '+formatEUR(totalInvest), {color:RED});
+  if(poistne>0) kv('Poistné', '− '+formatEUR2(poistne), {alt:true});
+  kv('Zostáva voľných', formatEUR2(volne), {strong:true, color: volne>=0?RED:RED});
+
+  bar('Čo navrhujeme');
+  const W = [72, 26, 26, 30, 26];
+  tableHead(['Program','Mesačne','Horizont','Cieľ','Vst. popl.'], W);
+  let alt = false;
+  Object.entries(fpState).forEach(function(e){
+    const id = e[0], st = e[1];
+    if(!st || st.type!=='invest') return;
+    const strat = STRATEGIES[st.currentStrategy] || STRATEGIES.vyvazena;
+    let mes, hor, ciel, fee;
+    if(st.fixedMonthly != null){
+      mes = st.fixedMonthly; hor = (st.roky||1)+' r.';
+      ciel = formatEUR(st.fixedFV||0); fee = st.noFee ? {pct:0, suma:0} : null;
+    } else if(st.isHypo){
+      const amt = parseFloat(st.selectedInvest)||0;
+      const c = amt>0 ? hypoCross(st, strat.rate, amt) : null;
+      mes = amt; hor = (c&&c.found)? (c.rokov+' r.') : '—';
+      ciel = formatEUR(st.zostatok);
+      fee = (c&&c.found) ? entryFeeFor(amt, c.mesiacov, st.currentStrategy) : null;
+    } else {
+      const pn = planNumbers(st);
+      mes = pn.pmt; hor = pn.roky+' r.'; ciel = formatEUR(pn.ciel);
+      fee = (id==='rezervy') ? {pct:0, suma:0} : entryFeeFor(pn.pmt, pn.roky*12, st.currentStrategy);
+    }
+    tableRow([st.label, formatEUR(mes), hor, ciel, fee? formatEUR(fee.suma) : '—'], W, {alt:alt});
+    alt = !alt;
+  });
+  tableTotal(['Spolu mesačne', formatEUR(totalInvest), '', '', ''], W);
+  note('Vstupný poplatok je jednorazová úhrada podľa cenníka Partners Investments (B1) z cieľovej sumy programu. Fond krátkodobých rezerv je bez vstupného poplatku.');
+
+  const goals = collectGoals().filter(function(g){ return g.category!=='zabezpecenie' && g.date && g.date!=='—'; })
+                              .sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
+  if(goals.length){
+    bar('Vaše míľniky');
+    const WM = [26, 108, 46];
+    tableHead(['Rok','Míľnik','Cieľová suma'], WM);
+    let a6=false;
+    goals.forEach(function(g){
+      const d = new Date(g.date);
+      const rok = isNaN(d) ? '—' : d.getFullYear();
+      const vek = isNaN(d) ? '' : (age + (d.getFullYear() - new Date().getFullYear()));
+      tableRow([String(rok), g.name + (vek?('   (vek '+vek+')'):''), formatEUR(g.suma)], WM, {alt:a6});
+      a6=!a6;
+    });
+    y += 4;
+  }
+
+  // ══════════════ STRANA 2 — REZERVA + DÔCHODOK ══════════════
+  newPage();
+
+  const rez = fpState['rezervy'];
+  if(rez){
+    const pn = planNumbers(rez);
+    bar('1. Finančná rezerva');
+    box('Cieľ: '+formatEUR(pn.ciel)+' do '+ (new Date().getFullYear()+pn.roky), [
+      ['Máte dnes', formatEUR(rezMa)],
+      ['Odkladať mesačne spolu', formatEUR(pn.pmt + ((rez.gap&&rez.gap.monthly)||0)), RED],
+      ['Z toho nový program', formatEUR(pn.pmt)],
+      ['Stratégia', (STRATEGIES[rez.currentStrategy]||{}).name+'  ·  '+Math.round((STRATEGIES[rez.currentStrategy]||{}).rate*100)+' % p.a.'],
+      ['Hodnota o '+pn.roky+' rokov', formatEUR(pn.totalFV), RED]
+    ]);
+    note('Rezerva ostáva kedykoľvek dostupná — kryje neplánované výdavky (oprava auta, zdravotné výdavky, výpadok príjmu) bez toho, aby ste museli siahnuť na dlhodobé programy.');
+  }
+
+  const doch = fpState['dochodok'];
+  if(doch){
+    const pn = planNumbers(doch);
+    const medzera = parseFloat((document.getElementById('doch_medzera')||{}).value)||0;
+    const statny = parseFloat((document.getElementById('doch_statny')||{}).value)||0;
+    const miera = parseFloat((document.getElementById('doch_miera')||{}).value)||0;
+    const dochVek = parseInt((document.getElementById('doch_vek')||{}).value)||65;
+    const divM = isDividendMode(), divR = dividendRate();
+    const inflF = Math.pow(1+INFLATION_RATE, pn.roky);
+    const naMes = function(kap){ return Math.round((divM ? (kap*divR/12) : (kap/240)) / inflF); };
+    const dds = fpState['dds'];
+    bar('2. Dôchodok');
+    kv('Štátny dôchodok podľa prognózy Sociálnej poisťovne', formatEUR(statny)+'/mes', {alt:true});
+    if(miera>0) kv('Miera náhrady (I. pilier z dnešnej hrubej mzdy)', miera+' %');
+    kv('Chýba na želanú úroveň', formatEUR(medzera)+'/mes', {alt:true, color:RED});
+    box('Cieľ: '+formatEUR(pn.ciel)+' vo veku '+dochVek, [
+      ['Investovať mesačne', formatEUR(pn.pmt), RED],
+      ['Stratégia', (STRATEGIES[doch.currentStrategy]||{}).name+'  ·  '+Math.round((STRATEGIES[doch.currentStrategy]||{}).rate*100)+' % p.a.'],
+      ['Vložíte spolu', formatEUR(pn.vklady)],
+      ['Hodnota o '+pn.roky+' rokov', formatEUR(pn.totalFV)+'   (dnešné € '+formatEUR(calcRealValue(pn.totalFV, pn.roky))+')', RED],
+      [divM ? ('= dividenda '+(divR*100).toFixed(1).replace('.0','')+' % p.a.') : '= mesačne navyše na 20 rokov',
+       formatEUR(naMes(pn.totalFV))+' (dnešné €)', RED]
+    ]);
+
+    const zdroje = [];
+    if(statny>0) zdroje.push(['I. pilier — štátny dôchodok', formatEUR(statny), statny]);
+    if(dds) zdroje.push(['III. pilier — '+(dds.poskytovatel||'DDS')+'  ('+formatEUR(dds.fixedMonthly)+'/mes)', formatEUR(naMes(dds.fixedFV||0)), naMes(dds.fixedFV||0)]);
+    if(pn.newFV>0) zdroje.push([((doch.produkt==='dis')?'DIS':'Investícia')+' cez OCP  ('+formatEUR(pn.pmt)+'/mes)', formatEUR(naMes(pn.newFV)), naMes(pn.newFV)]);
+    const spolu = zdroje.reduce(function(a,z){ return a+z[2]; }, 0);
+    if(zdroje.length>1 && spolu>0){
+      sub('Z čoho sa poskladá váš dôchodok (dnešné €)');
+      const WD = [96, 44, 40];
+      tableHead(['Zdroj','Mesačne','Podiel'], WD);
+      let ad=false;
+      zdroje.forEach(function(z){ tableRow([z[0], z[1], Math.round(z[2]/spolu*100)+' %'], WD, {alt:ad}); ad=!ad; });
+      tableTotal(['Spolu', formatEUR(spolu), '100 %'], WD);
+      const hrubyM = parseFloat((document.getElementById('k_hruby')||{}).value)||0;
+      if(hrubyM>0) kv('Miera náhrady s plánom (z dnešnej hrubej mzdy)', Math.round(spolu/hrubyM*100)+' %   (zo štátu '+Math.round(statny/hrubyM*100)+' %)', {strong:true});
+    }
+    const danVynos = Math.max(0, pn.newFV - pn.vklady);
+    const danSuma = Math.round(danVynos*FUND_TAX);
+    if(danSuma>0 && doch.produkt==='dis'){
+      box('Daňová výhoda DIS', [
+        ['Vaše vklady spolu', formatEUR(pn.vklady)],
+        ['Z toho zhodnotenie', '+'+formatEUR(danVynos)],
+        ['Daň 19 % v klasickom podielovom fonde', formatEUR(danSuma)],
+        ['V DIS neplatíte nič — ušetríte', formatEUR(danSuma), RED]
+      ]);
+    }
+    note('Počítame len s I. pilierom — II. pilier berieme ako prípadný bonus navyše.'
+      + (divM ? ' Pri dividendovom modeli sa kapitál nemíňa — vypláca sa z neho '+(divR*100).toFixed(1).replace('.0','')+' % ročne a zvyšok ostáva investovaný a dedí sa.' : '')
+      + ' Oslobodenie DIS od dane vyžaduje držbu aspoň 15 rokov a ročný vklad do 3 000 €.');
+  }
+
+  // ══════════════ STRANA 3 — DETI + ÚVERY + VSTUPNÉ POPLATKY ══════════════
+  newPage();
+
+  Object.entries(fpState).forEach(function(e){
+    const id = e[0], st = e[1];
+    if(!st || st.type!=='invest' || id.indexOf('child_')!==0) return;
+    if(st.fixedMonthly != null || st.isHypo) return;
+    const pn = planNumbers(st);
+    bar('3. '+st.label);
+    box('Cieľ: '+formatEUR(pn.ciel), [
+      ['Odkladať mesačne', formatEUR(pn.pmt), RED],
+      ['Horizont', pn.roky+' rokov'],
+      ['Stratégia', (STRATEGIES[st.currentStrategy]||{}).name+'  ·  '+Math.round((STRATEGIES[st.currentStrategy]||{}).rate*100)+' % p.a.'],
+      ['Vložíte spolu', formatEUR(pn.vklady)],
+      ['Hodnota na konci', formatEUR(pn.totalFV)+'   (dnešné € '+formatEUR(calcRealValue(pn.totalFV, pn.roky))+')', RED]
+    ]);
+  });
+
+  const up = fpState[UVER_PROG_ID];
+  if(up){
+    const strat = STRATEGIES[up.currentStrategy] || STRATEGIES.vyvazena;
+    const amt = parseFloat(up.selectedInvest)||0;
+    const bez = hypoCross(up, strat.rate, 0);
+    const sel = amt>0 ? hypoCross(up, strat.rate, amt) : null;
+    bar('4. Úvery a cesta z dlhov');
+    const WU = [58, 32, 32, 34, 24];
+    tableHead(['Úver','Zostatok','Sadzba','Splátka','Koniec'], WU);
+    let a2=false;
+    up.rows.forEach(function(r){
+      tableRow([r.nazov, formatEUR(r.dlh), ((r.urok||0)*100).toFixed(2)+' %', formatEUR(r.splatka), r.koniec||'—'], WU,
+               {alt:a2, colors:{2:(r.urok>=0.07?RED:GREY)}});
+      a2=!a2;
+    });
+    tableTotal(['Spolu', formatEUR(up.zostatok), (up.urok*100).toFixed(2)+' %', formatEUR(up.mesacnaSplatka), ''], WU);
+    kv('Ak nič nezmeníte — posledný úver splatený', (bez.rokKonca||'—'), {alt:true});
+    kv('Na úrokoch celkovo zaplatíte', formatEUR(bez.urokyDoKonca), {color:RED});
+    if(sel && sel.found){
+      const fee = entryFeeFor(amt, sel.mesiacov, up.currentStrategy);
+      box('S programom '+formatEUR(amt)+'/mes', [
+        ['Bez dlhov už v roku', sel.rokPretnutia, RED],
+        ['Skôr o', Math.max(0, Math.round((bez.mesiacovDoKonca-sel.mesiacov)/12*10)/10)+' rokov'],
+        ['Ušetríte na úrokoch', formatEUR(sel.uspora), RED],
+        ['Vložíte spolu (hodnota programu)', formatEUR(sel.vklady)+'   ('+formatEUR(sel.investiciaVtedy)+')'],
+        ['Vstupný poplatok', fee? (fee.pct+' % = '+formatEUR(fee.suma)) : '—'],
+        ['Uvoľnená splátka po splatení', formatEUR(up.mesacnaSplatka)+'/mes', RED]
+      ]);
+    }
+    note('Úvery ostávajú tak, ako sú — splácate ich ďalej. Program beží popri nich; keď jeho hodnota dosiahne zostatok dlhu, odpredáte ho a úvery jednorazovo doplatíte. Pri poklese trhu sa moment splatenia posunie.');
+  }
+
+  // Varianty cieľových súm — nižší vstupný poplatok na štarte
+  const varianty = (typeof programVarianty==='function') ? programVarianty() : [];
+  if(varianty.length){
+    const sumFee = function(k){ return varianty.reduce(function(a,x){ return a+x[k].fee.suma; },0); };
+    const sumMes = function(k){ return varianty.reduce(function(a,x){ return a+x[k].mes; },0); };
+    const startBaseP = parseFloat((document.getElementById('fp_start_suma')||{}).value) || START_MES_DEFAULT;
+    bar('Vstupné poplatky — plná verzia vs. štart '+formatEUR(startBaseP)+'/mes');
+    doc.setFontSize(8); col(SILVER); setN();
+    const introL = doc.splitTextToSize('Vstupný poplatok sa počíta z cieľovej sumy programu, teda z mesačnej sumy × počet mesiacov. Horizonty ostávajú rovnaké — na štarte znížime len mesačnú sumu v zmluve, a keď budete mať vytvorenú rezervu, cieľovú sumu navýšime na plnú.', contentW-6);
+    need(introL.length*3.6+4);
+    doc.text(introL, margin+3, y); y += introL.length*3.6 + 3; col(GREY);
+    const WV = [50, 30, 20, 26, 20, 34];
+    tableHead(['Program','Horizont','Plán €/m','Poplatok','Štart €/m','Poplatok'], WV);
+    let a3=false;
+    varianty.forEach(function(x){
+      const f=function(o){ return x.noFee ? '0 €' : (o.fee.pct+' % = '+formatEUR(o.fee.suma)); };
+      const horTxt = (x.mesiaceZ > x.mesiace)
+        ? ((Math.round(x.mesiace/12*10)/10)+' r. / zml. '+Math.round(x.mesiaceZ/12)+' r.')
+        : ((Math.round(x.mesiace/12*10)/10)+' r.');
+      tableRow([x.label, horTxt,
+                formatEUR(x.plan.mes), f(x.plan),
+                formatEUR(x.start.mes), f(x.start)], WV, {alt:a3});
+      a3=!a3;
+    });
+    tableTotal(['Spolu', '', formatEUR(sumMes('plan')), formatEUR(sumFee('plan')), formatEUR(sumMes('start')), formatEUR(sumFee('start'))], WV);
+    const uspPopl = sumFee('plan') - sumFee('start');
+    if(uspPopl>0) kv('Na vstupných poplatkoch na štarte zaplatíte menej o', formatEUR(uspPopl), {strong:true});
+    note('Mesačne môžete posielať aj plnú sumu — nižšia je len zmluvná cieľová suma, z ktorej sa počíta poplatok. Pri neskoršom navýšení sa doplatí poplatok z navýšenej časti, takže celkovo zaplatíte podobne; rozdiel je v tom, kedy to zaplatíte. Dynamickú stratégiu možno podpísať najskôr na 10 rokov — pri kratšom cieli sa preto cieľová suma počíta z 10-ročného horizontu.');
+  }
+
+  // ══════════════ STRANA 4 — ZABEZPEČENIE + MÍĽNIKY + KROKY ══════════════
+  newPage();
+  bar('5. Zabezpečenie príjmu a rodiny');
+  const WZ = [88, 46, 46];
+  tableHead(['Riziko','Poistná suma','Typ krytia'], WZ);
+  let a4=false;
+  document.querySelectorAll('.fp-zab-k:checked').forEach(function(cb){
+    const suma = parseFloat(cb.dataset.suma)||0;
+    if(suma<=0) return;
+    tableRow([cb.dataset.name, zabAmountLabel(suma, cb.dataset.unit||'jednorazovo'), zabPsTypeLabel(cb.dataset.unit, cb.dataset.typ)], WZ, {alt:a4});
+    a4=!a4;
+  });
+  y += 3;
+
+  let chybaZoznam = [];
+  if(exP.ma){
+    const need2 = {smrt:0, inval:0, kch:0, uraz:0, denna:0};
+    document.querySelectorAll('.fp-zab-k:checked').forEach(function(cb){
+      const s2 = parseFloat(cb.dataset.suma)||0, n = cb.dataset.name||'', t = cb.dataset.typ||'';
+      if(t==='klesajuca'||t==='fixna') need2.smrt += s2;
+      else if(t==='inval') need2.inval = Math.max(need2.inval, s2);
+      else if(n.indexOf('Kritické')>-1) need2.kch = s2;
+      else if(n.indexOf('Trvalé následky')>-1) need2.uraz = s2;
+      else if(cb.dataset.unit==='den') need2.denna = Math.max(need2.denna, s2);
+    });
+    const riadky = [
+      ['Úmrtie', exP.smrt, need2.smrt, false],
+      ['Invalidita', exP.inval, need2.inval, false],
+      ['Kritické choroby', exP.kch, need2.kch, false],
+      ['Trvalé následky úrazu', exP.uraz, need2.uraz, false],
+      ['Denné odškodné', exP.denna, need2.denna, true]
+    ].filter(function(r){ return r[1]>0 || r[2]>0; });
+    sub('Čo už máte vs. čo potrebujete' + (exP.poistovna?' — '+exP.poistovna:''));
+    const WP = [70, 36, 36, 38];
+    tableHead(['Riziko','Máte dnes','Potrebujete','Rozdiel'], WP);
+    let a5=false;
+    riadky.forEach(function(r){
+      const f = r[3] ? function(v){return Math.round(v)+' €/deň';} : formatEUR;
+      const d = r[2]-r[1];
+      if(d>0) chybaZoznam.push([r[0], r[1]>0?'navýšiť o '+f(d):'doplniť '+f(d), f(r[2])]);
+      need(6);
+      if(a5){ doc.setFillColor(248,248,248); doc.rect(margin, y-3.6, contentW, 5.6, 'F'); }
+      let x = margin+3;
+      setB(); col(GREY); doc.setFontSize(8.3); doc.text(r[0], x, y); x += WP[0];
+      setN(); doc.text(f(r[1]), x+WP[1]-3, y, {align:'right'}); x += WP[1];
+      doc.text(f(r[2]), x+WP[2]-3, y, {align:'right'}); x += WP[2];
+      sticker(d>0 ? ('chýba '+f(d)) : (r[2]<=0 ? 'v pláne neriešime' : 'kryté'),
+              pageW-margin-3, y, d>0 ? YELLOW : (r[2]<=0 ? LGREY : LGREEN));
+      col(GREY); setN(); doc.setFontSize(8.3);
+      y += 5.6; a5=!a5;
+    });
+    y += 3;
+    if(chybaZoznam.length){
+      const rows = chybaZoznam.map(function(c){ return [c[0]+' — '+c[1], 'nová PS '+c[2], RED]; });
+      rows.push(['Dnes platíte', formatEUR2(exP.poistne)+'/mes']);
+      rows.push(['Poistné po úprave krytia', formatEUR2(poistne)+'/mes', RED]);
+      box('Čo dopoistiť'+(exP.poistovna?' do zmluvy '+exP.poistovna:''), rows);
+    } else {
+      kv('Poistné podľa plánu', formatEUR2(poistne)+'/mes', {strong:true});
+    }
+  } else {
+    kv('Poistné podľa plánu', formatEUR2(poistne)+'/mes', {strong:true});
+  }
+  note('Krátkodobé výpadky (výpoveď, materská) riešime rezervou, nie poistením. Presné poistné závisí od veku, zdravotného stavu a poisťovne.');
+
+  bar('Ďalšie kroky');
+  const kroky = [];
+  if(exP.ma && chybaZoznam.length) kroky.push('Podpísať dodatok k poistnej zmluve '+(exP.poistovna||'')+' — doplniť chýbajúce krytie.');
+  else if(!exP.ma) kroky.push('Uzavrieť životné poistenie v odporúčaných poistných sumách.');
+  Object.entries(fpState).forEach(function(e){
+    const st = e[1]; if(!st || st.type!=='invest') return;
+    const mes = (st.fixedMonthly != null) ? st.fixedMonthly : (st.isHypo ? (parseFloat(st.selectedInvest)||0) : (planNumbers(st).pmt||0));
+    if(mes>0) kroky.push('Založiť program „'+st.label+'" — '+formatEUR(mes)+'/mes.');
+  });
+  kroky.push('Nastaviť trvalé príkazy k prvému dňu v mesiaci.');
+  kroky.push('Kontrolné stretnutie o 12 mesiacov — prehodnotenie stratégie a cieľov.');
+  doc.setFontSize(8.8); setN(); col(GREY);
+  kroky.forEach(function(k){
+    const lines = doc.splitTextToSize(k, contentW-12);
+    need(lines.length*4.4+3);
+    fill(RED); doc.circle(margin+4, y-1.2, 1, 'F');
+    doc.text(lines, margin+9, y);
+    y += lines.length*4.4 + 1.6;
+  });
+  y += 4;
+
+  need(32);
+  fill(LGREY); doc.roundedRect(margin, y-4, contentW, 26, R, R, 'F');
+  doc.setFontSize(8.5); setB(); col(RED);
+  doc.text('Váš poradca', margin+5, y+2);
+  setN(); col(GREY); doc.setFontSize(8.5);
+  doc.text(adv.name+'   ·   '+adv.title, margin+5, y+8);
+  doc.text(adv.company + (adv.web ? ('   ·   '+adv.web) : ''), margin+5, y+14);
+  doc.text([adv.email, adv.phone].filter(Boolean).join('   ·   '), margin+5, y+20);
+  logoMark(pageW - margin - 34, y+14, 11, RED);
+  y += 30;
+
+  note('Tento finančný plán je informatívneho charakteru a nepredstavuje záväznú ponuku. Uvedené výnosy sú predpokladané a nezaručené — skutočné výnosy sa môžu líšiť. Pred podpisom zmluvy si prečítajte štatút fondu a kľúčové informácie pre investorov. Minulé výnosy nie sú zárukou budúcich výnosov.');
+
+  // Päta na každej strane
+  const pages = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(7.5); setN(); col(SILVER);
+    doc.text(String(i)+' / '+pages, pageW-margin, pageH-9, {align:'right'});
+    if(i>1) doc.text(meno+'  ·  Finančný plán', margin, pageH-9);
+  }
+
+  doc.save('Financny-plan-'+meno.replace(/\s+/g,'-')+'.pdf');
+}
+
 
 async function generatePDF(){
   // Build FP data first
@@ -4494,7 +5561,7 @@ async function generatePDF(){
   if(document.getElementById('fp_dochodok').checked && fpState['dochodok']){
     const st = fpState['dochodok'];
     const pn = planNumbers(st);
-    const fee = getEntryFee(pn.vklady, st.currentStrategy);
+    const fee = entryFeeFor(pn.pmt, pn.roky*12, st.currentStrategy);
     addSection(2, 'Dôchodok — Partners Investments');
     if(st.gap) pdfGapCard(st.gap, st.roky);
     const medzera = parseFloat(document.getElementById('doch_medzera').value)||0;
@@ -4532,7 +5599,7 @@ async function generatePDF(){
     if(st.type !== 'invest' || id === 'rezervy' || id === 'dochodok') return;
     if(st.isHypo) return; // handle separately
     const pn = planNumbers(st);
-    const fee = getEntryFee(pn.vklady, st.currentStrategy);
+    const fee = entryFeeFor(pn.pmt, pn.roky*12, st.currentStrategy);
     addSection(secNum, st.label);
     if(st.gap) pdfGapCard(st.gap, st.roky);
     addLine('Cieľová suma', formatEUR(pn.ciel));
@@ -5385,6 +6452,13 @@ function rokyTxt(n){
   if(!Number.isInteger(x)) return String(x).replace('.', ',') + ' roka';
   const a = Math.abs(x);
   return x + (a === 1 ? ' rok' : (a >= 2 && a <= 4 ? ' roky' : ' rokov'));
+}
+
+// Suma s centmi, ak nejde o celé euro (presné poistné z ponuky), inak ako formatEUR
+function formatEUR2(n){
+  if(isNaN(n)) return '0 €';
+  if(Math.abs(n - Math.round(n)) < 0.005) return formatEUR(n);
+  return n.toLocaleString('sk-SK', {minimumFractionDigits:2, maximumFractionDigits:2})+' €';
 }
 
 function formatEUR(n){
