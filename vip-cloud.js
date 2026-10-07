@@ -105,10 +105,16 @@ function isCloudId(v){
 // SÚBORU (.json) sú tieto fragmenty nedôveryhodné — môžu obsahovať vložený kód, ktorý by sa
 // vykonal v prihlásenej VIP relácii. Preto z nich odstránime nebezpečné prvky a event-handlery.
 // Vlastné cloudové záznamy (písané appkou) sa nesanitizujú — ostávajú plne interaktívne.
+// Inline obsluhy, ktoré smú prežiť import: iba prepočty formulára a odstránenie riadku
+// (presne podľa šablón riadkov v aof.html). Všetko ostatné on* sa zahodí.
+var AOF_SAFE_HANDLER = /^\s*(?:(?:this\.closest\('(?:tr|\.card)'\)\.remove\(\)|(?:calcRezervy|calcFamilyAge|calcChildAge|calcChildTargetDate|recomputeZab|syncZabCheck)\((?:this)?\))\s*;?\s*)+$/;
+
 function sanitizeAofHTMLString(html){
   if(!html || typeof html !== 'string') return html || '';
   try{
-    var docp = new DOMParser().parseFromString('<div id="__sanroot">'+html+'</div>', 'text/html');
+    // Riadky tabuliek (<tr>) treba parsovať v kontexte tabuľky — v <div> by ich parser zahodil
+    var isRows = /^\s*<tr[\s>]/i.test(html);
+    var docp = new DOMParser().parseFromString(isRows ? '<table><tbody id="__sanroot">'+html+'</tbody></table>' : '<div id="__sanroot">'+html+'</div>', 'text/html');
     var root = docp.getElementById('__sanroot');
     if(!root) return '';
     var BAD = ['SCRIPT','IFRAME','OBJECT','EMBED','LINK','META','BASE','STYLE','SVG','IMG','VIDEO','AUDIO','SOURCE','FORM','MATH','IMAGE','USE','FOREIGNOBJECT','APPLET','FRAME','FRAMESET'];
@@ -116,7 +122,7 @@ function sanitizeAofHTMLString(html){
       if(BAD.indexOf((el.tagName||'').toUpperCase()) > -1){ if(el.parentNode) el.parentNode.removeChild(el); return; } // toUpperCase: SVG prvky majú tagName malými písmenami
       Array.prototype.slice.call(el.attributes).forEach(function(a){
         var n = a.name.toLowerCase(), v = (a.value||'').toLowerCase().replace(/\s+/g,'');
-        if(n.indexOf('on') === 0) el.removeAttribute(a.name);                                  // onerror, onclick, oninput…
+        if(n.indexOf('on') === 0){ if(!AOF_SAFE_HANDLER.test(a.value||'')) el.removeAttribute(a.name); } // onerror, onclick… okrem prepočtov
         else if((n==='href'||n==='src'||n==='xlink:href'||n==='formaction'||n==='action') &&
                 (v.indexOf('javascript:')===0 || v.indexOf('data:')===0)) el.removeAttribute(a.name);
         else if(n==='style' && v.indexOf('expression(')>-1) el.removeAttribute(a.name);
