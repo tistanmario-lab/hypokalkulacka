@@ -5,30 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VIP Zóna | Nové heslo | Mário Tišťan</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#003049;--red:#AB0534;--silver:#989FA7;--sand:#ECEDED;--white:#fff;--green:#2e7d32;--muted:rgba(0,48,73,0.5);--border:rgba(0,48,73,0.1);--radius:20px;}
+:root{
+  /* Partners — základná farebnosť */
+  --red:#AB0534;--red-light:#CD6D80;--red-dark:#8F042C;--silver:#989FA7;--gray:#4D4D4D;--sand:#ECEDED;--white:#fff;
+  /* doplnková — len zvýraznenie */
+  --c-yellow:#FFF3B0;--c-green:#CBD9C4;
+  --muted:rgba(77,77,77,0.68);--border:rgba(77,77,77,0.14);--radius:20px;
+}
+/* Graphik — brandové písmo Partners, z počítača (súbor fontu sa nezverejňuje); fallback Arial */
+@font-face{font-family:'Graphik';src:local('Graphik-Regular'),local('Graphik Regular');font-weight:400;font-style:normal;}
+@font-face{font-family:'Graphik';src:local('Graphik-Medium'),local('Graphik Medium');font-weight:500;font-style:normal;}
+@font-face{font-family:'Graphik';src:local('Graphik-Semibold'),local('Graphik Semibold');font-weight:600 800;font-style:normal;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);min-height:100vh;display:flex;align-items:center;justify-content:center;}
+body{font-family:'Graphik',Arial,Helvetica,sans-serif;background:var(--sand);color:var(--gray);min-height:100vh;display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased;}
 .login-container{width:100%;max-width:420px;padding:20px;}
-.login-card{background:var(--white);border-radius:var(--radius);padding:48px 40px;box-shadow:0 16px 48px rgba(0,48,73,0.08);text-align:center;}
-.login-logo{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy);text-decoration:none;margin-bottom:8px;display:block;}
-.login-logo span{color:var(--red);}
-.login-badge{display:inline-block;background:var(--navy);color:#fff;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:32px;}
-.login-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;}
-.login-sub{font-size:14px;color:var(--muted);margin-bottom:32px;line-height:1.6;}
+.login-card{background:var(--white);border-radius:var(--radius);padding:44px 40px 40px;box-shadow:0 16px 48px rgba(77,77,77,0.08);text-align:center;}
+.login-brand{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:30px;text-decoration:none;color:var(--gray);}
+.login-brand img{height:22px;width:auto;display:block;}
+.login-brand-name{display:inline-flex;align-items:center;gap:10px;font-size:15px;font-weight:500;letter-spacing:-.005em;}
+.login-badge{background:var(--red);color:#fff;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:12px;}
+.login-title{font-size:22px;font-weight:600;letter-spacing:-.012em;margin-bottom:8px;}
+.login-sub{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6;}
 .input-group{margin-bottom:16px;text-align:left;}
 .input-group label{display:block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.input-group input{width:100%;padding:14px 16px;font-size:15px;font-family:'DM Sans',sans-serif;border:1px solid var(--border);border-radius:12px;background:var(--sand);color:var(--navy);outline:none;transition:border-color .2s;}
-.input-group input:focus{border-color:var(--navy);}
-.login-btn{width:100%;padding:16px;background:var(--red);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border:none;border-radius:12px;cursor:pointer;transition:background .2s;margin-top:8px;}
-.login-btn:hover{background:var(--navy);}
+.input-group input{width:100%;padding:14px 16px;font-size:15px;font-family:inherit;border:1px solid var(--border);border-radius:12px;background:var(--sand);color:var(--gray);outline:none;transition:border-color .2s;}
+.input-group input:focus{border-color:var(--red);}
+.login-btn{width:100%;padding:16px;background:var(--red);color:#fff;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border:none;border-radius:12px;cursor:pointer;transition:background .2s;margin-top:8px;}
+.login-btn:hover{background:var(--red-dark);}
 .login-error{display:none;color:var(--red);font-size:13px;font-weight:500;margin-top:12px;}
-.login-ok{display:none;color:var(--green);font-size:13px;font-weight:500;margin-top:12px;}
+.login-ok{display:none;color:var(--gray);background:rgba(203,217,196,0.55);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:500;margin-top:12px;}
 .login-footer{margin-top:24px;font-size:12px;color:var(--silver);}
-.login-footer a{color:var(--navy);text-decoration:none;font-weight:500;}
+.login-footer a{color:var(--gray);text-decoration:none;font-weight:500;}
 .login-footer a:hover{color:var(--red);}
+.login-link{background:none;border:none;color:var(--gray);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;text-decoration:underline;padding:0;margin-top:14px;}
+.login-link:hover{color:var(--red);}
 @media (max-width:480px){.login-card{padding:36px 24px;}.input-group input{padding:14px 16px;font-size:16px;min-height:48px;}.login-btn{padding:14px;min-height:48px;}}
 </style>
 <script src="supabase.min.js"></script>
@@ -37,8 +48,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);m
 <body>
 <div class="login-container">
   <div class="login-card">
-    <a href="index.html" class="login-logo">Mário <span>Tišťan</span></a>
-    <div class="login-badge">VIP Zóna</div>
+    <a href="index.html" class="login-brand"><img src="img/partners-logo-red.png" alt="Partners"><span class="login-brand-name">Mário Tišťan <span class="login-badge">VIP Zóna</span></span></a>
     <h1 class="login-title">Nastavenie nového hesla</h1>
     <p class="login-sub">Zadajte nové heslo k vášmu účtu.</p>
 

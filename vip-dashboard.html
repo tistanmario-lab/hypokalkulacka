@@ -5,248 +5,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VIP Zóna | Dashboard | Mário Tišťan</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy: #003049;
-  --red: #AB0534;
-  --silver: #989FA7;
-  --sand: #ECEDED;
-  --white: #ffffff;
-  --dark-gray: #4D4D4D;
-  --muted: rgba(0,48,73,0.5);
-  --border: rgba(0,48,73,0.1);
-  --radius: 20px;
+:root{
+  /* Partners — základná farebnosť */
+  --red:#AB0534;--red-light:#CD6D80;--red-dark:#8F042C;--silver:#989FA7;--gray:#4D4D4D;--sand:#ECEDED;--white:#fff;
+  /* doplnková — len zvýraznenie */
+  --c-yellow:#FFF3B0;--c-green:#CBD9C4;
+  --muted:rgba(77,77,77,0.68);--border:rgba(77,77,77,0.14);--radius:20px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(--navy); line-height: 1.6; min-height: 100vh; }
+/* Graphik — brandové písmo Partners, z počítača (súbor fontu sa nezverejňuje); fallback Arial */
+@font-face{font-family:'Graphik';src:local('Graphik-Regular'),local('Graphik Regular');font-weight:400;font-style:normal;}
+@font-face{font-family:'Graphik';src:local('Graphik-Medium'),local('Graphik Medium');font-weight:500;font-style:normal;}
+@font-face{font-family:'Graphik';src:local('Graphik-Semibold'),local('Graphik Semibold');font-weight:600 800;font-style:normal;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Graphik',Arial,Helvetica,sans-serif;background:var(--sand);color:var(--gray);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* Top bar */
-.vip-topbar {
-  background: var(--navy);
-  padding: 0 5%;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.vip-topbar-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.vip-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-  text-decoration: none;
-}
-.vip-logo span { color: var(--red); }
-.vip-badge {
-  background: var(--red);
-  color: #fff;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 12px;
-  margin-left: 10px;
-  vertical-align: middle;
-}
-.vip-topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-.vip-user {
-  color: rgba(255,255,255,0.6);
-  font-size: 13px;
-}
-.vip-user strong { color: #fff; }
-.vip-logout {
-  color: rgba(255,255,255,0.5);
-  font-size: 12px;
-  font-weight: 500;
-  text-decoration: none;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  transition: color .2s;
-  cursor: pointer;
-  background: none;
-  border: none;
-  font-family: inherit;
-}
-.vip-logout:hover { color: var(--red); }
+/* Horná lišta — rovnaká ako v AOF */
+.vip-topbar{background:var(--white);padding:0 5%;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border);}
+.vip-topbar-inner{max-width:1100px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.vip-logo{display:inline-flex;align-items:center;gap:12px;font-size:15px;font-weight:500;color:var(--gray);text-decoration:none;letter-spacing:-.005em;}
+.vip-logo img{height:16px;width:auto;display:block;}
+.vip-sep{width:1px;height:20px;background:var(--border);}
+.vip-badge{background:var(--red);color:#fff;font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:12px;}
+.vip-topbar-right{display:flex;align-items:center;gap:20px;}
+.vip-user{color:var(--muted);font-size:13px;}
+.vip-user strong{color:var(--gray);font-weight:500;}
+.vip-logout{color:var(--muted);font-size:12px;font-weight:500;text-decoration:none;letter-spacing:.04em;text-transform:uppercase;transition:color .2s;cursor:pointer;background:none;border:none;font-family:inherit;}
+.vip-logout:hover{color:var(--red);}
 
-/* Main content */
-.vip-main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 40px 5% 80px;
-}
+.vip-main{max-width:1100px;margin:0 auto;padding:32px 5% 80px;}
 
-.vip-welcome {
-  margin-bottom: 40px;
-}
-.vip-welcome h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.vip-welcome p {
-  font-size: 15px;
-  color: var(--muted);
-}
+/* Uvítanie — červená plocha s rámom Partners (prerušenie vpravo dole) */
+.vip-welcome{--fx:8px;position:relative;overflow:hidden;background:var(--red);color:#fff;border-radius:var(--radius);padding:calc(var(--fx) * 5.5) calc(var(--fx) * 6);margin-bottom:32px;text-align:center;}
+.vip-welcome::before{content:'';position:absolute;inset:var(--fx);border:var(--fx) solid #fff;border-radius:calc(20px + var(--fx) / 2);pointer-events:none;}
+.vip-welcome::after{content:'';position:absolute;pointer-events:none;background:var(--red);right:calc(var(--fx) - 2px);bottom:calc(var(--fx) - 2px);width:calc(2.5 * var(--fx) + 6.292px);height:calc(2.5 * var(--fx) + 6.292px);}
+.vip-welcome .pg-cap{position:absolute;z-index:1;width:var(--fx);height:var(--fx);border-radius:50%;background:#fff;pointer-events:none;}
+.vip-welcome .pg-cap.b{right:calc(3 * var(--fx) + 4.292px);bottom:var(--fx);}
+.vip-welcome .pg-cap.r{right:var(--fx);bottom:calc(3 * var(--fx) + 4.292px);}
+.vip-welcome h1{position:relative;z-index:1;font-size:32px;font-weight:600;letter-spacing:-.015em;line-height:1.2;margin-bottom:8px;}
+.vip-welcome p{position:relative;z-index:1;font-size:15px;}
+@media (max-width:600px){.vip-welcome{--fx:6px;}.vip-welcome h1{font-size:24px;}}
 
-/* Tool cards grid */
-.vip-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-bottom: 48px;
+/* Nástroje */
+.vip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:48px;}
+@media (max-width:900px){.vip-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:600px){
+  .vip-grid{grid-template-columns:1fr;}
+  .vip-logout{padding:8px 12px;min-height:40px;display:inline-flex;align-items:center;}
+  .vip-user{display:none;}
+  .vip-stat-value{font-size:22px;}
+  .vip-card{padding:18px;}
 }
-@media (max-width: 900px) { .vip-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px) {
-  .vip-grid { grid-template-columns: 1fr; }
-  .vip-logout { padding: 8px 12px; min-height: 40px; display: inline-flex; align-items: center; }
-  .vip-stat-value { font-size: 22px; }
-  .vip-card { padding: 18px; }
-}
+.vip-card{background:var(--white);border-radius:var(--radius);padding:32px 28px;border:1px solid var(--border);transition:all .3s;text-decoration:none;color:var(--gray);display:flex;flex-direction:column;position:relative;overflow:hidden;}
+.vip-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(77,77,77,0.10);border-color:var(--red);}
+.vip-card-icon{font-size:40px;margin-bottom:16px;color:var(--red);}
+.vip-card-icon svg{width:1em;height:1em;stroke-width:1.5;}
+.vip-card h3{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px;}
+.vip-card p{font-size:13px;color:var(--muted);line-height:1.6;flex:1;}
+.vip-card-status{display:inline-block;align-self:flex-start;margin-top:16px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:20px;}
+.status-active{background:var(--c-green);color:var(--gray);}
+.status-soon{background:var(--c-yellow);color:var(--gray);}
+.status-planned{background:var(--sand);color:var(--silver);}
 
-.vip-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 32px 28px;
-  border: 1px solid var(--border);
-  transition: all .3s;
-  text-decoration: none;
-  color: var(--navy);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-}
-.vip-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 36px rgba(0,48,73,0.10);
-  border-color: var(--red);
-}
-.vip-card-icon {
-  font-size: 40px;
-  margin-bottom: 16px;
-  color: var(--red);
-}
-.vip-card-icon svg { width: 1em; height: 1em; stroke-width: 1.5; }
-.vip-card h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.vip-card p {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.6;
-  flex: 1;
-}
-.vip-card-status {
-  display: inline-block;
-  margin-top: 16px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  padding: 4px 12px;
-  border-radius: 20px;
-}
-.status-active { background: #e8f5e9; color: #2e7d32; }
-.status-soon { background: #fff3e0; color: #e65100; }
-.status-planned { background: var(--sand); color: var(--silver); }
+.vip-section-title{font-size:22px;font-weight:600;letter-spacing:-.012em;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--border);}
 
-/* Section headers */
-.vip-section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--border);
-}
+/* Štatistiky */
+.vip-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:48px;}
+@media (max-width:768px){.vip-stats{grid-template-columns:repeat(2,1fr);}}
+.vip-stat{background:var(--white);border-radius:16px;padding:24px;text-align:center;border:1px solid var(--border);}
+.vip-stat-value{font-size:28px;font-weight:600;letter-spacing:-.015em;color:var(--red);}
+.vip-stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:4px;}
 
-/* Quick stats */
-.vip-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 48px;
-}
-@media (max-width: 768px) { .vip-stats { grid-template-columns: repeat(2, 1fr); } }
+.vip-footer{text-align:center;padding:24px;font-size:12px;color:var(--silver);border-top:1px solid var(--border);}
 
-.vip-stat {
-  background: var(--white);
-  border-radius: 16px;
-  padding: 24px;
-  text-align: center;
-  border: 1px solid var(--border);
-}
-.vip-stat-value {
-  font-family: 'Playfair Display', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--navy);
-}
-.vip-stat-label {
-  font-size: 12px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  margin-top: 4px;
-}
-
-/* Footer */
-.vip-footer {
-  text-align: center;
-  padding: 24px;
-  font-size: 12px;
-  color: var(--silver);
-  border-top: 1px solid var(--border);
-}
-
-/* ── Evidencia analýz (AOF) ── */
-.aof-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
-.aof-newbtn { padding: 11px 16px; font-family: inherit; font-size: 13px; font-weight: 600; border: none; border-radius: 12px; background: var(--red); color: #fff; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background .2s; white-space: nowrap; }
-.aof-newbtn:hover { background: var(--navy); }
-.aof-search { flex: 1; min-width: 200px; padding: 11px 14px; font-family: inherit; font-size: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--white); color: var(--navy); outline: none; transition: border-color .2s; }
-.aof-search:focus { border-color: var(--navy); }
-.aof-sort { padding: 11px 14px; font-family: inherit; font-size: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--white); color: var(--navy); cursor: pointer; outline: none; }
-.aof-count { color: var(--muted); font-size: 13px; margin-left: auto; white-space: nowrap; }
-.aof-table-wrap { background: var(--white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-.aof-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.aof-table thead th { text-align: left; padding: 14px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: rgba(0,48,73,0.03); border-bottom: 1px solid var(--border); white-space: nowrap; }
-.aof-table tbody td { padding: 13px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-.aof-table tbody tr:last-child td { border-bottom: none; }
-.aof-table tbody tr { transition: background .15s; }
-.aof-table tbody tr:hover { background: rgba(0,48,73,0.025); }
-.aof-name { font-weight: 600; color: var(--navy); }
-.aof-date { color: var(--muted); font-size: 13px; white-space: nowrap; }
-.aof-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
-.aof-btn { padding: 7px 13px; font-family: inherit; font-size: 13px; font-weight: 500; border: 1px solid var(--border); border-radius: 9px; background: var(--white); color: var(--navy); cursor: pointer; transition: all .15s; }
-.aof-btn:hover { border-color: var(--navy); }
-.aof-btn.open { background: var(--navy); color: #fff; border-color: var(--navy); }
-.aof-btn.open:hover { background: #004a73; }
-.aof-btn.del:hover { border-color: var(--red); color: var(--red); }
-.aof-empty { text-align: center; padding: 32px 16px; color: var(--muted); font-size: 14px; }
-@media (max-width: 600px) {
-  .aof-count { margin-left: 0; }
-  .aof-table-wrap { overflow-x: auto; }
-  .aof-table { min-width: 520px; }
+/* Evidencia analýz (AOF) */
+.aof-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:16px;}
+.aof-newbtn{padding:11px 16px;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:12px;background:var(--red);color:#fff;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s;white-space:nowrap;}
+.aof-newbtn:hover{background:var(--red-dark);}
+.aof-search{flex:1;min-width:200px;padding:11px 14px;font-family:inherit;font-size:14px;border:1px solid var(--border);border-radius:12px;background:var(--white);color:var(--gray);outline:none;transition:border-color .2s;}
+.aof-search:focus{border-color:var(--red);}
+.aof-sort{padding:11px 14px;font-family:inherit;font-size:14px;border:1px solid var(--border);border-radius:12px;background:var(--white);color:var(--gray);cursor:pointer;outline:none;}
+.aof-count{color:var(--muted);font-size:13px;margin-left:auto;white-space:nowrap;}
+.aof-table-wrap{background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.aof-table{width:100%;border-collapse:collapse;font-size:14px;}
+.aof-table thead th{text-align:left;padding:14px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:rgba(77,77,77,0.035);border-bottom:1px solid var(--border);white-space:nowrap;}
+.aof-table tbody td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.aof-table tbody tr:last-child td{border-bottom:none;}
+.aof-table tbody tr{transition:background .15s;}
+.aof-table tbody tr:hover{background:rgba(77,77,77,0.03);}
+.aof-name{font-weight:600;color:var(--gray);}
+.aof-date{color:var(--muted);font-size:13px;white-space:nowrap;}
+.aof-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.aof-btn{padding:7px 13px;font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--border);border-radius:9px;background:var(--white);color:var(--gray);cursor:pointer;transition:all .15s;}
+.aof-btn:hover{border-color:var(--red);color:var(--red);}
+.aof-btn.open{background:var(--red);color:#fff;border-color:var(--red);}
+.aof-btn.open:hover{background:var(--red-dark);color:#fff;}
+.aof-btn.del:hover{border-color:var(--red);color:var(--red);}
+.aof-empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:14px;}
+@media (max-width:600px){
+  .aof-count{margin-left:0;}
+  .aof-table-wrap{overflow-x:auto;}
+  .aof-table{min-width:520px;}
 }
 </style>
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -274,10 +134,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 <!-- Top bar -->
 <div class="vip-topbar">
   <div class="vip-topbar-inner">
-    <div>
-      <a href="index.html" class="vip-logo">Mário <span>Tišťan</span></a>
-      <span class="vip-badge">VIP Zóna</span>
-    </div>
+    <a href="index.html" class="vip-logo"><img src="img/partners-logo-red.png" alt="Partners"><span class="vip-sep"></span><span>Mário Tišťan</span><span class="vip-badge">VIP Zóna</span></a>
     <div class="vip-topbar-right">
       <span class="vip-user">Prihlásený: <strong id="vipUserName"></strong></span>
       <button class="vip-logout" onclick="doLogout()">Odhlásiť sa</button>
@@ -290,6 +147,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 
   <!-- Welcome -->
   <div class="vip-welcome">
+    <span class="pg-cap b" aria-hidden="true"></span><span class="pg-cap r" aria-hidden="true"></span>
     <h1>Vitaj v tvojej VIP Zóne</h1>
     <p>Interné nástroje pre finančné plánovanie a analýzu.</p>
   </div>
@@ -322,7 +180,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
     <a href="aof.html" class="vip-card">
       <div class="vip-card-icon"><i data-lucide="clipboard-list"></i></div>
       <h3>AOF — Analýza &amp; Finančný plán</h3>
-      <p>10-krokový proces — komplexná analýza klienta, interaktívny finančný plán a export do PDF.</p>
+      <p>9-krokový proces — komplexná analýza klienta, interaktívny finančný plán a dokument pre klienta v PDF.</p>
       <span class="vip-card-status status-active">Aktívne</span>
     </a>
 
