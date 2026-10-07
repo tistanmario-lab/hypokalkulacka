@@ -2223,7 +2223,7 @@ function buildZabTable(prefix, bodyId){
   if(optimZostatok > 0){
     const _uvPopis = _uv.rows.length>1 ? (_uv.rows.length+' úvery spolu') : (_uv.rows[0] ? _uv.rows[0].nazov : '');
     addPsRow(tbody, prefix, 'Úmrtie — krytie úverov', optimZostatok,
-      `Klesajúca poistná suma · ${_uvPopis}${optimSplatnost>0?' · '+optimSplatnost+' rokov':''}`, 1, 'klesajuca', prevEdit, optimSplatnost);
+      `Klesajúca poistná suma · ${_uvPopis}${optimSplatnost>0?' · '+rokyTxt(optimSplatnost):''}`, 1, 'klesajuca', prevEdit, optimSplatnost);
   }
 
   // Úmrtie — krytie rodiny / pohrebné (schválená metodika)
@@ -2333,7 +2333,7 @@ function buildTimeline(){
     <div class="timeline-v-dot"></div>
     <div class="timeline-v-header">
       <span class="timeline-v-year">${thisYear}</span>
-      <span class="timeline-v-name">Dnes — vek ${age} rokov</span>
+      <span class="timeline-v-name">Dnes — vek ${rokyTxt(age)}</span>
       <span class="timeline-v-badge navy">Štart</span>
     </div>
   </div>`;
@@ -2910,7 +2910,7 @@ function recalcHypoPayoff(id, stratKey){
   if(selC.found){
     html += `<div class="fp-rec-row" style="background:rgba(46,125,50,0.06);border-radius:6px;padding:4px 6px;"><span>S investíciou <strong>${formatEUR(parseFloat(state.selectedInvest)||0)}/mes</strong> — bez dlhov už v roku</span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${selC.rokPretnutia}</strong> (o ${selC.rokov} r.)</span></div>`;
     html += `<div class="fp-rec-row"><span>Ušetríte na úrokoch</span><span style="color:var(--green);font-weight:700;font-size:15px;">${formatEUR(selC.uspora)}</span></div>`;
-    html += `<div class="fp-rec-row"><span>Skôr o</span><span>${Math.max(0, Math.round((bez.mesiacovDoKonca-selC.mesiacov)/12*10)/10)} rokov</span></div>`;
+    html += `<div class="fp-rec-row"><span>Skôr o</span><span>${rokyTxt(Math.max(0, Math.round((bez.mesiacovDoKonca-selC.mesiacov)/12*10)/10))}</span></div>`;
   }
   html += '</div>';
 
@@ -3157,7 +3157,7 @@ function buildProgramDetail(programId, state, strat, pmt, fv){
   // Key numbers
   html += '<div class="fp-rec" style="margin-top:12px;">';
   html += `<div class="fp-rec-row"><span>Cieľová suma</span><span>${formatEUR(pn.ciel)}</span></div>`;
-  html += `<div class="fp-rec-row"><span>Horizont</span><span>${pn.roky} rokov (${pn.roky*12} mesiacov)</span></div>`;
+  html += `<div class="fp-rec-row"><span>Horizont</span><span>${rokyTxt(pn.roky)} (${pn.roky*12} mesiacov)</span></div>`;
   html += `<div class="fp-rec-row"><span>Predpokladané zhodnotenie</span><span>${Math.round(strat.rate*100)} % p.a.</span></div>`;
   if(pn.hasExisting) html += `<div class="fp-rec-row"><span>Projekcia už existujúcich úspor</span><span>${formatEUR(pn.projFV)}</span></div>`;
   if(pn.pmt > 0){
@@ -3255,7 +3255,7 @@ function projCard(mesacne, roky, saved, rate){
   h += '<div style="padding:14px;background:rgba(46,125,50,0.07);border:1px solid rgba(46,125,50,0.35);border-left:4px solid var(--green);border-radius:12px;">';
   h += `<div class="fp-rec-row"><span>Odkladá</span><span class="fp-rec-highlight">${formatEUR(mesacne)}/mes</span></div>`;
   if(saved>0) h += `<div class="fp-rec-row"><span>Už nasporené</span><span>${formatEUR(saved)}</span></div>`;
-  h += `<div class="fp-rec-row"><span>Horizont</span><span>${roky} rokov</span></div>`;
+  h += `<div class="fp-rec-row"><span>Horizont</span><span>${rokyTxt(roky)}</span></div>`;
   h += `<div class="fp-rec-row"><span>Vloží spolu</span><span>${formatEUR(vklady)}</span></div>`;
   h += `<div class="fp-rec-row"><span>Zhodnotenie</span><span style="color:var(--green);font-weight:600;">+${formatEUR(vynos)}</span></div>`;
   h += `<div class="fp-rec-row"><span><strong>Bude mať o ${roky} r.</strong></span><span class="fp-rec-highlight" style="font-size:15px;"><strong>${formatEUR(total)}</strong></span></div>`;
@@ -3594,7 +3594,8 @@ function buildFinancialPlan(){
     const hot = parseFloat(document.getElementById('byv_hotovost').value)||0;
     const val = parseFloat(document.getElementById('byv_hodnota').value)||0;
     const lokalita = document.getElementById('byv_lokalita').value||'—';
-    const sposob = document.getElementById('byv_sposob').value;
+    const _spEl = document.getElementById('byv_sposob');
+    const sposob = (_spEl.selectedOptions[0] && _spEl.selectedOptions[0].text) || _spEl.value; // „Úver“, nie interné „uver“
     const hasOptim = document.getElementById('ch_optim').checked;
     let html = '';
     if(hasOptim){
@@ -3605,13 +3606,13 @@ function buildFinancialPlan(){
       const fixDatum = document.getElementById('optim_fixacia_datum').value||'—';
       const splatka = formatEUR(parseFloat(document.getElementById('optim_splatka').value)||0);
       const doba = document.getElementById('optim_doba').value||'—';
-      html += `<div class="fp-product"><div class="fp-product-icon protect">${ico('home')}</div><div class="fp-product-info"><div class="fp-product-name">Aktuálny hypotekárny úver — ${banka}</div><div class="fp-product-desc">Zostatok ${zostatok} · Sadzba ${urok}% · Splátka ${splatka} · Zostáva ${doba} rokov</div></div></div>`;
+      html += `<div class="fp-product"><div class="fp-product-icon protect">${ico('home')}</div><div class="fp-product-info"><div class="fp-product-name">Aktuálny hypotekárny úver — ${banka}</div><div class="fp-product-desc">Zostatok ${zostatok} · Sadzba ${urok}% · Splátka ${splatka} · Zostáva ${rokyTxt(doba)}</div></div></div>`;
       html += '<div class="fp-rec" style="margin-top:12px;">';
       html += `<div class="fp-rec-row"><span>Banka</span><span>${banka}</span></div>`;
       html += `<div class="fp-rec-row"><span>Zostatok</span><span>${zostatok}</span></div>`;
       html += `<div class="fp-rec-row"><span>Úroková sadzba</span><span>${urok} %</span></div>`;
       const fixDatumFmt = fixDatum && fixDatum !== '—' ? new Date(fixDatum).toLocaleDateString('sk-SK') : fixDatum;
-      html += `<div class="fp-rec-row"><span>Fixácia</span><span>${fixacia} rokov (do ${fixDatumFmt})</span></div>`;
+      html += `<div class="fp-rec-row"><span>Fixácia</span><span>${rokyTxt(fixacia)} (do ${fixDatumFmt})</span></div>`;
       html += `<div class="fp-rec-row"><span>Mesačná splátka</span><span>${splatka}</span></div>`;
       html += '</div>';
       html += '<div class="info-box"><strong>Odporúčanie:</strong> Pri konci fixácie zvážte refinancovanie pre lepšiu sadzbu. Porovnáme ponuky bánk na trhu.</div>';
@@ -3652,7 +3653,7 @@ function buildFinancialPlan(){
       html += '<div class="fp-rec" style="margin-top:12px;"><div class="fp-rec-title">Nový hypotekárny úver</div>';
       html += `<div class="fp-rec-row"><span>Výška úveru</span><span class="fp-rec-highlight">${formatEUR(uverSuma)}</span></div>`;
       html += `<div class="fp-rec-row"><span>Úroková sadzba</span><span>${uverUrok} % p.a.</span></div>`;
-      html += `<div class="fp-rec-row"><span>Doba splácania</span><span>${uverDoba} rokov</span></div>`;
+      html += `<div class="fp-rec-row"><span>Doba splácania</span><span>${rokyTxt(uverDoba)}</span></div>`;
       html += `<div class="fp-rec-row"><span>Mesačná splátka</span><span>${formatEUR(Math.round(splatka))}</span></div>`;
       html += `<div class="fp-rec-row"><span>Očakávané preplatenie (úroky za celú dobu)</span><span style="color:var(--red);font-weight:600;">${formatEUR(preplat)}</span></div>`;
       html += '</div>';
@@ -4367,7 +4368,7 @@ async function generatePDF(){
 
   addSection(1, 'Osobné údaje');
   addLine('Meno', meno);
-  addLine('Vek', age+' rokov');
+  addLine('Vek', rokyTxt(age));
   const pracaVal = document.getElementById('k_praca').value||'zamestnanec';
   const pracaLabels = {zamestnanec:'Zamestnanec', szco:'SZČO', materska:'Materská dovolenka', ine:'Iné'};
   addLine('Pracovný status', pracaLabels[pracaVal]||pracaVal);
@@ -4501,7 +4502,7 @@ async function generatePDF(){
     addLine('Cieľová suma (20 r. na dôchodku)', formatEUR(pn.ciel));
     addLine('Stratégia', pn.s.name+' ('+Math.round(pn.s.rate*100)+' % p.a.)');
     addLine('Fond', pn.s.fond);
-    addLine('Horizont', st.roky+' rokov');
+    addLine('Horizont', rokyTxt(st.roky));
     if(pn.projFV>0) addLine('Projekcia existujúcich produktov', formatEUR(pn.projFV));
     addLine('Mesačná investícia'+(pn.hasExisting?' (navyše)':''), pn.pmt>0?formatEUR(pn.pmt):'0 € — cieľ pokrytý', true);
     addLine('Predpokladaná hodnota na konci'+(pn.hasExisting?' (spolu)':''), formatEUR(pn.totalFV));
@@ -4537,7 +4538,7 @@ async function generatePDF(){
     addLine('Cieľová suma', formatEUR(pn.ciel));
     addLine('Stratégia', pn.s.name+' ('+Math.round(pn.s.rate*100)+' % p.a.)');
     addLine('Fond', pn.s.fond);
-    addLine('Horizont', st.roky+' rokov');
+    addLine('Horizont', rokyTxt(st.roky));
     if(pn.projFV>0) addLine('Projekcia už nasporeného', formatEUR(pn.projFV));
     addLine('Mesačná investícia'+(pn.hasExisting?' (navyše)':''), pn.pmt>0?formatEUR(pn.pmt):'0 € — cieľ pokrytý', true);
     addLine('Predpokladaná hodnota na konci'+(pn.hasExisting?' (spolu)':''), formatEUR(pn.totalFV));
@@ -4955,6 +4956,8 @@ function collectAOFData(){
   document.querySelectorAll('#zabBodyKlient input[type=number], #zabBodyPartner input[type=number]').forEach(inp => inp.setAttribute('value', inp.value));
   data.zabKlientHTML = document.getElementById('zabBodyKlient').innerHTML;
   data.zabPartnerHTML = document.getElementById('zabBodyPartner')?.innerHTML||'';
+  // Zadal poradca mieru náhrady ručne? (po načítaní podľa toho vieme, či je vedúca)
+  data.dochMieraEdited = document.getElementById('doch_miera')?.dataset.edited === '1';
 
   return data;
 }
@@ -5335,10 +5338,25 @@ function applyAOFData(data){
     if(_dtYes&&_dtNo){ _dtYes.classList.toggle('active', hasDeti); _dtNo.classList.toggle('active', !hasDeti); }
 
     // Ručne zadané hodnoty si po načítaní udrž — inak by ich auto-odhad prepísal
-    ['doch_statny','doch_potrebny','doch_miera','doch_roky_poistenia'].forEach(function(id){
+    ['doch_statny','doch_potrebny','doch_roky_poistenia'].forEach(function(id){
       var el = document.getElementById(id);
       if(el && (parseFloat(el.value)||0) > 0) el.dataset.edited = '1';
     });
+    // Miera náhrady je "vedúca" (dôchodok sa z nej prepočíta) len ak ju poradca zadal ručne.
+    // Ak je to iba zaokrúhlený dopočet zo štátneho dôchodku, posunula by ho (1 127 € → 1 128 €).
+    var _mi = document.getElementById('doch_miera');
+    if(_mi){
+      var _miRucne;
+      if(typeof data.dochMieraEdited === 'boolean') _miRucne = data.dochMieraEdited;
+      else {
+        // Staršie analýzy flag nemajú — ručná je, ak sa nezhoduje s dopočtom zo sumy dôchodku
+        var _st = parseFloat((document.getElementById('doch_statny')||{}).value)||0;
+        var _hr = parseFloat((document.getElementById('k_hruby')||{}).value)||0;
+        var _odvodena = _hr > 0 ? Math.round(_st / _hr * 1000) / 10 : 0;
+        _miRucne = (parseFloat(_mi.value)||0) > 0 && Math.abs((parseFloat(_mi.value)||0) - _odvodena) > 0.05;
+      }
+      if(_miRucne) _mi.dataset.edited = '1'; else delete _mi.dataset.edited;
+    }
     ['zab_zavisly_k','zab_zavisly_p'].forEach(function(id){
       var el = document.getElementById(id);
       if(el && el.checked) el.dataset.edited = '1';
@@ -5360,6 +5378,15 @@ function applyAOFData(data){
 // ============================================================
 // UTILITIES
 // ============================================================
+// Slovenské skloňovanie: 1 rok · 2–4 roky · 0, 5+ rokov · desatinné 2,5 roka
+function rokyTxt(n){
+  const x = Number(n);
+  if(n === '' || n === null || n === undefined || !isFinite(x)) return n + ' rokov';
+  if(!Number.isInteger(x)) return String(x).replace('.', ',') + ' roka';
+  const a = Math.abs(x);
+  return x + (a === 1 ? ' rok' : (a >= 2 && a <= 4 ? ' roky' : ' rokov'));
+}
+
 function formatEUR(n){
   if(isNaN(n)) return '0 €';
   return Math.round(n).toLocaleString('sk-SK')+' €';
