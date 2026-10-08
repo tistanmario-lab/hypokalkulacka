@@ -1,4 +1,22 @@
 {
+  "rewrites": [
+    {
+      "source": "/advisorflow",
+      "destination": "/advisorflow.html"
+    },
+    {
+      "source": "/advisorflow-en",
+      "destination": "/advisorflow-en.html"
+    },
+    {
+      "source": "/advisorflow/",
+      "destination": "/advisorflow.html"
+    },
+    {
+      "source": "/advisorflow-en/",
+      "destination": "/advisorflow-en.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
