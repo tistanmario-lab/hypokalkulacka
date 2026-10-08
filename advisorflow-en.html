@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Advisor Flow | Intelligent sales assistant</title>
+<meta name="description" content="Advisor Flow is an upcoming iOS app for financial intermediaries and sales teams. Intelligent workflow, automation and AI.">
+<link rel="canonical" href="https://www.mariotistan.sk/advisorflow-en">
+<meta name="robots" content="index, follow">
+<link rel="alternate" hreflang="sk" href="https://www.mariotistan.sk/advisorflow">
+<link rel="alternate" hreflang="en" href="https://www.mariotistan.sk/advisorflow-en">
+<link rel="alternate" hreflang="x-default" href="https://www.mariotistan.sk/advisorflow">
+<meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0d14" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="advisorflow-icon.svg">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Advisor Flow">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:title" content="Advisor Flow | Intelligent sales assistant">
+<meta property="og:description" content="An upcoming iOS app for financial intermediaries and sales teams. Less administration, more room for business.">
+<meta property="og:url" content="https://www.mariotistan.sk/advisorflow-en">
+<meta property="og:image" content="https://www.mariotistan.sk/advisorflow-og-en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Advisor Flow – less administration, more room for business">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Advisor Flow | Intelligent sales assistant">
+<meta name="twitter:description" content="An upcoming iOS app for financial intermediaries and sales teams.">
+<meta name="twitter:image" content="https://www.mariotistan.sk/advisorflow-og-en.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://www.mariotistan.sk/advisorflow-en#webpage",
+      "url": "https://www.mariotistan.sk/advisorflow-en",
+      "name": "Advisor Flow | Intelligent sales assistant",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Mário Tišťan",
+        "url": "https://www.mariotistan.sk/"
+      },
+      "about": {
+        "@id": "https://www.mariotistan.sk/advisorflow-en#app"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.mariotistan.sk/advisorflow-en#app",
+      "name": "Advisor Flow",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "iOS",
+      "description": "An upcoming iOS app for financial intermediaries and sales teams: calls, contacts, meetings, tasks and analytics in one place. Under development, not yet publicly available.",
+      "url": "https://www.mariotistan.sk/advisorflow-en",
+      "author": {
+        "@type": "Person",
+        "name": "Mário Tišťan",
+        "url": "https://www.mariotistan.sk/"
+      }
+    }
+  ]
+}
+</script>
+
+<script>
+/* Téma: nastaví sa pred prvým vykreslením, aby stránka neblikla. */
+(function(){
+  var d = document.documentElement;
+  d.classList.add('js');
+  try {
+    var t = localStorage.getItem('af-theme');
+    if (t === 'dark' || t === 'light') d.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f7f8fb;
+  --bg-alt: #eef1f7;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --line: #e2e8f0;
+  --accent: #4f46e5;
+  --accent-ink: #4338ca;
+  --accent-soft: rgba(79,70,229,.09);
+  --solid: #4f46e5;
+  --teal: #0b6b63;
+  --teal-soft: rgba(13,148,136,.12);
+  --plan: #475569;
+  --plan-soft: rgba(100,116,139,.14);
+  --shadow: 0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.06);
+  --shadow-lg: 0 24px 60px rgba(30,27,75,.18);
+  --glow-1: rgba(99,102,241,.22);
+  --glow-2: rgba(13,148,136,.16);
+  --radius: 18px;
+  --maxw: 1120px;
+  --gutter: clamp(16px, 5vw, 32px);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a0d14; --bg-alt: #0e131d; --surface: #121722; --text: #e8ecf4; --muted: #9aa6bb; --line: #232a3a;
+    --accent: #818cf8; --accent-ink: #a5b4fc; --accent-soft: rgba(129,140,248,.14);
+    --teal: #5eead4; --teal-soft: rgba(45,212,191,.13);
+    --plan: #cbd5e1; --plan-soft: rgba(148,163,184,.16);
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-lg: 0 24px 60px rgba(0,0,0,.55);
+    --glow-1: rgba(99,102,241,.28); --glow-2: rgba(45,212,191,.14);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0a0d14; --bg-alt: #0e131d; --surface: #121722; --text: #e8ecf4; --muted: #9aa6bb; --line: #232a3a;
+  --accent: #818cf8; --accent-ink: #a5b4fc; --accent-soft: rgba(129,140,248,.14);
+  --teal: #5eead4; --teal-soft: rgba(45,212,191,.13);
+  --plan: #cbd5e1; --plan-soft: rgba(148,163,184,.16);
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  --shadow-lg: 0 24px 60px rgba(0,0,0,.55);
+  --glow-1: rgba(99,102,241,.28); --glow-2: rgba(45,212,191,.14);
+}
+:root[data-theme="light"] { color-scheme: light; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font); font-size: 17px; line-height: 1.6; color: var(--text); background: var(--bg);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; overflow-x: hidden;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: var(--accent-ink); }
+a:hover { text-decoration: none; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.skip { position: absolute; left: 12px; top: -60px; z-index: 100; background: var(--accent); color: #fff; padding: 10px 16px; border-radius: 10px; text-decoration: none; font-weight: 600; }
+.skip:focus { top: 12px; }
+.container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gutter); }
+section { scroll-margin-top: 76px; }
+.section { padding-block: clamp(64px, 9vw, 112px); }
+.section.alt { background: var(--bg-alt); }
+.eyebrow { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 14px; }
+h1, h2, h3 { line-height: 1.12; letter-spacing: -.02em; font-weight: 700; }
+h1 { font-size: clamp(36px, 5.6vw, 60px); letter-spacing: -.035em; }
+h2 { font-size: clamp(28px, 4vw, 42px); margin-bottom: 18px; }
+h3 { font-size: 19px; letter-spacing: -.01em; line-height: 1.25; }
+.lead { font-size: clamp(18px, 2vw, 21px); color: var(--muted); max-width: 62ch; }
+.sec-head { max-width: 760px; margin-bottom: clamp(32px, 5vw, 56px); }
+.ic { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* Tlačidlá */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 12px 24px; border-radius: 999px; font: inherit; font-size: 16px; font-weight: 600; text-decoration: none; cursor: pointer; border: 1.5px solid transparent; transition: transform .2s, box-shadow .2s, background .2s, border-color .2s; }
+.btn .ic { width: 18px; height: 18px; stroke-width: 2.2; }
+.btn-primary { background: #4f46e5; color: #fff; box-shadow: 0 6px 20px rgba(79,70,229,.35); }
+.btn-primary:hover { background: #4338ca; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(79,70,229,.45); }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent-ink); }
+
+/* Hlavička */
+header.top { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: saturate(160%) blur(14px); -webkit-backdrop-filter: saturate(160%) blur(14px); border-bottom: 1px solid var(--line); }
+.nav { display: flex; align-items: center; gap: 24px; min-height: 64px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -.02em; color: var(--text); text-decoration: none; }
+.brand img, .brand svg { width: 30px; height: 30px; border-radius: 8px; }
+.nav-links { display: flex; gap: 4px; list-style: none; margin-left: auto; align-items: center; }
+.nav-links a { display: block; padding: 8px 12px; border-radius: 10px; font-size: 15px; font-weight: 500; color: var(--muted); text-decoration: none; transition: color .2s, background .2s; }
+.nav-links a:hover { color: var(--text); background: var(--accent-soft); }
+.nav-links a.home { color: var(--text); border: 1px solid var(--line); margin-left: 6px; }
+.icon-btn { width: 44px; height: 44px; display: inline-grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; transition: border-color .2s; }
+.icon-btn:hover { border-color: var(--accent); }
+.lang-btn { width: auto; min-width: 44px; padding: 0 12px; font-size: 14px; font-weight: 700; letter-spacing: .04em; text-decoration: none; }
+.icon-btn .ic { width: 20px; height: 20px; }
+.theme-sun { display: none; }
+:root[data-theme="dark"] .theme-sun { display: block; }
+:root[data-theme="dark"] .theme-moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-sun { display: block; }
+  :root:not([data-theme="light"]) .theme-moon { display: none; }
+}
+.menu-btn { display: none; }
+@media (max-width: 900px) {
+  .nav { gap: 10px; }
+  .menu-btn { display: inline-grid; margin-left: auto; }
+  .nav-links { display: none; position: absolute; top: 64px; left: 0; right: 0; flex-direction: column; align-items: stretch; margin: 0; padding: 12px var(--gutter) 20px; background: var(--bg); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 14px 12px; font-size: 17px; }
+  .nav-links a.home { margin: 6px 0 0; text-align: center; }
+}
+
+/* Hero */
+.hero { position: relative; padding-block: clamp(48px, 8vw, 104px) clamp(56px, 8vw, 96px); overflow: hidden; }
+.hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; z-index: 0; }
+.hero::before { width: 760px; height: 760px; right: -240px; top: -300px; background: radial-gradient(closest-side, var(--glow-1), transparent); animation: drift 16s ease-in-out infinite alternate; }
+.hero::after { width: 640px; height: 640px; left: -260px; bottom: -240px; background: radial-gradient(closest-side, var(--glow-2), transparent); animation: drift 20s ease-in-out infinite alternate-reverse; }
+@keyframes drift { to { transform: translate3d(-40px, 30px, 0) scale(1.08); } }
+.hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, .6fr); gap: clamp(32px, 5vw, 64px); align-items: center; }
+.status { display: inline-flex; align-items: center; gap: 10px; padding: 7px 14px 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 26px; }
+.status .dot { width: 9px; height: 9px; border-radius: 50%; background: #14b8a6; box-shadow: 0 0 0 0 rgba(20,184,166,.6); animation: pulse 2.4s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 9px rgba(20,184,166,0); } 100% { box-shadow: 0 0 0 0 rgba(20,184,166,0); } }
+.hero .name { font-size: 15px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 16px; }
+.hero h1 .grad { background: linear-gradient(100deg, var(--accent) 10%, #0d9488 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero .sub { font-size: clamp(20px, 2.4vw, 25px); font-weight: 500; letter-spacing: -.01em; margin-top: 24px; max-width: 32ch; }
+.hero .desc { color: var(--muted); margin-top: 18px; max-width: 54ch; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+.hero .note { margin-top: 18px; font-size: 14px; color: var(--muted); }
+
+/* Ilustrácia telefónu (HTML/CSS, nie snímka obrazovky) */
+figure.device { justify-self: center; text-align: center; }
+.phone { position: relative; width: 268px; height: 540px; margin: 0 auto; border-radius: 44px; padding: 11px; background: linear-gradient(160deg, #2a3144, #0f1420); box-shadow: var(--shadow-lg), inset 0 0 0 1.5px rgba(255,255,255,.08); animation: floaty 7s ease-in-out infinite; }
+@keyframes floaty { 50% { transform: translateY(-10px); } }
+.phone::before { content: ""; position: absolute; top: 20px; left: 50%; width: 76px; height: 22px; transform: translateX(-50%); background: #05070b; border-radius: 14px; z-index: 3; }
+.screen { height: 100%; border-radius: 34px; background: #f4f6fb; padding: 54px 14px 14px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; text-align: left; color: #0f172a; }
+.s-head { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
+.s-title { font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+.s-pill { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: rgba(13,148,136,.14); color: #0f766e; }
+.s-card { background: #fff; border-radius: 16px; padding: 11px 12px; box-shadow: 0 1px 2px rgba(15,23,42,.06); }
+.s-label { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #64748b; margin-bottom: 8px; }
+.s-row { display: flex; align-items: center; gap: 9px; padding: 5px 0; }
+.s-row + .s-row { border-top: 1px solid #eef1f6; }
+.av { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #c7d2fe, #99f6e4); flex: none; }
+.bars { flex: 1; display: grid; gap: 5px; }
+.bars b { height: 7px; border-radius: 4px; background: #e2e8f0; display: block; }
+.bars b.s { width: 55%; background: #eef1f6; }
+.call { width: 24px; height: 24px; border-radius: 50%; background: #4f46e5; flex: none; position: relative; }
+.call::after { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: #fff; opacity: .9; }
+.s-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.s-chips span { font-size: 11px; font-weight: 600; padding: 6px 10px; border-radius: 99px; background: #eef2ff; color: #4338ca; }
+.s-chips span.on { background: #4f46e5; color: #fff; }
+.tabbar { margin-top: auto; display: flex; justify-content: space-around; padding: 10px 0 2px; }
+.tabbar i { width: 22px; height: 22px; border-radius: 7px; background: #dbe1ee; display: block; }
+.tabbar i.on { background: #4f46e5; }
+figure.device figcaption { margin-top: 22px; font-size: 13px; color: var(--muted); }
+@media (max-width: 860px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  figure.device { order: 2; }
+}
+
+/* Problém a riešenie */
+.problem-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.problem { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 18px; }
+.problem .ic { color: var(--accent); margin-bottom: 14px; }
+.problem h3 { font-size: 16px; margin-bottom: 8px; }
+.problem p { font-size: 14.5px; color: var(--muted); line-height: 1.5; }
+@media (max-width: 1000px) { .problem-grid { grid-template-columns: repeat(2, 1fr); } .problem:last-child { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .problem-grid { grid-template-columns: 1fr; } }
+.solution { margin-top: 28px; background: linear-gradient(135deg, var(--accent-soft), var(--teal-soft)); border: 1px solid var(--line); border-radius: calc(var(--radius) + 6px); padding: clamp(24px, 4vw, 40px); }
+.solution h3 { font-size: clamp(20px, 2.4vw, 24px); margin-bottom: 10px; }
+.solution > p { color: var(--muted); max-width: 70ch; }
+.flow { list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 6px; margin-top: 26px; }
+.flow li { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-weight: 600; font-size: 15px; box-shadow: var(--shadow); }
+.flow li b { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--solid); color: #fff; font-size: 12px; }
+.flow .arr { background: none; border: 0; box-shadow: none; padding: 0; color: var(--muted); }
+.flow .arr .ic { width: 18px; height: 18px; }
+@media (max-width: 640px) { .flow .arr { display: none; } }
+
+/* Funkcie */
+.legend { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 0 0 28px; font-size: 14.5px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 10px; }
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .02em; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge.dev { background: var(--teal-soft); color: var(--teal); }
+.badge.plan { background: var(--plan-soft); color: var(--plan); }
+.feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.card { position: relative; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 22px 22px; transition: transform .25s, box-shadow .25s, border-color .25s; }
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.card .ico { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-bottom: 18px; }
+.card h3 { margin-bottom: 10px; }
+.card p { font-size: 15px; color: var(--muted); line-height: 1.55; flex: 1; }
+.card .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
+.fine { margin-top: 26px; font-size: 14.5px; color: var(--muted); max-width: 80ch; }
+@media (max-width: 1040px) { .feature-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px) { .feature-grid { grid-template-columns: 1fr; } }
+
+/* AI roadmap */
+.ai-grid { display: grid; grid-template-columns: .95fr 1.05fr; gap: clamp(28px, 5vw, 64px); align-items: start; }
+.ai-list { list-style: none; display: grid; gap: 12px; }
+.ai-list li { display: flex; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; transition: border-color .2s, transform .2s; }
+.ai-list li:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); transform: translateX(3px); }
+.ai-list .ico { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
+.ai-list span.t { font-weight: 600; flex: 1; line-height: 1.35; }
+.callout { margin-top: 28px; border-left: 4px solid var(--accent); background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; border-top: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 20px 22px; }
+.callout p { font-size: 15.5px; color: var(--muted); }
+.callout p + p { margin-top: 10px; }
+.callout strong { color: var(--text); }
+@media (max-width: 860px) { .ai-grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .ai-list li { flex-wrap: wrap; } .ai-list span.t { flex-basis: calc(100% - 60px); } .ai-list .badge { margin-left: 56px; } }
+
+/* Vývoj – časová os */
+.timeline { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; counter-reset: step; position: relative; }
+.timeline li { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 22px 24px; }
+.timeline li::before { counter-increment: step; content: counter(step); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--solid); color: #fff; font-weight: 700; margin-bottom: 18px; }
+.timeline li:nth-child(2)::before { background: #0f766e; }
+.timeline li:nth-child(3)::before { background: #475569; }
+.timeline .when { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.timeline h3 { margin-bottom: 10px; }
+.timeline p { font-size: 15px; color: var(--muted); }
+.timeline .badge { margin-top: 16px; }
+.dev-intro { max-width: 70ch; color: var(--muted); display: grid; gap: 14px; margin-bottom: 40px; }
+@media (max-width: 860px) { .timeline { grid-template-columns: 1fr; } }
+
+/* Pre koho */
+.who-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; }
+.who-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 24px; }
+.who-box h3 { font-size: 14px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; font-weight: 700; }
+.who-box ul { list-style: none; display: grid; gap: 14px; }
+.who-box.primary ul { grid-template-columns: 1fr 1fr; }
+.who-box li { display: flex; align-items: center; gap: 12px; font-weight: 600; line-height: 1.3; }
+.who-box li .ico { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
+.who-box.future li .ico { background: var(--plan-soft); color: var(--plan); }
+@media (max-width: 860px) { .who-grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .who-box.primary ul { grid-template-columns: 1fr; } }
+
+/* About (EN) */
+.about-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: clamp(28px, 5vw, 64px); align-items: start; }
+.about-grid .sub { font-size: clamp(19px, 2.2vw, 22px); font-weight: 600; color: var(--muted); margin: -4px 0 26px; letter-spacing: -.01em; }
+.about-text { display: grid; gap: 16px; color: var(--muted); }
+.about-text p strong { color: var(--text); }
+.facts { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 22px; box-shadow: var(--shadow); }
+.facts div { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.facts div:last-child { border-bottom: 0; }
+.facts dt { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.facts dd { font-weight: 600; margin-top: 2px; }
+.founder-note { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
+.founder-note h3 { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+@media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; } }
+
+/* Kontakt */
+.contact { text-align: center; }
+.contact-box { max-width: 760px; margin: 0 auto; background: linear-gradient(135deg, var(--accent-soft), var(--teal-soft)); border: 1px solid var(--line); border-radius: 28px; padding: clamp(36px, 6vw, 64px) clamp(22px, 5vw, 56px); }
+.contact-box p { color: var(--muted); max-width: 52ch; margin: 0 auto; }
+.contact-box .cta-row { justify-content: center; }
+.mail-line { margin-top: 20px; font-size: 15px; }
+.mail-line a { font-weight: 600; word-break: break-all; }
+
+/* Pätička */
+footer { border-top: 1px solid var(--line); padding-block: 40px 48px; font-size: 14.5px; color: var(--muted); }
+.foot-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px 48px; align-items: start; }
+.foot-grid .brand { margin-bottom: 12px; }
+.foot-links { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: flex-end; }
+.foot-links a { color: var(--muted); text-decoration: none; }
+.foot-links a:hover { color: var(--text); text-decoration: underline; }
+.legal { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.65; max-width: 90ch; display: grid; gap: 8px; }
+@media (max-width: 700px) { .foot-grid { grid-template-columns: 1fr; } .foot-links { justify-content: flex-start; } }
+
+/* Animácie pri skrolovaní (bez JS je všetko viditeľné) */
+.js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; transition-delay: var(--d, 0s); }
+.js .reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Ikony (Lucide štýl) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+    <symbol id="i-smartphone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  </defs>
+</svg>
+
+<a class="skip" href="#obsah">Skip to content</a>
+
+<header class="top">
+  <div class="container nav">
+    <a class="brand" href="#hero" aria-label="Advisor Flow – top of page">
+      <img src="advisorflow-icon.svg" width="30" height="30" alt="">
+      Advisor Flow
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#funkcie">Features</a></li>
+      <li><a href="#ai">AI roadmap</a></li>
+      <li><a href="#vyvoj">Progress</a></li>
+      <li><a href="#pre-koho">Who it's for</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#kontakt">Contact</a></li>
+      <li><a class="home" href="index.html">mariotistan.sk</a></li>
+    </ul>
+    <a class="icon-btn lang-btn" href="/advisorflow" hreflang="sk" lang="sk" aria-label="Prepnúť na slovenskú verziu" title="Slovenčina">SK</a>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light and dark mode">
+      <svg class="ic theme-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+      <svg class="ic theme-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+    </button>
+    <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="obsah">
+
+<!-- 1 · HERO -->
+<section class="hero" id="hero" aria-labelledby="hero-h">
+  <div class="container hero-grid">
+    <div>
+      <p class="status"><span class="dot" aria-hidden="true"></span>Early-stage SaaS | In Development</p>
+      <p class="name">Advisor Flow</p>
+      <h1 id="hero-h"><span class="sr-only">Advisor Flow – </span>Less administration. <br><span class="grad">More room for business.</span></h1>
+      <p class="sub">An intelligent sales assistant for financial intermediaries and sales teams.</p>
+      <p class="desc">Advisor Flow is an upcoming iOS app that helps simplify sales processes, organise meetings, manage tasks and track sales performance.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="mailto:asistent@mariotistan.sk?subject=Advisor%20Flow%20%E2%80%93%20interest%20in%20testing&amp;body=Hello%2C%0A%0AI%27m%20interested%20in%20testing%20the%20Advisor%20Flow%20app.%0A%0AName%3A%0ARole%20/%20company%3A%0APhone%20%28optional%29%3A%0A%0AThank%20you.">I'm interested in testing <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-ghost" href="#funkcie">See the features</a>
+      </div>
+      <p class="note">The app is under development and is not yet publicly available.</p>
+    </div>
+
+    <figure class="device">
+      <div class="phone" aria-hidden="true">
+        <div class="screen">
+          <div class="s-head"><span class="s-title">Today</span><span class="s-pill">Illustration</span></div>
+          <div class="s-card">
+            <div class="s-label">Who to call today</div>
+            <div class="s-row"><i class="av"></i><span class="bars"><b></b><b class="s"></b></span><i class="call"></i></div>
+            <div class="s-row"><i class="av"></i><span class="bars"><b></b><b class="s"></b></span><i class="call"></i></div>
+            <div class="s-row"><i class="av"></i><span class="bars"><b></b><b class="s"></b></span><i class="call"></i></div>
+          </div>
+          <div class="s-card">
+            <div class="s-label">Call result</div>
+            <div class="s-chips"><span class="on">Meeting booked</span><span>Reschedule</span></div>
+          </div>
+          <div class="s-card">
+            <div class="s-label">Next meeting</div>
+            <div class="s-row"><i class="av"></i><span class="bars"><b></b><b class="s"></b></span></div>
+          </div>
+          <div class="tabbar"><i class="on"></i><i></i><i></i><i></i></div>
+        </div>
+      </div>
+      <figcaption>Illustrative preview of the interface – not a screenshot.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 2 · PROBLÉM A RIEŠENIE -->
+<section class="section alt" id="problem" aria-labelledby="problem-h">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Problem and solution</span>
+      <h2 id="problem-h">All important sales activities in one place.</h2>
+      <p class="lead">A salesperson loses time not while selling, but around it. These are situations we know from everyday work in financial intermediation.</p>
+    </div>
+
+    <div class="problem-grid">
+      <article class="problem reveal">
+        <svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg>
+        <h3>Scattered information</h3>
+        <p>Contacts, notes, calls and appointments live in different apps and notebooks.</p>
+      </article>
+      <article class="problem reveal" style="--d:.06s">
+        <svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg>
+        <h3>Manual call logging</h3>
+        <p>After every call you have to find the contact and write down by hand how it went.</p>
+      </article>
+      <article class="problem reveal" style="--d:.12s">
+        <svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg>
+        <h3>Forgotten follow-ups</h3>
+        <p>A promised call-back or next step easily gets lost in the rush of the day.</p>
+      </article>
+      <article class="problem reveal" style="--d:.18s">
+        <svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>
+        <h3>Inefficient calendar work</h3>
+        <p>Booking, moving or cancelling an appointment means jumping between several places.</p>
+      </article>
+      <article class="problem reveal" style="--d:.24s">
+        <svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg>
+        <h3>Little insight into performance</h3>
+        <p>Without numbers it is hard to know how many calls lead to a meeting and how many meetings lead to a deal.</p>
+      </article>
+    </div>
+
+    <div class="solution reveal">
+      <h3>Advisor Flow aims to bring these things together into one smooth working day.</h3>
+      <p>The goal is for one step to follow naturally from the next, so the advisor does not have to retype anything or keep it all in their head.</p>
+      <ol class="flow" aria-label="Sequence of a working day in the app">
+        <li><b>1</b>Call</li>
+        <li class="arr" aria-hidden="true"><svg class="ic"><use href="#i-arrow"/></svg></li>
+        <li><b>2</b>Result</li>
+        <li class="arr" aria-hidden="true"><svg class="ic"><use href="#i-arrow"/></svg></li>
+        <li><b>3</b>Next step</li>
+        <li class="arr" aria-hidden="true"><svg class="ic"><use href="#i-arrow"/></svg></li>
+        <li><b>4</b>Meeting</li>
+        <li class="arr" aria-hidden="true"><svg class="ic"><use href="#i-arrow"/></svg></li>
+        <li><b>5</b>Performance overview</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · FUNKCIE -->
+<section class="section" id="funkcie" aria-labelledby="funkcie-h">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">App features</span>
+      <h2 id="funkcie-h">What Advisor Flow addresses</h2>
+      <p class="lead">Eight areas we are working on. Each one shows its current status.</p>
+    </div>
+
+    <div class="legend reveal" role="note">
+      <span><span class="badge dev">In development</span> The basis of the feature is already in the app; we keep refining it.</span>
+      <span><span class="badge plan">Planned</span> Not implemented yet.</span>
+    </div>
+
+    <div class="feature-grid">
+      <article class="card reveal">
+        <div class="ico"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg></div>
+        <h3>Call management</h3>
+        <p>Log a call result in a few taps, a “Who to call today” list and tracking of call-backs.</p>
+        <div class="badges"><span class="badge dev">In development</span></div>
+      </article>
+      <article class="card reveal" style="--d:.05s">
+        <div class="ico"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></div>
+        <h3>Contact management</h3>
+        <p>Import of contacts from the iPhone, statuses from lead to client, and a history of calls and meetings for every contact.</p>
+        <div class="badges"><span class="badge dev">In development</span></div>
+      </article>
+      <article class="card reveal" style="--d:.1s">
+        <div class="ico"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></div>
+        <h3>Planning sales meetings</h3>
+        <p>Meetings are written to Apple Calendar. Moving or cancelling an appointment is reflected in the calendar event too.</p>
+        <div class="badges"><span class="badge dev">In development</span></div>
+      </article>
+      <article class="card reveal" style="--d:.15s">
+        <div class="ico"><svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg></div>
+        <h3>Reminders and work tasks</h3>
+        <p>Follow-ups with notifications, and tasks that can be written to Apple Reminders, including for a colleague.</p>
+        <div class="badges"><span class="badge dev">In development</span></div>
+      </article>
+      <article class="card reveal">
+        <div class="ico"><svg class="ic" aria-hidden="true"><use href="#i-message"/></svg></div>
+        <h3>Follow-up communication automation</h3>
+        <p>The app suggests the next step and prepares the message text. The user always confirms sending. Broader automation is planned.</p>
+        <div class="badges"><span class="badge dev">In development</span><span class="badge plan">Extension planned</span></div>
+      </article>
+      <article class="card reveal" style="--d:.05s">
+        <div class="ico"><svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg></div>
+        <h3>Statistics and performance review</h3>
+        <p>Sales funnel, monthly goals, sources of new clients and a comparison with the previous period.</p>
+        <div class="badges"><span class="badge dev">In development</span></div>
+      </article>
+      <article class="card reveal" style="--d:.1s">
+        <div class="ico"><svg class="ic" aria-hidden="true"><use href="#i-smartphone"/></svg></div>
+        <h3>Apple ecosystem integration</h3>
+        <p>Calendar, Reminders, Contacts and the system Messages and Mail apps. We are also preparing an Apple Watch companion and a Mac app.</p>
+        <div class="badges"><span class="badge dev">In development</span></div>
+      </article>
+      <article class="card reveal" style="--d:.15s">
+        <div class="ico"><svg class="ic" aria-hidden="true"><use href="#i-zap"/></svg></div>
+        <h3>Intelligent sales workflow</h3>
+        <p>Today this means linking steps by fixed rules: call, follow-up, meeting, service. An AI layer is planned.</p>
+        <div class="badges"><span class="badge dev">In development</span><span class="badge plan">AI layer planned</span></div>
+      </article>
+    </div>
+
+    <p class="fine reveal">None of the features is commercially available yet, and their scope may change during testing.</p>
+  </div>
+</section>
+
+<!-- 4 · AI ROADMAP -->
+<section class="section alt" id="ai" aria-labelledby="ai-h">
+  <div class="container ai-grid">
+    <div class="reveal">
+      <span class="eyebrow">AI roadmap</span>
+      <h2 id="ai-h">The future of sales productivity with AI.</h2>
+      <p class="lead">These are the directions we want to explore once the core of the app has proven itself. Everything on this list is planned, not finished.</p>
+      <div class="callout">
+        <p><strong>We use Claude Code while developing the app.</strong></p>
+        <p>Claude API integration is planned, but is not yet implemented in production.</p>
+        <p>Advisor Flow is not an official partner or product of Anthropic.</p>
+      </div>
+    </div>
+
+    <ul class="ai-list">
+      <li class="reveal"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-file"/></svg></span><span class="t">AI summaries of sales activity</span><span class="badge plan">Planned</span></li>
+      <li class="reveal" style="--d:.05s"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg></span><span class="t">Intelligent meeting preparation</span><span class="badge plan">Planned</span></li>
+      <li class="reveal" style="--d:.1s"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg></span><span class="t">Suggested next sales steps</span><span class="badge plan">Planned</span></li>
+      <li class="reveal" style="--d:.15s"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg></span><span class="t">Administration automation</span><span class="badge plan">Planned</span></li>
+      <li class="reveal" style="--d:.2s"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-message"/></svg></span><span class="t">Conversational AI assistant</span><span class="badge plan">Planned</span></li>
+      <li class="reveal" style="--d:.25s"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg></span><span class="t">Voice control</span><span class="badge plan">Planned</span></li>
+      <li class="reveal" style="--d:.3s"><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-link"/></svg></span><span class="t">Integration with external services via MCP</span><span class="badge plan">Planned</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5 · AKTUÁLNY STAV VÝVOJA -->
+<section class="section" id="vyvoj" aria-labelledby="vyvoj-h">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Current development status</span>
+      <h2 id="vyvoj-h">We are preparing real-world testing</h2>
+    </div>
+    <div class="dev-intro reveal">
+      <p>Advisor Flow is built on practical experience from financial intermediation.</p>
+      <p>The first phase of testing will take place within an existing network of financial intermediaries. The aim is to gather real feedback, refine the user interface and make sure the app is stable.</p>
+      <p>After successful testing, we plan a commercial launch as a subscription.</p>
+    </div>
+
+    <ol class="timeline">
+      <li class="reveal">
+        <div class="when">2026</div>
+        <h3>MVP development</h3>
+        <p>We are building the core of a salesperson’s working day: calls, contacts, meetings, tasks and statistics.</p>
+        <span class="badge dev">In progress</span>
+      </li>
+      <li class="reveal" style="--d:.08s">
+        <div class="when">Next phase</div>
+        <h3>Internal testing</h3>
+        <p>Validating the app within an existing network of financial intermediaries and collecting feedback.</p>
+        <span class="badge dev">In preparation</span>
+      </li>
+      <li class="reveal" style="--d:.16s">
+        <div class="when">Future phase</div>
+        <h3>Commercial launch</h3>
+        <p>A monthly subscription after successful testing. No launch date has been set yet.</p>
+        <span class="badge plan">Planned</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- 6 · PRE KOHO -->
+<section class="section alt" id="pre-koho" aria-labelledby="koho-h">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Who Advisor Flow is for</span>
+      <h2 id="koho-h">For people who live on calls and meetings.</h2>
+    </div>
+    <div class="who-grid">
+      <div class="who-box primary reveal">
+        <h3>Primary</h3>
+        <ul>
+          <li><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-briefcase"/></svg></span>Financial intermediaries</li>
+          <li><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span>Financial advisors</li>
+          <li><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg></span>Sales managers</li>
+          <li><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg></span>Sales teams</li>
+        </ul>
+      </div>
+      <div class="who-box future reveal" style="--d:.08s">
+        <h3>Future segments</h3>
+        <ul>
+          <li><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg></span>Real-estate agents</li>
+          <li><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span>Independent salespeople</li>
+          <li><span class="ico"><svg class="ic" aria-hidden="true"><use href="#i-building"/></svg></span>B2B sales organisations</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · ABOUT (EN) -->
+<section class="section" id="about" aria-labelledby="about-h">
+  <div class="container about-grid">
+    <div class="reveal">
+      <span class="eyebrow">About the startup</span>
+      <h2 id="about-h">About Advisor Flow</h2>
+      <p class="sub">Building the future of sales productivity.</p>
+      <div class="about-text">
+        <p>Advisor Flow is a new, self-funded B2B SaaS initiative started in Slovakia in 2026.</p>
+        <p>We're building a native iOS application to streamline calls, appointments, follow-ups, tasks and performance analytics for financial advisors and sales teams.</p>
+        <p>The product is currently under active development.</p>
+        <p>We plan to validate it through internal testing with an established network of financial advisors before launching a commercial subscription model.</p>
+        <p>Claude Code supports our development workflow, and we plan to explore Claude API integration for intelligent summaries, meeting preparation and workflow automation.</p>
+        <p>Our long-term vision is to provide an intelligent, scalable productivity platform for independent professionals and businesses.</p>
+      </div>
+      <div class="founder-note about-text">
+        <h3>Founder background</h3>
+        <p>The founder has worked in financial services for approximately ten years and has operated as a sole proprietor since March 2021.</p>
+        <p>Advisor Flow is a new software product initiative, not a separately incorporated company.</p>
+      </div>
+    </div>
+    <dl class="facts reveal" style="--d:.08s">
+      <div><dt>Founder</dt><dd>Mário Tišťan</dd></div>
+      <div><dt>Location</dt><dd>Slovakia</dd></div>
+      <div><dt>Product initiative started</dt><dd>2026</dd></div>
+      <div><dt>Funding</dt><dd>Self-funded</dd></div>
+      <div><dt>Business model</dt><dd>B2B SaaS</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- 8 · KONTAKT -->
+<section class="section alt contact" id="kontakt" aria-labelledby="kontakt-h">
+  <div class="container">
+    <div class="contact-box reveal">
+      <span class="eyebrow">Contact</span>
+      <h2 id="kontakt-h">Interested in Advisor Flow?</h2>
+      <p>We are currently preparing internal testing of the app. If you are interested in future testing, collaboration or information about the project, get in touch.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="mailto:asistent@mariotistan.sk?subject=Advisor%20Flow%20%E2%80%93%20contact"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg> Contact Advisor Flow</a>
+      </div>
+      <p class="mail-line">Email: <a href="mailto:asistent@mariotistan.sk">asistent@mariotistan.sk</a></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#hero"><img src="advisorflow-icon.svg" width="30" height="30" alt="">Advisor Flow</a>
+        <p>A software initiative by Mário Tišťan · Slovakia · since 2026</p>
+      </div>
+      <ul class="foot-links">
+        <li><a href="#funkcie">Features</a></li>
+        <li><a href="#ai">AI roadmap</a></li>
+        <li><a href="#vyvoj">Progress</a></li>
+        <li><a href="index.html">mariotistan.sk</a></li>
+        <li><a href="ochrana-udajov.html" hreflang="sk" lang="sk">Privacy policy (SK)</a></li>
+      </ul>
+    </div>
+    <div class="legal">
+      <p>Advisor Flow is a new, standalone software project, not a separate legal entity. The project is self-funded.</p>
+      <p>Advisor Flow is not an official product of Partners Group SK or Anthropic and is neither affiliated with nor endorsed by either of them. The app is under development, the features described may change, and planned features are not guaranteed.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var doc = document.documentElement;
+
+  /* Prepínač témy */
+  var themeBtn = document.getElementById('themeBtn');
+  function isDark() {
+    var t = doc.getAttribute('data-theme');
+    if (t) return t === 'dark';
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function syncThemeLabel() {
+    themeBtn.setAttribute('aria-label', isDark() ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+  themeBtn.addEventListener('click', function () {
+    var next = isDark() ? 'light' : 'dark';
+    doc.setAttribute('data-theme', next);
+    try { localStorage.setItem('af-theme', next); } catch (e) {}
+    syncThemeLabel();
+  });
+  syncThemeLabel();
+
+  /* Mobilné menu */
+  var menuBtn = document.getElementById('menuBtn');
+  var navLinks = document.getElementById('navLinks');
+  function setMenu(open) {
+    navLinks.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    menuBtn.firstElementChild.firstElementChild.setAttribute('href', open ? '#i-x' : '#i-menu');
+  }
+  menuBtn.addEventListener('click', function () { setMenu(!navLinks.classList.contains('open')); });
+  navLinks.addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setMenu(false); });
+
+  /* Jemné zjavovanie prvkov pri skrolovaní */
+  var items = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    items.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  items.forEach(function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>
