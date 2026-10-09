@@ -12,7 +12,7 @@
 <link rel="alternate" hreflang="x-default" href="https://www.mariotistan.sk/advisorflow">
 <meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0a0d14" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/svg+xml" href="advisorflow-icon.svg">
+<link rel="icon" type="image/svg+xml" href="/advisorflow-icon.svg">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Advisor Flow">
@@ -40,18 +40,16 @@
       "url": "https://www.mariotistan.sk/advisorflow",
       "name": "Advisor Flow | Inteligentný obchodný asistent",
       "inLanguage": "sk",
-      "isPartOf": { "@type": "WebSite", "name": "Mário Tišťan", "url": "https://www.mariotistan.sk/" },
-      "about": { "@id": "https://www.mariotistan.sk/advisorflow#app" }
-    },
-    {
-      "@type": "SoftwareApplication",
-      "@id": "https://www.mariotistan.sk/advisorflow#app",
-      "name": "Advisor Flow",
-      "applicationCategory": "BusinessApplication",
-      "operatingSystem": "iOS",
-      "description": "Pripravovaná iOS aplikácia pre finančných sprostredkovateľov a obchodné tímy: telefonáty, kontakty, stretnutia, úlohy a štatistiky na jednom mieste. Vo vývoji, zatiaľ nie je verejne dostupná.",
-      "url": "https://www.mariotistan.sk/advisorflow",
-      "author": { "@type": "Person", "name": "Mário Tišťan", "url": "https://www.mariotistan.sk/" }
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Mário Tišťan",
+        "url": "https://www.mariotistan.sk/"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Mário Tišťan",
+        "url": "https://www.mariotistan.sk/"
+      }
     }
   ]
 }
@@ -385,7 +383,7 @@ footer { border-top: 1px solid var(--line); padding-block: 40px 48px; font-size:
 <header class="top">
   <div class="container nav">
     <a class="brand" href="#hero" aria-label="Advisor Flow – začiatok stránky">
-      <img src="advisorflow-icon.svg" width="30" height="30" alt="">
+      <img src="/advisorflow-icon.svg" width="30" height="30" alt="">
       Advisor Flow
     </a>
     <ul class="nav-links" id="navLinks">
@@ -395,7 +393,7 @@ footer { border-top: 1px solid var(--line); padding-block: 40px 48px; font-size:
       <li><a href="#pre-koho">Pre koho</a></li>
       <li><a href="#about" lang="en" hreflang="en">About</a></li>
       <li><a href="#kontakt">Kontakt</a></li>
-      <li><a class="home" href="index.html">mariotistan.sk</a></li>
+      <li><a class="home" href="/">mariotistan.sk</a></li>
     </ul>
     <a class="icon-btn lang-btn" href="/advisorflow-en" hreflang="en" lang="en" aria-label="Switch to the English version" title="English">EN</a>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Prepnúť svetlý a tmavý režim">
@@ -561,7 +559,7 @@ footer { border-top: 1px solid var(--line); padding-block: 40px 48px; font-size:
       <article class="card reveal" style="--d:.1s">
         <div class="ico"><svg class="ic" aria-hidden="true"><use href="#i-smartphone"/></svg></div>
         <h3>Integrácia s ekosystémom Apple</h3>
-        <p>Kalendár, Pripomienky, Kontakty a systémové Správy či Mail. Pripravujeme aj spoločníka pre Apple Watch a aplikáciu pre Mac.</p>
+        <p>Kalendár, Pripomienky, Kontakty a systémové Správy či Mail. Pripravujeme aj aplikácie pre Apple Watch a Mac.</p>
         <div class="badges"><span class="badge dev">Vo vývoji</span></div>
       </article>
       <article class="card reveal" style="--d:.15s">
@@ -610,7 +608,7 @@ footer { border-top: 1px solid var(--line); padding-block: 40px 48px; font-size:
       <h2 id="vyvoj-h">Pripravujeme testovanie v praxi</h2>
     </div>
     <div class="dev-intro reveal">
-      <p>Advisor Flow vzniká na základe praktických skúseností z finančného sprostredkovania. Vytvára ho finančný sprostredkovateľ pre profesionálov, pre ktorých je každá minúta strávená administratívou minútou preč od klientov.</p>
+      <p>Advisor Flow vzniká na základe praktických skúseností z finančného sprostredkovania. Vytvára ho finančný sprostredkovateľ pre profesionálov, pre ktorých je každá minúta strávená administratívou minútou, ktorú nemôžu venovať klientom.</p>
       <p>Prvá fáza testovania bude prebiehať v existujúcej sieti finančných sprostredkovateľov. Cieľom je získavať reálnu spätnú väzbu, optimalizovať používateľské rozhranie a zabezpečiť stabilitu aplikácie.</p>
       <p>Po úspešnom testovaní plánujeme komerčné spustenie formou predplatného.</p>
     </div>
@@ -680,7 +678,7 @@ footer { border-top: 1px solid var(--line); padding-block: 40px 48px; font-size:
         <p>We're building a native iOS application to streamline calls, appointments, follow-ups, tasks and performance analytics for financial advisors and sales teams.</p>
         <p>The product is currently under active development.</p>
         <p>We plan to validate it through internal testing with an established network of financial advisors before launching a commercial subscription model.</p>
-        <p>We use Claude Code to support product development and plan to integrate Claude API to build secure, responsible AI-powered productivity features, such as intelligent summaries, meeting preparation and workflow automation.</p>
+        <p>We use Claude Code to support product development and plan to integrate the Claude API to build secure, responsible AI-powered productivity features, such as intelligent summaries, meeting preparation and workflow automation.</p>
         <p>Our long-term vision is to provide an intelligent, scalable productivity platform for independent professionals and businesses.</p>
       </div>
       <div class="founder-note about-text">
@@ -720,15 +718,15 @@ footer { border-top: 1px solid var(--line); padding-block: 40px 48px; font-size:
   <div class="container">
     <div class="foot-grid">
       <div>
-        <a class="brand" href="#hero"><img src="advisorflow-icon.svg" width="30" height="30" alt="">Advisor Flow</a>
+        <a class="brand" href="#hero"><img src="/advisorflow-icon.svg" width="30" height="30" alt="">Advisor Flow</a>
         <p>Softvérová iniciatíva Mária Tišťana · Slovensko · od roku 2026</p>
       </div>
       <ul class="foot-links">
         <li><a href="#funkcie">Funkcie</a></li>
         <li><a href="#ai">AI roadmap</a></li>
         <li><a href="#vyvoj">Vývoj</a></li>
-        <li><a href="index.html">mariotistan.sk</a></li>
-        <li><a href="ochrana-udajov.html">Ochrana údajov</a></li>
+        <li><a href="/">mariotistan.sk</a></li>
+        <li><a href="/ochrana-udajov.html">Ochrana údajov</a></li>
       </ul>
     </div>
     <div class="legal">
