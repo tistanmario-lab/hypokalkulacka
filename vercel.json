@@ -1,4 +1,16 @@
 {
+  "redirects": [
+    {
+      "source": "/advisorflow/",
+      "destination": "/advisorflow",
+      "permanent": true
+    },
+    {
+      "source": "/advisorflow-en/",
+      "destination": "/advisorflow-en",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/advisorflow",
@@ -6,14 +18,6 @@
     },
     {
       "source": "/advisorflow-en",
-      "destination": "/advisorflow-en.html"
-    },
-    {
-      "source": "/advisorflow/",
-      "destination": "/advisorflow.html"
-    },
-    {
-      "source": "/advisorflow-en/",
       "destination": "/advisorflow-en.html"
     }
   ],
