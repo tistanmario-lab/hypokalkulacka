@@ -209,6 +209,8 @@ body{font-family:'Graphik',Arial,Helvetica,sans-serif;background:var(--sand);col
 .zab-davka-override{width:96px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--navy);background:var(--white);transition:border-color .2s;}
 .zab-davka-override:focus{outline:none;border-color:var(--red);}
 .zab-davka-override.edited{border-color:var(--red);background:rgba(171,5,52,0.03);}
+.zab-ps-variants{display:block;width:170px;margin-top:6px;padding:5px 8px;border:1px dashed var(--border);border-radius:8px;font-family:inherit;font-size:12px;color:var(--gray);background:var(--white);}
+.zab-ps-variants:focus{outline:none;border-color:var(--red);border-style:solid;}
 
 /* Priority badges */
 .zab-priority{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.04em;white-space:nowrap;}
@@ -2265,6 +2267,19 @@ function zabRentaToPS(kind, gap){
   return { ps: Math.round(gap), unit:'mes', typ:'', label: formatEUR(Math.round(gap))+'/mes' };
 }
 // Štítky poistnej sumy / typu krytia do zmluvy (zohľadňujú klesajúcu a fixnú PS)
+// Varianty poistnej sumy zadané pri riziku (Krok 8) — čísla oddelené čiarkou/bodkočiarkou
+function zabVariantySum(cb, hlavna){
+  const tr = cb && cb.closest ? cb.closest('tr') : null;
+  const inp = tr ? tr.querySelector('.zab-ps-variants') : null;
+  if(!inp || !inp.value.trim()) return [];
+  const out = [];
+  inp.value.split(/[;,|\/]+/).forEach(function(t){
+    const n = parseFloat(t.replace(/[^0-9.]/g, ''));
+    if(n > 0 && Math.round(n) !== Math.round(hlavna) && out.indexOf(Math.round(n)) < 0) out.push(Math.round(n));
+  });
+  return out.sort(function(a, b){ return b - a; });
+}
+
 function zabPsLabel(suma, unit, typ){
   if(unit==='den') return formatEUR(suma)+'/deň';
   if(typ==='klesajuca' || typ==='inval') return formatEUR(suma)+' (klesajúca PS)';
@@ -2326,6 +2341,7 @@ function buildZabTable(prefix, bodyId){
   // Zachovaj ručne prepísané dávky/PS pred prestavbou tabuľky
   const prevEdit = {};
   tbody.querySelectorAll('.zab-davka-override[data-edited="1"]').forEach(inp=>{ prevEdit[inp.dataset.row] = inp.value; });
+  tbody.querySelectorAll('.zab-ps-variants').forEach(inp=>{ if(inp.value.trim()) prevEdit[inp.dataset.row+'__var'] = inp.value.trim(); });
   tbody.innerHTML = '';
 
   // ── Skupina A: výpadok príjmu (mesačná renta) ──
@@ -2465,7 +2481,9 @@ function addPsRow(tbody, prefix, name, ps, sub, prio, typ, prevEdit, roky){
   tr.innerHTML =
     `<td><strong>${name}</strong><div class="zab-sub">${sub}</div></td>`+
     `<td colspan="2" class="zab-sub">Poistná suma</td>`+
-    `<td><input type="number" min="0" class="zab-davka-override${edited?' edited':''}" data-mode="ps" data-row="${name}"${edited?' data-edited="1"':''} value="${Math.round(val)}" oninput="recomputeZab(this)"></td>`+
+    `<td><input type="number" min="0" class="zab-davka-override${edited?' edited':''}" data-mode="ps" data-row="${name}"${edited?' data-edited="1"':''} value="${Math.round(val)}" oninput="recomputeZab(this)">`+
+      (typ==='kch' ? `<input type="text" class="zab-ps-variants" data-row="${name}" placeholder="Varianty, napr. 100000, 30000" title="Ďalšie varianty poistnej sumy na porovnanie (zobrazia sa v pláne)" value="${String(prevEdit[name+'__var']||'').replace(/"/g,'')}">` : '')+
+    `</td>`+
     `<td><input type="checkbox" class="fp-zab-${prefix}" data-name="${name}" data-suma="${Math.round(val)}" data-unit="jednorazovo" data-priority="${prio}" data-typ="${typ}"${rokyAttr} ${val>0?'checked':''}></td>`;
   tbody.appendChild(tr);
 }
@@ -3970,7 +3988,8 @@ function buildFinancialPlan(){
     const _hrubyVal = parseFloat(document.getElementById('k_hruby').value)||0;
     const _miera = parseFloat((document.getElementById('doch_miera')||{}).value)||0;
     const _zProg = ((document.getElementById('doch_prognoza')||{}).checked);
-    html += `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Štátny dôchodok ${formatEUR(_statnyVal)}/mes — ${_zProg?'<strong>z dôchodkovej prognózy Sociálnej poisťovne</strong> (I. pilier)':'orientačný odhad; presnú sumu má klient v dôchodkovej prognóze zo Sociálnej poisťovne'}.</div>`;
+    if(_statnyVal <= 0) html += `<div class="info-box" style="margin-bottom:12px;"><strong>So štátnym dôchodkom v pláne nepočítame.</strong> Dôchodok z vlastného portfólia má fungovať samostatne — štátny dôchodok (I. pilier) bude bonus navyše.</div>`;
+    else html += `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Štátny dôchodok ${formatEUR(_statnyVal)}/mes — ${_zProg?'<strong>z dôchodkovej prognózy Sociálnej poisťovne</strong> (I. pilier)':'orientačný odhad; presnú sumu má klient v dôchodkovej prognóze zo Sociálnej poisťovne'}.</div>`;
     if(_miera > 0){
       const _nizka = _miera < 50;
       html += `<div class="info-box${_nizka?' warning':''}" style="margin-bottom:12px;">`;
@@ -4380,7 +4399,8 @@ function buildFinancialPlan(){
         name:cb.dataset.name, suma:parseFloat(cb.dataset.suma)||0,
         davka:parseFloat(cb.dataset.davka)||0, krytie:parseFloat(cb.dataset.krytie)||0,
         vydavky:parseFloat(cb.dataset.vydavky)||0, splatka:parseFloat(cb.dataset.splatka)||0,
-        unit:cb.dataset.unit||'mes', prio:parseInt(cb.dataset.priority)||3, typ:cb.dataset.typ||''
+        unit:cb.dataset.unit||'mes', prio:parseInt(cb.dataset.priority)||3, typ:cb.dataset.typ||'',
+        varianty: zabVariantySum(cb, parseFloat(cb.dataset.suma)||0)
       })).filter(it=>it.suma>0).sort((a,b)=>a.prio-b.prio);
       if(items.length===0) return '';
       let h = `<div style="font-size:14px;font-weight:700;color:var(--navy);margin:18px 0 10px;">${title}</div>`;
@@ -4426,7 +4446,7 @@ function buildFinancialPlan(){
       h += `<table class="zab-ps-table"><thead><tr><th>Produkt</th><th>Typ krytia</th><th style="text-align:right;">Poistná suma</th><th>Priorita</th></tr></thead><tbody>`;
       items.forEach(it=>{
         const prod = getZabProduct(it.name);
-        h += `<tr><td>${it.name}<div class="zab-sub">${prod.product}</div></td><td>${zabPsTypeLabel(it.unit,it.typ)}</td><td class="ps-amount">${zabPsLabel(it.suma,it.unit,it.typ)}</td><td>${prioLabel[it.prio]}</td></tr>`;
+        h += `<tr><td>${it.name}<div class="zab-sub">${prod.product}</div></td><td>${zabPsTypeLabel(it.unit,it.typ)}</td><td class="ps-amount">${zabPsLabel(it.suma,it.unit,it.typ)}${it.varianty.length?'<div class="zab-sub" style="font-weight:400;">alternatívy: '+it.varianty.map(formatEUR).join(' · ')+'</div>':''}</td><td>${prioLabel[it.prio]}</td></tr>`;
       });
       h += `</tbody></table>`;
       // Súhrn poistnej sumy pre prípad úmrtia
@@ -4929,6 +4949,10 @@ function collectAOFData(){
   data.zabPartnerHTML = document.getElementById('zabBodyPartner')?.innerHTML||'';
   // Zadal poradca mieru náhrady ručne? (po načítaní podľa toho vieme, či je vedúca)
   data.dochMieraEdited = document.getElementById('doch_miera')?.dataset.edited === '1';
+  // Štátny dôchodok zadaný ručne — aj 0 € (napr. odchod do dôchodku pred štátnym dôchodkovým vekom)
+  data.dochStatnyEdited = document.getElementById('doch_statny')?.dataset.edited === '1';
+  // Varianty poistných súm (napr. kritické choroby 200 000 / 100 000 / 30 000) prežijú serializáciu
+  document.querySelectorAll('.zab-ps-variants').forEach(function(i){ i.setAttribute('value', i.value); });
 
   return data;
 }
@@ -5283,7 +5307,7 @@ function applyAOFData(data){
     // Dôchodok: uložené hodnoty ber ako ručne nastavené, nech ich nový auto-odhad neprepíše
     // (zachová pôvodné čísla v starších analýzach — odhad sa dotkne len prázdnych polí).
     var _ds = document.getElementById('doch_statny');
-    if(_ds && (parseFloat(_ds.value)||0) > 0) _ds.dataset.edited = '1';
+    if(_ds && (data.dochStatnyEdited === true || (parseFloat(_ds.value)||0) > 0)) _ds.dataset.edited = '1';
     var _drp = document.getElementById('doch_roky_poistenia');
     if(_drp && (parseFloat(_drp.value)||0) > 0) _drp.dataset.edited = '1';
 
