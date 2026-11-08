@@ -49,11 +49,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#ECEDED;color:#00304
 header{background:#fff;border-bottom:1px solid rgba(0,48,73,0.08);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:0 1px 8px rgba(0,48,73,0.04)}
 .logo-badge{background:#003049;color:#fff;font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;padding:6px 12px}
 .logo-title{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin:0 0 0 12px}
-.pg-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,48,73,0.55)}
+.pg-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color: rgba(0,48,73,0.72)}
 .main{max-width:1100px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:340px 1fr;gap:20px}
 .panel{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:24px;margin-bottom:16px;border-radius:20px}
 .panel-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;background:#003049;color:#fff;margin-bottom:14px;border-radius:6px}
-.panel-tag.gold{background:#989FA7}
+.panel-tag.gold{background:#989FA7;color:#003049}
 .panel-tag.red{background:#AB0534}
 .panel-title{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#003049;margin-bottom:20px}
 .field{margin-bottom:18px}
@@ -64,7 +64,7 @@ input[type=range].blue-range{accent-color:#003049}
 input[type=range].gold-range{accent-color:#989FA7}
 .num-input{width:110px;padding:6px 10px;text-align:right;font-size:14px;font-weight:800;color:#AB0534;background:rgba(171,5,52,0.05);border:1px solid rgba(171,5,52,0.15);outline:none;border-radius:8px}
 .num-input.blue{color:#003049;background:rgba(0,48,73,0.04);border-color:rgba(0,48,73,0.12)}
-.num-input.gold{color:#989FA7;background:rgba(152,159,167,0.06);border-color:rgba(152,159,167,0.2)}
+.num-input.gold{color:#5F656B;background:rgba(152,159,167,0.06);border-color:rgba(152,159,167,0.2)}
 .num-input:focus{border-color:#AB0534}
 .info-row{background:rgba(0,48,73,0.04);border-left:3px solid rgba(0,48,73,0.3);padding:10px 14px;margin-bottom:16px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(0,48,73,0.72);display:flex;justify-content:space-between;align-items:center;gap:10px;border-radius:0 12px 12px 0}
 .info-row span{color:#003049;font-size:14px;font-weight:800}
@@ -86,11 +86,11 @@ input[type=range].gold-range{accent-color:#989FA7}
 .cbox{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:20px;border-radius:20px}
 .cbox-tag{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;display:inline-block;margin-bottom:10px;border-radius:6px}
 .cbox-tag.red{background:#AB0534;color:#fff}
-.cbox-tag.gold{background:#989FA7;color:#fff}
+.cbox-tag.gold{background:#989FA7;color:#003049}
 .cbox-tag.navy{background:#003049;color:#fff}
 .cbox-title{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
 .cbox-title.red{color:#AB0534}
-.cbox-title.gold{color:#989FA7}
+.cbox-title.gold{color:#5F656B}
 .cbox-title.navy{color:#003049}
 .cbox-stat-lbl{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(0,48,73,0.65);margin-bottom:3px}
 .cbox-stat-val{font-size:24px;font-weight:800;letter-spacing:-.02em;color:#003049;margin-bottom:12px}
@@ -125,16 +125,16 @@ input[type=range].gold-range{accent-color:#989FA7}
 .pdf-btn{width:100%;padding:15px;background:#AB0534;border:none;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;transition:background .2s;border-radius:20px}
 .pdf-btn:hover{background:#003049}
 .pdf-btn svg{width:18px;height:18px;fill:currentColor}
-footer{text-align:center;padding:24px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,48,73,0.5);border-top:1px solid rgba(0,48,73,0.07);max-width:1100px;margin:0 auto}
+footer{text-align:center;padding:24px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color: rgba(0,48,73,0.72);border-top:1px solid rgba(0,48,73,0.07);max-width:1100px;margin:0 auto}
 .pdf-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,48,73,0.6);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
 .pdf-modal-overlay.show{display:flex}
 .pdf-modal{background:#fff;border-radius:20px;padding:36px;max-width:420px;width:100%;position:relative;box-shadow:0 24px 64px rgba(0,0,0,0.2)}
-.pdf-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:rgba(0,48,73,0.4);padding:4px}
+.pdf-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color: rgba(0,48,73,0.72);padding:4px}
 .pdf-modal h3{font-size:22px;font-weight:700;color:#003049;margin-bottom:8px}
-.pdf-modal p{font-size:14px;color:rgba(0,48,73,0.5);margin-bottom:20px}
+.pdf-modal p{font-size:14px;color: rgba(0,48,73,0.72);margin-bottom:20px}
 .pdf-modal-input{width:100%;padding:12px 16px;border:1px solid rgba(0,48,73,0.15);border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:16px;box-sizing:border-box}
 .pdf-modal-input:focus{border-color:#003049}
-.pdf-modal-check{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;font-size:12px;color:rgba(0,48,73,0.6);line-height:1.5}
+.pdf-modal-check{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;font-size:12px;color: rgba(0,48,73,0.72);line-height:1.5}
 .pdf-modal-check input{margin-top:3px;flex-shrink:0}
 .pdf-modal-check a{color:#AB0534}
 .pdf-modal-btn{width:100%;padding:14px;background:#AB0534;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s}
@@ -294,7 +294,7 @@ footer{font-size:10px;padding:16px 10px}
       </div>
 
       <div class="divider" style="margin:16px 0"></div>
-      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,48,73,0.5);margin-bottom:8px">Ako dlho majú úspory vydržať?</div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color: rgba(0,48,73,0.72);margin-bottom:8px">Ako dlho majú úspory vydržať?</div>
       <div class="freq-btns">
         <button class="freq-btn active" id="btnRenta20" onclick="setRentaType('20')">20 rokov dôchodku</button>
         <button class="freq-btn" id="btnRentaInf" onclick="setRentaType('inf')">Navždy (z výnosov)</button>
@@ -338,7 +338,7 @@ footer{font-size:10px;padding:16px 10px}
           <span class="field-lbl">3. pilier (tvoj + zamestn&#225;vate&#318;)</span>
           <div style="display:flex;align-items:center;gap:4px">
             <input class="num-input gold" id="pillar3" type="number" value="0">
-            <span style="font-size:11px;font-weight:800;color:#989FA7">&#8364;</span>
+            <span style="font-size:11px;font-weight:800;color:#5F656B">&#8364;</span>
           </div>
         </div>
         <input type="range" class="gold-range" min="0" max="500" step="5" value="0" id="pillar3R">
@@ -364,7 +364,7 @@ footer{font-size:10px;padding:16px 10px}
       <div class="field">
         <div class="field-row">
           <span class="field-lbl">O&#269;ak&#225;van&#225; infl&#225;cia</span>
-          <span style="font-size:11px;font-weight:800;color:#989FA7" id="inflationOut">3.0 %</span>
+          <span style="font-size:11px;font-weight:800;color:#5F656B" id="inflationOut">3.0 %</span>
         </div>
         <input type="range" class="gold-range" min="0" max="10" step="0.5" value="3" id="inflationR" oninput="document.getElementById('inflationOut').textContent=parseFloat(this.value).toFixed(1)+' %';calc()">
       </div>
@@ -448,11 +448,11 @@ footer{font-size:10px;padding:16px 10px}
       <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin-bottom:16px">Keby si začal skôr...</div>
       <div class="delay-item">
         <span class="delay-label">Pred 10 rokmi stačilo by</span>
-        <span class="delay-value" style="color:#2a9d8f" id="delay10ago">0 €/mesiac</span>
+        <span class="delay-value" style="color:#1E7A6F" id="delay10ago">0 €/mesiac</span>
       </div>
       <div class="delay-item">
         <span class="delay-label">Pred 5 rokmi stačilo by</span>
-        <span class="delay-value" style="color:#2a9d8f" id="delay5ago">0 €/mesiac</span>
+        <span class="delay-value" style="color:#1E7A6F" id="delay5ago">0 €/mesiac</span>
       </div>
       <div class="delay-item" style="background:rgba(171,5,52,0.04);padding:10px 8px;border-radius:10px">
         <span class="delay-label" style="font-weight:800;color:#003049">DNES — odporúčanie</span>
@@ -478,13 +478,13 @@ footer{font-size:10px;padding:16px 10px}
       <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin-bottom:16px">Zhrnutie tvojej situ&#225;cie</div>
 
       <div class="out-row">
-        <div class="out-head"><span>Bez pr&#237;pravy</span><span style="color:rgba(0,48,73,0.4)" id="outNoPrepVal">&#353;t&#225;tny d&#244;chodok 600 &#8364;</span></div>
+        <div class="out-head"><span>Bez pr&#237;pravy</span><span style="color: rgba(0,48,73,0.72)" id="outNoPrepVal">&#353;t&#225;tny d&#244;chodok 600 &#8364;</span></div>
         <div class="out-bar"><div class="out-bar-a" id="outNoPrepBar" style="width:50%"></div></div>
         <div class="out-note" id="outNoPrepNote">&#352;t&#225;tny d&#244;chodok pokryje 50% &#382;elan&#233;ho pr&#237;jmu</div>
       </div>
 
       <div class="out-row">
-        <div class="out-head"><span>Aktu&#225;lna pr&#237;prava</span><span style="color:#989FA7" id="outCurrentVal">nasporen&#233; 0 &#8364;</span></div>
+        <div class="out-head"><span>Aktu&#225;lna pr&#237;prava</span><span style="color:#5F656B" id="outCurrentVal">nasporen&#233; 0 &#8364;</span></div>
         <div class="out-bar"><div class="out-bar-a" id="outCurrentBarPension" style="width:50%"></div><div class="out-bar-b" id="outCurrentBarInvest" style="width:0%"></div></div>
         <div class="out-note" id="outCurrentNote">&#8212;</div>
       </div>
@@ -523,8 +523,8 @@ footer{font-size:10px;padding:16px 10px}
     </div>
     <div class="pdf-modal-success" id="pdfModalSuccess" style="display:none">
       <div style="font-size:32px;margin-bottom:12px">&#10004;</div>
-      <div>PDF bolo stiahnut&#233; a odoslan&#233; na v&#225;&#353; email.</div>
-      <div style="margin-top:8px;font-size:13px;color:rgba(0,48,73,0.5)">Ozv&#233;m sa v&#225;m &#269;o najsk&#244;r.</div>
+      <div>PDF bolo stiahnut&#233;.</div>
+      <div style="margin-top:8px;font-size:13px;color: rgba(0,48,73,0.72)">Ozvem sa v&#225;m &#269;o najsk&#244;r.</div>
     </div>
   </div>
 </div>
@@ -918,14 +918,14 @@ function submitPdfForm(){
     '<div style="padding:28px 36px;">'+
       '<div style="font-size:13px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#AB0534;margin-bottom:14px;">VAŠE ÚDAJE</div>'+
       '<table style="width:100%;border-collapse:collapse;font-size:13px;">'+
-        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Vek</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+age+' rokov</td></tr>'+
-        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Vek odchodu do dôchodku</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+retireAge+' rokov</td></tr>'+
-        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Čistý mesačný príjem</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(income)+'</td></tr>'+
-        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Očakávaný štátny dôchodok</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(statePension)+'</td></tr>'+
-        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Želaný príjem na dôchodku</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(desiredIncome)+'</td></tr>'+
-        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Už nasporené</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(savings)+'</td></tr>'+
-        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Mesačne investujem</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(monthlyInvest)+'</td></tr>'+
-        '<tr><td style="padding:8px 0;color:rgba(0,48,73,0.6);">Očakávané zhodnotenie</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+returnRate+' %</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color: rgba(0,48,73,0.72);">Vek</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+age+' rokov</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color: rgba(0,48,73,0.72);">Vek odchodu do dôchodku</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+retireAge+' rokov</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color: rgba(0,48,73,0.72);">Čistý mesačný príjem</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(income)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color: rgba(0,48,73,0.72);">Očakávaný štátny dôchodok</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(statePension)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color: rgba(0,48,73,0.72);">Želaný príjem na dôchodku</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(desiredIncome)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color: rgba(0,48,73,0.72);">Už nasporené</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(savings)+'</td></tr>'+
+        '<tr style="border-bottom:1px solid rgba(0,48,73,0.08);"><td style="padding:8px 0;color: rgba(0,48,73,0.72);">Mesačne investujem</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+fmt(monthlyInvest)+'</td></tr>'+
+        '<tr><td style="padding:8px 0;color: rgba(0,48,73,0.72);">Očakávané zhodnotenie</td><td style="padding:8px 0;text-align:right;font-weight:700;">'+returnRate+' %</td></tr>'+
       '</table>'+
       '<div style="background:#AB0534;border-radius:14px;padding:20px 28px;margin:20px 0;display:flex;justify-content:space-between;align-items:center;color:#fff;">'+
         '<div><div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5;margin-bottom:4px;">Medzera v príjme</div><div style="font-size:28px;font-weight:800;">'+fmt(gap)+'/mesiac</div></div>'+
@@ -935,18 +935,18 @@ function submitPdfForm(){
       '<div style="display:flex;gap:16px;margin-bottom:20px;">'+
         '<div style="flex:1;background:rgba(171,5,52,0.05);border-radius:14px;padding:18px 20px;">'+
           '<div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#AB0534;margin-bottom:12px;">Aktuálna príprava</div>'+
-          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Nasporené pri dôchodku</div>'+
+          '<div style="font-size:10px;color: rgba(0,48,73,0.72);margin-bottom:4px;">Nasporené pri dôchodku</div>'+
           '<div style="font-size:20px;font-weight:800;margin-bottom:8px;">'+fmt(currentPortfolio)+'</div>'+
         '</div>'+
         '<div style="flex:1;background:rgba(0,48,73,0.05);border-radius:14px;padding:18px 20px;">'+
           '<div style="font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#003049;margin-bottom:12px;">Odporúčanie</div>'+
-          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Potrebná nasporená suma</div>'+
+          '<div style="font-size:10px;color: rgba(0,48,73,0.72);margin-bottom:4px;">Potrebná nasporená suma</div>'+
           '<div style="font-size:20px;font-weight:800;margin-bottom:8px;">'+fmt(neededPortfolio)+'</div>'+
-          '<div style="font-size:10px;color:rgba(0,48,73,0.5);margin-bottom:4px;">Mesačne investovať</div>'+
+          '<div style="font-size:10px;color: rgba(0,48,73,0.72);margin-bottom:4px;">Mesačne investovať</div>'+
           '<div style="font-size:20px;font-weight:800;color:#AB0534;">'+fmt(neededMonthly)+'</div>'+
         '</div>'+
       '</div>'+
-      '<div style="background:rgba(0,48,73,0.03);padding:20px 36px;font-size:10px;color:rgba(0,48,73,0.4);line-height:1.6;">'+
+      '<div style="background:rgba(0,48,73,0.03);padding:20px 36px;font-size:10px;color: rgba(0,48,73,0.72);line-height:1.6;">'+
         '<div>Tento výpočet je orientačný a nenahrádza individuálnu konzultáciu.</div>'+
         '<div>Kontakt: mario.tistan@partnersgroup.sk | +421 902 130 096 | mariotistan.sk</div>'+
         '<div>Podriadený finančný agent Partners Group SK s.r.o. · Registrácia NBS č. 221967</div>'+
