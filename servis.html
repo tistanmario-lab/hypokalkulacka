@@ -63,6 +63,10 @@ textarea{resize:vertical;min-height:60px;}
 .alert.warn{background:rgba(230,81,0,0.07);border-color:var(--orange);}
 .alert.info{background:rgba(0,48,73,0.04);border-color:var(--navy);}
 .alert.ok{background:rgba(46,125,50,0.07);border-color:var(--green);}
+.alert svg.lucide{width:18px;height:18px;stroke-width:1.75;flex:0 0 auto;margin-top:1px;}
+.alert.warn svg.lucide{color:#B23F00;}.alert.info svg.lucide{color:var(--navy);}.alert.ok svg.lucide{color:var(--green);}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:2px;}
+.dot.ok{background:var(--green);}.dot.warn{background:var(--orange);}.dot.bad{background:var(--red);}
 .chk{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
 .chk input[type=checkbox]{width:18px;height:18px;flex:0 0 auto;}
 .chk .lbl{font-weight:600;font-size:14px;flex:0 0 200px;}
@@ -447,14 +451,14 @@ function showPrehlad(){
     ciele.forEach(function(g){
       var p=goalProjection(g);
       var col=p.status==='ok'?'var(--green)':(p.status==='warn'?'var(--orange)':'var(--red)');
-      var ik=p.status==='ok'?'🟢':(p.status==='warn'?'🟠':'🔴');
+      var ik='<span class="dot '+p.status+'" aria-hidden="true"></span>';
       var w=Math.max(2,Math.min(100,p.pctNow));
       h+='<div style="margin-bottom:16px;">';
       h+='<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;"><div style="font-weight:700;font-size:15px;">'+esc(g.nazov||'Cieľ')+'</div><div style="font-size:13px;color:var(--muted);">cieľ '+fmtEUR(p.C)+(p.roky!=null?(' · o '+fmtDec(p.roky)+' r.'):'')+'</div></div>';
       h+='<div style="background:var(--sand);border-radius:20px;height:14px;overflow:hidden;margin:6px 0;"><div style="height:100%;width:'+w+'%;background:'+col+';border-radius:20px;"></div></div>';
       h+='<div style="font-size:13px;">Dnes: <strong>'+fmtEUR(p.A)+'</strong> ('+p.pctNow+' % cieľa)'+(p.roky!=null?(' · '+ik+' projekcia o '+fmtDec(p.roky)+' r.: <strong>'+fmtEUR(p.FV)+'</strong> ('+p.pctProj+' %)'):'')+'</div>';
-      if(p.shortfall>0 && p.addMonthly>0) h+='<div class="alert warn" style="margin-top:6px;">⚠️ <div>'+'Na splnenie cieľa stačí odkladať <strong>+'+fmtEUR(p.addMonthly)+'/mes</strong> (inak bude chýbať '+fmtEUR(p.shortfall)+').</div></div>';
-      else if(p.roky!=null) h+='<div class="alert ok" style="margin-top:6px;">✓ <div>'+osl('Pri súčasnom tempe cieľ splníte.','Pri súčasnom tempe cieľ splníš.')+'</div></div>';
+      if(p.shortfall>0 && p.addMonthly>0) h+='<div class="alert warn" style="margin-top:6px;"><i data-lucide="alert-triangle"></i><div>'+'Na splnenie cieľa stačí odkladať <strong>+'+fmtEUR(p.addMonthly)+'/mes</strong> (inak bude chýbať '+fmtEUR(p.shortfall)+').</div></div>';
+      else if(p.roky!=null) h+='<div class="alert ok" style="margin-top:6px;"><i data-lucide="check"></i><div>'+osl('Pri súčasnom tempe cieľ splníte.','Pri súčasnom tempe cieľ splníš.')+'</div></div>';
       h+='</div>';
     });
     h+='</div>';
@@ -462,8 +466,8 @@ function showPrehlad(){
 
   // UPOZORNENIA
   h+='<div class="card no-break"><div class="sec-title"><span class="sec-num">3</span> Na čo dať pozor</div>';
-  if(al.length){ al.forEach(function(a){ h+='<div class="alert '+(a.lvl==='exp'?'warn':a.lvl)+'">'+(a.lvl==='info'?'💡':'⚠️')+' <div>'+esc(a.t)+'</div></div>'; }); }
-  else h+='<div class="alert ok">✓ <div>Žiadne urgentné termíny — všetko v poriadku.</div></div>';
+  if(al.length){ al.forEach(function(a){ h+='<div class="alert '+(a.lvl==='exp'?'warn':a.lvl)+'">'+(a.lvl==='info'?'<i data-lucide="lightbulb"></i>':'<i data-lucide="alert-triangle"></i>')+'<div>'+esc(a.t)+'</div></div>'; }); }
+  else h+='<div class="alert ok"><i data-lucide="check"></i><div>Žiadne urgentné termíny — všetko v poriadku.</div></div>';
   h+='</div>';
 
   // REVÍZNY CHECKLIST
@@ -486,7 +490,7 @@ function showPrehlad(){
   if(SERVIS.dalsiTermin) h+='<p><strong>Ďalší servis:</strong> '+fmtDate(SERVIS.dalsiTermin)+'</p>';
   h+='</div>';
   // referral nudge
-  h+='<div class="alert info" style="margin-top:12px;">💡 <div>'+osl('Ak vám spolupráca vyhovuje','Ak ti spolupráca vyhovuje')+', poprosím o odporúčanie — koho z '+osl('vášho','tvojho')+' okolia by mohla podobná pomoc potešiť?'+(SERVIS.klient.pocetOdporucani?(' (doteraz: '+SERVIS.klient.pocetOdporucani+')'):'')+'</div></div>';
+  h+='<div class="alert info" style="margin-top:12px;"><i data-lucide="lightbulb"></i><div>'+osl('Ak vám spolupráca vyhovuje','Ak ti spolupráca vyhovuje')+', poprosím o odporúčanie — koho z '+osl('vášho','tvojho')+' okolia by mohla podobná pomoc potešiť?'+(SERVIS.klient.pocetOdporucani?(' (doteraz: '+SERVIS.klient.pocetOdporucani+')'):'')+'</div></div>';
   h+='</div>';
 
   document.getElementById('prehlad').innerHTML=h;
