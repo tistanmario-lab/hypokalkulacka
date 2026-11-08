@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YF1E1SN7J8"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YF1E1SN7J8');</script>
+<!-- Súhlas s cookies: Google Analytics sa načíta až po súhlase -->
+<script src="/consent.js" defer></script>
 <title>InvestKalkulačka+ | Partners Group SK</title>
 <meta name="description" content="Investičná kalkulačka Partners Group SK — porovnajte stratégie investovania a sledujte rast portfólia v čase.">
 <link rel="canonical" href="https://www.mariotistan.sk/invest-kalkulacka.html">
@@ -317,7 +316,7 @@ td{padding:7px 6px;font-size:11px}
   </button>
 </div>
 
-<footer>© 2026 Partners Group SK · InvestKalkulačka+ · Všetky práva vyhradené · mariotistan.sk</footer>
+<footer>© 2026 Partners Group SK · InvestKalkulačka+ · Všetky práva vyhradené · mariotistan.sk · <a href="#nastavenia-cookies" data-cookie-settings style="color:inherit;text-decoration:underline">Nastavenia cookies</a></footer>
 
 <!-- PDF / Email Modal -->
 <div class="pdf-modal-overlay" id="pdfModal">
@@ -347,7 +346,7 @@ var strategies = [
   {id:'pfki', name:'PFKI', rate:2, color:'#6c757d', dash:[]},
   {id:'konzerv', name:'Konzervatívna', rate:4, color:'#2a9d8f', dash:[]},
   {id:'vyvaz', name:'Vyvážená', rate:6, color:'#e9c46a', dash:[]},
-  {id:'zlato', name:'Zlato', rate:6, color:'#f4a261', dash:[]},
+  {id:'zlato', name:'Zlato', rate:6, color:'#f4a261', dash:[8,4]},
   {id:'realit', name:'Realitná', rate:5, color:'#264653', dash:[]},
   {id:'dynam', name:'Dynamická', rate:8, color:'#AB0534', dash:[]}
 ];
@@ -668,6 +667,19 @@ function checkModalForm(){
   document.getElementById('modalSendBtn').disabled = !(name && email && gdpr);
 }
 
+// Písmo s diakritikou pre text v PDF (predvolené písmo jsPDF nepozná „č“)
+function loadPdfFont(pdf){
+  function b64(buf){ var bin='', b=new Uint8Array(buf); for(var i=0;i<b.length;i++) bin+=String.fromCharCode(b[i]); return btoa(bin); }
+  return Promise.all([fetch('fonts/dm-sans-regular.ttf'), fetch('fonts/dm-sans-bold.ttf')]).then(function(rs){
+    if(!rs[0].ok || !rs[1].ok) return false;
+    return Promise.all([rs[0].arrayBuffer(), rs[1].arrayBuffer()]).then(function(bufs){
+      pdf.addFileToVFS('DMSans-Regular.ttf', b64(bufs[0])); pdf.addFont('DMSans-Regular.ttf','DMSans','normal');
+      pdf.addFileToVFS('DMSans-Bold.ttf', b64(bufs[1])); pdf.addFont('DMSans-Bold.ttf','DMSans','bold');
+      return true;
+    });
+  }).catch(function(){ return false; });
+}
+
 function generatePdf(){
   return new Promise(function(resolve){
     var el = document.getElementById('mainContent');
@@ -683,15 +695,20 @@ function generatePdf(){
         imgH = ph - 30;
         imgW = imgH * ratio;
       }
-      pdf.setFontSize(14);
-      pdf.setTextColor(0,48,73);
-      pdf.text('InvestKalkulačka+ — Výpočet', 10, 12);
-      pdf.setFontSize(8);
-      pdf.setTextColor(150);
-      pdf.text('Partners Group SK · mariotistan.sk', 10, 18);
-      pdf.addImage(imgData, 'JPEG', 10, 22, imgW, imgH);
-      pdf.save('invest-kalkulacka-vypocet.pdf');
-      resolve();
+      var finish = function(fontOk){
+        pdf.setFontSize(14);
+        pdf.setTextColor(0,48,73);
+        if(fontOk) pdf.setFont('DMSans','bold');
+        pdf.text(fontOk ? 'InvestKalkulačka+ — Výpočet' : 'InvestKalkulacka+ - Vypocet', 10, 12);
+        if(fontOk) pdf.setFont('DMSans','normal');
+        pdf.setFontSize(8);
+        pdf.setTextColor(150);
+        pdf.text('Partners Group SK · mariotistan.sk', 10, 18);
+        pdf.addImage(imgData, 'JPEG', 10, 22, imgW, imgH);
+        pdf.save('invest-kalkulacka-vypocet.pdf');
+        resolve();
+      };
+      loadPdfFont(pdf).then(finish, function(){ finish(false); });
     });
   });
 }
