@@ -7,18 +7,19 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YF1E1SN7J8"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YF1E1SN7J8');</script>
 <title>InvestKalkulačka+ | Partners Group SK</title>
-<meta name="description" content="Investičná kalkulačka Partners Group SK — porovnajte stratégie investovania a sledujte rast portfólia v čase.">
+<link rel="stylesheet" href="/partners.css">
+<meta name="description" content="Investičná kalkulačka Partners Group SK — porovnaj stratégie investovania a sleduj rast portfólia v čase.">
 <link rel="canonical" href="https://www.mariotistan.sk/invest-kalkulacka.html">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:title" content="InvestKalkulačka+ | Mário Tišťan — Partners Group SK">
-<meta property="og:description" content="Porovnajte 7 investičných stratégií a sledujte rast portfólia v čase. Bezplatný online nástroj.">
+<meta property="og:description" content="Porovnaj 7 investičných stratégií a sleduj rast portfólia v čase. Bezplatný online nástroj.">
 <meta property="og:image" content="https://www.mariotistan.sk/mario-foto.jpg">
 <meta property="og:url" content="https://www.mariotistan.sk/invest-kalkulacka.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="InvestKalkulačka+ | Mário Tišťan — Partners Group SK">
-<meta name="twitter:description" content="Porovnajte 7 investičných stratégií a sledujte rast portfólia v čase. Bezplatný online nástroj.">
+<meta name="twitter:description" content="Porovnaj 7 investičných stratégií a sleduj rast portfólia v čase. Bezplatný online nástroj.">
 <meta name="twitter:image" content="https://www.mariotistan.sk/mario-foto.jpg">
 <script type="application/ld+json">
 {
@@ -26,7 +27,7 @@
   "@type": "WebApplication",
   "name": "InvestKalkulačka+",
   "url": "https://www.mariotistan.sk/invest-kalkulacka.html",
-  "description": "Investičná kalkulačka — porovnajte 7 investičných stratégií a sledujte rast portfólia v čase. Nominálne aj reálne hodnoty.",
+  "description": "Investičná kalkulačka — porovnaj 7 investičných stratégií a sleduj rast portfólia v čase. Nominálne aj reálne hodnoty.",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Web",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
@@ -44,140 +45,192 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans','Segoe UI',system-ui,sans-serif;background:#ECEDED;color:#003049;min-height:100vh}
-header{background:#fff;border-bottom:1px solid rgba(0,48,73,0.08);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:0 1px 8px rgba(0,48,73,0.04)}
-.logo-badge{background:#003049;color:#fff;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px}
-.logo-title{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049;margin:0 0 0 12px}
-.pg-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,48,73,0.55)}
-.main{max-width:1100px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:340px 1fr;gap:20px}
-.panel{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:24px;margin-bottom:16px;border-radius:20px}
-.panel-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;background:#003049;color:#fff;margin-bottom:14px;border-radius:6px}
-.panel-tag.gold{background:#989FA7}
-.panel-title{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#003049;margin-bottom:20px}
-.field{margin-bottom:18px}
-.field-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.field-lbl{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(0,48,73,0.92)}
-input[type=range]{width:100%;height:3px;appearance:none;background:rgba(0,48,73,0.1);outline:none;cursor:pointer;accent-color:#AB0534}
-input[type=range].blue-range{accent-color:#003049}
-input[type=range].gold-range{accent-color:#989FA7}
-.num-input{width:110px;padding:6px 10px;text-align:right;font-size:14px;font-weight:800;color:#AB0534;background:rgba(171,5,52,0.05);border:1px solid rgba(171,5,52,0.15);outline:none;border-radius:8px}
-.num-input.blue{color:#003049;background:rgba(0,48,73,0.04);border-color:rgba(0,48,73,0.12)}
-.num-input:focus{border-color:#AB0534}
-.info-row{background:rgba(0,48,73,0.04);border-left:3px solid rgba(0,48,73,0.3);padding:10px 14px;margin-bottom:16px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(0,48,73,0.72);display:flex;justify-content:space-between;align-items:center;gap:10px;border-radius:0 12px 12px 0}
-.info-row span{color:#003049;font-size:14px;font-weight:800}
-.splatka-card{background:#003049;color:#fff;padding:24px;position:relative;overflow:hidden;margin-top:16px;border-radius:20px}
-.splatka-lbl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.8);margin-bottom:6px}
-.splatka-val{font-size:38px;font-weight:800;letter-spacing:-.02em}
-.splatka-sub{font-size:11px;color:rgba(255,255,255,0.75);margin-top:6px}
-.splatka-row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1)}
-.splatka-mini-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:2px}
-.splatka-mini-val{font-size:16px;font-weight:800;color:#fff}
-.glow{position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;background:rgba(171,5,52,0.3);border-radius:50%;filter:blur(40px)}
-.chart-panel{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:20px;margin-bottom:16px;border-radius:20px}
-.chart-title{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#003049;margin-bottom:12px}
-.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(0,48,73,0.72)}
-.legend-dot{width:10px;height:10px;border-radius:2px}
-.chart-wrap{position:relative;width:100%;height:300px}
-.table-wrap{background:#fff;border:1px solid rgba(0,48,73,0.08);overflow:hidden;margin-bottom:16px;border-radius:20px}
-.table-scroll{overflow-x:auto;max-height:500px;overflow-y:auto}
-table{width:100%;border-collapse:collapse;font-size:12px}
-thead{background:#003049;color:#fff;position:sticky;top:0}
-th{padding:10px 12px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;text-align:left;border-right:1px solid rgba(255,255,255,.1);white-space:nowrap}
-tbody tr{border-bottom:1px solid rgba(0,48,73,0.05)}
-tbody tr:hover{background:#ECEDED}
-tbody tr.hl-row{background:rgba(171,5,52,0.05)}
-tbody tr.hl-row:hover{background:rgba(171,5,52,0.08)}
-td{padding:8px 12px;font-weight:600;color:rgba(0,48,73,0.85);white-space:nowrap}
-td.green{color:#AB0534;font-weight:800}
-td.blue{color:#003049;font-weight:800}
-.strat-dot{width:10px;height:10px;display:inline-block;border-radius:50%;margin-right:6px;vertical-align:middle}
-.strat-check-row{display:flex;align-items:center;padding:8px 12px;border-left:3px solid transparent;margin-bottom:4px;border-radius:0 10px 10px 0;transition:background .2s;cursor:pointer;user-select:none}
-.strat-check-row:hover{background:rgba(0,48,73,0.03)}
-.strat-check-row input[type=checkbox]{margin-right:10px;accent-color:#003049;width:16px;height:16px;cursor:pointer}
-.strat-check-name{font-size:13px;font-weight:700;color:#003049;flex:1}
-.strat-check-rate{font-size:12px;font-weight:800;color:rgba(0,48,73,0.65);margin-left:8px}
-.bar-panel{background:#fff;border:1px solid rgba(0,48,73,0.08);padding:20px;margin-bottom:16px;border-radius:20px}
-.hbar-row{margin-bottom:12px}
-.hbar-label{display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(0,48,73,0.72);margin-bottom:4px}
-.hbar-track{height:22px;background:rgba(0,48,73,0.04);border-radius:4px;display:flex;overflow:hidden}
-.hbar-deposits{background:rgba(0,48,73,0.15);height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#003049;white-space:nowrap;overflow:hidden;min-width:0}
-.hbar-gains{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;min-width:0}
-.pdf-btn{width:100%;padding:14px;background:#AB0534;border:none;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;transition:background .2s;border-radius:20px}
-.pdf-btn:hover{background:#003049}
-.pdf-btn svg{width:18px;height:18px;fill:currentColor}
-footer{text-align:center;padding:24px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,48,73,0.5);border-top:1px solid rgba(0,48,73,0.07);max-width:1100px;margin:0 auto}
-.pdf-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,48,73,0.6);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+*{margin:0;padding:0}
+body{background:var(--bg-2);color:var(--fg-2);font-size:15px;line-height:1.5;min-height:100vh}
+strong{font-weight:600}
+
+/* Hlavička */
+header{position:sticky;top:0;z-index:20;height:64px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff;border-bottom:1px solid var(--line)}
+.hdr-left,.hdr-right{display:flex;align-items:center;gap:16px;min-width:0}
+.back-link{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px 0 8px;margin-left:-8px;border-radius:8px;font-size:15px;font-weight:500;color:var(--fg-2);text-decoration:none;transition:background-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.back-link:hover{background:var(--bg-hover);color:var(--fg)}
+.hdr-brand{display:flex;align-items:baseline;gap:8px;min-width:0}
+.hdr-slash{color:var(--silver);font-size:15px}
+.logo-title{font-size:15px;font-weight:500;line-height:1.2;color:var(--fg-2);white-space:nowrap}
+.hdr-link{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;color:var(--fg-2);text-decoration:none;transition:color var(--t-fast) var(--ease)}
+.hdr-link:hover{color:var(--fg)}
+.pg-label{font-size:14px;color:var(--fg-3);white-space:nowrap}
+
+/* Rozloženie */
+.main{max-width:1100px;margin:0 auto;padding:24px;display:grid;grid-template-columns:340px minmax(0,1fr);gap:24px;align-items:start}
+.main>div>:last-child{margin-bottom:0}
+.panel,.chart-panel,.bar-panel{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;margin-bottom:16px}
+.panel-title,.chart-title{font-size:18px;font-weight:600;letter-spacing:-.01em;line-height:1.3;color:var(--fg);margin-bottom:20px}
+.chart-title{margin-bottom:16px}
+
+/* Vstupy */
+.field{margin-bottom:20px}
+.field-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.field-lbl{font-size:14px;font-weight:500;line-height:1.3;color:var(--fg-2)}
+.input-unit{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.unit{min-width:12px;font-size:14px;font-weight:500;color:var(--fg-3)}
+.num-input{width:96px;height:40px;padding:0 12px;text-align:right;font-family:var(--font);font-size:15px;font-weight:600;color:var(--fg);background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);outline:none;transition:border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.num-input:hover{border-color:var(--fg-3)}
+.num-input:focus{border-color:var(--red);box-shadow:0 0 0 3px var(--red-tint)}
+input[type=range]{-webkit-appearance:none;appearance:none;display:block;width:100%;height:20px;background:transparent;cursor:pointer;outline:none}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--light)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--light)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:20px;height:20px;margin-top:-8px;border-radius:50%;background:var(--fg);border:4px solid #fff;box-shadow:0 0 0 1px var(--line-strong);transition:box-shadow var(--t-fast) var(--ease)}
+input[type=range]::-moz-range-thumb{box-sizing:border-box;width:20px;height:20px;border-radius:50%;background:var(--fg);border:4px solid #fff;box-shadow:0 0 0 1px var(--line-strong)}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--red)}
+input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 2px var(--red)}
+.info-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-2);border-radius:var(--r);font-size:14px;line-height:1.4;color:var(--fg-2)}
+.info-row span{font-size:15px;font-weight:600;color:var(--fg);white-space:nowrap}
+.note{margin-top:12px;font-size:13px;line-height:1.5;color:var(--fg-3)}
+.note strong{color:var(--fg-2)}
+
+/* Prepínač nominálna / reálna */
+.freq-btns{display:flex;gap:4px;padding:4px;background:var(--bg-2);border-radius:var(--r)}
+.freq-btn{flex:1 1 auto;min-height:36px;padding:0 12px;border:1px solid transparent;border-radius:6px;background:transparent;font-family:var(--font);font-size:14px;font-weight:500;color:var(--fg-2);cursor:pointer;transition:background-color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.freq-btn:hover{color:var(--fg)}
+.freq-btn.active{background:#fff;border-color:var(--line);color:var(--fg);box-shadow:var(--shadow-sm)}
+
+/* Stratégie v grafe */
+.strat-check-row{display:flex;align-items:center;gap:12px;min-height:40px;padding:8px 12px;margin:0 -12px;border-radius:8px;cursor:pointer;user-select:none;transition:background-color var(--t-fast) var(--ease)}
+.strat-check-row:hover{background:var(--bg-hover)}
+.strat-check-row input[type=checkbox]{width:16px;height:16px;margin:0;flex-shrink:0;accent-color:var(--fg);cursor:pointer}
+.strat-check-name{flex:1;font-size:14px;color:var(--fg-2)}
+.strat-check-rate{font-size:14px;font-weight:500;color:var(--fg)}
+.swatch{display:inline-block;flex-shrink:0;width:16px;height:0;border-top:2px solid currentColor;vertical-align:middle}
+.swatch.dashed{border-top-style:dashed}
+.swatch.dotted{border-top-style:dotted}
+.swatch.plan{border-top-width:3px}
+
+/* Výsledok — jediný červený moment stránky */
+.splatka-card{background:var(--red);color:#fff;padding:24px;border-radius:var(--r-lg);margin-bottom:16px}
+.splatka-lbl{font-size:15px;font-weight:500;line-height:1.4;color:rgba(255,255,255,.85)}
+.splatka-val{margin-top:4px;font-size:40px;font-weight:600;letter-spacing:-.015em;line-height:1.1}
+.splatka-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.24)}
+.splatka-mini-lbl{margin-bottom:4px;font-size:13px;font-weight:500;line-height:1.4;color:rgba(255,255,255,.85)}
+.splatka-mini-val{font-size:20px;font-weight:600;line-height:1.2}
+
+/* Graf */
+.chart-wrap{position:relative;width:100%;height:320px}
+
+/* Tabuľka */
+.table-wrap{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px}
+.table-head{padding:24px 24px 8px}
+.table-head .chart-title{margin-bottom:0}
+.table-scroll{overflow:auto;max-height:500px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+/* tabuľkové číslice len v stĺpcoch s celými sumami (v tomto písme by roztiahli desatinnú čiarku) */
+td:nth-child(3),td:nth-child(4),td:nth-child(5){font-variant-numeric:tabular-nums}
+thead th{position:sticky;top:0;z-index:1;padding:12px;background:#fff;border-bottom:1px solid var(--line);font-size:13px;font-weight:500;color:var(--fg-3);text-align:left;white-space:nowrap}
+th:not(:first-child),td:not(:first-child){text-align:right}
+th:first-child,td:first-child{padding-left:24px}
+th:last-child,td:last-child{padding-right:24px}
+tbody tr{border-bottom:1px solid var(--line)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg-hover)}
+tbody tr.hl-row{background:var(--red-tint)}
+tbody tr.hl-row:hover{background:#F2DCE2}
+td{padding:12px;color:var(--fg-2);white-space:nowrap}
+td.name{min-width:160px;font-weight:500;color:var(--fg);white-space:normal}
+.name-in{display:flex;align-items:flex-start;gap:8px;line-height:20px}
+.name-in .swatch{margin-top:9px}
+td.sum{font-weight:600;color:var(--fg)}
+tr.hl-row td.sum{color:var(--red)}
+td.neg{color:var(--negative)}
+
+/* Vklady vs. výnosy */
+.hbar-legend{display:flex;flex-wrap:wrap;gap:16px;margin:-4px 0 20px;font-size:13px;color:var(--fg-3)}
+.hbar-legend span{display:inline-flex;align-items:center;gap:8px}
+.hbar-legend i{display:inline-block;width:12px;height:12px;border-radius:3px}
+.hbar-row{margin-bottom:16px}
+.hbar-row:last-child{margin-bottom:0}
+.hbar-label{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;font-size:14px;color:var(--fg-2)}
+.hbar-name{display:inline-flex;align-items:center;gap:8px}
+.hbar-total{font-weight:600;color:var(--fg);white-space:nowrap}
+.hbar-track{display:flex;height:24px;border-radius:6px;overflow:hidden;background:var(--bg-hover)}
+.hbar-deposits,.hbar-gains{height:100%;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;font-size:12px;font-weight:500}
+.hbar-deposits{background:#D9DBDE;color:var(--fg-2)}
+.hbar-gains{background:var(--fg-2);color:#fff}
+.hbar-gains.is-plan{background:var(--red)}
+.hbar-gains.is-neg{background:transparent;color:var(--negative);padding:0 8px}
+
+/* PDF */
+.pdf-wrap{max-width:1100px;margin:0 auto;padding:0 24px 24px;display:flex;justify-content:flex-end}
+.pdf-btn{min-width:280px}
+.btn-primary:disabled{background:var(--light);color:var(--fg-3);cursor:not-allowed}
+
+footer{max-width:1100px;margin:0 auto;padding:24px;border-top:1px solid var(--line);text-align:center;font-size:13px;line-height:1.5;color:var(--fg-3)}
+
+/* Okno s PDF */
+.pdf-modal-overlay{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(38,38,38,.55)}
 .pdf-modal-overlay.show{display:flex}
-.pdf-modal{background:#fff;border-radius:20px;padding:36px;max-width:420px;width:100%;position:relative;box-shadow:0 24px 64px rgba(0,0,0,0.2)}
-.pdf-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:rgba(0,48,73,0.4);padding:4px}
-.pdf-modal h3{font-size:22px;font-weight:700;color:#003049;margin-bottom:8px}
-.pdf-modal p{font-size:14px;color:rgba(0,48,73,0.5);margin-bottom:20px}
-.pdf-modal-input{width:100%;padding:12px 16px;border:1px solid rgba(0,48,73,0.15);border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:16px;box-sizing:border-box}
-.pdf-modal-input:focus{border-color:#003049}
-.pdf-modal-check{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;font-size:12px;color:rgba(0,48,73,0.6);line-height:1.5}
-.pdf-modal-check input{margin-top:3px;flex-shrink:0}
-.pdf-modal-check a{color:#AB0534}
-.pdf-modal-btn{width:100%;padding:14px;background:#AB0534;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s}
-.pdf-modal-btn:hover{background:#003049}
-.pdf-modal-btn:disabled{background:#989FA7;cursor:not-allowed}
-.pdf-modal-success{text-align:center;padding:20px 0;font-size:16px;font-weight:600;color:#003049}
-.divider{height:1px;background:rgba(0,48,73,0.06);margin:16px 0}
+.pdf-modal{position:relative;width:100%;max-width:420px;padding:32px;background:#fff;border-radius:var(--r-lg);box-shadow:0 24px 64px rgba(0,0,0,.18)}
+.pdf-modal-close{position:absolute;top:12px;right:12px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;border-radius:8px;background:none;color:var(--fg-3);cursor:pointer;transition:background-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.pdf-modal-close:hover{background:var(--bg-hover);color:var(--fg)}
+.pdf-modal h3{padding-right:32px;margin-bottom:8px;font-size:22px;font-weight:600;letter-spacing:-.015em;line-height:1.2;color:var(--fg)}
+.pdf-modal p{margin-bottom:20px;font-size:15px;line-height:1.5;color:var(--fg-2)}
+.pdf-modal-input{display:block;width:100%;height:48px;padding:0 16px;margin-bottom:12px;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);font-family:var(--font);font-size:15px;color:var(--fg);outline:none;transition:border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.pdf-modal-input::placeholder{color:var(--fg-3)}
+.pdf-modal-input:focus{border-color:var(--red);box-shadow:0 0 0 3px var(--red-tint)}
+.pdf-modal-check{display:flex;align-items:flex-start;gap:12px;margin:8px 0 20px;font-size:13px;line-height:1.5;color:var(--fg-2)}
+.pdf-modal-check input{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--fg)}
+.pdf-modal-check a{color:var(--red);text-underline-offset:2px}
+.pdf-modal-btn{width:100%}
+.pdf-modal-success{padding:20px 0;text-align:center;font-size:16px;font-weight:500;color:var(--fg)}
+
 @media(max-width:800px){
-.main{grid-template-columns:1fr;padding:16px 10px}
+.main{grid-template-columns:minmax(0,1fr);padding:16px}
 }
 @media(max-width:600px){
 html,body{overflow-x:hidden}
-header{padding:0 10px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding-top:8px;padding-bottom:8px}
-header>div:first-child{order:1}
-header>div:last-child{order:2}
-.logo-title{font-size:11px;margin-left:8px}
+header{position:static;height:auto;min-height:56px;padding:8px 16px;flex-wrap:wrap;row-gap:4px}
+.hdr-left{gap:8px}
+.back-text{display:none}
+.back-link{padding:0 8px}
 .pg-label{display:none}
-.main{padding:12px 8px;gap:12px}
-.panel{padding:16px 12px}
-.field-row{flex-wrap:wrap;gap:4px}
-.field-lbl{font-size:12px}
-.num-input{width:100px;font-size:14px;padding:6px 8px}
-.info-row{font-size:11px;padding:8px 12px;flex-wrap:wrap;gap:4px}
-.splatka-card{padding:16px}
-.splatka-val{font-size:30px}
-.splatka-sub{font-size:11px}
-.splatka-mini-val{font-size:14px}
-.chart-wrap{height:220px}
-.chart-panel{padding:14px}
-.chart-legend{gap:8px}
-.legend-item{font-size:11px}
-.bar-panel{padding:14px}
-.hbar-label{font-size:10px}
-.hbar-track{height:20px}
-.hbar-deposits,.hbar-gains{font-size:9px}
-.pdf-btn{font-size:12px;padding:13px}
-footer{font-size:10px;padding:16px 10px}
-.pdf-modal{padding:24px 18px}
-.pdf-modal h3{font-size:18px}
-.pdf-modal p{font-size:13px}
-.pdf-modal-input{font-size:14px;padding:10px 12px}
-.pdf-modal-btn{font-size:11px;padding:12px}
-table{font-size:11px}
-th{padding:8px 6px;font-size:10px;letter-spacing:.04em}
-td{padding:7px 6px;font-size:11px}
-.strat-check-row{padding:8px 10px}
-.strat-check-name{font-size:12px}
-.strat-check-rate{font-size:11px}
+.hdr-link{font-size:14px}
+.main{padding:12px;gap:12px}
+.panel,.chart-panel,.bar-panel{padding:20px 16px}
+.field-row{flex-wrap:wrap;gap:8px}
+.num-input{width:96px}
+.splatka-card{padding:20px}
+.splatka-val{font-size:32px}
+.splatka-mini-val{font-size:18px}
+.table-head{padding:20px 16px 8px}
+table{font-size:13px}
+th,td{padding:10px 12px}
+th:first-child,td:first-child{padding-left:16px}
+th:last-child,td:last-child{padding-right:16px}
+.pdf-wrap{padding:0 12px 16px}
+.pdf-btn{width:100%;min-width:0}
+footer{padding:16px 12px}
+.pdf-modal{padding:24px 20px}
+.pdf-modal h3{font-size:20px}
 }
 </style>
 </head>
 <body>
 
 <header>
-  <div style="display:flex;align-items:center">
-    <a href="index.html" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:#003049;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-right:16px;padding:6px 14px;border:1px solid rgba(0,48,73,0.15);border-radius:12px;transition:background .2s" onmouseover="this.style.background='#ECEDED'" onmouseout="this.style.background='transparent'">← Späť</a>
-    <div class="logo-badge">MT</div>
-    <h1 class="logo-title">InvestKalkulačka+</h1>
+  <div class="hdr-left">
+    <a href="index.html" class="back-link" aria-label="Späť na úvod">
+      <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      <span class="back-text">Späť</span>
+    </a>
+    <div class="hdr-brand">
+      <a class="site-logo" href="/">Mário Tišťan</a>
+      <span class="hdr-slash" aria-hidden="true">/</span>
+      <h1 class="logo-title">InvestKalkulačka+</h1>
+    </div>
   </div>
-  <div style="display:flex;align-items:center;gap:12px">
-    <a href="hypokalkulacka.html" style="font-size:10px;font-weight:600;color:#AB0534;text-decoration:none;letter-spacing:.04em;transition:opacity .2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Vyskúšaj aj HypoKalkulačku+ →</a>
+  <div class="hdr-right">
+    <a href="hypokalkulacka.html" class="hdr-link">Vyskúšaj aj HypoKalkulačku+
+      <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </a>
     <div class="pg-label">Partners Group SK</div>
   </div>
 </header>
@@ -186,40 +239,39 @@ td{padding:7px 6px;font-size:11px}
   <!-- LEFT COLUMN -->
   <div>
     <div class="panel">
-      <div class="panel-tag">Investícia</div>
       <div class="panel-title">Tvoja investícia</div>
 
       <div class="field">
         <div class="field-row">
-          <span class="field-lbl">Jednorazová investícia</span>
-          <div style="display:flex;align-items:center;gap:4px">
+          <label class="field-lbl" for="lumpSum">Jednorazová investícia</label>
+          <div class="input-unit">
             <input class="num-input" id="lumpSum" type="number" value="0" min="0" max="100000" step="500">
-            <span style="font-size:13px;font-weight:800;color:#AB0534">€</span>
+            <span class="unit">€</span>
           </div>
         </div>
-        <input type="range" min="0" max="100000" step="500" value="0" id="lumpSumR">
+        <input type="range" min="0" max="100000" step="500" value="0" id="lumpSumR" aria-label="Jednorazová investícia">
       </div>
 
       <div class="field">
         <div class="field-row">
-          <span class="field-lbl">Mesačná investícia</span>
-          <div style="display:flex;align-items:center;gap:4px">
+          <label class="field-lbl" for="monthlyInvest">Mesačná investícia</label>
+          <div class="input-unit">
             <input class="num-input" id="monthlyInvest" type="number" value="100" min="0" max="2000" step="10">
-            <span style="font-size:13px;font-weight:800;color:#AB0534">€</span>
+            <span class="unit">€</span>
           </div>
         </div>
-        <input type="range" min="0" max="2000" step="10" value="100" id="monthlyInvestR">
+        <input type="range" min="0" max="2000" step="10" value="100" id="monthlyInvestR" aria-label="Mesačná investícia">
       </div>
 
       <div class="field">
         <div class="field-row">
-          <span class="field-lbl">Ročný bonus (13. plat, prémie)</span>
-          <div style="display:flex;align-items:center;gap:4px">
+          <label class="field-lbl" for="annualBonus">Ročný bonus (13. plat, prémie)</label>
+          <div class="input-unit">
             <input class="num-input" id="annualBonus" type="number" value="0" min="0" max="10000" step="100">
-            <span style="font-size:13px;font-weight:800;color:#AB0534">€</span>
+            <span class="unit">€</span>
           </div>
         </div>
-        <input type="range" min="0" max="10000" step="100" value="0" id="annualBonusR">
+        <input type="range" min="0" max="10000" step="100" value="0" id="annualBonusR" aria-label="Ročný bonus">
       </div>
 
       <div class="info-row">
@@ -228,41 +280,34 @@ td{padding:7px 6px;font-size:11px}
     </div>
 
     <div class="panel">
-      <div class="panel-tag">Horizont</div>
       <div class="panel-title">Investičný horizont</div>
 
       <div class="field">
         <div class="field-row">
-          <span class="field-lbl">Horizont</span>
-          <div style="display:flex;align-items:center;gap:4px">
-            <input class="num-input blue" id="horizon" type="number" value="20" min="1" max="40" step="1">
-            <span style="font-size:13px;font-weight:800;color:#003049">r</span>
+          <label class="field-lbl" for="horizon">Horizont</label>
+          <div class="input-unit">
+            <input class="num-input" id="horizon" type="number" value="20" min="1" max="40" step="1">
+            <span class="unit">r</span>
           </div>
         </div>
-        <input type="range" class="blue-range" min="1" max="40" step="1" value="20" id="horizonR">
+        <input type="range" min="1" max="40" step="1" value="20" id="horizonR" aria-label="Horizont v rokoch">
       </div>
 
-      <div class="info-row" style="border-left-color:rgba(0,48,73,0.15)">
-        <span style="font-size:10px;font-weight:600;color:rgba(0,48,73,0.4);text-transform:none;letter-spacing:0">Dlhší horizont = väčšia sila zloženého úročenia</span>
-      </div>
+      <p class="note">Dlhší horizont = väčšia sila zloženého úročenia</p>
     </div>
 
     <div class="panel">
-      <div class="panel-tag gold">Zobrazenie</div>
       <div class="panel-title">Nominálna vs. reálna hodnota</div>
 
-      <div class="freq-btns" style="margin-bottom:12px">
+      <div class="freq-btns">
         <button class="freq-btn active" id="btnNominal" onclick="setValueMode('nominal')">Nominálna</button>
         <button class="freq-btn" id="btnReal" onclick="setValueMode('real')">Reálna (po inflácii)</button>
       </div>
-      <div class="info-row" id="valueModeInfo" style="border-left-color:rgba(0,48,73,0.15);font-size:10px">
-        Zobrazuje sa nominálna hodnota — bez zohľadnenia inflácie.
-      </div>
+      <p class="note" id="valueModeInfo">Zobrazuje sa nominálna hodnota — bez zohľadnenia inflácie</p>
     </div>
 
     <div class="panel">
-      <div class="panel-tag gold">Stratégie</div>
-      <div class="panel-title">Porovnanie stratégií</div>
+      <div class="panel-title">Stratégie v grafe</div>
 
       <div id="stratChecks"></div>
     </div>
@@ -270,20 +315,19 @@ td{padding:7px 6px;font-size:11px}
 
   <!-- RIGHT COLUMN -->
   <div>
-    <div class="splatka-card" style="margin-bottom:16px">
-      <div class="splatka-lbl">Za <span id="hlYears">20</span> rokov vložíš</div>
-      <div class="splatka-val" id="hlDeposits">—</div>
+    <div class="splatka-card">
+      <div class="splatka-lbl" id="hlDynLabel">Pri dynamickej stratégii budeš mať</div>
+      <div class="splatka-val" id="hlDynamic">—</div>
       <div class="splatka-row">
         <div>
-          <div class="splatka-mini-lbl" id="hlDynLabel">Pri dynamickej stratégii budeš mať</div>
-          <div class="splatka-mini-val" id="hlDynamic">—</div>
+          <div class="splatka-mini-lbl">Za <span id="hlYears">20</span> rokov vložíš</div>
+          <div class="splatka-mini-val" id="hlDeposits">—</div>
         </div>
-        <div style="text-align:right">
+        <div>
           <div class="splatka-mini-lbl" id="hlGainsLabel">Peniaze zarobili za teba</div>
           <div class="splatka-mini-val" id="hlGains">—</div>
         </div>
       </div>
-      <div class="glow"></div>
     </div>
 
     <div class="chart-panel">
@@ -292,8 +336,8 @@ td{padding:7px 6px;font-size:11px}
     </div>
 
     <div class="table-wrap">
-      <div style="padding:12px 16px;background:rgba(0,48,73,0.03);border-bottom:1px solid rgba(0,48,73,0.08)">
-        <div style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#003049">Porovnanie stratégií</div>
+      <div class="table-head">
+        <div class="chart-title">Porovnanie stratégií</div>
       </div>
       <div class="table-scroll">
         <table>
@@ -305,14 +349,18 @@ td{padding:7px 6px;font-size:11px}
 
     <div class="bar-panel">
       <div class="chart-title">Tvoje vklady vs. výnosy</div>
+      <div class="hbar-legend" aria-hidden="true">
+        <span><i style="background:#D9DBDE"></i>Vklady</span>
+        <span><i style="background:var(--fg-2)"></i>Výnosy</span>
+      </div>
       <div id="hbarContainer"></div>
     </div>
   </div>
 </div>
 
-<div style="max-width:1100px;margin:0 auto;padding:0 16px 16px">
-  <button class="pdf-btn" onclick="openPdfModal()">
-    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+<div class="pdf-wrap">
+  <button class="btn btn-primary pdf-btn" onclick="openPdfModal()">
+    <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
     Stiahnuť PDF s výpočtom
   </button>
 </div>
@@ -321,36 +369,62 @@ td{padding:7px 6px;font-size:11px}
 
 <!-- PDF / Email Modal -->
 <div class="pdf-modal-overlay" id="pdfModal">
-  <div class="pdf-modal">
-    <button class="pdf-modal-close" onclick="closePdfModal()">×</button>
+  <div class="pdf-modal" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
+    <button class="pdf-modal-close" onclick="closePdfModal()" aria-label="Zavrieť">
+      <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
     <div id="modalFormContent">
-      <h3>Stiahni si výpočet</h3>
-      <p>Zadaj email a stiahni si PDF s výpočtom.</p>
-      <input class="pdf-modal-input" id="modalName" type="text" placeholder="Meno a priezvisko">
-      <input class="pdf-modal-input" id="modalEmail" type="email" placeholder="Váš e-mail">
+      <h3 id="pdfModalTitle">Stiahni si výpočet</h3>
+      <p>Zadaj e-mail a stiahni si PDF s výpočtom</p>
+      <input class="pdf-modal-input" id="modalName" type="text" placeholder="Meno a priezvisko" autocomplete="name">
+      <input class="pdf-modal-input" id="modalEmail" type="email" placeholder="E-mail" autocomplete="email">
       <div class="pdf-modal-check">
         <input type="checkbox" id="modalGdpr">
         <label for="modalGdpr">Súhlasím so <a href="ochrana-udajov.html" target="_blank" rel="noopener">spracovaním osobných údajov</a> za účelom zaslania investičného výpočtu a prípadného kontaktovania finančným poradcom.</label>
       </div>
-      <button class="pdf-modal-btn" id="modalSendBtn" onclick="sendPdfEmail()" disabled>Stiahnuť PDF</button>
+      <button class="btn btn-primary pdf-modal-btn" id="modalSendBtn" onclick="sendPdfEmail()" disabled>Stiahnuť PDF</button>
     </div>
     <div id="modalSuccess" style="display:none">
-      <div class="pdf-modal-success">Ďakujeme! PDF sa sťahuje.</div>
+      <div class="pdf-modal-success">Ďakujeme, PDF sa sťahuje</div>
     </div>
   </div>
 </div>
 
 <script>
+// Farby sérií: dynamická stratégia = Partners červená (jediný akcent),
+// ostatné v neutrálnych odtieňoch — čím vyšší výnos, tým tmavšia čiara.
 var strategies = [
-  {id:'inflacia', name:'Inflácia (strata hodnoty)', rate:-3, color:'#e76f51', dash:[4,4], isInflation:true},
-  {id:'termin', name:'Termínovaný vklad', rate:1.5, color:'#989FA7', dash:[5,5]},
-  {id:'pfki', name:'PFKI', rate:2, color:'#6c757d', dash:[]},
-  {id:'konzerv', name:'Konzervatívna', rate:4, color:'#2a9d8f', dash:[]},
-  {id:'vyvaz', name:'Vyvážená', rate:6, color:'#e9c46a', dash:[]},
-  {id:'zlato', name:'Zlato', rate:6, color:'#f4a261', dash:[]},
-  {id:'realit', name:'Realitná', rate:5, color:'#264653', dash:[]},
+  {id:'inflacia', name:'Inflácia (strata hodnoty)', rate:-3, color:'#8A9097', dash:[2,4], isInflation:true},
+  {id:'termin', name:'Termínovaný vklad', rate:1.5, color:'#8A9097', dash:[6,4]},
+  {id:'pfki', name:'PFKI', rate:2, color:'#8A9097', dash:[]},
+  {id:'konzerv', name:'Konzervatívna', rate:4, color:'#666A70', dash:[]},
+  {id:'vyvaz', name:'Vyvážená', rate:6, color:'#262626', dash:[]},
+  {id:'zlato', name:'Zlato', rate:6, color:'#262626', dash:[6,4]},
+  {id:'realit', name:'Realitná', rate:5, color:'#4D4D4D', dash:[]},
   {id:'dynam', name:'Dynamická', rate:8, color:'#AB0534', dash:[]}
 ];
+
+// Písmo a farby z partners.css aj pre graf (canvas nečíta CSS premenné)
+var rootStyle = getComputedStyle(document.documentElement);
+function cssVar(name, fallback){ var v = rootStyle.getPropertyValue(name); return (v && v.trim()) || fallback; }
+var UI = {
+  font: cssVar('--font', "'Schibsted Grotesk', Arial, sans-serif"),
+  fg: cssVar('--fg', '#262626'),
+  fg2: cssVar('--fg-2', '#4D4D4D'),
+  fg3: cssVar('--fg-3', '#666A70'),
+  line: cssVar('--line', 'rgba(38,38,38,0.12)')
+};
+if(window.Chart){
+  Chart.defaults.font.family = UI.font;
+  Chart.defaults.color = UI.fg3;
+}
+
+function swatchHtml(s){
+  var cls = 'swatch';
+  if(s.dash && s.dash.length) cls += s.dash[0] <= 2 ? ' dotted' : ' dashed';
+  if(s.id === 'dynam') cls += ' plan';
+  return '<span class="'+cls+'" style="color:'+s.color+'"></span>';
+}
 
 var checkedStrategies = {};
 strategies.forEach(function(s){ checkedStrategies[s.id] = true; });
@@ -361,8 +435,8 @@ function setValueMode(mode){
   document.getElementById('btnNominal').className = 'freq-btn' + (mode==='nominal'?' active':'');
   document.getElementById('btnReal').className = 'freq-btn' + (mode==='real'?' active':'');
   document.getElementById('valueModeInfo').innerHTML = mode==='nominal'
-    ? 'Zobrazuje sa nominálna hodnota — bez zohľadnenia inflácie.'
-    : 'Zobrazuje sa <strong>reálna kúpna sila</strong> — po odpočítaní inflácie '+INFLATION+'% ročne.';
+    ? 'Zobrazuje sa nominálna hodnota — bez zohľadnenia inflácie'
+    : 'Zobrazuje sa <strong>reálna kúpna sila</strong> — po odpočítaní inflácie '+INFLATION+' % ročne';
   calc();
 }
 
@@ -373,6 +447,9 @@ function fmt(n){
   return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(Math.round(n))+' €';
 }
 
+// Sadzby s desatinnou čiarkou (1,5 %), ako ostatné čísla na stránke
+function fmtRate(n){ return String(n).replace('.', ','); }
+
 function fmtPct(n){
   if(isNaN(n)) return '—';
   return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:1}).format(n)+' %';
@@ -382,11 +459,11 @@ function buildStratChecks(){
   var c = document.getElementById('stratChecks');
   var html = '';
   strategies.forEach(function(s){
-    html += '<label class="strat-check-row" style="border-left-color:'+s.color+'" for="chk_'+s.id+'">';
+    html += '<label class="strat-check-row" for="chk_'+s.id+'">';
     html += '<input type="checkbox" id="chk_'+s.id+'" checked onchange="checkedStrategies[\''+s.id+'\']=this.checked;calc()">';
-    html += '<span class="strat-dot" style="width:10px;height:10px;border-radius:50%;background:'+s.color+';display:inline-block;margin-right:8px;flex-shrink:0"></span>';
+    html += swatchHtml(s);
     html += '<span class="strat-check-name">'+s.name+'</span>';
-    html += '<span class="strat-check-rate">'+s.rate+' %</span>';
+    html += '<span class="strat-check-rate">'+fmtRate(s.rate)+' %</span>';
     html += '</label>';
   });
   c.innerHTML = html;
@@ -513,16 +590,19 @@ function buildChart(results, horizon, totalDeposits, lumpSum, monthlyInvest, ann
 
   var datasets = [];
 
-  // Deposits reference line
+  // Vklady — jemná sivá plocha pod čiarami
   datasets.push({
     label: 'Vklady',
     data: depositData,
-    borderColor: 'rgba(0,48,73,0.25)',
-    borderDash: [6,4],
-    borderWidth: 2,
+    borderColor: 'rgba(38,38,38,0.35)',
+    backgroundColor: 'rgba(38,38,38,0.05)',
+    borderDash: [4,4],
+    borderWidth: 1.5,
     pointRadius: 0,
-    fill: false,
-    tension: 0
+    pointHoverRadius: 0,
+    fill: 'origin',
+    tension: 0,
+    order: 20
   });
 
   // Strategy lines
@@ -530,17 +610,19 @@ function buildChart(results, horizon, totalDeposits, lumpSum, monthlyInvest, ann
     if(!checkedStrategies[s.id]) return;
     var r = results[s.id];
     var data = r.yearlyData.map(function(d){ return d.value; });
+    var isPlan = s.id === 'dynam';
     datasets.push({
-      label: s.name + ' (' + s.rate + '%)',
+      label: s.name + ' (' + fmtRate(s.rate) + ' %)',
       data: data,
       borderColor: s.color,
+      backgroundColor: s.color,
       borderDash: s.dash,
-      borderWidth: 2.5,
+      borderWidth: isPlan ? 3 : 2,
       pointRadius: 0,
       pointHoverRadius: 4,
-      fill: true,
-      backgroundColor: hexToRgba(s.color, 0.06),
-      tension: 0.3
+      fill: false,
+      tension: 0.3,
+      order: isPlan ? 0 : 10
     });
   });
 
@@ -555,32 +637,47 @@ function buildChart(results, horizon, totalDeposits, lumpSum, monthlyInvest, ann
       maintainAspectRatio: false,
       interaction: {mode:'index', intersect:false},
       plugins: {
-        legend: {display:true, position:'bottom', labels:{usePointStyle:true, pointStyle:'circle', padding:12, font:{size:10, weight:'600'}}},
+        legend: {display:true, position:'bottom', labels:{usePointStyle:true, pointStyle:'line', pointStyleWidth:20, padding:12, color:UI.fg2, font:{size:12}}},
         tooltip: {
-          backgroundColor: '#003049',
-          titleFont: {size:11, weight:'700'},
-          bodyFont: {size:11},
+          backgroundColor: '#fff',
+          borderColor: UI.line,
+          borderWidth: 1,
+          titleColor: UI.fg,
+          bodyColor: UI.fg2,
+          titleFont: {size:12, weight:'600'},
+          bodyFont: {size:12},
           padding: 12,
-          cornerRadius: 10,
+          cornerRadius: 8,
+          boxPadding: 4,
+          usePointStyle: true,
           callbacks: {
+            title: function(items){
+              return items.length ? 'Rok ' + items[0].label : '';
+            },
             label: function(ctx){
               return ctx.dataset.label + ': ' + fmt(ctx.parsed.y);
+            },
+            labelColor: function(ctx){
+              var c = ctx.dataset.label === 'Vklady' ? '#D9DBDE' : ctx.dataset.borderColor;
+              return {borderColor: c, backgroundColor: c};
             }
           }
         }
       },
       scales: {
         x: {
-          title: {display:true, text:'Roky', font:{size:10, weight:'700'}, color:'rgba(0,48,73,0.4)'},
+          title: {display:true, text:'Roky', font:{size:12}, color:UI.fg3},
           grid: {display:false},
-          ticks: {font:{size:9, weight:'600'}, color:'rgba(0,48,73,0.4)'}
+          border: {color:UI.line},
+          ticks: {font:{size:12}, color:UI.fg3}
         },
         y: {
-          title: {display:true, text:'Hodnota portfólia (€)', font:{size:10, weight:'700'}, color:'rgba(0,48,73,0.4)'},
-          grid: {color:'rgba(0,48,73,0.05)'},
+          title: {display:true, text:'Hodnota portfólia (€)', font:{size:12}, color:UI.fg3},
+          grid: {color:UI.line},
+          border: {display:false},
           ticks: {
-            font:{size:9, weight:'600'},
-            color:'rgba(0,48,73,0.4)',
+            font:{size:12},
+            color:UI.fg3,
             callback: function(v){ return new Intl.NumberFormat('sk-SK',{maximumFractionDigits:0}).format(v)+' €'; }
           }
         }
@@ -602,15 +699,13 @@ function buildCompTable(results, totalDeposits){
   rows.forEach(function(row){
     var isDyn = row.s.id === 'dynam';
     html += '<tr'+(isDyn?' class="hl-row"':'')+'>';
-    html += '<td style="font-weight:700;color:#003049"><span class="strat-dot" style="background:'+row.s.color+'"></span>'+row.s.name+'</td>';
+    html += '<td class="name"><span class="name-in">'+swatchHtml(row.s)+'<span>'+row.s.name+'</span></span></td>';
     var displayRate = row.s.isInflation ? row.s.rate : (valueMode==='real' ? row.s.rate - INFLATION : row.s.rate);
-    html += '<td>'+displayRate+' %</td>';
-    html += '<td class="green" style="font-weight:800">'+fmt(row.fv)+'</td>';
+    html += '<td>'+fmtRate(displayRate)+' %</td>';
+    html += '<td class="sum">'+fmt(row.fv)+'</td>';
     html += '<td>'+fmt(row.deposits)+'</td>';
-    var gainsColor = row.gains < 0 ? '#e74c3c' : '#003049';
-    html += '<td style="color:'+gainsColor+';font-weight:700">'+fmt(row.gains)+'</td>';
-    var pctColor = row.gainsPct < 0 ? '#e74c3c' : row.s.color;
-    html += '<td style="color:'+pctColor+';font-weight:800">'+fmtPct(row.gainsPct)+'</td>';
+    html += '<td'+(row.gains < 0 ? ' class="neg"' : '')+'>'+fmt(row.gains)+'</td>';
+    html += '<td'+(row.gainsPct < 0 ? ' class="neg"' : '')+'>'+fmtPct(row.gainsPct)+'</td>';
     html += '</tr>';
   });
   document.getElementById('compTableBody').innerHTML = html;
@@ -630,11 +725,12 @@ function buildHBars(results, totalDeposits){
     var total = row.fv;
     var depW = maxFv > 0 ? (row.deposits / maxFv * 100) : 0;
     var gainW = maxFv > 0 ? (row.gains / maxFv * 100) : 0;
+    var gainCls = row.gains < 0 ? ' is-neg' : (row.s.id === 'dynam' ? ' is-plan' : '');
     html += '<div class="hbar-row">';
-    html += '<div class="hbar-label"><span><span class="strat-dot" style="background:'+row.s.color+';width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle"></span>'+row.s.name+'</span><span style="color:#003049;font-weight:800">'+fmt(total)+'</span></div>';
+    html += '<div class="hbar-label"><span class="hbar-name">'+swatchHtml(row.s)+row.s.name+'</span><span class="hbar-total">'+fmt(total)+'</span></div>';
     html += '<div class="hbar-track">';
     html += '<div class="hbar-deposits" style="width:'+depW+'%">'+fmt(row.deposits)+'</div>';
-    html += '<div class="hbar-gains" style="width:'+gainW+'%;background:'+row.s.color+'">'+fmt(row.gains)+'</div>';
+    html += '<div class="hbar-gains'+gainCls+'" style="width:'+gainW+'%">'+fmt(row.gains)+'</div>';
     html += '</div>';
     html += '</div>';
   });
@@ -679,7 +775,7 @@ function generatePdf(){
         imgW = imgH * ratio;
       }
       pdf.setFontSize(14);
-      pdf.setTextColor(0,48,73);
+      pdf.setTextColor(38,38,38);
       pdf.text('InvestKalkulačka+ — Výpočet', 10, 12);
       pdf.setFontSize(8);
       pdf.setTextColor(150);
@@ -741,6 +837,10 @@ syncPair('monthlyInvest','monthlyInvestR',0,2000);
 syncPair('annualBonus','annualBonusR',0,10000);
 syncPair('horizon','horizonR',1,40);
 calc();
+// Po načítaní písma prekresli graf, aby aj popisky v canvase boli v písme webu
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(function(){ if(mainChart) mainChart.update('none'); });
+}
 </script>
 </body>
 </html>

@@ -9,47 +9,39 @@
 <title>Ochrana osobných údajov | Mário Tišťan</title>
 <meta name="description" content="Ochrana osobných údajov — informácie o spracovaní osobných údajov klientov Mária Tišťana, Partners Group SK.">
 <link rel="canonical" href="https://www.mariotistan.sk/ochrana-udajov.html">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/partners.css">
 <style>
-:root {
-  --navy: #003049;
-  --red: #AB0534;
-  --silver: #989FA7;
-  --sand: #ECEDED;
-  --white: #ffffff;
-  --muted: rgba(0,48,73,0.5);
-  --border: rgba(0,48,73,0.1);
-  --radius: 20px;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--navy); line-height: 1.6; }
-header { background: var(--navy); color: #fff; padding: 24px 5%; }
-.header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-.header-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
-.header-logo span { color: var(--red); }
-.header-back { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; transition: all .2s; }
-.header-back:hover { background: rgba(255,255,255,0.1); color: #fff; }
-main { max-width: 900px; margin: 0 auto; padding: 60px 5% 80px; }
-h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 44px); font-weight: 700; color: var(--navy); margin-bottom: 8px; }
-.subtitle { font-size: 14px; color: var(--muted); margin-bottom: 48px; }
-h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-top: 40px; margin-bottom: 12px; }
-p, li { font-size: 15px; font-weight: 300; color: rgba(0,48,73,0.7); line-height: 1.8; margin-bottom: 12px; }
-ul { padding-left: 24px; margin-bottom: 16px; }
-strong { font-weight: 600; color: var(--navy); }
-a { color: var(--red); }
-.info-box { background: var(--sand); padding: 24px; border-radius: var(--radius); margin: 24px 0; border-left: 4px solid var(--red); }
-.info-box p { margin-bottom: 4px; }
-footer { background: var(--navy); color: rgba(255,255,255,0.3); padding: 24px 5%; text-align: center; font-size: 12px; }
+* { margin: 0; padding: 0; }
+body { font-size: 16px; line-height: 1.6; }
+.ico { width: 18px; height: 18px; flex-shrink: 0; }
+.page-header { border-bottom: 1px solid var(--line); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 768px; height: 64px; margin: 0 auto; padding: 0 24px; }
+.header-back { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: var(--fg-2); text-decoration: none; transition: color var(--t-fast) var(--ease); }
+.header-back:hover { color: var(--fg); }
+main { max-width: 768px; margin: 0 auto; padding: 64px 24px 96px; }
+h1 { font-size: clamp(32px, 4vw, 44px); font-weight: 600; line-height: 1.1; letter-spacing: -0.015em; color: var(--fg); }
+.subtitle { margin-top: 12px; margin-bottom: 40px; font-size: 15px; color: var(--fg-3); }
+h2 { margin-top: 48px; margin-bottom: 12px; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: var(--fg); }
+p, li { font-size: 16px; line-height: 1.7; color: var(--fg-2); }
+p + p, ul + p { margin-top: 12px; }
+ul { margin: 12px 0 16px; padding-left: 24px; }
+li + li { margin-top: 6px; }
+strong { font-weight: 500; color: var(--fg); }
+a { color: var(--red); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--red-hover); }
+.info-box { margin: 32px 0; padding: 24px 28px; background: var(--bg-2); border-radius: var(--r-lg); }
+.info-box p + p { margin-top: 4px; }
+.page-footer { padding: 24px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.6; text-align: center; color: var(--fg-3); }
+@media (max-width: 480px) { .header-inner, main { padding-left: 16px; padding-right: 16px; } main { padding-top: 48px; } }
 </style>
 </head>
 <body>
 
-<header>
+<header class="page-header">
   <div class="header-inner">
-    <a href="index.html" class="header-logo">Mário <span>Tišťan</span></a>
-    <a href="index.html" class="header-back">← Späť na hlavnú stránku</a>
+    <a href="/" class="site-logo">Mário Tišťan</a>
+    <a href="/" class="header-back"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>Späť na hlavnú stránku</a>
   </div>
 </header>
 
@@ -128,7 +120,7 @@ footer { background: var(--navy); color: rgba(255,255,255,0.3); padding: 24px 5%
   <p>Ak nie ste spokojný so spôsobom spracovania vašich údajov, máte právo podať sťažnosť na <strong>Úrad na ochranu osobných údajov SR</strong> (<a href="https://dataprotection.gov.sk" target="_blank" rel="noopener">dataprotection.gov.sk</a>).</p>
 </main>
 
-<footer>
+<footer class="page-footer">
   © 2026 Mário Tišťan · mariotistan.sk · Podriadený finančný agent Partners Group SK s.r.o.
 </footer>
 

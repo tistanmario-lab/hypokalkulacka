@@ -166,288 +166,249 @@
   ]
 }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/partners.css">
 <style>
-:root {
-  --navy: #003049;
-  --red: #AB0534;
-  --silver: #989FA7;
-  --sand: #ECEDED;
-  --white: #ffffff;
-  --dark-gray: #4D4D4D;
-  --light-red: #CD6D80;
-  --muted: rgba(0,48,73,0.5);
-  --border: rgba(0,48,73,0.1);
-  --radius: 20px;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; overflow-x: hidden; }
-body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--navy); line-height: 1.6; overflow-x: hidden; }
+* { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; overflow-x: hidden; }
+body { font-size: 16px; line-height: 1.6; }
+img { display: block; max-width: 100%; height: auto; }
+ul, ol { list-style: none; }
+a { color: inherit; }
+.wrap { width: 100%; max-width: 1168px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 480px) { .wrap { padding: 0 16px; } }
 
-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 0 5%; }
-.nav-inner { max-width: 1100px; margin: 0 auto; height: 68px; display: flex; align-items: center; justify-content: space-between; }
-.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); text-decoration: none; }
-.nav-logo span { color: var(--red); font-weight: 700; }
-.nav-links { display: flex; gap: 32px; list-style: none; }
-.nav-links a { font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color .2s; }
-.nav-links a:hover { color: var(--navy); }
+/* Navigácia */
+.site-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.96); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.nav-inner { display: flex; align-items: center; gap: 24px; height: 64px; }
+.nav-links { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+.nav-links > li > a { display: inline-flex; align-items: center; height: 40px; padding: 0 12px; border-radius: var(--r); font-size: 15px; font-weight: 500; color: var(--fg-2); text-decoration: none; transition: color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease); }
+.nav-links > li > a:hover { color: var(--fg); background: var(--bg-hover); }
 .nav-dropdown { position: relative; }
-.nav-dropdown > a { cursor: pointer; }
-.nav-dropdown-panel { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 10px 0; min-width: 210px; box-shadow: 0 8px 24px rgba(0,48,73,0.10); opacity: 0; transition: opacity .2s; z-index: 110; }
-.nav-dropdown:hover .nav-dropdown-panel { display: block; opacity: 1; }
-.nav-dropdown-panel a { display: block; padding: 8px 20px; font-size: 13px; font-weight: 500; letter-spacing: .04em; text-transform: none; color: var(--muted); text-decoration: none; white-space: nowrap; transition: background .15s, color .15s; }
-.nav-dropdown-panel a:hover { background: var(--sand); color: var(--navy); }
-.nav-cta { background: var(--red); color: #fff; padding: 10px 22px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; transition: background .2s; border-radius: var(--radius); }
-.nav-cta:hover { background: var(--navy); }
-.hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
-.hamburger span { display: block; width: 22px; height: 2px; background: var(--navy); margin: 5px 0; transition: all .3s; }
-@media (max-width: 768px) {
-  .nav-links { display: none; position: absolute; top: 68px; left: 0; right: 0; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); flex-direction: column; padding: 20px 5%; gap: 16px; border-bottom: 1px solid var(--border); }
-  .nav-links.open { display: flex; }
-  .hamburger { display: block; }
+.nav-dropdown > a::after { content: ''; width: 6px; height: 6px; margin-left: 8px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); }
+.nav-dropdown-panel { display: none; position: absolute; top: 100%; left: 0; min-width: 232px; padding: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+.nav-dropdown:hover .nav-dropdown-panel, .nav-dropdown:focus-within .nav-dropdown-panel { display: block; }
+.nav-dropdown-panel a { display: flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 6px; font-size: 15px; color: var(--fg-2); text-decoration: none; white-space: nowrap; transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease); }
+.nav-dropdown-panel a:hover { background: var(--bg-hover); color: var(--fg); }
+.nav-cta { margin-left: 8px; }
+.hamburger { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 5px; width: 40px; height: 40px; margin-left: auto; border: 0; border-radius: var(--r); background: none; cursor: pointer; }
+.hamburger span { display: block; width: 20px; height: 1.5px; background: var(--fg); }
+@media (max-width: 900px) {
+  .hamburger { display: inline-flex; }
   .nav-cta { display: none; }
-  .nav-dropdown-panel { display: flex !important; position: static; transform: none; background: none; border: none; box-shadow: none; padding: 0; min-width: 0; opacity: 1; flex-direction: column; gap: 8px; margin-top: 4px; }
-  .nav-dropdown-panel a { padding: 4px 0; font-size: 13px; }
+  .nav-links { display: none; position: absolute; top: 64px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0; margin: 0; padding: 8px 16px 16px; background: var(--bg); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+  .nav-links.open { display: flex; }
+  .nav-links > li > a { width: 100%; height: 44px; }
+  .nav-dropdown > a::after { display: none; }
+  .nav-dropdown-panel { display: block; position: static; min-width: 0; padding: 0 0 4px 12px; background: none; border: 0; box-shadow: none; }
+  .nav-dropdown-panel a { height: 40px; }
 }
 
-.hero-wrap { max-width: 1100px; margin: 0 auto; padding: 0 5%; }
-.hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 100px 0 60px; gap: 60px; }
-@media (max-width: 768px) { .hero { grid-template-columns: 1fr; text-align: center; } }
-.hero-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 20px; }
-.hero-tag::before { content: ''; width: 24px; height: 2px; background: var(--red); }
-.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 5vw, 68px); font-weight: 700; line-height: 1.05; letter-spacing: -.03em; color: var(--navy); margin-bottom: 10px; }
+/* Úvod */
+.hero { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr); gap: 64px; align-items: center; min-height: 100vh; min-height: 100svh; padding-top: 112px; padding-bottom: 64px; }
+.hero h1 { margin-top: 16px; font-size: clamp(40px, 5.2vw, 64px); font-weight: 600; line-height: 1.04; letter-spacing: -0.015em; color: var(--fg); }
 .hero h1 em { font-style: normal; color: var(--red); }
-.hero-accent { font-size: clamp(18px, 2.5vw, 22px); font-weight: 500; color: var(--red); margin-bottom: 24px; font-family: 'DM Sans', sans-serif; }
-.hero-desc { font-size: 17px; font-weight: 300; color: var(--muted); line-height: 1.7; margin-bottom: 36px; max-width: 480px; }
-@media (max-width: 768px) { .hero-desc { margin-left: auto; margin-right: auto; } }
-.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
-@media (max-width: 768px) { .hero-btns { justify-content: center; } }
-.btn-primary { background: var(--red); color: #fff; padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: background .2s; border-radius: var(--radius); }
-.btn-primary:hover { background: var(--navy); }
-.btn-secondary { border: 1.5px solid var(--navy); color: var(--navy); padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: all .2s; border-radius: var(--radius); }
-.btn-secondary:hover { background: var(--navy); color: #fff; }
-.hero-photo { position: relative; }
-.photo-frame { width: 100%; aspect-ratio: 4/5; background: var(--sand); position: relative; overflow: hidden; border-radius: var(--radius); }
-.photo-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.photo-badge { position: absolute; bottom: 24px; right: 24px; background: var(--white); padding: 14px 18px; border-left: 3px solid var(--red); border-radius: 12px; max-width: calc(100% - 48px); }
-@media (max-width: 768px) { .photo-badge { bottom: 16px; right: 16px; } }
-.badge-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; }
-.badge-txt { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.photo-accent { position: absolute; top: -20px; left: -20px; width: 80px; height: 80px; border: 3px solid var(--red); border-radius: var(--radius); }
-
-/* Social Proof Bar */
-.social-proof { background: var(--navy); padding: 48px 5%; overflow: hidden; }
-.proof-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; overflow: hidden; }
-@media (max-width: 900px) { .proof-inner { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
-@media (max-width: 480px) { .proof-inner { grid-template-columns: 1fr; text-align: center; } }
-.proof-item { display: flex; align-items: flex-start; gap: 16px; }
-@media (max-width: 480px) { .proof-item { flex-direction: column; align-items: center; } }
-.proof-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; border-radius: 12px; flex-shrink: 0; }
-.proof-icon svg { width: 22px; height: 22px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.proof-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #fff; line-height: 1.1; }
-@media (max-width: 900px) { .proof-num { font-size: 22px; } }
-.proof-lbl { font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.5); margin-top: 2px; word-break: break-word; }
-
-section { padding: 80px 5%; }
-.section-inner { max-width: 1100px; margin: 0 auto; }
-.section-tag { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.section-tag::before { content: ''; width: 20px; height: 2px; background: var(--red); }
-.section-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 700; color: var(--navy); letter-spacing: -.02em; line-height: 1.1; margin-bottom: 16px; }
-.section-sub { font-size: 16px; font-weight: 300; color: var(--muted); max-width: 560px; line-height: 1.7; }
-
-/* Services — large cards with scenarios */
-.services { background: var(--sand); }
-.services-grid { display: grid; grid-template-columns: 1fr; gap: 32px; margin-top: 48px; }
-.service-card-large { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; transition: box-shadow .3s; }
-.service-card-large:hover { box-shadow: 0 12px 40px rgba(0,48,73,0.08); }
-.service-card-header { padding: 36px 36px 24px; border-bottom: 1px solid var(--border); }
-@media (max-width: 480px) { .service-card-header { padding: 24px 20px 16px; } }
-.service-card-header-top { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
-.service-icon-lg { width: 56px; height: 56px; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 26px; border-radius: 14px; flex-shrink: 0; }
-.service-title-lg { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--navy); }
-.service-subtitle-lg { font-size: 15px; font-weight: 400; color: var(--muted); margin-left: 72px; }
-.scenarios { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-@media (max-width: 768px) { .scenarios { grid-template-columns: 1fr; } }
-.scenario { padding: 32px 36px; }
-@media (max-width: 480px) { .scenario { padding: 20px; } }
-.scenario:first-child { border-right: 1px solid var(--border); }
-@media (max-width: 768px) { .scenario:first-child { border-right: none; border-bottom: 1px solid var(--border); } }
-.scenario-q { font-size: 15px; font-style: italic; color: var(--navy); font-weight: 500; margin-bottom: 14px; line-height: 1.6; padding-left: 16px; border-left: 3px solid var(--red); }
-.scenario-a { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.75; }
-
-/* Steps */
-.steps { background: var(--white); }
-.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; position: relative; }
-@media (max-width: 768px) { .steps-grid { grid-template-columns: 1fr; } }
-.step-card { text-align: center; position: relative; padding: 0 16px; }
-.step-num { width: 56px; height: 56px; background: var(--red); color: #fff; font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-.step-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
-.step-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; }
-.step-line { display: none; }
-@media (min-width: 769px) {
-  .step-line { display: block; position: absolute; top: 28px; left: calc(33.33% + 28px); width: calc(33.33% - 56px); height: 2px; background: var(--border); }
-  .step-line.l2 { left: calc(66.66% + 28px); }
+.hero-lead { margin-top: 24px; font-size: 20px; font-weight: 500; line-height: 1.45; color: var(--fg); }
+.hero-desc { max-width: 32em; margin-top: 12px; font-size: 18px; line-height: 1.6; color: var(--fg-2); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.hero-photo { width: 100%; max-width: 500px; justify-self: end; }
+.hero-photo img { object-position: 50% 12%; background: var(--bg-2); }
+@media (max-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 48px; min-height: 0; padding-top: 112px; }
+  .hero-photo { justify-self: start; max-width: 440px; }
+}
+@media (max-width: 480px) {
+  .hero { padding-top: 96px; }
+  .hero h1 { font-size: 38px; }
+  .hero-lead { font-size: 18px; }
+  .hero-desc { font-size: 17px; }
+  .hero-actions .btn { width: 100%; }
 }
 
-/* About section */
-.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; margin-top: 48px; }
-@media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; } }
-.about-text p { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.7); line-height: 1.8; margin-bottom: 16px; }
-.about-text h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); margin-top: 28px; margin-bottom: 12px; }
-.about-highlight { background: var(--sand); border-left: 4px solid var(--red); padding: 24px 28px; border-radius: 0 var(--radius) var(--radius) 0; margin: 20px 0; }
-@media (max-width: 480px) { .about-highlight { padding: 16px 18px; } }
-.about-highlight p { font-size: 15px; font-weight: 400; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 0; }
-.about-photos { position: relative; min-height: 420px; }
-.about-photo-main { width: 80%; border-radius: var(--radius); overflow: hidden; box-shadow: 0 16px 48px rgba(0,48,73,0.12); position: relative; z-index: 2; }
-.about-photo-main img { width: 100%; height: auto; display: block; }
-.about-photo-secondary { width: 45%; border-radius: var(--radius); overflow: hidden; box-shadow: 0 12px 36px rgba(0,48,73,0.15); position: absolute; bottom: -40px; right: -10px; z-index: 3; transform: rotate(2deg); border: 4px solid var(--white); }
-.about-photo-secondary img, .about-photo-placeholder { width: 100%; height: auto; display: block; }
-.about-photo-placeholder { aspect-ratio: 4/3; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 48px; color: var(--silver); }
+/* Kalkulačky pod úvodom */
+.calcs { padding-bottom: 80px; }
+.calc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.calc-card { display: flex; flex-direction: column; min-height: 232px; padding: 24px; border-radius: var(--r-lg); background: var(--bg-2); color: var(--fg); text-decoration: none; transition: background-color var(--t-fast) var(--ease); }
+.calc-card:hover { background: #E3E4E4; }
+.calc-name { font-size: 14px; font-weight: 500; color: var(--fg-3); }
+.calc-card h3 { margin-top: 8px; font-size: 22px; font-weight: 500; line-height: 1.25; letter-spacing: -0.01em; color: var(--fg); }
+.calc-desc { margin-top: 8px; font-size: 15px; line-height: 1.5; color: var(--fg-2); }
+.calc-go { display: inline-flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 20px; font-size: 15px; font-weight: 500; color: var(--fg); }
+.calc-go .lucide { width: 18px; height: 18px; }
+@media (max-width: 900px) { .calc-grid { grid-template-columns: minmax(0, 1fr); } .calc-card { min-height: 0; } }
+
+/* Čísla */
+.stats { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.stat { padding: 40px 32px; }
+.stat:first-child { padding-left: 0; }
+.stat + .stat { border-left: 1px solid var(--line); }
+.stat-label { font-size: 15px; font-weight: 500; color: var(--fg-3); }
+.stat-value { margin-top: 8px; font-size: clamp(36px, 4vw, 48px); font-weight: 600; line-height: 1; letter-spacing: -0.015em; color: var(--fg); }
+.stat-note { margin-top: 12px; font-size: 15px; line-height: 1.5; color: var(--fg-2); }
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: minmax(0, 1fr); }
+  .stat, .stat:first-child { padding: 24px 0; }
+  .stat + .stat { border-left: 0; border-top: 1px solid var(--line); }
+}
+
+/* Sekcie */
+.section { padding: 96px 0; }
+.section-alt { background: var(--bg-2); }
+.section-rule { border-top: 1px solid var(--line); }
+.section-head { max-width: 720px; margin-bottom: 48px; }
+.section-head h2 { margin-top: 12px; font-size: clamp(32px, 4vw, 44px); font-weight: 600; line-height: 1.1; letter-spacing: -0.015em; color: var(--fg); }
+.section-sub { margin-top: 16px; font-size: 18px; line-height: 1.6; color: var(--fg-2); }
+@media (max-width: 600px) { .section { padding: 64px 0; } .section-head { margin-bottom: 32px; } }
+
+/* Služby */
+.services-list { display: grid; gap: 16px; }
+.service { overflow: hidden; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); }
+.service-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; padding: 28px 32px; border-bottom: 1px solid var(--line); }
+.service-head h3 { font-size: 24px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); }
+.service-head p { font-size: 16px; color: var(--fg-3); }
+.scenarios { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.scenario { padding: 28px 32px 32px; }
+.scenario + .scenario { border-left: 1px solid var(--line); }
+.scenario-q { font-size: 18px; font-weight: 500; line-height: 1.45; color: var(--fg); }
+.scenario-a { margin-top: 12px; font-size: 16px; line-height: 1.65; color: var(--fg-2); }
 @media (max-width: 768px) {
-  .about-photos { min-height: 320px; margin-bottom: 40px; }
-  .about-photo-main { width: 75%; }
-  .about-photo-secondary { width: 50%; }
+  .scenarios { grid-template-columns: minmax(0, 1fr); }
+  .scenario + .scenario { border-left: 0; border-top: 1px solid var(--line); }
+  .service-head, .scenario { padding-left: 20px; padding-right: 20px; }
 }
 
-/* Team section */
-.team-section { background: var(--sand); }
-.team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; }
-@media (max-width: 768px) { .team-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; } }
-.team-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; text-align: center; transition: box-shadow .3s, transform .3s; }
-.team-card:hover { box-shadow: 0 12px 40px rgba(0,48,73,0.1); transform: translateY(-4px); }
-.team-card.featured { border-color: var(--red); border-width: 2px; }
-.team-photo { width: 100%; aspect-ratio: 3/4; background: var(--sand); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.team-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
-.team-photo-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
-.team-photo-placeholder svg { width: 64px; height: 64px; color: var(--silver); }
-.team-info { padding: 28px 24px 32px; }
-@media (max-width: 480px) { .team-info { padding: 20px 16px 24px; } }
-.team-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
-.team-role { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
-.team-location { font-size: 11px; font-weight: 500; color: var(--silver); margin-bottom: 16px; }
-.team-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
-.team-cta { display: inline-block; padding: 12px 24px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; border-radius: var(--radius); transition: all .2s; }
-.team-cta-primary { background: var(--red); color: #fff; }
-.team-cta-primary:hover { background: var(--navy); }
-.team-cta-secondary { border: 1.5px solid var(--navy); color: var(--navy); }
-.team-cta-secondary:hover { background: var(--navy); color: #fff; }
+/* Ako to funguje */
+.steps-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.step { padding-top: 24px; border-top: 1px solid var(--line); }
+.step-num { display: block; font-size: 28px; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: var(--red); }
+.step h3 { margin-top: 24px; font-size: 20px; font-weight: 500; line-height: 1.3; color: var(--fg); }
+.step p { margin-top: 8px; font-size: 16px; line-height: 1.65; color: var(--fg-2); }
+@media (max-width: 768px) { .steps-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
 
-/* Tools & Blog section */
-.tools-section { background: var(--navy); color: #fff; }
-.tools-section .section-tag { color: var(--silver); }
-.tools-section .section-tag::before { background: var(--silver); }
-.tools-section .section-title { color: #fff; }
-.tools-section .section-sub { color: rgba(255,255,255,0.5); }
-.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 48px; align-items: start; }
-@media (max-width: 768px) { .tools-grid { grid-template-columns: 1fr; } }
-.tools-calc-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,48,73,0.12); border-color: var(--red) !important; }
-.calc-intro { font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 24px; word-break: break-word; }
-.blog-intro { font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 24px; }
+/* O mne */
+.about-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 64px; align-items: start; }
+.about-text p { font-size: 17px; line-height: 1.75; color: var(--fg-2); }
+.about-text p + p { margin-top: 16px; }
+.about-text h3 { margin-top: 40px; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: var(--fg); }
+.about-text h3 + p { margin-top: 12px; }
+.about-note { margin-top: 32px; padding: 24px 28px; background: var(--bg-2); border-radius: var(--r-lg); }
+.about-note p { color: var(--fg); }
+.text-link { color: var(--red); font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: color var(--t-fast) var(--ease); }
+.text-link:hover { color: var(--red-hover); }
+.about-photos { position: sticky; top: 96px; display: grid; grid-template-columns: 0.688fr 1fr; gap: 16px; align-items: start; }
+.about-photos img { width: 100%; border-radius: var(--r-lg); background: var(--bg-2); }
+@media (max-width: 900px) { .about-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; } .about-photos { position: static; } }
 
-/* Blog cards */
-.blog-grid-side { display: flex; flex-direction: column; gap: 16px; }
-.blog-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all .3s; text-decoration: none; color: inherit; display: block; }
-.blog-card:hover { border-color: var(--navy); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,48,73,0.08); }
-.blog-body { padding: 20px 24px; }
-.blog-tag { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
-.blog-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 6px; line-height: 1.3; }
-.blog-excerpt { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
-.blog-link { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--red); text-decoration: none; border-bottom: 1px solid rgba(171,5,52,0.3); padding-bottom: 2px; transition: color .2s; }
-.blog-link:hover { color: var(--navy); border-color: var(--navy); }
+/* Tím */
+.team-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.member { display: flex; flex-direction: column; overflow: hidden; background: var(--bg); border-radius: var(--r-lg); }
+.member-photo { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 20%; background: #E3E4E4; }
+.member-monogram { display: flex; align-items: center; justify-content: center; font-size: 56px; font-weight: 500; letter-spacing: -0.02em; color: var(--fg-3); }
+.member-body { display: flex; flex: 1; flex-direction: column; padding: 24px; }
+.member h3 { font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); }
+.member-role { margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--fg-2); }
+.member-place { margin-top: 2px; font-size: 14px; color: var(--fg-3); }
+.member-desc { margin-top: 16px; font-size: 16px; line-height: 1.6; color: var(--fg-2); }
+.member-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 24px; }
+@media (max-width: 900px) { .team-grid { grid-template-columns: minmax(0, 1fr); max-width: 440px; } }
 
-/* Contact */
-.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 48px; align-items: start; }
-@media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
-.contact-info { display: flex; flex-direction: column; gap: 16px; }
-.contact-item { display: flex; align-items: flex-start; gap: 16px; padding: 20px; border: 1px solid var(--border); transition: border-color .2s; border-radius: var(--radius); }
-.contact-item:hover { border-color: var(--navy); }
-.contact-item-icon { width: 40px; height: 40px; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; border-radius: 12px; }
-.contact-item-lbl { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
-.contact-item-val { font-size: 15px; font-weight: 500; color: var(--navy); }
-.contact-item-val a { color: var(--navy); text-decoration: none; }
-.contact-item-val a:hover { color: var(--red); }
-.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-.form-label { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.form-input { padding: 12px 16px; border: 1px solid var(--border); font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--navy); background: var(--white); outline: none; transition: border-color .2s; width: 100%; border-radius: 12px; }
-.form-input:focus { border-color: var(--navy); }
-textarea.form-input { resize: vertical; min-height: 120px; }
-.form-btn { background: var(--red); color: #fff; padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; border: none; cursor: pointer; transition: background .2s; margin-bottom: 12px; width: 100%; border-radius: var(--radius); }
-.form-btn:hover { background: var(--navy); }
-.form-note { font-size: 12px; color: var(--muted); }
+/* Nástroje a blog */
+.tools-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: start; }
+.col-title { font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: var(--fg); }
+.col-intro { margin-top: 8px; margin-bottom: 20px; font-size: 16px; line-height: 1.6; color: var(--fg-2); }
+.list-card { display: flex; align-items: center; gap: 16px; padding: 20px 20px 20px 24px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-card); color: inherit; text-decoration: none; transition: border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease); }
+.list-card + .list-card { margin-top: 12px; }
+.list-card:hover { background: var(--bg-hover); border-color: var(--line-strong); }
+.lc-body { flex: 1; min-width: 0; }
+.lc-meta { margin-bottom: 4px; font-size: 14px; font-weight: 500; color: var(--fg-3); }
+.lc-title { font-size: 18px; font-weight: 500; line-height: 1.35; color: var(--fg); }
+.lc-desc { margin-top: 4px; font-size: 15px; line-height: 1.5; color: var(--fg-2); }
+.list-card .lucide { color: var(--fg-3); }
+@media (max-width: 900px) { .tools-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
 
-footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
-.footer-inner { max-width: 1100px; margin: 0 auto; }
-.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-@media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; } }
-@media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
-.footer-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 12px; }
-.footer-logo span { color: var(--red); }
-.footer-desc { font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 20px; }
-.footer-socials { display: flex; gap: 12px; }
-.footer-socials a { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; transition: background .2s; }
-.footer-socials a:hover { background: var(--red); }
-.footer-socials svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.footer-heading { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 16px; }
-.footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.footer-links a { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.6); text-decoration: none; transition: color .2s; }
-.footer-links a:hover { color: #fff; }
-.footer-contact-item { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 10px; line-height: 1.5; }
-.footer-contact-item a { color: rgba(255,255,255,0.6); text-decoration: none; transition: color .2s; }
-.footer-contact-item a:hover { color: #fff; }
-.footer-contact-label { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 2px; }
-.footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-@media (max-width: 480px) { .footer-bottom { flex-direction: column; text-align: center; } }
-.footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
-.footer-legal { font-size: 11px; color: rgba(255,255,255,0.25); line-height: 1.6; text-align: right; }
-@media (max-width: 480px) { .footer-legal { text-align: center; } }
-.footer-legal a { color: rgba(255,255,255,0.4); text-decoration: underline; }
+/* Kontakt */
+.contact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; align-items: start; }
+.contact-list { display: grid; gap: 12px; }
+.contact-row { display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: var(--bg); border-radius: var(--r-card); }
+.contact-row > .lucide { color: var(--fg-3); }
+.contact-label { font-size: 14px; font-weight: 500; color: var(--fg-3); }
+.contact-value { margin-top: 2px; font-size: 17px; font-weight: 500; color: var(--fg); }
+.contact-value a { color: var(--fg); text-decoration: none; transition: color var(--t-fast) var(--ease); }
+.contact-value a:hover { color: var(--red); }
+.social { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.social a { display: inline-flex; align-items: center; gap: 8px; }
+.ico { width: 20px; height: 20px; flex-shrink: 0; }
+.form { padding: 32px; background: var(--bg); border-radius: var(--r-lg); }
+.form-group + .form-group { margin-top: 16px; }
+.form-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--fg-2); }
+.form-input { display: block; width: 100%; min-height: 48px; padding: 12px 16px; font-family: var(--font); font-size: 16px; line-height: 1.4; color: var(--fg); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--r); transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease); }
+.form-input::placeholder { color: #8A8E94; }
+.form-input:hover { border-color: var(--fg-3); }
+.form-input:focus { outline: none; border-color: var(--fg); box-shadow: 0 0 0 3px var(--red-tint); }
+select.form-input { -webkit-appearance: none; appearance: none; padding-right: 44px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23666A70' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+textarea.form-input { min-height: 128px; resize: vertical; }
+.form .btn { width: 100%; margin-top: 24px; }
+.form-note { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--fg-3); }
+.form-note a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 900px) { .contact-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
+@media (max-width: 480px) { .form { padding: 20px; } .contact-row { padding: 16px 20px; } }
 
-.fade-up { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
-.fade-up.visible { opacity: 1; transform: translateY(0); }
+/* Pätička */
+.site-footer { padding: 64px 0 32px; border-top: 1px solid var(--line); }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.3fr; gap: 40px; }
+.footer-desc { max-width: 26em; margin-top: 12px; font-size: 15px; line-height: 1.6; color: var(--fg-2); }
+.footer-socials { display: flex; gap: 8px; margin-top: 20px; }
+.footer-socials a { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; color: var(--fg-2); border: 1px solid var(--line); border-radius: var(--r); transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease); }
+.footer-socials a:hover { color: var(--fg); border-color: var(--line-strong); }
+.footer-heading { margin-bottom: 12px; font-size: 14px; font-weight: 500; color: var(--fg-3); }
+.footer-links { display: grid; gap: 8px; }
+.footer-links + .footer-heading { margin-top: 24px; }
+.footer-links a, .footer-contact a { font-size: 15px; color: var(--fg-2); text-decoration: none; transition: color var(--t-fast) var(--ease); }
+.footer-links a:hover, .footer-contact a:hover { color: var(--fg); }
+.footer-contact dt { font-size: 13px; color: var(--fg-3); }
+.footer-contact dd { margin-bottom: 12px; font-size: 15px; line-height: 1.5; color: var(--fg-2); }
+.footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.6; color: var(--fg-3); }
+.footer-bottom a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .footer-grid { grid-template-columns: minmax(0, 1fr); } }
 
-/* Floating WhatsApp button */
-.float-wa { position: fixed; bottom: 24px; right: 24px; z-index: 90; display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
-.float-btn { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; box-shadow: 0 4px 16px rgba(0,0,0,0.2); transition: transform .2s, box-shadow .2s; }
-.float-btn:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(0,0,0,0.25); }
-.float-wa-btn { background: #25D366; }
-.float-call-btn { background: var(--red); }
-
-/* Cookie banner */
-.cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: var(--navy); color: #fff; padding: 16px 5%; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; font-size: 13px; transform: translateY(100%); transition: transform .4s ease; }
-.cookie-banner.show { transform: translateY(0); }
-.cookie-banner p { max-width: 600px; color: rgba(255,255,255,0.7); line-height: 1.5; }
-.cookie-banner a { color: rgba(255,255,255,0.9); text-decoration: underline; }
-.cookie-accept { background: var(--red); color: #fff; border: none; padding: 10px 24px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; border-radius: var(--radius); transition: background .2s; flex-shrink: 0; }
-.cookie-accept:hover { background: #fff; color: var(--navy); }
-
-/* Calculator CTA Section */
-.calc-cta-section { padding: 40px 5%; background: var(--white); }
-.calc-cta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; max-width: 1100px; margin: 0 auto; }
-.calc-cta-card { background: var(--sand); border-radius: 20px; padding: 40px 32px; text-decoration: none; color: var(--navy); display: flex; flex-direction: column; gap: 12px; transition: transform 0.2s, box-shadow 0.2s; border: 2px solid transparent; }
-.calc-cta-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,48,73,0.12); border-color: var(--red); }
-.calc-cta-icon { font-size: 40px; color: var(--red); }
-.calc-cta-icon svg, .service-icon-lg svg, .contact-item-icon svg { width: 1em; height: 1em; stroke-width: 1.5; }
-.calc-cta-title { font-size: 22px; font-weight: 800; line-height: 1.3; font-family: 'Playfair Display', serif; color: var(--navy); }
-.calc-cta-desc { font-size: 14px; color: rgba(0,48,73,0.6); line-height: 1.5; }
-.calc-cta-arrow { font-size: 13px; font-weight: 700; color: var(--red); letter-spacing: 0.04em; text-transform: uppercase; margin-top: auto; }
-@media (max-width: 768px) {
-  .calc-cta-grid { grid-template-columns: 1fr; }
-  .calc-cta-card { padding: 24px 16px; }
-  .calc-cta-title { font-size: 18px; }
+/* Plávajúce tlačidlá */
+.float-actions { position: fixed; right: 24px; bottom: 24px; z-index: 90; display: flex; flex-direction: column; gap: 12px; }
+.float-btn { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; box-shadow: var(--shadow); transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease); }
+.float-btn:active { transform: scale(0.96); }
+.float-call { color: var(--fg); background: var(--bg); border: 1px solid var(--line); }
+.float-call:hover { background: var(--bg-hover); }
+.float-wa { background: #25D366; }
+.float-wa:hover { background: #1FB85A; }
+.float-label { display: none; }
+/* Na mobile spodná lišta s vlastným miestom, aby tlačidlá neprekrývali text */
+@media (max-width: 600px) {
+  body { padding-bottom: 72px; }
+  .float-actions { left: 0; right: 0; bottom: 0; flex-direction: row; gap: 8px; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: rgba(255,255,255,0.96); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-top: 1px solid var(--line); }
+  .float-btn { flex: 1; gap: 8px; width: auto; height: 48px; border-radius: var(--r); box-shadow: none; font-size: 16px; font-weight: 500; text-decoration: none; color: var(--fg); background: var(--bg); border: 1px solid var(--line-strong); }
+  .float-btn:hover { background: var(--bg-hover); }
+  .float-wa svg { fill: #25D366; }
+  .float-label { display: inline; }
 }
+
+/* Cookies */
+.cookie-banner { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 200; display: flex; align-items: center; gap: 16px; max-width: 640px; margin: 0 auto; padding: 16px 16px 16px 20px; font-size: 14px; color: var(--fg-2); background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); transform: translateY(calc(100% + 24px)); transition: transform var(--t-enter) var(--ease); }
+.cookie-banner.show { transform: none; }
+.cookie-banner p { flex: 1; line-height: 1.5; }
+.cookie-banner a { color: var(--fg); text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 480px) { .cookie-banner { flex-direction: column; align-items: stretch; } }
 </style>
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
-<nav>
-  <div class="nav-inner">
-    <a href="#" class="nav-logo">Mário <span>Tišťan</span></a>
-    <ul class="nav-links">
+<nav class="site-nav" aria-label="Hlavná navigácia">
+  <div class="wrap nav-inner">
+    <a href="#" class="site-logo">Mário Tišťan</a>
+    <ul class="nav-links" id="nav-links">
       <li><a href="#s-cim-pomaham">S čím pomáham</a></li>
       <li><a href="#o-mne">O mne</a></li>
-      <li><a href="#nas-tim">Náš Tím</a></li>
+      <li><a href="#nas-tim">Náš tím</a></li>
       <li class="nav-dropdown">
         <a href="#nastroje">Nástroje</a>
         <div class="nav-dropdown-panel">
@@ -459,480 +420,409 @@ footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
       </li>
       <li><a href="#kontakt">Kontakt</a></li>
     </ul>
-    <button class="hamburger" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+    <button class="hamburger" type="button" aria-label="Menu" aria-controls="nav-links" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-    <a href="#kontakt" class="nav-cta">Dohodnúť stretnutie</a>
+    <a href="#kontakt" class="btn btn-primary btn-sm nav-cta">Dohodnúť stretnutie</a>
   </div>
 </nav>
 
-<!-- HERO -->
-<div class="hero-wrap">
-  <div class="hero">
-    <div>
-      <div class="hero-tag">Partners Group SK</div>
-      <h1>Postavme tvoje financie na <em>pevné základy</em>.</h1>
-      <div class="hero-accent">Zrozumiteľne, ľudsky a na dlhé roky.</div>
-      <p class="hero-desc">Pomáham (nielen) mladým rodinám šikovne vyriešiť bývanie, pripraviť deťom štartovný kapitál a budovať majetok tak, aby ste mali pokojný spánok.</p>
-      <div class="hero-btns">
-        <a href="#kontakt" class="btn-primary">Dajme si kávu a preberme to</a>
-        <a href="#nastroje" class="btn-secondary">HypoKalkulačka</a>
-      </div>
-    </div>
-    <div class="hero-photo">
-      <div class="photo-accent"></div>
-      <div class="photo-frame">
-        <img src="hero-mario.jpg" alt="Mário Tišťan - Senior Consultant Partners Group SK" loading="eager" fetchpriority="high">
-        <div class="photo-badge">
-          <div class="badge-num">2016</div>
-          <div class="badge-txt">Rok začiatku</div>
-        </div>
-      </div>
+<!-- ÚVOD -->
+<header class="wrap hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Finančný poradca · Partners Group SK</p>
+    <h1>Postavme tvoje financie na <em>pevné základy</em></h1>
+    <p class="hero-lead">Zrozumiteľne, ľudsky a na dlhé roky</p>
+    <p class="hero-desc">Pomáham (nielen) mladým rodinám šikovne vyriešiť bývanie, pripraviť deťom štartovný kapitál a budovať majetok tak, aby si mal pokojný spánok</p>
+    <div class="hero-actions">
+      <a href="#kontakt" class="btn btn-primary">Dajme si kávu a preberme to</a>
+      <a href="hypokalkulacka.html" class="btn btn-secondary">HypoKalkulačka+</a>
     </div>
   </div>
-</div>
+  <div class="pframe hero-photo">
+    <svg viewBox="0 0 400 475" aria-hidden="true"><path d="M67.9 12.5H362.5A25 25 0 0 1 387.5 37.5V437.5A25 25 0 0 1 362.5 462.5H37.5A25 25 0 0 1 12.5 437.5V67.9"/></svg>
+    <img src="hero-mario.jpg" alt="Mário Tišťan, finančný poradca Partners Group SK" width="847" height="900" loading="eager" fetchpriority="high">
+  </div>
+</header>
 
-<!-- CALCULATOR CTA -->
-<section class="calc-cta-section">
-  <div class="calc-cta-grid">
-    <a href="hypokalkulacka.html" class="calc-cta-card fade-up">
-      <div class="calc-cta-icon"><i data-lucide="home"></i></div>
-      <div class="calc-cta-title">Koľko budem platiť za hypotéku?</div>
-      <div class="calc-cta-desc">Vypočítaj si splátku, porovnaj stratégie a zisti, koľko ušetríš.</div>
-      <span class="calc-cta-arrow">Otvoriť kalkulačku →</span>
+<!-- KALKULAČKY -->
+<section class="calcs" aria-label="Kalkulačky">
+  <div class="wrap calc-grid">
+    <a href="hypokalkulacka.html" class="calc-card">
+      <span class="calc-name">HypoKalkulačka+</span>
+      <h3>Koľko budem platiť za hypotéku?</h3>
+      <p class="calc-desc">Vypočítaj si splátku, porovnaj stratégie a zisti, koľko ušetríš</p>
+      <span class="calc-go">Otvoriť kalkulačku <i data-lucide="arrow-right"></i></span>
     </a>
-    <a href="dochodkova-kalkulacka.html" class="calc-cta-card fade-up">
-      <div class="calc-cta-icon"><i data-lucide="bar-chart-3"></i></div>
-      <div class="calc-cta-title">Koľko mi bude chýbať na dôchodku?</div>
-      <div class="calc-cta-desc">Zisti medzeru v príjme a koľko musíš investovať, aby si žil bez starostí.</div>
-      <span class="calc-cta-arrow">Otvoriť kalkulačku →</span>
+    <a href="dochodkova-kalkulacka.html" class="calc-card">
+      <span class="calc-name">DôchodKalkulačka+</span>
+      <h3>Koľko mi bude chýbať na dôchodku?</h3>
+      <p class="calc-desc">Zisti medzeru v príjme a koľko musíš investovať, aby si žil bez starostí</p>
+      <span class="calc-go">Otvoriť kalkulačku <i data-lucide="arrow-right"></i></span>
     </a>
-    <a href="invest-kalkulacka.html" class="calc-cta-card fade-up">
-      <div class="calc-cta-icon"><i data-lucide="wallet"></i></div>
-      <div class="calc-cta-title">Kam investovať a koľko zarobím?</div>
-      <div class="calc-cta-desc">Porovnaj 7 stratégií — od termíňáku po dynamickú. Vidíš silu zloženého úročenia.</div>
-      <span class="calc-cta-arrow">Otvoriť kalkulačku →</span>
+    <a href="invest-kalkulacka.html" class="calc-card">
+      <span class="calc-name">InvestKalkulačka+</span>
+      <h3>Kam investovať a koľko zarobím?</h3>
+      <p class="calc-desc">Porovnaj 7 stratégií od termíňáku po dynamickú a uvidíš silu zloženého úročenia</p>
+      <span class="calc-go">Otvoriť kalkulačku <i data-lucide="arrow-right"></i></span>
     </a>
   </div>
 </section>
 
-<!-- SOCIAL PROOF BAR -->
-<div class="social-proof" id="social-proof">
-  <div class="proof-inner fade-up">
-    <div class="proof-item">
-      <div class="proof-icon">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      </div>
-      <div>
-        <div class="proof-num" data-counter="year">Od roku 2016</div>
-        <div class="proof-lbl">Skúsenosti na trhu</div>
-      </div>
+<!-- ČÍSLA -->
+<section class="stats" id="social-proof" aria-label="V číslach">
+  <div class="wrap stats-grid">
+    <div class="stat">
+      <p class="stat-label">Vo financiách od roku</p>
+      <p class="stat-value">2016</p>
     </div>
-    <div class="proof-item">
-      <div class="proof-icon">
-        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      </div>
-      <div>
-        <div class="proof-num" data-counter="value">3,5 milióna €+</div>
-        <div class="proof-lbl">Hodnota majetku pod správou</div>
-      </div>
+    <div class="stat">
+      <p class="stat-label">Hodnota majetku pod správou</p>
+      <p class="stat-value">3,5 mil. €+</p>
     </div>
-    <div class="proof-item">
-      <div class="proof-icon">
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </div>
-      <div>
-        <div class="proof-num" data-counter="partner"><span class="counter-val">100</span> %</div>
-        <div class="proof-lbl">Dlhodobé partnerstvo</div>
-      </div>
-    </div>
-    <div class="proof-item">
-      <div class="proof-icon">
-        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      </div>
-      <div>
-        <div class="proof-num" data-counter="cities"><span class="counter-val">6</span> miest</div>
-        <div class="proof-lbl">BA, TT, ZA, CA, BY, NR + Online</div>
-      </div>
+    <div class="stat">
+      <p class="stat-label">Osobne alebo online</p>
+      <p class="stat-value">6 miest</p>
+      <p class="stat-note">Bratislava, Trnava, Žilina, Čadca, Bytča, Nitra</p>
     </div>
   </div>
-</div>
+</section>
 
-<!-- SERVICES -->
-<section class="services" id="s-cim-pomaham">
-  <div class="section-inner">
-    <div class="section-tag fade-up">Riešenia</div>
-    <h2 class="section-title fade-up">S čím za mnou ľudia chodia najčastejšie?</h2>
-    <p class="section-sub fade-up">A s čím viem pomôcť aj tebe</p>
-    <div class="services-grid">
+<!-- SLUŽBY -->
+<section class="section section-alt" id="s-cim-pomaham">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Riešenia</p>
+      <h2>S čím za mnou ľudia chodia najčastejšie?</h2>
+      <p class="section-sub">A s čím viem pomôcť aj tebe</p>
+    </div>
+    <div class="services-list">
 
-      <!-- Box 1: Bývanie a Hypotéky -->
-      <div class="service-card-large fade-up">
-        <div class="service-card-header">
-          <div class="service-card-header-top">
-            <div class="service-icon-lg"><i data-lucide="home"></i></div>
-            <div class="service-title-lg">Bývanie a Hypotéky</div>
-          </div>
-          <div class="service-subtitle-lg">Bez stresu a preplácania</div>
+      <article class="service">
+        <div class="service-head">
+          <h3>Bývanie a hypotéky</h3>
+          <p>Bez stresu a preplácania</p>
         </div>
         <div class="scenarios">
           <div class="scenario">
-            <div class="scenario-q">„Chceme vlastné bývanie, ale nevieme, na čo reálne máme."</div>
+            <p class="scenario-q">„Chceme vlastné bývanie, ale nevieme, na čo reálne máme.“</p>
             <p class="scenario-a">Zistíme tvoje možnosti, prepočítame, čo ti prejde v banke a nastavíme to tak, aby ťa splátka v noci nebudila zo sna.</p>
           </div>
           <div class="scenario">
-            <div class="scenario-q">„Končí mi fixácia a banka mi poslala list s vysokým úrokom."</div>
+            <p class="scenario-q">„Končí mi fixácia a banka mi poslala list s vysokým úrokom.“</p>
             <p class="scenario-a">Pozrieme sa na to, či sa s tvojou súčasnou bankou dá vyjednávať, alebo ti nájdeme výhodnejšiu ponuku inde a refinancujeme to.</p>
           </div>
         </div>
-      </div>
+      </article>
 
-      <!-- Box 2: Investovanie a Dôchodok -->
-      <div class="service-card-large fade-up">
-        <div class="service-card-header">
-          <div class="service-card-header-top">
-            <div class="service-icon-lg"><i data-lucide="trending-up"></i></div>
-            <div class="service-title-lg">Investovanie a Dôchodok</div>
-          </div>
-          <div class="service-subtitle-lg">Nech peniaze pracujú za teba</div>
+      <article class="service">
+        <div class="service-head">
+          <h3>Investovanie a dôchodok</h3>
+          <p>Nech peniaze pracujú za teba</p>
         </div>
         <div class="scenarios">
           <div class="scenario">
-            <div class="scenario-q">„Mám voľné peniaze a hľadám bezpečné miesto, kde ich zhodnotiť."</div>
+            <p class="scenario-q">„Mám voľné peniaze a hľadám bezpečné miesto, kde ich zhodnotiť.“</p>
             <p class="scenario-a">Peniaze na bežnom účte požiera inflácia. Pripravím ti investičné portfólio na mieru, ktoré zodpovedá tvojmu vzťahu k riziku.</p>
           </div>
           <div class="scenario">
-            <div class="scenario-q">„Chcem sa efektívne pripraviť na dôchodok."</div>
+            <p class="scenario-q">„Chcem sa efektívne pripraviť na dôchodok.“</p>
             <p class="scenario-a">Spoliehať sa len na štát sa dnes už nevypláca. Nastavíme tvoje mesačné prebytky tak, aby si mal v budúcnosti dôstojnú jeseň života.</p>
           </div>
         </div>
-      </div>
+      </article>
 
-      <!-- Box 3: Rodina a Bezpečnosť -->
-      <div class="service-card-large fade-up">
-        <div class="service-card-header">
-          <div class="service-card-header-top">
-            <div class="service-icon-lg"><i data-lucide="shield-check"></i></div>
-            <div class="service-title-lg">Rodina a Bezpečnosť</div>
-          </div>
-          <div class="service-subtitle-lg">Lebo stať sa môže čokoľvek</div>
+      <article class="service">
+        <div class="service-head">
+          <h3>Rodina a bezpečnosť</h3>
+          <p>Lebo stať sa môže čokoľvek</p>
         </div>
         <div class="scenarios">
           <div class="scenario">
-            <div class="scenario-q">„Čo ak prasiatko prestane sypať? (strata práce, choroba)"</div>
+            <p class="scenario-q">„Čo ak prasiatko prestane sypať? (strata práce, choroba)“</p>
             <p class="scenario-a">Skontrolujeme a nastavíme tvoje poistenie tak, aby reálne chránilo tvoju rodinu a krylo hypotéku, keď to budeš najviac potrebovať.</p>
           </div>
           <div class="scenario">
-            <div class="scenario-q">„Chceme deťom nasporiť na štart do života a štúdium."</div>
+            <p class="scenario-q">„Chceme deťom nasporiť na štart do života a štúdium.“</p>
             <p class="scenario-a">Ukážem ti, ako aj s menšími pravidelnými sumami dokážeš deťom vybudovať slušný kapitál na ich prvý byt či vysokú školu.</p>
           </div>
         </div>
-      </div>
+      </article>
 
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="steps" id="ako-to-funguje">
-  <div class="section-inner">
-    <div class="section-tag fade-up">Jednoduchý proces</div>
-    <h2 class="section-title fade-up">Ako to funguje</h2>
-    <div class="steps-grid fade-up">
-      <div class="step-line"></div>
-      <div class="step-line l2"></div>
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <div class="step-title">Bezplatná konzultácia</div>
-        <p class="step-desc">Stretneme sa osobne alebo online. Zistím tvoju aktuálnu situáciu, ciele a možnosti. Bez záväzkov, bez poplatkov.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <div class="step-title">Návrh riešenia</div>
-        <p class="step-desc">Pripravím konkrétny finančný plán na mieru — porovnám ponuky bánk a poisťovní a vysvetlím všetky možnosti.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <div class="step-title">Realizácia a servis</div>
-        <p class="step-desc">Zariadim všetko za teba — od papierovačiek po podpis. A potom? Pravidelný servis a úpravy podľa tvojho života.</p>
-      </div>
+<!-- AKO TO FUNGUJE -->
+<section class="section" id="ako-to-funguje">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Jednoduchý proces</p>
+      <h2>Ako to funguje</h2>
     </div>
+    <ol class="steps-grid">
+      <li class="step">
+        <span class="step-num">01</span>
+        <h3>Bezplatná konzultácia</h3>
+        <p>Stretneme sa osobne alebo online. Zistím tvoju aktuálnu situáciu, ciele a možnosti. Bez záväzkov, bez poplatkov.</p>
+      </li>
+      <li class="step">
+        <span class="step-num">02</span>
+        <h3>Návrh riešenia</h3>
+        <p>Pripravím konkrétny finančný plán na mieru — porovnám ponuky bánk a poisťovní a vysvetlím všetky možnosti.</p>
+      </li>
+      <li class="step">
+        <span class="step-num">03</span>
+        <h3>Realizácia a servis</h3>
+        <p>Zariadim všetko za teba — od papierovačiek po podpis. A potom? Pravidelný servis a úpravy podľa tvojho života.</p>
+      </li>
+    </ol>
   </div>
 </section>
 
-<!-- ABOUT ME -->
-<section id="o-mne">
-  <div class="section-inner">
-    <div class="section-tag fade-up">O mne</div>
-    <h2 class="section-title fade-up">Kto vlastne som?</h2>
-    <p class="section-sub fade-up">A prečo to robím inak</p>
+<!-- O MNE -->
+<section class="section section-rule" id="o-mne">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">O mne</p>
+      <h2>Kto vlastne som?</h2>
+      <p class="section-sub">A prečo to robím inak</p>
+    </div>
     <div class="about-grid">
-      <div class="about-text fade-up">
+      <div class="about-text">
         <p>Som Mário. Vo financiách sa hýbem od roku 2016. Pôvodne som do tohto biznisu išiel kvôli slobode — a to nielen tej časovej, ale aj finančnej. Na začiatku bolo mojím cieľom mať dostatok prostriedkov na to, aby som sa mohol naplno venovať kulturistike, nebol závislý od sponzorov a aby peniaze jednoducho nerozhodovali o tom, čo si v živote môžem dovoliť a čo nie. Zostal som však pre niečo úplne iné — pre reálny dopad na životy ľudí.</p>
+        <p>Zďaleka to pre mňa nie je len o číslach a grafoch. Najväčšiu radosť mi robí, keď s klientom vybojujeme hypotéku na prvé vlastné bývanie a pomôžem mu osamostatniť sa, hoci sa to na začiatku zdalo neriešiteľné. Alebo keď mi klient po piatich rokoch spolupráce pri káve povie: „Mário, som rád, že sme do toho vtedy išli. Bez teba by sme takéto finančné rezervy dnes nemali.“</p>
 
-        <p>Zďaleka to pre mňa nie je len o číslach a grafoch. Najväčšiu radosť mi robí, keď s klientom vybojujeme hypotéku na prvé vlastné bývanie a pomôžem mu osamostatniť sa, hoci sa to na začiatku zdalo neriešiteľné. Alebo keď mi klient po piatich rokoch spolupráce pri káve povie: „Mário, som rád, že sme do toho vtedy išli. Bez teba by sme takéto finančné rezervy dnes nemali."</p>
-
-        <div class="about-highlight">
+        <div class="about-note">
           <p>Sú však aj momenty, kedy ide do tuhého, a vtedy sa ukazuje skutočný význam mojej práce. Keď môj klient dostal infarkt, z plnenia kritických chorôb si dokázal vykryť nielen liečbu, ale aj dlhodobý výpadok príjmu. Alebo moja 56-ročná klientka, ktorej diagnostikovali rakovinu — vďaka správne nastavenému poisteniu si mohla dovoliť kvalitnejšiu liečbu v Nemecku a dostala sa z toho. To sú chvíle, kedy viem, že to, čo robím, má obrovský zmysel.</p>
         </div>
 
         <h3>Nie som v tom sám</h3>
         <p>Na rozdiel od klasického zamestnania, kde sa šéf málokedy úprimne zaujíma o tvoje ciele, ja mám okolo seba skvelé, prajné prostredie. Baví ma, že môžem pozitívne ovplyvňovať nielen klientov, ale aj mojich kolegov, s ktorými spoločne rastieme.</p>
-        <p>Verím, že kvalitné finančné plánovanie si vyžaduje nielen odbornosť, ale aj stopercentnú pozornosť. Preto som obklopený profesionálmi, ktorí mi pomáhajú doručovať vám ten najlepší servis. <a href="#nas-tim" style="color:var(--red);font-weight:600">Spoznajte náš tím →</a></p>
+        <p>Verím, že kvalitné finančné plánovanie si vyžaduje nielen odbornosť, ale aj stopercentnú pozornosť. Preto som obklopený profesionálmi, ktorí mi pomáhajú doručovať ti ten najlepší servis. <a href="#nas-tim" class="text-link">Spoznaj náš tím</a></p>
 
-        <h3>Keď práve neriešim financie...</h3>
+        <h3>Keď práve neriešim financie</h3>
         <p>Som aktívny športovec. Rád si dám do tela vo fitku, behám, zbehnem na airsoft alebo turistiku a dokonalý reset je pre mňa sauna. Som nadšenec do technológií, umelej inteligencie a biohackingu. A úplne najradšej zo všetkého trávim čas s mojou priateľkou — je nám jedno, či sme doma, alebo niekde na cestách, hlavne, že sme spolu.</p>
       </div>
-      <div class="about-photos fade-up">
-        <div class="about-photo-main">
-          <img src="mario-priatelka.jpg" alt="Mário s priateľkou" loading="lazy">
-        </div>
-        <div class="about-photo-secondary">
-          <img src="mario-kaviarena.jpg" alt="Mário Tišťan pri stretnutí s klientom" loading="lazy">
-        </div>
+      <div class="about-photos">
+        <img src="mario-priatelka.jpg" alt="Mário s priateľkou" width="413" height="600" loading="lazy">
+        <img src="mario-kaviarena.jpg" alt="Mário Tišťan pri stretnutí s klientom" width="768" height="768" loading="lazy">
       </div>
     </div>
   </div>
 </section>
 
-<!-- TEAM -->
-<section class="team-section" id="nas-tim">
-  <div class="section-inner">
-    <div class="section-tag fade-up">Náš tím</div>
-    <h2 class="section-title fade-up">Váš tím pre finančnú slobodu</h2>
-    <p class="section-sub fade-up">Staviame na odbornosti, zastupiteľnosti a lokálnej dostupnosti.</p>
+<!-- TÍM -->
+<section class="section section-alt" id="nas-tim">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Náš tím</p>
+      <h2>Tvoj tím pre finančnú slobodu</h2>
+      <p class="section-sub">Staviame na odbornosti, zastupiteľnosti a lokálnej dostupnosti</p>
+    </div>
     <div class="team-grid">
 
-      <!-- Mário -->
-      <div class="team-card featured fade-up">
-        <div class="team-photo">
-          <img src="mario-foto.jpg" alt="Mário Tišťan — Senior Consultant Partners Group SK" loading="lazy">
-        </div>
-        <div class="team-info">
-          <div class="team-name">Mário Tišťan</div>
-          <div class="team-role">Senior Consultant</div>
-          <div class="team-location">Bratislava · Žilina · Čadca · Bytča · Online</div>
-          <p class="team-desc">Strategické plánovanie a investície. Zastrešujem dlhodobú víziu vášho majetku a hľadám cesty k vašim cieľom.</p>
-          <a href="#kontakt" class="team-cta team-cta-primary">Dohodnúť stratégiu</a>
-        </div>
-      </div>
-
-      <!-- Monika -->
-      <div class="team-card fade-up">
-        <div class="team-photo">
-          <img src="monika-foto.jpg" alt="Monika Čupková — Team Manažér Partners Group SK" loading="lazy">
-        </div>
-        <div class="team-info">
-          <div class="team-name">Monika Čupková</div>
-          <div class="team-role">Team Manažér</div>
-          <div class="team-location">Trnava · Nitra</div>
-          <p class="team-desc">Riadenie tímu a odborný servis. Zabezpečuje vysokú kvalitu poradenstva a osobný prístup ku klientom v trnavskom regióne.</p>
-          <a href="tel:+421915865958" class="team-cta team-cta-primary"><i data-lucide="phone" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"></i>Zavolať Monike</a>
-          <a href="https://wa.me/421915865958?text=Dobr%C3%BD%20de%C5%88%2C%20Monika%2C%20rada%20by%20som%20sa%20poradila%20o%20mojich%20financi%C3%A1ch.%20Kedy%20by%20ste%20mali%20%C4%8Das%20na%20stretnutie%3F" class="team-cta team-cta-secondary" target="_blank" rel="noopener"><i data-lucide="message-circle" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"></i>WhatsApp</a>
-        </div>
-      </div>
-
-      <!-- Lenka -->
-      <div class="team-card fade-up">
-        <div class="team-photo">
-          <div class="team-photo-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <article class="member">
+        <img class="member-photo" src="mario-foto.jpg" alt="Mário Tišťan, Senior Consultant Partners Group SK" width="800" height="1080" loading="lazy">
+        <div class="member-body">
+          <h3>Mário Tišťan</h3>
+          <p class="member-role">Senior Consultant</p>
+          <p class="member-place">Bratislava · Žilina · Čadca · Bytča · online</p>
+          <p class="member-desc">Strategické plánovanie a investície. Zastrešujem dlhodobú víziu tvojho majetku a hľadám cesty k tvojim cieľom.</p>
+          <div class="member-actions">
+            <a href="#kontakt" class="btn btn-secondary btn-sm">Dohodnúť stratégiu</a>
           </div>
         </div>
-        <div class="team-info">
-          <div class="team-name">Lenka Štoderová</div>
-          <div class="team-role">Asistentka · Klientska podpora</div>
-          <div class="team-location">Online</div>
-          <p class="team-desc">Administratíva a operatíva. Postará sa o to, aby vaše zmluvy a požiadavky boli vybavené rýchlo a bez chýb.</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
-            <a href="mailto:asistent.cupka2@partnersgroup.sk?subject=Servis%20k%20zmluvám" class="team-cta team-cta-secondary" style="font-size:11px;padding:10px 16px">Kontaktovať mailom</a>
-            <a href="tel:+421949537118" class="team-cta team-cta-secondary" style="font-size:11px;padding:10px 16px">Zavolať</a>
+      </article>
+
+      <article class="member">
+        <img class="member-photo" src="monika-foto.jpg" alt="Monika Čupková, Team Manažér Partners Group SK" width="1620" height="2158" loading="lazy">
+        <div class="member-body">
+          <h3>Monika Čupková</h3>
+          <p class="member-role">Team Manažér</p>
+          <p class="member-place">Trnava · Nitra</p>
+          <p class="member-desc">Riadenie tímu a odborný servis. Zabezpečuje vysokú kvalitu poradenstva a osobný prístup ku klientom v trnavskom regióne.</p>
+          <div class="member-actions">
+            <a href="tel:+421915865958" class="btn btn-secondary btn-sm"><i data-lucide="phone"></i>Zavolať Monike</a>
+            <a href="https://wa.me/421915865958?text=Dobr%C3%BD%20de%C5%88%2C%20Monika%2C%20rada%20by%20som%20sa%20poradila%20o%20mojich%20financi%C3%A1ch.%20Kedy%20by%20ste%20mali%20%C4%8Das%20na%20stretnutie%3F" class="btn btn-secondary btn-sm" target="_blank" rel="noopener"><i data-lucide="message-circle"></i>WhatsApp</a>
           </div>
         </div>
-      </div>
+      </article>
+
+      <article class="member">
+        <div class="member-photo member-monogram" aria-hidden="true">LŠ</div>
+        <div class="member-body">
+          <h3>Lenka Štoderová</h3>
+          <p class="member-role">Asistentka · Klientska podpora</p>
+          <p class="member-place">Online</p>
+          <p class="member-desc">Administratíva a operatíva. Postará sa o to, aby tvoje zmluvy a požiadavky boli vybavené rýchlo a bez chýb.</p>
+          <div class="member-actions">
+            <a href="mailto:asistent.cupka2@partnersgroup.sk?subject=Servis%20k%20zmluv%C3%A1m" class="btn btn-secondary btn-sm"><i data-lucide="mail"></i>Kontaktovať mailom</a>
+            <a href="tel:+421949537118" class="btn btn-secondary btn-sm"><i data-lucide="phone"></i>Zavolať</a>
+          </div>
+        </div>
+      </article>
 
     </div>
   </div>
 </section>
 
-<!-- TOOLS & BLOG -->
-<section class="tools-section" id="nastroje">
-  <div class="section-inner">
-    <div class="section-tag fade-up">Nástroje a vzdelávanie</div>
-    <h2 class="section-title fade-up">Počítaj a vzdelávaj sa</h2>
+<!-- NÁSTROJE A BLOG -->
+<section class="section" id="nastroje">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Nástroje a vzdelávanie</p>
+      <h2>Počítaj a vzdelávaj sa</h2>
+    </div>
     <div class="tools-grid">
-      <!-- Left: Calculator Cards -->
-      <div class="fade-up">
-        <p class="calc-intro">Vyskúšaj moje bezplatné kalkulačky — prepočítaj si hypotéku, dôchodok aj investície.</p>
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <a href="hypokalkulacka.html" class="tools-calc-card" style="text-decoration:none;display:flex;align-items:center;gap:20px;background:#fff;border-radius:var(--radius);padding:24px;border:1px solid var(--border);transition:all .3s;color:var(--navy)">
-            <div style="font-size:36px;flex-shrink:0;color:var(--red)"><i data-lucide="home"></i></div>
-            <div>
-              <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;color:var(--navy)">HypoKalkulačka+</div>
-              <div style="font-size:13px;color:var(--muted);line-height:1.5">Vypočítaj splátku, porovnaj stratégie a zisti, koľko ušetríš na úrokoch.</div>
-              <span style="font-size:12px;font-weight:700;color:var(--red);margin-top:8px;display:inline-block;letter-spacing:.04em;text-transform:uppercase">Otvoriť kalkulačku →</span>
-            </div>
-          </a>
-          <a href="dochodkova-kalkulacka.html" class="tools-calc-card" style="text-decoration:none;display:flex;align-items:center;gap:20px;background:#fff;border-radius:var(--radius);padding:24px;border:1px solid var(--border);transition:all .3s;color:var(--navy)">
-            <div style="font-size:36px;flex-shrink:0;color:var(--red)"><i data-lucide="bar-chart-3"></i></div>
-            <div>
-              <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;color:var(--navy)">DôchodKalkulačka+</div>
-              <div style="font-size:13px;color:var(--muted);line-height:1.5">Koľko ti bude chýbať na dôchodku? Zisti medzeru a koľko investovať.</div>
-              <span style="font-size:12px;font-weight:700;color:var(--red);margin-top:8px;display:inline-block;letter-spacing:.04em;text-transform:uppercase">Otvoriť kalkulačku →</span>
-            </div>
-          </a>
-          <a href="invest-kalkulacka.html" class="tools-calc-card" style="text-decoration:none;display:flex;align-items:center;gap:20px;background:#fff;border-radius:var(--radius);padding:24px;border:1px solid var(--border);transition:all .3s;color:var(--navy)">
-            <div style="font-size:36px;flex-shrink:0;color:var(--red)"><i data-lucide="wallet"></i></div>
-            <div>
-              <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;color:var(--navy)">InvestKalkulačka+</div>
-              <div style="font-size:13px;color:var(--muted);line-height:1.5">Porovnaj 7 investičných stratégií a sleduj silu zloženého úročenia.</div>
-              <span style="font-size:12px;font-weight:700;color:var(--red);margin-top:8px;display:inline-block;letter-spacing:.04em;text-transform:uppercase">Otvoriť kalkulačku →</span>
-            </div>
-          </a>
-        </div>
-      </div>
-      <!-- Right: Blog -->
-      <div class="fade-up">
-        <p class="blog-intro">Najnovšie články a moje osobné pohľady na aktuálne dianie na trhu.</p>
-        <div class="blog-grid-side">
-          <a href="blog-dochodkova-prognoza.html" class="blog-card">
-            <div class="blog-body">
-              <div class="blog-tag">Dôchodok · Nové</div>
-              <div class="blog-title">Dôchodková prognóza: čo ti list zo Sociálnej poisťovne naozaj hovorí</div>
-              <p class="blog-excerpt">3,4 milióna Slovákov dostalo prvý odhad dôchodku. Ako čítať sumy, scenáre a mieru náhrady.</p>
-              <span class="blog-link">Čítať článok →</span>
-            </div>
-          </a>
-          <a href="blog-hypoteky.html" class="blog-card">
-            <div class="blog-body">
-              <div class="blog-tag">Hypotéky</div>
-              <div class="blog-title">5 vecí, ktoré musíš vedieť pred podpisom hypotéky</div>
-              <p class="blog-excerpt">Fixácia, LTV, DSTI, poplatky a predčasné splatenie — na čo si dať pozor.</p>
-              <span class="blog-link">Čítať článok →</span>
-            </div>
-          </a>
-          <a href="blog-investicie.html" class="blog-card">
-            <div class="blog-body">
-              <div class="blog-tag">Investície</div>
-              <div class="blog-title">Prečo začať investovať čo najskôr — aj s malou sumou</div>
-              <p class="blog-excerpt">Zložené úročenie je najsilnejší nástroj budovania majetku.</p>
-              <span class="blog-link">Čítať článok →</span>
-            </div>
-          </a>
-          <a href="blog-poistenie.html" class="blog-card">
-            <div class="blog-body">
-              <div class="blog-tag">Poistenie</div>
-              <div class="blog-title">Životné poistenie: kedy sa oplatí a kedy je to zbytočný výdavok</div>
-              <p class="blog-excerpt">Ak máš rodinu, hypotéku alebo záväzky — môže ti zachrániť budúcnosť.</p>
-              <span class="blog-link">Čítať článok →</span>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="kontakt">
-  <div class="section-inner">
-    <div class="section-tag fade-up">Kontakt</div>
-    <h2 class="section-title fade-up">Dajme si kávu a pozrime sa na tvoje financie</h2>
-    <p class="section-sub fade-up">Prvé stretnutie je vždy bezplatné. Môžeme sa stretnúť osobne v Bratislave, Trnave, Žiline, Čadci, Bytči, Nitre, alebo sa spojíme online odkiaľkoľvek.</p>
-    <div class="contact-grid">
-      <div class="contact-info fade-up">
-        <div class="contact-item">
-          <div class="contact-item-icon"><i data-lucide="phone"></i></div>
-          <div>
-            <div class="contact-item-lbl">Telefón</div>
-            <div class="contact-item-val"><a href="tel:+421902130096">+421 902 130 096</a></div>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="contact-item-icon"><i data-lucide="mail"></i></div>
-          <div>
-            <div class="contact-item-lbl">E-mail</div>
-            <div class="contact-item-val" id="em"></div>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="contact-item-icon"><i data-lucide="globe"></i></div>
-          <div>
-            <div class="contact-item-lbl">Sociálne siete</div>
-            <div class="contact-item-val" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-              <a href="https://www.instagram.com/mario.tistan/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                Instagram
-              </a>
-              <a href="https://www.facebook.com/mario.tistan" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                Facebook
-              </a>
-              <a href="https://www.linkedin.com/in/m%C3%A1rio-ti%C5%A1%C5%A5an-9b533313b" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-                LinkedIn
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="fade-up">
-        <form action="https://formspree.io/f/mdawjqak" method="POST">
-          <input type="hidden" name="_subject" value="Web — kontaktný formulár (mariotistan.sk)">
-          <div class="form-group">
-            <label class="form-label" for="f-meno">Meno</label>
-            <input type="text" name="meno" id="f-meno" class="form-input" placeholder="Ján Novák" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="f-kontakt">Telefón/E-mail</label>
-            <input type="text" name="kontakt" id="f-kontakt" class="form-input" placeholder="+421 9xx xxx xxx" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="f-tema">S čím potrebuješ pomôcť?</label>
-            <select name="tema" id="f-tema" class="form-input">
-              <option value="">— Vyber tému —</option>
-              <option value="byvanie">Bývanie</option>
-              <option value="investicie">Investície</option>
-              <option value="dochodok">Dôchodok / Sporenie</option>
-              <option value="refinancovanie">Refinancovanie hypotéky</option>
-              <option value="poistenie">Poistenie</option>
-              <option value="poradit">Chcem len poradiť...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="f-sprava">Správa</label>
-            <textarea name="sprava" id="f-sprava" class="form-input" placeholder="Krátky popis tvojej situácie..."></textarea>
-          </div>
-          <button type="submit" class="form-btn">Odoslať správu</button>
-          <p class="form-note">Odoslaním súhlasíte so spracovaním osobných údajov podľa <a href="ochrana-udajov.html" style="color:inherit;text-decoration:underline">Ochrany osobných údajov</a>. Slúžia výhradne na dohodnutie konzultácie.</p>
-        </form>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <!-- Col 1: Brand -->
       <div>
-        <div class="footer-logo">Mário <span>Tišťan</span></div>
+        <h3 class="col-title">Kalkulačky</h3>
+        <p class="col-intro">Vyskúšaj moje bezplatné kalkulačky — prepočítaj si hypotéku, dôchodok aj investície</p>
+        <a href="hypokalkulacka.html" class="list-card">
+          <div class="lc-body">
+            <p class="lc-title">HypoKalkulačka+</p>
+            <p class="lc-desc">Vypočítaj splátku, porovnaj stratégie a zisti, koľko ušetríš na úrokoch</p>
+          </div>
+          <i data-lucide="chevron-right"></i>
+        </a>
+        <a href="dochodkova-kalkulacka.html" class="list-card">
+          <div class="lc-body">
+            <p class="lc-title">DôchodKalkulačka+</p>
+            <p class="lc-desc">Koľko ti bude chýbať na dôchodku? Zisti medzeru a koľko investovať</p>
+          </div>
+          <i data-lucide="chevron-right"></i>
+        </a>
+        <a href="invest-kalkulacka.html" class="list-card">
+          <div class="lc-body">
+            <p class="lc-title">InvestKalkulačka+</p>
+            <p class="lc-desc">Porovnaj 7 investičných stratégií a sleduj silu zloženého úročenia</p>
+          </div>
+          <i data-lucide="chevron-right"></i>
+        </a>
+      </div>
+      <div>
+        <h3 class="col-title">Blog</h3>
+        <p class="col-intro">Najnovšie články a moje osobné pohľady na aktuálne dianie na trhu</p>
+        <a href="blog-dochodkova-prognoza.html" class="list-card">
+          <div class="lc-body">
+            <p class="lc-meta">Dôchodok</p>
+            <p class="lc-title">Dôchodková prognóza: čo ti list zo Sociálnej poisťovne naozaj hovorí</p>
+            <p class="lc-desc">3,4 milióna Slovákov dostalo prvý odhad dôchodku — ako čítať sumy, scenáre a mieru náhrady</p>
+          </div>
+          <i data-lucide="chevron-right"></i>
+        </a>
+        <a href="blog-hypoteky.html" class="list-card">
+          <div class="lc-body">
+            <p class="lc-meta">Hypotéky</p>
+            <p class="lc-title">5 vecí, ktoré musíš vedieť pred podpisom hypotéky</p>
+            <p class="lc-desc">Fixácia, LTV, DSTI, poplatky a predčasné splatenie — na čo si dať pozor</p>
+          </div>
+          <i data-lucide="chevron-right"></i>
+        </a>
+        <a href="blog-investicie.html" class="list-card">
+          <div class="lc-body">
+            <p class="lc-meta">Investície</p>
+            <p class="lc-title">Prečo začať investovať čo najskôr — aj s malou sumou</p>
+            <p class="lc-desc">Zložené úročenie je najsilnejší nástroj budovania majetku</p>
+          </div>
+          <i data-lucide="chevron-right"></i>
+        </a>
+        <a href="blog-poistenie.html" class="list-card">
+          <div class="lc-body">
+            <p class="lc-meta">Poistenie</p>
+            <p class="lc-title">Životné poistenie: kedy sa oplatí a kedy je to zbytočný výdavok</p>
+            <p class="lc-desc">Ak máš rodinu, hypotéku alebo záväzky, môže ti zachrániť budúcnosť</p>
+          </div>
+          <i data-lucide="chevron-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KONTAKT -->
+<section class="section section-alt" id="kontakt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Kontakt</p>
+      <h2>Dajme si kávu a pozrime sa na tvoje financie</h2>
+      <p class="section-sub">Prvé stretnutie je vždy bezplatné. Môžeme sa stretnúť osobne v Bratislave, Trnave, Žiline, Čadci, Bytči, Nitre, alebo sa spojíme online odkiaľkoľvek.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-list">
+        <div class="contact-row">
+          <i data-lucide="phone"></i>
+          <div>
+            <p class="contact-label">Telefón</p>
+            <p class="contact-value"><a href="tel:+421902130096">+421 902 130 096</a></p>
+          </div>
+        </div>
+        <div class="contact-row">
+          <i data-lucide="mail"></i>
+          <div>
+            <p class="contact-label">E-mail</p>
+            <p class="contact-value" id="em"></p>
+          </div>
+        </div>
+        <div class="contact-row">
+          <i data-lucide="globe"></i>
+          <div>
+            <p class="contact-label">Sociálne siete</p>
+            <p class="contact-value social">
+              <a href="https://www.instagram.com/mario.tistan/" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>Instagram</a>
+              <a href="https://www.facebook.com/mario.tistan" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>Facebook</a>
+              <a href="https://www.linkedin.com/in/m%C3%A1rio-ti%C5%A1%C5%A5an-9b533313b" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn</a>
+            </p>
+          </div>
+        </div>
+      </div>
+      <form class="form" action="https://formspree.io/f/mdawjqak" method="POST">
+        <input type="hidden" name="_subject" value="Web — kontaktný formulár (mariotistan.sk)">
+        <div class="form-group">
+          <label class="form-label" for="f-meno">Meno</label>
+          <input type="text" name="meno" id="f-meno" class="form-input" placeholder="Ján Novák" autocomplete="name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-kontakt">Telefón alebo e-mail</label>
+          <input type="text" name="kontakt" id="f-kontakt" class="form-input" placeholder="+421 9xx xxx xxx" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-tema">S čím potrebuješ pomôcť?</label>
+          <select name="tema" id="f-tema" class="form-input">
+            <option value="">Vyber tému</option>
+            <option value="byvanie">Bývanie</option>
+            <option value="investicie">Investície</option>
+            <option value="dochodok">Dôchodok / Sporenie</option>
+            <option value="refinancovanie">Refinancovanie hypotéky</option>
+            <option value="poistenie">Poistenie</option>
+            <option value="poradit">Chcem sa len poradiť</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-sprava">Správa</label>
+          <textarea name="sprava" id="f-sprava" class="form-input" placeholder="Krátky popis tvojej situácie"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Odoslať správu</button>
+        <p class="form-note">Odoslaním súhlasíš so spracovaním osobných údajov podľa <a href="ochrana-udajov.html">zásad ochrany osobných údajov</a>. Slúžia výhradne na dohodnutie konzultácie.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="#" class="site-logo">Mário Tišťan</a>
         <p class="footer-desc">Finančný poradca v Partners Group SK. Pomáham s hypotékami, investíciami, poistením a dôchodkovým sporením od roku 2016.</p>
         <div class="footer-socials">
-          <a href="https://www.instagram.com/mario.tistan/" target="_blank" rel="noopener" title="Instagram">
-            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-          </a>
-          <a href="https://www.facebook.com/mario.tistan" target="_blank" rel="noopener" title="Facebook">
-            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-          </a>
-          <a href="https://www.linkedin.com/in/m%C3%A1rio-ti%C5%A1%C5%A5an-9b533313b" target="_blank" rel="noopener" title="LinkedIn">
-            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-          </a>
+          <a href="https://www.instagram.com/mario.tistan/" target="_blank" rel="noopener" aria-label="Instagram"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a href="https://www.facebook.com/mario.tistan" target="_blank" rel="noopener" aria-label="Facebook"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://www.linkedin.com/in/m%C3%A1rio-ti%C5%A1%C5%A5an-9b533313b" target="_blank" rel="noopener" aria-label="LinkedIn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
         </div>
       </div>
-      <!-- Col 2: Navigácia -->
       <div>
-        <div class="footer-heading">Navigácia</div>
+        <p class="footer-heading">Navigácia</p>
         <ul class="footer-links">
           <li><a href="#s-cim-pomaham">S čím pomáham</a></li>
           <li><a href="#o-mne">O mne</a></li>
@@ -941,147 +831,84 @@ footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
           <li><a href="#kontakt">Kontakt</a></li>
         </ul>
       </div>
-      <!-- Col 3: Kalkulačky -->
       <div>
-        <div class="footer-heading">Kalkulačky</div>
+        <p class="footer-heading">Kalkulačky</p>
         <ul class="footer-links">
           <li><a href="hypokalkulacka.html">HypoKalkulačka+</a></li>
           <li><a href="dochodkova-kalkulacka.html">DôchodKalkulačka+</a></li>
           <li><a href="invest-kalkulacka.html">InvestKalkulačka+</a></li>
         </ul>
-        <div class="footer-heading" style="margin-top:20px">Blog</div>
+        <p class="footer-heading">Blog</p>
         <ul class="footer-links">
           <li><a href="blog-hypoteky.html">Hypotéky</a></li>
           <li><a href="blog-investicie.html">Investície</a></li>
           <li><a href="blog-poistenie.html">Poistenie</a></li>
+          <li><a href="blog-dochodkova-prognoza.html">Dôchodok</a></li>
         </ul>
       </div>
-      <!-- Col 4: Kontakt -->
-      <div>
-        <div class="footer-heading">Kontakt</div>
-        <div class="footer-contact-item">
-          <div class="footer-contact-label">Telefón</div>
-          <a href="tel:+421902130096">+421 902 130 096</a>
-        </div>
-        <div class="footer-contact-item">
-          <div class="footer-contact-label">E-mail</div>
-          <a href="mailto:mario.tistan@partnersgroup.sk">mario.tistan@partnersgroup.sk</a>
-        </div>
-        <div class="footer-contact-item">
-          <div class="footer-contact-label">Dostupnosť</div>
-          BA · TT · ZA · CA · BY · NR · Online
-        </div>
-        <div class="footer-contact-item" style="margin-top:12px">
-          <a href="https://www.partnersgroup.sk" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.4);font-size:12px">www.partnersgroup.sk</a>
-        </div>
+      <div class="footer-contact">
+        <p class="footer-heading">Kontakt</p>
+        <dl>
+          <dt>Telefón</dt>
+          <dd><a href="tel:+421902130096">+421 902 130 096</a></dd>
+          <dt>E-mail</dt>
+          <dd><a href="mailto:mario.tistan@partnersgroup.sk">mario.tistan@partnersgroup.sk</a></dd>
+          <dt>Kde sa stretneme</dt>
+          <dd>Bratislava, Trnava, Žilina, Čadca, Bytča, Nitra a online</dd>
+        </dl>
+        <a href="https://www.partnersgroup.sk" target="_blank" rel="noopener">partnersgroup.sk</a>
       </div>
     </div>
-    <!-- Bottom bar -->
     <div class="footer-bottom">
-      <div class="footer-copy">© 2026 Mário Tišťan · mariotistan.sk · Softvérový projekt: <a href="advisorflow" style="color:rgba(255,255,255,0.6);text-decoration:underline;text-underline-offset:3px">Advisor Flow</a></div>
-      <div class="footer-legal">
-        Podriadený finančný agent Partners Group SK s.r.o. · NBS č. 221967 · <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener">Register NBS</a> · <a href="ochrana-udajov.html">Ochrana údajov</a>
-      </div>
+      <p>© 2026 Mário Tišťan · mariotistan.sk · Softvérový projekt: <a href="advisorflow">Advisor Flow</a></p>
+      <p>Podriadený finančný agent Partners Group SK s.r.o. · NBS č. 221967 · <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener">Register NBS</a> · <a href="ochrana-udajov.html">Ochrana údajov</a></p>
     </div>
   </div>
 </footer>
 
-<!-- Floating WhatsApp + Telefón -->
-<div class="float-wa">
-  <a href="tel:+421902130096" class="float-btn float-call-btn" title="Zavolať">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-  </a>
-  <a href="https://wa.me/421902130096?text=Dobr%C3%BD%20de%C5%88%20p%C3%A1n%20Ti%C5%A1%C5%A5an%2C%20chcel%20by%20som%20sa%20poradi%C5%A5%20o..." class="float-btn float-wa-btn" target="_blank" rel="noopener" title="WhatsApp">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-  </a>
+<!-- Plávajúce tlačidlá: telefón + WhatsApp -->
+<div class="float-actions">
+  <a href="tel:+421902130096" class="float-btn float-call" aria-label="Zavolať Máriovi"><i data-lucide="phone"></i><span class="float-label">Zavolať</span></a>
+  <a href="https://wa.me/421902130096?text=Dobr%C3%BD%20de%C5%88%20p%C3%A1n%20Ti%C5%A1%C5%A5an%2C%20chcel%20by%20som%20sa%20poradi%C5%A5%20o..." class="float-btn float-wa" target="_blank" rel="noopener" aria-label="Napísať na WhatsApp"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg><span class="float-label">WhatsApp</span></a>
 </div>
 
-<!-- Cookie Banner -->
-<div class="cookie-banner" id="cookieBanner">
+<!-- Cookie lišta -->
+<div class="cookie-banner" id="cookieBanner" role="region" aria-label="Cookies">
   <p>Táto stránka používa cookies na zlepšenie tvojho zážitku. <a href="ochrana-udajov.html">Viac informácií</a></p>
-  <button class="cookie-accept" onclick="acceptCookies()">Súhlasím</button>
+  <button type="button" class="btn btn-primary btn-sm" onclick="acceptCookies()">Súhlasím</button>
 </div>
 
 <script>
-// Email obfuscation
+// E-mail (ochrana pred robotmi)
 var u='mario.tistan';var d='partnersgroup.sk';var e=u+'@'+d;
 document.getElementById('em').innerHTML='<a href="mailto:'+e+'">'+e+'</a>';
 
-// Fade-up IntersectionObserver
-var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
-document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
-
-// Animated counter helper
-function animateCount(el, target, suffix, duration) {
-  var start = 0, startTime = null;
-  function step(ts) {
-    if (!startTime) startTime = ts;
-    var progress = Math.min((ts - startTime) / duration, 1);
-    var eased = 1 - Math.pow(1 - progress, 3);
-    var current = Math.round(eased * target);
-    el.textContent = current + suffix;
-    if (progress < 1) requestAnimationFrame(step);
+// Mobilné menu
+var navToggle=document.querySelector('.hamburger');
+var navLinks=document.getElementById('nav-links');
+navToggle.addEventListener('click',function(){
+  var open=navLinks.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded',open?'true':'false');
+});
+navLinks.addEventListener('click',function(ev){
+  if(ev.target.closest('a')&&window.innerWidth<=900){
+    navLinks.classList.remove('open');
+    navToggle.setAttribute('aria-expanded','false');
   }
-  requestAnimationFrame(step);
-}
+});
 
-// Social proof counters
-var proofAnimated = false;
-var proofObs = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry) {
-    if (entry.isIntersecting && !proofAnimated) {
-      proofAnimated = true;
-      var items = document.querySelectorAll('.proof-num');
-      // "Od roku 2016" - animate from 2000 to 2016
-      if (items[0]) {
-        var el0 = items[0], st0 = null;
-        function stepYear(ts) {
-          if (!st0) st0 = ts;
-          var p = Math.min((ts - st0) / 1200, 1);
-          var eased = 1 - Math.pow(1 - p, 3);
-          el0.textContent = 'Od roku ' + Math.round(2000 + eased * 16);
-          if (p < 1) requestAnimationFrame(stepYear);
-        }
-        requestAnimationFrame(stepYear);
-      }
-      // "3,5 milióna €+"
-      if (items[1]) {
-        var el1 = items[1], st1 = null;
-        function stepVal(ts) {
-          if (!st1) st1 = ts;
-          var p = Math.min((ts - st1) / 1500, 1);
-          var eased = 1 - Math.pow(1 - p, 3);
-          el1.textContent = (eased * 3.5).toFixed(1).replace('.',',') + ' milióna €+';
-          if (p < 1) requestAnimationFrame(stepVal);
-        }
-        requestAnimationFrame(stepVal);
-      }
-      // "100 %"
-      if (items[2]) {
-        var cVal = items[2].querySelector('.counter-val');
-        if (cVal) animateCount(cVal, 100, '', 1800);
-      }
-      // "6 miest"
-      if (items[3]) {
-        var cVal3 = items[3].querySelector('.counter-val');
-        if (cVal3) animateCount(cVal3, 6, '', 1000);
-      }
-    }
-  });
-}, {threshold: 0.3});
-
-var proofBar = document.querySelector('.social-proof');
-if (proofBar) proofObs.observe(proofBar);
-
-// Cookie banner
-function acceptCookies() {
-  localStorage.setItem('cookiesAccepted', 'true');
+// Cookie lišta
+function acceptCookies(){
+  try{localStorage.setItem('cookiesAccepted','true');}catch(err){}
   document.getElementById('cookieBanner').classList.remove('show');
 }
-if (!localStorage.getItem('cookiesAccepted')) {
-  setTimeout(function() { document.getElementById('cookieBanner').classList.add('show'); }, 1500);
-}
-// Initialize Lucide icons
+try{
+  if(!localStorage.getItem('cookiesAccepted')){
+    setTimeout(function(){document.getElementById('cookieBanner').classList.add('show');},1500);
+  }
+}catch(err){}
+
+// Ikony
 lucide.createIcons();
 </script>
 </body>
