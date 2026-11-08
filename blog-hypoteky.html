@@ -45,7 +45,7 @@
   --sand: #ECEDED;
   --white: #ffffff;
   --dark-gray: #4D4D4D;
-  --muted: rgba(0,48,73,0.5);
+  --muted: rgba(0,48,73,0.72);
   --border: rgba(0,48,73,0.1);
   --radius: 20px;
 }
@@ -57,7 +57,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(
 .blog-header { background: var(--navy); padding: 20px 5%; }
 .header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
 .header-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; }
-.header-logo span { color: var(--red); }
+.header-logo span { color: #D98393; }
 .header-back { font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; transition: color .2s; display: inline-flex; align-items: center; gap: 8px; }
 .header-back:hover { color: #fff; }
 .header-back svg { width: 16px; height: 16px; }
@@ -67,16 +67,16 @@ body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(
 .article-hero-inner { max-width: 760px; margin: 0 auto; }
 .article-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--white); background: var(--red); padding: 6px 14px; border-radius: 100px; margin-bottom: 20px; }
 .article-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 700; color: #fff; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 16px; }
-.article-meta { font-size: 13px; color: rgba(255,255,255,0.4); }
+.article-meta { font-size: 13px; color: rgba(255,255,255,0.65); }
 
 /* Article content */
 .article-wrap { max-width: 760px; margin: 0 auto; padding: 48px 5% 80px; }
 .article-wrap h2 { font-family: 'Playfair Display', serif; font-size: clamp(22px, 3vw, 30px); font-weight: 700; color: var(--navy); margin: 48px 0 16px; line-height: 1.2; }
 .article-wrap h2:first-child { margin-top: 0; }
-.article-wrap p { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 16px; }
+.article-wrap p { font-size: 16px; font-weight: 400; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 16px; }
 .article-wrap strong { font-weight: 600; color: var(--navy); }
 .article-wrap ul, .article-wrap ol { margin: 0 0 16px 24px; }
-.article-wrap li { font-size: 16px; font-weight: 300; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 8px; }
+.article-wrap li { font-size: 16px; font-weight: 400; color: rgba(0,48,73,0.75); line-height: 1.8; margin-bottom: 8px; }
 
 /* Info box */
 .info-box { background: var(--sand); border-left: 4px solid var(--red); padding: 20px 24px; border-radius: 0 var(--radius) var(--radius) 0; margin: 24px 0; }
@@ -86,14 +86,14 @@ body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(
 
 /* Key takeaway */
 .takeaway { background: var(--navy); color: #fff; padding: 24px 28px; border-radius: var(--radius); margin: 32px 0; }
-.takeaway-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+.takeaway-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #D98393; margin-bottom: 8px; }
 .takeaway p { color: rgba(255,255,255,0.85); font-size: 15px; font-weight: 400; margin-bottom: 0; }
 
 /* CTA section */
 .article-cta { background: var(--sand); padding: 60px 5%; }
 .article-cta-inner { max-width: 760px; margin: 0 auto; text-align: center; }
 .article-cta h2 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 3vw, 36px); font-weight: 700; color: var(--navy); margin-bottom: 16px; line-height: 1.2; }
-.article-cta p { font-size: 16px; font-weight: 300; color: var(--muted); margin-bottom: 28px; line-height: 1.7; max-width: 520px; margin-left: auto; margin-right: auto; }
+.article-cta p { font-size: 16px; font-weight: 400; color: var(--muted); margin-bottom: 28px; line-height: 1.7; max-width: 520px; margin-left: auto; margin-right: auto; }
 .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; display: inline-block; transition: background .2s; border-radius: var(--radius); }
 .btn-primary:hover { background: var(--navy); }
@@ -104,8 +104,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(
 footer { background: var(--navy); color: #fff; padding: 40px 5%; }
 .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
 .footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; }
-.footer-logo span { color: var(--red); }
-.footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+.footer-logo span { color: #D98393; }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,0.65); }
 </style>
 </head>
 <body>
@@ -113,7 +113,7 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
 <header class="blog-header">
   <div class="header-inner">
     <a href="index.html" class="header-logo">Mário <span>Tišťan</span></a>
-    <a href="index.html#blog" class="header-back">
+    <a href="index.html#nastroje" class="header-back">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       Späť na články
     </a>
@@ -192,7 +192,7 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
 
   <p>Tu je možno najdôležitejšia rada: <strong>nikdy nechoďte len do jednej banky</strong>. Každá banka má iné sadzby, iné podmienky, iné poplatky. Rozdiel medzi najlepšou a najhoršou ponukou na trhu môže byť 0,5 – 1 % ročne. Zní to málo? Pri hypotéke 150 000 eur na 30 rokov je to rozdiel <strong>15 000 až 30 000 eur</strong> na úrokoch za celú dobu splácania.</p>
 
-  <p>Problém je, že obísť 10 bánk, v každej vyplniť žiadosť, priniesť dokumenty a porovnať ponuky je časovo náročné a vyčerpávajúce. Práve tu prichádza na rad nezávislý finančný poradca.</p>
+  <p>Problém je, že obísť 10 bánk, v každej vyplniť žiadosť, priniesť dokumenty a porovnať ponuky je časovo náročné a vyčerpávajúce. Práve tu prichádza na rad finančný agent.</p>
 
   <div class="info-box">
     <p><strong>Prečo využiť poradcu?</strong></p>
@@ -220,8 +220,8 @@ footer { background: var(--navy); color: #fff; padding: 40px 5%; }
   <div class="footer-inner">
     <div class="footer-logo">Mário <span>Tišťan</span></div>
     <div class="footer-copy">&copy; 2026 Mário Tišťan &middot; mariotistan.sk</div>
-    <div style="width:100%;text-align:center;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6">
-      Podriadený finančný agent Partners Group SK s.r.o. &middot; Registrácia NBS č. 221967 &middot; <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5);text-decoration:underline">Overenie v registri NBS</a> &middot; <a href="ochrana-udajov.html" style="color:rgba(255,255,255,0.5);text-decoration:underline">Ochrana osobných údajov</a>
+    <div style="width:100%;text-align:center;margin-top:12px;font-size:11px;color: rgba(255,255,255,0.65);line-height:1.6">
+      Podriadený finančný agent Partners Group SK s.r.o. &middot; Registrácia NBS č. 221967 &middot; <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.65);text-decoration:underline">Overenie v registri NBS</a> &middot; <a href="ochrana-udajov.html" style="color: rgba(255,255,255,0.65);text-decoration:underline">Ochrana osobných údajov</a>
     </div>
   </div>
 </footer>
