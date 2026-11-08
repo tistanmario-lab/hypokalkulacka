@@ -14,9 +14,8 @@
   }catch(e){}
 })();
 </script>
-<!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YF1E1SN7J8"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YF1E1SN7J8');</script>
+<!-- Súhlas s cookies: Google Analytics sa načíta až po súhlase -->
+<script src="/consent.js" defer></script>
 <title>Mário Tišťan | Finančný poradca | Partners Group SK</title>
 <meta name="description" content="Mário Tišťan — Senior Consultant Partners Group SK. Hypotéky, investície, poistenie a dôchodkové sporenie. Bratislava, Trnava, Žilina, Čadca, Bytča, Nitra.">
 <link rel="canonical" href="https://www.mariotistan.sk/">
@@ -124,8 +123,8 @@
       ],
       "sameAs": [
         "https://www.facebook.com/mario.tistan",
-        "https://www.instagram.com/mariotistan",
-        "https://www.linkedin.com/in/mariotistan"
+        "https://www.instagram.com/mario.tistan/",
+        "https://www.linkedin.com/in/m%C3%A1rio-ti%C5%A1%C5%A5an-9b533313b"
       ]
     },
     {
@@ -413,13 +412,6 @@ footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
 .float-wa-btn { background: #25D366; }
 .float-call-btn { background: var(--red); }
 
-/* Cookie banner */
-.cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: var(--navy); color: #fff; padding: 16px 5%; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; font-size: 13px; transform: translateY(100%); transition: transform .4s ease; }
-.cookie-banner.show { transform: translateY(0); }
-.cookie-banner p { max-width: 600px; color: rgba(255,255,255,0.7); line-height: 1.5; }
-.cookie-banner a { color: rgba(255,255,255,0.9); text-decoration: underline; }
-.cookie-accept { background: var(--red); color: #fff; border: none; padding: 10px 24px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; border-radius: var(--radius); transition: background .2s; flex-shrink: 0; }
-.cookie-accept:hover { background: #fff; color: var(--navy); }
 
 /* Calculator CTA Section */
 .calc-cta-section { padding: 40px 5%; background: var(--white); }
@@ -971,7 +963,7 @@ footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
     <div class="footer-bottom">
       <div class="footer-copy">© 2026 Mário Tišťan · mariotistan.sk · Softvérový projekt: <a href="advisorflow" style="color:rgba(255,255,255,0.6);text-decoration:underline;text-underline-offset:3px">Advisor Flow</a></div>
       <div class="footer-legal">
-        Podriadený finančný agent Partners Group SK s.r.o. · NBS č. 221967 · <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener">Register NBS</a> · <a href="ochrana-udajov.html">Ochrana údajov</a>
+        Podriadený finančný agent Partners Group SK s.r.o. · NBS č. 221967 · <a href="https://regfap.nbs.sk/search.php" target="_blank" rel="noopener">Register NBS</a> · <a href="ochrana-udajov.html">Ochrana údajov</a> · <a href="#nastavenia-cookies" data-cookie-settings>Nastavenia cookies</a>
       </div>
     </div>
   </div>
@@ -987,11 +979,6 @@ footer { background: var(--navy); color: #fff; padding: 60px 5% 32px; }
   </a>
 </div>
 
-<!-- Cookie Banner -->
-<div class="cookie-banner" id="cookieBanner">
-  <p>Táto stránka používa cookies na zlepšenie vášho zážitku. <a href="ochrana-udajov.html">Viac informácií</a></p>
-  <button class="cookie-accept" onclick="acceptCookies()">Súhlasím</button>
-</div>
 
 <script>
 // Email obfuscation
@@ -1059,14 +1046,6 @@ var proofObs = new IntersectionObserver(function(entries) {
 var proofBar = document.querySelector('.social-proof');
 if (proofBar) proofObs.observe(proofBar);
 
-// Cookie banner
-function acceptCookies() {
-  localStorage.setItem('cookiesAccepted', 'true');
-  document.getElementById('cookieBanner').classList.remove('show');
-}
-if (!localStorage.getItem('cookiesAccepted')) {
-  setTimeout(function() { document.getElementById('cookieBanner').classList.add('show'); }, 1500);
-}
 // Initialize Lucide icons
 lucide.createIcons();
 </script>
