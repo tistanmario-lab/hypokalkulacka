@@ -177,7 +177,7 @@ td{padding:7px 6px;font-size:11px}
     <h1 class="logo-title">InvestKalkulačka+</h1>
   </div>
   <div style="display:flex;align-items:center;gap:12px">
-    <a href="hypokalkulacka.html" style="font-size:10px;font-weight:600;color:#AB0534;text-decoration:none;letter-spacing:.04em;transition:opacity .2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Vyskúšaj aj HypoKalkulačku+ →</a>
+    <a href="hypokalkulacka.html" style="font-size:10px;font-weight:600;color:#AB0534;text-decoration:none;letter-spacing:.04em;transition:opacity .2s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Vyskúšajte aj HypoKalkulačku+ →</a>
     <div class="pg-label">Partners Group SK</div>
   </div>
 </header>
@@ -187,7 +187,7 @@ td{padding:7px 6px;font-size:11px}
   <div>
     <div class="panel">
       <div class="panel-tag">Investícia</div>
-      <div class="panel-title">Tvoja investícia</div>
+      <div class="panel-title">Vaša investícia</div>
 
       <div class="field">
         <div class="field-row">
@@ -223,7 +223,7 @@ td{padding:7px 6px;font-size:11px}
       </div>
 
       <div class="info-row">
-        Celkovo ročne investuješ <span id="yearlyTotalInfo">1 200 €</span>
+        Celkovo ročne investujete <span id="yearlyTotalInfo">1 200 €</span>
       </div>
     </div>
 
@@ -271,15 +271,15 @@ td{padding:7px 6px;font-size:11px}
   <!-- RIGHT COLUMN -->
   <div>
     <div class="splatka-card" style="margin-bottom:16px">
-      <div class="splatka-lbl">Za <span id="hlYears">20</span> rokov vložíš</div>
+      <div class="splatka-lbl">Za <span id="hlYears">20</span> rokov vložíte</div>
       <div class="splatka-val" id="hlDeposits">—</div>
       <div class="splatka-row">
         <div>
-          <div class="splatka-mini-lbl" id="hlDynLabel">Pri dynamickej stratégii budeš mať</div>
+          <div class="splatka-mini-lbl" id="hlDynLabel">Pri dynamickej stratégii budete mať</div>
           <div class="splatka-mini-val" id="hlDynamic">—</div>
         </div>
         <div style="text-align:right">
-          <div class="splatka-mini-lbl" id="hlGainsLabel">Peniaze zarobili za teba</div>
+          <div class="splatka-mini-lbl" id="hlGainsLabel">Peniaze zarobili za vás</div>
           <div class="splatka-mini-val" id="hlGains">—</div>
         </div>
       </div>
@@ -304,7 +304,7 @@ td{padding:7px 6px;font-size:11px}
     </div>
 
     <div class="bar-panel">
-      <div class="chart-title">Tvoje vklady vs. výnosy</div>
+      <div class="chart-title">Vaše vklady vs. výnosy</div>
       <div id="hbarContainer"></div>
     </div>
   </div>
@@ -324,8 +324,8 @@ td{padding:7px 6px;font-size:11px}
   <div class="pdf-modal">
     <button class="pdf-modal-close" onclick="closePdfModal()">×</button>
     <div id="modalFormContent">
-      <h3>Stiahni si výpočet</h3>
-      <p>Zadaj email a stiahni si PDF s výpočtom.</p>
+      <h3>Stiahnite si výpočet</h3>
+      <p>Zadajte e-mail a stiahnite si PDF s výpočtom.</p>
       <input class="pdf-modal-input" id="modalName" type="text" placeholder="Meno a priezvisko">
       <input class="pdf-modal-input" id="modalEmail" type="email" placeholder="Váš e-mail">
       <div class="pdf-modal-check">
@@ -489,11 +489,11 @@ function calc(){
   // Update highlight labels based on value mode
   var hlDynLabel = document.getElementById('hlDynLabel');
   if(hlDynLabel){
-    hlDynLabel.textContent = valueMode==='real' ? 'Reálna hodnota pri dynamickej stratégii' : 'Pri dynamickej stratégii budeš mať';
+    hlDynLabel.textContent = valueMode==='real' ? 'Reálna hodnota pri dynamickej stratégii' : 'Pri dynamickej stratégii budete mať';
   }
   var hlGainsLabel = document.getElementById('hlGainsLabel');
   if(hlGainsLabel){
-    hlGainsLabel.textContent = valueMode==='real' ? 'Reálny zisk (po inflácii)' : 'Peniaze zarobili za teba';
+    hlGainsLabel.textContent = valueMode==='real' ? 'Reálny zisk (po inflácii)' : 'Peniaze zarobili za vás';
   }
 
   // Build chart
