@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servisné stretnutie | VIP Zóna | Mário Tišťan</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#003049;--red:#AB0534;--silver:#989FA7;--sand:#ECEDED;--white:#fff;--muted:rgba(0,48,73,0.72);--border:rgba(0,48,73,0.1);--green:#276B2B;--orange:#e65100;--radius:18px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--navy);line-height:1.6;min-height:100vh;}
+.topbar{background:var(--navy);padding:0 5%;position:sticky;top:0;z-index:100;}
+.topbar-inner{max-width:1000px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#fff;text-decoration:none;}
+.logo span{color:#D98393;}
+.badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:12px;margin-left:8px;}
+.topbar a.back{color:rgba(255,255,255,0.6);font-size:12px;text-decoration:none;text-transform:uppercase;letter-spacing:.04em;}
+.topbar a.back:hover{color:#fff;}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 5% 80px;}
+h1.page{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:4px;}
+.sub{font-size:14px;color:var(--muted);margin-bottom:24px;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;}
+.card h2{font-family:'Playfair Display',serif;font-size:19px;margin-bottom:4px;}
+.card .hint{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.sec-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin:8px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sec-num{display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;align-items:center;justify-content:center;font-family:'DM Sans';font-size:14px;font-weight:600;}
+label{display:block;font-size:12px;font-weight:600;letter-spacing:.03em;color:var(--muted);margin-bottom:5px;}
+input,select,textarea{width:100%;padding:10px 12px;font-family:inherit;font-size:14px;border:1px solid var(--border);border-radius:10px;background:var(--white);color:var(--navy);outline:none;transition:border-color .2s;}
+input:focus,select:focus,textarea:focus{border-color:var(--navy);}
+textarea{resize:vertical;min-height:60px;}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px;}
+.btn{padding:11px 18px;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:11px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:7px;}
+.btn-red{background:var(--red);color:#fff;}.btn-red:hover{background:var(--navy);}
+.btn-navy{background:var(--navy);color:#fff;}.btn-navy:hover{background:#004a73;}
+.btn-out{background:var(--white);color:var(--navy);border:1px solid var(--border);}.btn-out:hover{border-color:var(--navy);}
+.btn-bar{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 24px;}
+/* zmluvy editor */
+.zm-table{width:100%;border-collapse:collapse;font-size:13px;}
+.zm-table th{text-align:left;padding:8px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+.zm-table td{padding:6px 6px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.zm-table input,.zm-table select{padding:7px 8px;font-size:13px;border-radius:8px;}
+.zm-wrap{overflow-x:auto;}
+.zm-table .num{max-width:110px;}
+.rm{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;line-height:1;}
+.muted{color:var(--muted);}
+/* prehľad */
+.hero{background:linear-gradient(135deg,var(--navy),#004a73);color:#fff;border-radius:var(--radius);padding:28px;margin-bottom:20px;}
+.hero .who{font-size:13px;opacity:.7;}
+.hero .big{font-family:'Playfair Display',serif;font-size:42px;font-weight:700;margin:6px 0;}
+.hero .grow{display:inline-block;background:rgba(46,125,50,0.25);color:#bfe6c2;font-weight:600;font-size:14px;padding:4px 12px;border-radius:20px;}
+.hero .split{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;font-size:13px;opacity:.9;}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.prod{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.prod .t{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.prod .v{font-size:22px;font-weight:700;color:var(--navy);margin:4px 0;}
+.prod .p{font-size:13px;font-weight:600;}
+.pos{color:var(--green);}.neg{color:var(--red);}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;}
+.pill.akt{background:#e8f5e9;color:var(--green);}.pill.ref{background:#fff3e0;color:#B23F00;}.pill.exp{background:rgba(171,5,52,0.08);color:var(--red);}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;margin-bottom:8px;font-size:13px;border-left:4px solid;}
+.alert.warn{background:rgba(230,81,0,0.07);border-color:var(--orange);}
+.alert.info{background:rgba(0,48,73,0.04);border-color:var(--navy);}
+.alert.ok{background:rgba(46,125,50,0.07);border-color:var(--green);}
+.alert svg.lucide{width:18px;height:18px;stroke-width:1.75;flex:0 0 auto;margin-top:1px;}
+.alert.warn svg.lucide{color:#B23F00;}.alert.info svg.lucide{color:var(--navy);}.alert.ok svg.lucide{color:var(--green);}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:2px;}
+.dot.ok{background:var(--green);}.dot.warn{background:var(--orange);}.dot.bad{background:var(--red);}
+.chk{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.chk input[type=checkbox]{width:18px;height:18px;flex:0 0 auto;}
+.chk .lbl{font-weight:600;font-size:14px;flex:0 0 200px;}
+.chk .note{flex:1;min-width:180px;}
+.empty{padding:40px 20px;text-align:center;color:var(--muted);}
+.print-only{display:none;}
+@media print{
+  .no-print{display:none!important;}
+  .print-only{display:block;}
+  body{background:#fff;}
+  .topbar{display:none;}
+  .wrap{padding:0;max-width:100%;}
+  .card{break-inside:avoid;border:1px solid #ddd;}
+}
+</style>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="supabase.min.js"></script>
+<script src="vip-cloud.js"></script>
+<script>
+// Auth guard
+(async function(){
+  try{
+    if(typeof vipResolveSession!=='function') return;
+    var sess = await vipResolveSession();
+    if(!sess){ window.location.replace('vip-login.html'); return; }
+    var u = await window.sbc.auth.getUser();
+    if(!u || u.error || !u.data || !u.data.user){ try{ await window.sbc.auth.signOut(); }catch(e){} window.location.replace('vip-login.html'); }
+  }catch(e){}
+})();
+</script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div><a href="vip-dashboard.html" class="logo">Mário <span>Tišťan</span></a><span class="badge">Servis</span></div>
+    <a href="vip-dashboard.html" class="back">&larr; Dashboard</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <h1 class="page">Servisné stretnutie</h1>
+  <div class="sub">Ročný prehľad portfólia a revízia cieľov s existujúcim klientom.</div>
+
+  <!-- LOAD BAR -->
+  <div class="card no-print" id="loadCard">
+    <h2>Načítať klienta</h2>
+    <div class="hint">Vlož servisný balíček klienta z Tany (JSON) — pripraví ho Claude — alebo načítaj súbor. Chýbajúce údaje doplníš nižšie ručne.</div>
+    <textarea id="pasteBox" rows="3" placeholder='Sem vlož JSON balíček klienta z Tany…'></textarea>
+    <div class="btn-bar" style="margin-top:12px;margin-bottom:0;">
+      <button class="btn btn-red" onclick="loadFromPaste()">Načítať z JSON</button>
+      <button class="btn btn-out" onclick="document.getElementById('fileInput').click()">Načítať súbor…</button>
+      <input type="file" id="fileInput" accept="application/json,.json" style="display:none" onchange="loadFromFile(event)">
+      <button class="btn btn-out" onclick="loadSample()">Ukážkový klient</button>
+      <button class="btn btn-out" onclick="newBlank()">Prázdny</button>
+    </div>
+    <div id="loadMsg" style="margin-top:10px;font-size:13px;"></div>
+  </div>
+
+  <div id="app" style="display:none;">
+
+    <!-- KROK 1: aktuálny stav (editor) -->
+    <div class="card no-print" id="krok1">
+      <div class="sec-title"><span class="sec-num">1</span> Aktuálny stav (z Tany — doplň/uprav)</div>
+      <div class="row">
+        <div><label>Meno klienta</label><input id="f_meno" oninput="syncKlient()"></div>
+        <div><label>Oslovenie</label><select id="f_oslovenie" onchange="syncKlient()"><option value="vykanie">Vykanie</option><option value="tykanie">Tykanie</option></select></div>
+        <div><label>Rating</label><select id="f_rating" onchange="syncKlient()"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option></select></div>
+        <div><label>Spolupráca od (1. stretnutie)</label><input type="date" id="f_od" oninput="syncKlient()"></div>
+      </div>
+      <div class="row">
+        <div><label>Expirácia inv. dotazníka</label><input type="date" id="f_dotaznik" oninput="syncKlient()"></div>
+        <div><label>Posledný kontakt</label><input type="date" id="f_kontakt" oninput="syncKlient()"></div>
+        <div><label>Počet odporúčaní doteraz</label><input type="number" id="f_odp" min="0" value="0" oninput="syncKlient()"></div>
+      </div>
+
+      <div style="font-size:13px;font-weight:600;margin:18px 0 8px;">Zmluvy / produkty</div>
+      <div class="zm-wrap">
+        <table class="zm-table" id="zmTable">
+          <thead><tr>
+            <th>Názov / produkt</th><th>Typ</th><th>Banka/Poisťovňa</th><th>Stav</th>
+            <th>Hodnota €</th><th>Mesačne €</th><th>Výk. YTD %</th><th>Výk. p.a. %</th>
+            <th>Zostatok istiny €</th><th>Úrok %</th><th>Refixácia/expirácia</th><th></th>
+          </tr></thead>
+          <tbody id="zmBody"></tbody>
+        </table>
+      </div>
+      <button class="btn btn-out" style="margin-top:12px;" onclick="addZmluva()">+ Pridať zmluvu</button>
+    </div>
+
+    <!-- KROK 1b: ciele (plán) -->
+    <div class="card no-print" id="krok1ciele">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;">Ciele klienta — plán vs. realita</div>
+      <div class="hint">Cieľová suma + termín = plán z finančného plánu; aktuálna hodnota + mesačne = realita. Nástroj ukáže, či cieľ klient splní.</div>
+      <div class="zm-wrap">
+        <table class="zm-table" id="cielTable">
+          <thead><tr><th>Cieľ</th><th>Cieľová suma €</th><th>Termín</th><th>Aktuálna hodnota €</th><th>Mesačne €</th><th>Výnos % p.a.</th><th></th></tr></thead>
+          <tbody id="cielBody"></tbody>
+        </table>
+      </div>
+      <button class="btn btn-out" style="margin-top:12px;" onclick="addCiel()">+ Pridať cieľ</button>
+    </div>
+
+    <!-- KROK 1 actions -->
+    <div class="btn-bar no-print">
+      <button class="btn btn-navy" onclick="showPrehlad()">Zobraziť prehľad pre klienta →</button>
+    </div>
+
+    <!-- KROK 2: prehľad pre klienta -->
+    <div id="krok2" style="display:none;">
+      <div class="btn-bar no-print">
+        <button class="btn btn-out" onclick="backToEdit()">&larr; Upraviť údaje</button>
+        <button class="btn btn-red" onclick="generatePDF()">Stiahnuť PDF</button>
+        <button class="btn btn-out" onclick="window.print()">Tlačiť</button>
+        <button class="btn btn-out" onclick="exportSnapshot()">Uložiť snímku (JSON)</button>
+      </div>
+      <div id="prehlad"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Stav
+// ============================================================
+let SERVIS = null;
+const TYPY = ['Investície (ETF/PAM)','Poistenie životné','Poistenie neživotné (PZP/Kasko)','Poistenie nehnuteľnosti','Hypotéka','Spotrebný úver','DDS','DSS','Iné'];
+const STAVY = ['Aktívna','V procese','Refixácia','Zrušená','Exspirovaná'];
+const INVEST_TYPY = ['Investície (ETF/PAM)','DDS','DSS'];
+
+function fmtEUR(n){ if(n===null||n===undefined||isNaN(n)) return '—'; return Math.round(n).toLocaleString('sk-SK')+' €'; }
+function fmtPct(n){ if(n===null||n===undefined||isNaN(n)||n==='') return null; return (n>0?'+':'')+fmtDec(Math.round(n*10)/10)+' %'; }
+function fmtDec(n){ return String(n).replace('.', ','); }
+function osl(vy, ty){ return (SERVIS && SERVIS.klient && SERVIS.klient.oslovenie==='tykanie') ? ty : vy; }
+function parseNum(v){ if(v===''||v===null||v===undefined) return null; var n=parseFloat(String(v).replace(',','.')); return isNaN(n)?null:n; }
+function daysUntil(dateStr){ if(!dateStr) return null; var d=new Date(dateStr); if(isNaN(d.getTime())) return null; return Math.round((d - new Date())/(24*3600*1000)); }
+function fmtDate(s){ if(!s) return '—'; var d=new Date(s); return isNaN(d.getTime())?s:d.toLocaleDateString('sk-SK',{day:'numeric',month:'short',year:'numeric'}); }
+
+// ============================================================
+// Načítanie
+// ============================================================
+function loadFromPaste(){
+  var t = document.getElementById('pasteBox').value.trim();
+  if(!t){ msg('Vlož JSON balíček.', true); return; }
+  try{ apply(JSON.parse(t)); }catch(e){ msg('Neplatný JSON: '+e.message, true); }
+}
+function loadFromFile(ev){
+  var f = ev.target.files && ev.target.files[0]; if(!f) return;
+  var r = new FileReader();
+  r.onload = function(e){ try{ apply(JSON.parse(e.target.result)); }catch(err){ msg('Chyba súboru: '+err.message, true); } };
+  r.readAsText(f); ev.target.value='';
+}
+function newBlank(){ apply({klient:{oslovenie:'vykanie'}, zmluvy:[]}); }
+function loadSample(){
+  apply({
+    klient:{ meno:'Mária Benčíková', oslovenie:'vykanie', rating:'B', datum1Stretnutia:'2025-01-20',
+      expiraciaInvDotaznika:'2026-01-20', poslednyKontakt:'2025-11-15', pocetOdporucani:2 },
+    zmluvy:[
+      {nazov:'PI Dynamická Regular ESG', typ:'Investície (ETF/PAM)', banka:'Partners Investments', stav:'Aktívna', hodnota:3396.81, mesacne:100, vykonnostYTD:14.78, vykonnostPA:12.31, zaciatok:'2025-01-20'},
+      {nazov:'Životné poistenie', typ:'Poistenie životné', banka:'NN poisťovňa', stav:'Aktívna', rocnePoistne:360, mesacne:30, zaciatok:'2025-02-01'},
+      {nazov:'Hypotéka byt', typ:'Hypotéka', banka:'SLSP', stav:'Aktívna', zostatokIstiny:88000, urok:3.9, refixacia:'2026-09-01', zaciatok:'2024-09-01'}
+    ],
+    ciele:[
+      {nazov:'Dôchodok', cielovaSuma:120000, termin:'2050-01-01', aktualnaHodnota:10218, mesacne:100, vynos:7},
+      {nazov:'Rezerva', cielovaSuma:9000, termin:'2027-01-01', aktualnaHodnota:4000, mesacne:80, vynos:2}
+    ]
+  });
+}
+function apply(data){
+  SERVIS = {
+    klient: Object.assign({oslovenie:'vykanie'}, data.klient||{}),
+    zmluvy: Array.isArray(data.zmluvy)?data.zmluvy.slice():[],
+    ciele: Array.isArray(data.ciele)?data.ciele.slice():[],
+    checklist: data.checklist||{},
+    odporucania: data.odporucania||'',
+    akcneBody: data.akcneBody||'',
+    dalsiTermin: data.dalsiTermin||''
+  };
+  document.getElementById('loadCard').style.display='none';
+  document.getElementById('app').style.display='block';
+  fillKlient(); renderZmluvy(); renderCiele(); backToEdit();
+  msg('');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function msg(t, err){ var e=document.getElementById('loadMsg'); e.textContent=t||''; e.style.color=err?'var(--red)':'var(--green)'; }
+
+// ============================================================
+// Krok 1 — editor
+// ============================================================
+function fillKlient(){
+  var k=SERVIS.klient;
+  document.getElementById('f_meno').value=k.meno||'';
+  document.getElementById('f_oslovenie').value=k.oslovenie||'vykanie';
+  document.getElementById('f_rating').value=k.rating||'';
+  document.getElementById('f_od').value=k.datum1Stretnutia||'';
+  document.getElementById('f_dotaznik').value=k.expiraciaInvDotaznika||'';
+  document.getElementById('f_kontakt').value=k.poslednyKontakt||'';
+  document.getElementById('f_odp').value=(k.pocetOdporucani!=null?k.pocetOdporucani:0);
+}
+function syncKlient(){
+  var k=SERVIS.klient;
+  k.meno=document.getElementById('f_meno').value;
+  k.oslovenie=document.getElementById('f_oslovenie').value;
+  k.rating=document.getElementById('f_rating').value;
+  k.datum1Stretnutia=document.getElementById('f_od').value;
+  k.expiraciaInvDotaznika=document.getElementById('f_dotaznik').value;
+  k.poslednyKontakt=document.getElementById('f_kontakt').value;
+  k.pocetOdporucani=parseNum(document.getElementById('f_odp').value);
+}
+function renderZmluvy(){
+  var tb=document.getElementById('zmBody'); tb.innerHTML='';
+  SERVIS.zmluvy.forEach(function(z,i){
+    var tr=document.createElement('tr');
+    function opt(arr,val){ return arr.map(function(o){return '<option'+(o===val?' selected':'')+'>'+o+'</option>';}).join(''); }
+    tr.innerHTML=
+      '<td><input value="'+esc(z.nazov||'')+'" data-i="'+i+'" data-k="nazov" oninput="zEdit(this)" style="min-width:150px;"></td>'+
+      '<td><select data-i="'+i+'" data-k="typ" onchange="zEdit(this)">'+opt(TYPY,z.typ||'Investície (ETF/PAM)')+'</select></td>'+
+      '<td><input value="'+esc(z.banka||'')+'" data-i="'+i+'" data-k="banka" oninput="zEdit(this)" style="min-width:120px;"></td>'+
+      '<td><select data-i="'+i+'" data-k="stav" onchange="zEdit(this)">'+opt(STAVY,z.stav||'Aktívna')+'</select></td>'+
+      '<td><input class="num" type="number" step="0.01" value="'+nz(z.hodnota)+'" data-i="'+i+'" data-k="hodnota" oninput="zEdit(this)"></td>'+
+      '<td><input class="num" type="number" step="0.01" value="'+nz(z.mesacne)+'" data-i="'+i+'" data-k="mesacne" oninput="zEdit(this)"></td>'+
+      '<td><input class="num" type="number" step="0.01" value="'+nz(z.vykonnostYTD)+'" data-i="'+i+'" data-k="vykonnostYTD" oninput="zEdit(this)"></td>'+
+      '<td><input class="num" type="number" step="0.01" value="'+nz(z.vykonnostPA)+'" data-i="'+i+'" data-k="vykonnostPA" oninput="zEdit(this)"></td>'+
+      '<td><input class="num" type="number" step="0.01" value="'+nz(z.zostatokIstiny)+'" data-i="'+i+'" data-k="zostatokIstiny" oninput="zEdit(this)"></td>'+
+      '<td><input class="num" type="number" step="0.01" value="'+nz(z.urok)+'" data-i="'+i+'" data-k="urok" oninput="zEdit(this)" style="max-width:70px;"></td>'+
+      '<td><input type="date" value="'+(z.refixacia||'')+'" data-i="'+i+'" data-k="refixacia" oninput="zEdit(this)"></td>'+
+      '<td><button class="rm" onclick="removeZmluva('+i+')" title="Odstrániť">&times;</button></td>';
+    tb.appendChild(tr);
+  });
+  if(SERVIS.zmluvy.length===0) tb.innerHTML='<tr><td colspan="12" class="muted" style="padding:14px;">Žiadne zmluvy — pridaj tlačidlom nižšie alebo načítaj z Tany.</td></tr>';
+}
+function esc(s){ return (s+'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function nz(v){ return (v===null||v===undefined||v==='')?'':v; }
+function zEdit(el){
+  var i=+el.dataset.i, k=el.dataset.k, v=el.value;
+  if(['hodnota','mesacne','vykonnostYTD','vykonnostPA','zostatokIstiny','urok'].indexOf(k)>-1) v=parseNum(v);
+  SERVIS.zmluvy[i][k]=v;
+}
+function addZmluva(){ SERVIS.zmluvy.push({typ:'Investície (ETF/PAM)', stav:'Aktívna', banka:'Partners Investments'}); renderZmluvy(); }
+function removeZmluva(i){ SERVIS.zmluvy.splice(i,1); renderZmluvy(); }
+
+// ── Ciele (plán) editor ──
+function renderCiele(){
+  var tb=document.getElementById('cielBody'); if(!tb) return; tb.innerHTML='';
+  (SERVIS.ciele||[]).forEach(function(g,i){
+    var tr=document.createElement('tr');
+    tr.innerHTML=
+      '<td><input value="'+esc(g.nazov||'')+'" data-i="'+i+'" data-k="nazov" oninput="cEdit(this)" style="min-width:140px;"></td>'+
+      '<td><input class="num" type="number" step="100" value="'+nz(g.cielovaSuma)+'" data-i="'+i+'" data-k="cielovaSuma" oninput="cEdit(this)"></td>'+
+      '<td><input type="date" value="'+(g.termin||'')+'" data-i="'+i+'" data-k="termin" oninput="cEdit(this)"></td>'+
+      '<td><input class="num" type="number" step="10" value="'+nz(g.aktualnaHodnota)+'" data-i="'+i+'" data-k="aktualnaHodnota" oninput="cEdit(this)"></td>'+
+      '<td><input class="num" type="number" step="10" value="'+nz(g.mesacne)+'" data-i="'+i+'" data-k="mesacne" oninput="cEdit(this)" style="max-width:90px;"></td>'+
+      '<td><input class="num" type="number" step="0.5" value="'+nz(g.vynos)+'" data-i="'+i+'" data-k="vynos" oninput="cEdit(this)" style="max-width:80px;" placeholder="auto"></td>'+
+      '<td><button class="rm" onclick="removeCiel('+i+')">&times;</button></td>';
+    tb.appendChild(tr);
+  });
+  if(!SERVIS.ciele || SERVIS.ciele.length===0) tb.innerHTML='<tr><td colspan="7" class="muted" style="padding:14px;">Žiadne ciele — pridaj cieľ z finančného plánu klienta.</td></tr>';
+}
+function cEdit(el){ var i=+el.dataset.i,k=el.dataset.k,v=el.value; if(['cielovaSuma','aktualnaHodnota','mesacne','vynos'].indexOf(k)>-1) v=parseNum(v); SERVIS.ciele[i][k]=v; }
+function addCiel(){ SERVIS.ciele=SERVIS.ciele||[]; SERVIS.ciele.push({}); renderCiele(); }
+function removeCiel(i){ SERVIS.ciele.splice(i,1); renderCiele(); }
+
+// ── Projekcia cieľa (plán vs realita) ──
+function calcFV(pmt, rAnnual, years){ if(!pmt||!years) return 0; var r=rAnnual/12, n=years*12; return r===0 ? pmt*n : pmt*(Math.pow(1+r,n)-1)/r; }
+function calcPMT(fv, rAnnual, years){ if(fv<=0||years<=0) return 0; var r=rAnnual/12, n=years*12; return r===0 ? fv/n : fv*r/(Math.pow(1+r,n)-1); }
+function autoRate(years){ return years>=10?0.08:(years>=5?0.05:0.02); }
+function goalProjection(g){
+  var C=parseNum(g.cielovaSuma)||0, A=parseNum(g.aktualnaHodnota)||0, m=parseNum(g.mesacne)||0;
+  var roky=null; if(g.termin){ var d=daysUntil(g.termin); if(d!==null) roky=Math.max(0, Math.round(d/365.25*10)/10); }
+  var r=(g.vynos!=null&&g.vynos!=='')?(parseNum(g.vynos)/100):autoRate(roky||5);
+  var FV = roky!=null ? Math.round(A*Math.pow(1+r,roky)+calcFV(m,r,roky)) : A;
+  var pctNow = C>0?Math.round(A/C*100):0;
+  var pctProj = C>0?Math.round(FV/C*100):0;
+  var shortfall = Math.max(0, C-FV);
+  var addMonthly = (roky&&roky>0)?Math.round(calcPMT(shortfall,r,roky)):0;
+  var status = pctProj>=100?'ok':(pctProj>=80?'warn':'bad');
+  return {C:C,A:A,m:m,roky:roky,r:r,FV:FV,pctNow:pctNow,pctProj:pctProj,shortfall:shortfall,addMonthly:addMonthly,status:status};
+}
+
+// ============================================================
+// Výpočty
+// ============================================================
+function compute(){
+  var inv=SERVIS.zmluvy.filter(function(z){ return INVEST_TYPY.indexOf(z.typ)>-1 && (z.stav!=='Zrušená'); });
+  var totalValue=0, growthYTD=0, wSum=0, wPaSum=0;
+  inv.forEach(function(z){
+    var h=parseNum(z.hodnota)||0; totalValue+=h;
+    var ytd=parseNum(z.vykonnostYTD); if(ytd!=null && h>0){ growthYTD += h - h/(1+ytd/100); }
+    var pa=parseNum(z.vykonnostPA); if(pa!=null && h>0){ wSum+=h; wPaSum+=pa*h; }
+  });
+  var wPa = wSum>0 ? wPaSum/wSum : null;
+  // odhad vkladov (ak vieme mesačne + začiatok)
+  var deposits=0, depKnown=false;
+  inv.forEach(function(z){
+    var m=parseNum(z.mesacne), st=z.zaciatok;
+    if(m && st){ var mo=Math.max(0, Math.round((new Date()-new Date(st))/(30.44*24*3600*1000))); deposits+=m*mo; depKnown=true; }
+  });
+  return {inv:inv, totalValue:totalValue, growthYTD:Math.round(growthYTD), wPa:wPa, deposits:Math.round(deposits), depKnown:depKnown};
+}
+function alerts(){
+  var out=[];
+  var dd=daysUntil(SERVIS.klient.expiraciaInvDotaznika);
+  if(dd!==null && dd<=120) out.push({lvl:'warn', t:'Investičný dotazník '+(dd<0?'expiroval':'expiruje')+' '+fmtDate(SERVIS.klient.expiraciaInvDotaznika)+(dd>=0?' (o '+dd+' dní)':'')+' — treba podpísať nový.'});
+  SERVIS.zmluvy.forEach(function(z){
+    var rd=daysUntil(z.refixacia);
+    if(rd!==null && rd<=180 && z.typ==='Hypotéka') out.push({lvl:'warn', t:'Refixácia hypotéky '+(z.banka||'')+' '+(rd<0?'už prebehla':'o '+rd+' dní')+' ('+fmtDate(z.refixacia)+') — pripravím porovnanie ponúk.'});
+    else if(rd!==null && rd<=120 && z.stav!=='Zrušená') out.push({lvl:'warn', t:'Zmluva „'+(z.nazov||z.typ)+'" — dôležitý dátum '+fmtDate(z.refixacia)+' (o '+rd+' dní).'});
+    if(z.stav==='Refixácia') out.push({lvl:'warn', t:'„'+(z.nazov||z.typ)+'" je v stave Refixácia — treba vyriešiť.'});
+    if(z.stav==='Exspirovaná') out.push({lvl:'exp', t:'„'+(z.nazov||z.typ)+'" je exspirovaná.'});
+  });
+  // chýbajúce produkty (upsell)
+  var typy={}; SERVIS.zmluvy.forEach(function(z){ if(z.stav!=='Zrušená') typy[z.typ]=true; });
+  var chyba=[];
+  if(!typy['Poistenie životné']) chyba.push('životné poistenie');
+  if(typy['Hypotéka'] && !typy['Poistenie nehnuteľnosti']) chyba.push('poistenie nehnuteľnosti (k hypotéke)');
+  if(!INVEST_TYPY.some(function(t){return typy[t];})) chyba.push('investície / sporenie');
+  if(chyba.length) out.push({lvl:'info', t:'Chýbajúce oblasti na prebratie: '+chyba.join(', ')+'.'});
+  return out;
+}
+
+// ============================================================
+// Krok 2 — prehľad pre klienta
+// ============================================================
+const CHECK_ITEMS=[
+  {k:'prijem', l:'Príjem', h:'Zmena príjmu? → navýšenie vkladov (step-up)'},
+  {k:'rodina', l:'Rodina', h:'Nové dieťa, sobáš, zmena závislých osôb?'},
+  {k:'byvanie', l:'Bývanie', h:'Nová/refinancovaná hypotéka, kúpa?'},
+  {k:'ciele', l:'Ciele', h:'Zmena sumy/termínu/priority, nový/zrušený cieľ?'},
+  {k:'rezerva', l:'Rezerva', h:'Použitá? treba doplniť?'},
+  {k:'poistenie', l:'Poistenie / riziká', h:'Zmena príjmu/závislých → prehodnotiť poistné sumy?'},
+  {k:'riziko', l:'Tolerancia rizika', h:'Zmena postoja k riziku → stratégia?'}
+];
+function showPrehlad(){
+  syncKlient();
+  var c=compute(), al=alerts(), k=SERVIS.klient;
+  var meno=k.meno||'Klient';
+  var mesiacov = k.datum1Stretnutia ? Math.max(0,Math.round((new Date()-new Date(k.datum1Stretnutia))/(30.44*24*3600*1000))) : null;
+  var h='';
+  // HERO
+  h+='<div class="hero"><div class="who">'+esc(meno)+(mesiacov!=null?(' · '+osl('spolupracujeme','spolupracujeme')+' '+mesiacov+' '+(mesiacov===1?'mesiac':(mesiacov<5?'mesiace':'mesiacov'))):'')+'</div>';
+  h+='<div class="big">'+fmtEUR(c.totalValue)+'</div>';
+  if(c.growthYTD>0) h+='<span class="grow">▲ +'+fmtEUR(c.growthYTD)+' tento rok'+(c.wPa!=null?(' · '+fmtPct(c.wPa)+' p.a.'):'')+'</span>';
+  else if(c.wPa!=null) h+='<span class="grow">'+fmtPct(c.wPa)+' p.a.</span>';
+  var totalMonthly = c.inv.reduce(function(s,z){ return s+(parseNum(z.mesacne)||0); },0);
+  var aktivne = SERVIS.zmluvy.filter(function(z){ return z.stav==='Aktívna'; }).length;
+  h+='<div class="split">';
+  if(totalMonthly>0) h+='<div>'+osl('Mesačne investujete','Mesačne investuješ')+': <strong>'+fmtEUR(totalMonthly)+'</strong></div>';
+  if(c.wPa!=null) h+='<div>Priemerná výkonnosť: <strong>'+fmtPct(c.wPa)+' p.a.</strong></div>';
+  h+='<div>Aktívnych zmlúv: <strong>'+aktivne+'</strong></div>';
+  h+='</div></div>';
+
+  // PRODUKTY
+  h+='<div class="card"><div class="sec-title"><span class="sec-num">'+osl('1','1')+'</span> '+osl('Vaše','Tvoje')+' portfólio a produkty</div><div class="prod-grid">';
+  SERVIS.zmluvy.filter(function(z){return z.stav!=='Zrušená';}).forEach(function(z){
+    var isInv=INVEST_TYPY.indexOf(z.typ)>-1;
+    var pillCls=z.stav==='Aktívna'?'akt':(z.stav==='Exspirovaná'?'exp':'ref');
+    h+='<div class="prod"><div class="t">'+esc(z.typ||'')+'</div>';
+    h+='<div style="font-weight:600;font-size:14px;">'+esc(z.nazov||z.banka||'')+'</div>';
+    if(isInv){
+      h+='<div class="v">'+fmtEUR(parseNum(z.hodnota))+'</div>';
+      var pa=fmtPct(parseNum(z.vykonnostPA)), ytd=fmtPct(parseNum(z.vykonnostYTD));
+      if(pa||ytd) h+='<div class="p '+((parseNum(z.vykonnostPA)||0)>=0?'pos':'neg')+'">'+(ytd?ytd+' YTD':'')+(pa?' · '+pa+' p.a.':'')+'</div>';
+      if(z.mesacne) h+='<div class="muted" style="font-size:12px;">'+fmtEUR(parseNum(z.mesacne))+'/mes</div>';
+    } else if(z.typ==='Hypotéka'){
+      h+='<div class="v">'+fmtEUR(parseNum(z.zostatokIstiny))+'</div>';
+      h+='<div class="muted" style="font-size:12px;">zostatok · '+(z.urok!=null&&z.urok!==''?fmtDec(z.urok)+' %':'—')+(z.refixacia?(' · refix '+fmtDate(z.refixacia)):'')+'</div>';
+    } else {
+      if(z.rocnePoistne) h+='<div class="v" style="font-size:18px;">'+fmtEUR(parseNum(z.rocnePoistne))+'/rok</div>';
+      else if(z.mesacne) h+='<div class="v" style="font-size:18px;">'+fmtEUR(parseNum(z.mesacne))+'/mes</div>';
+    }
+    h+='<div style="margin-top:6px;"><span class="pill '+pillCls+'">'+esc(z.stav||'')+'</span></div>';
+    h+='</div>';
+  });
+  h+='</div></div>';
+
+  // NAPREDOVANIE K CIEĽOM
+  var ciele=(SERVIS.ciele||[]).filter(function(g){ return (parseNum(g.cielovaSuma)||0)>0; });
+  if(ciele.length){
+    h+='<div class="card"><div class="sec-title"><span class="sec-num">2</span> '+osl('Napredovanie k vašim cieľom','Napredovanie k tvojim cieľom')+'</div>';
+    ciele.forEach(function(g){
+      var p=goalProjection(g);
+      var col=p.status==='ok'?'var(--green)':(p.status==='warn'?'var(--orange)':'var(--red)');
+      var ik='<span class="dot '+p.status+'" aria-hidden="true"></span>';
+      var w=Math.max(2,Math.min(100,p.pctNow));
+      h+='<div style="margin-bottom:16px;">';
+      h+='<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;"><div style="font-weight:700;font-size:15px;">'+esc(g.nazov||'Cieľ')+'</div><div style="font-size:13px;color:var(--muted);">cieľ '+fmtEUR(p.C)+(p.roky!=null?(' · o '+fmtDec(p.roky)+' r.'):'')+'</div></div>';
+      h+='<div style="background:var(--sand);border-radius:20px;height:14px;overflow:hidden;margin:6px 0;"><div style="height:100%;width:'+w+'%;background:'+col+';border-radius:20px;"></div></div>';
+      h+='<div style="font-size:13px;">Dnes: <strong>'+fmtEUR(p.A)+'</strong> ('+p.pctNow+' % cieľa)'+(p.roky!=null?(' · '+ik+' projekcia o '+fmtDec(p.roky)+' r.: <strong>'+fmtEUR(p.FV)+'</strong> ('+p.pctProj+' %)'):'')+'</div>';
+      if(p.shortfall>0 && p.addMonthly>0) h+='<div class="alert warn" style="margin-top:6px;"><i data-lucide="alert-triangle"></i><div>'+'Na splnenie cieľa stačí odkladať <strong>+'+fmtEUR(p.addMonthly)+'/mes</strong> (inak bude chýbať '+fmtEUR(p.shortfall)+').</div></div>';
+      else if(p.roky!=null) h+='<div class="alert ok" style="margin-top:6px;"><i data-lucide="check"></i><div>'+osl('Pri súčasnom tempe cieľ splníte.','Pri súčasnom tempe cieľ splníš.')+'</div></div>';
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+
+  // UPOZORNENIA
+  h+='<div class="card no-break"><div class="sec-title"><span class="sec-num">3</span> Na čo dať pozor</div>';
+  if(al.length){ al.forEach(function(a){ h+='<div class="alert '+(a.lvl==='exp'?'warn':a.lvl)+'">'+(a.lvl==='info'?'<i data-lucide="lightbulb"></i>':'<i data-lucide="alert-triangle"></i>')+'<div>'+esc(a.t)+'</div></div>'; }); }
+  else h+='<div class="alert ok"><i data-lucide="check"></i><div>Žiadne urgentné termíny — všetko v poriadku.</div></div>';
+  h+='</div>';
+
+  // REVÍZNY CHECKLIST
+  h+='<div class="card no-print"><div class="sec-title"><span class="sec-num">4</span> Revízia — zmenilo sa niečo?</div><div class="hint">Prejdi s klientom; čo sa zmenilo, zapíš.</div>';
+  CHECK_ITEMS.forEach(function(it){
+    var v=SERVIS.checklist[it.k]||{};
+    h+='<div class="chk"><input type="checkbox" id="ck_'+it.k+'" '+(v.on?'checked':'')+' onchange="ckToggle(\''+it.k+'\')"><span class="lbl">'+it.l+'</span><input class="note" id="ckn_'+it.k+'" placeholder="'+it.h+'" value="'+esc(v.note||'')+'" oninput="ckNote(\''+it.k+'\')"></div>';
+  });
+  h+='</div>';
+
+  // ODPORÚČANIA + AKČNÉ BODY
+  h+='<div class="card"><div class="sec-title"><span class="sec-num">5</span> Odporúčania a ďalšie kroky</div>';
+  h+='<div class="no-print"><label>Odporúčania (čo upraviť / doplniť)</label><textarea id="f_odpor" oninput="SERVIS.odporucania=this.value" placeholder="Napr. navýšiť investíciu o 30 €/mes, doplniť poistenie nehnuteľnosti, podpísať nový inv. dotazník…">'+esc(SERVIS.odporucania||'')+'</textarea></div>';
+  h+='<div class="row" style="margin-top:12px;"><div class="no-print"><label>Akčné body</label><textarea id="f_akcne" oninput="SERVIS.akcneBody=this.value" placeholder="Kto čo spraví do kedy…">'+esc(SERVIS.akcneBody||'')+'</textarea></div>';
+  h+='<div class="no-print"><label>Ďalší servisný termín</label><input type="date" id="f_dalsi" value="'+(SERVIS.dalsiTermin||'')+'" oninput="SERVIS.dalsiTermin=this.value"></div></div>';
+  // print verzia odporúčaní
+  h+='<div class="print-only">';
+  if(SERVIS.odporucania) h+='<p><strong>Odporúčania:</strong> '+esc(SERVIS.odporucania)+'</p>';
+  if(SERVIS.akcneBody) h+='<p><strong>Akčné body:</strong> '+esc(SERVIS.akcneBody)+'</p>';
+  if(SERVIS.dalsiTermin) h+='<p><strong>Ďalší servis:</strong> '+fmtDate(SERVIS.dalsiTermin)+'</p>';
+  h+='</div>';
+  // referral nudge
+  h+='<div class="alert info" style="margin-top:12px;"><i data-lucide="lightbulb"></i><div>'+osl('Ak vám spolupráca vyhovuje','Ak ti spolupráca vyhovuje')+', poprosím o odporúčanie — koho z '+osl('vášho','tvojho')+' okolia by mohla podobná pomoc potešiť?'+(SERVIS.klient.pocetOdporucani?(' (doteraz: '+SERVIS.klient.pocetOdporucani+')'):'')+'</div></div>';
+  h+='</div>';
+
+  document.getElementById('prehlad').innerHTML=h;
+  document.getElementById('krok1').style.display='none';
+  document.getElementById('krok1ciele').style.display='none';
+  document.querySelectorAll('.btn-bar')[1] && (document.querySelectorAll('.btn-bar')[1].style.display='none');
+  document.getElementById('krok2').style.display='block';
+  if(window.lucide) lucide.createIcons();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function ckToggle(k){ SERVIS.checklist[k]=SERVIS.checklist[k]||{}; SERVIS.checklist[k].on=document.getElementById('ck_'+k).checked; }
+function ckNote(k){ SERVIS.checklist[k]=SERVIS.checklist[k]||{}; SERVIS.checklist[k].note=document.getElementById('ckn_'+k).value; }
+
+function backToEdit(){
+  document.getElementById('krok2').style.display='none';
+  document.getElementById('krok1').style.display='block';
+  document.getElementById('krok1ciele').style.display='block';
+  var bars=document.querySelectorAll('#app .btn-bar'); if(bars[0]) bars[0].style.display='flex';
+}
+
+function exportSnapshot(){
+  syncKlient();
+  var snap=JSON.parse(JSON.stringify(SERVIS));
+  snap.snapshotDate=new Date().toISOString();
+  snap.computed=compute();
+  var blob=new Blob([JSON.stringify(snap,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob); var a=document.createElement('a');
+  a.href=url; a.download='Servis_'+((SERVIS.klient.meno||'klient').replace(/\s+/g,'_'))+'_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ── Poradca (autor reportu) — podľa prihlásenia ──
+const ADVISORS = {
+  default: {name:'Mário Tišťan', title:'Senior Consultant', company:'Partners Group SK', email:'mario.tistan@partnersgroup.sk', phone:'+421 902 130 096', web:'www.mariotistan.sk'},
+  monika:  {name:'Monika Čupková', title:'Team Manažér', company:'Partners Group SK', email:'monika.cupkova@partnersgroup.sk', phone:'+421 915 865 958', web:''}
+};
+let currentAdvisor = ADVISORS.default;
+(async function(){ try{ if(typeof vipCurrentUser==='function'){ var u=await vipCurrentUser(); if(u && (u.email||'').toLowerCase().indexOf('cupkova')>-1) currentAdvisor=ADVISORS.monika; } }catch(e){} })();
+
+function arrBufB64(buf){ var bin='',b=new Uint8Array(buf); for(var i=0;i<b.byteLength;i++) bin+=String.fromCharCode(b[i]); return btoa(bin); }
+
+async function generatePDF(){
+  syncKlient();
+  if(!window.jspdf || !window.jspdf.jsPDF){ alert('PDF knižnica sa nenačítala.'); return; }
+  var fontLoaded=false;
+  try{ var rr=await fetch('fonts/dm-sans-regular.ttf'), rb=await fetch('fonts/dm-sans-bold.ttf');
+    if(rr.ok&&rb.ok){ window._sfR=arrBufB64(await rr.arrayBuffer()); window._sfB=arrBufB64(await rb.arrayBuffer()); fontLoaded=true; } }catch(e){}
+  var jsPDF=window.jspdf.jsPDF, doc=new jsPDF('p','mm','a4');
+  var pageW=doc.internal.pageSize.getWidth(), margin=15, contentW=pageW-2*margin, y=15;
+  var FN=fontLoaded?'DMSans':undefined;
+  if(fontLoaded){ doc.addFileToVFS('DMSans-Regular.ttf',window._sfR); doc.addFileToVFS('DMSans-Bold.ttf',window._sfB); doc.addFont('DMSans-Regular.ttf','DMSans','normal'); doc.addFont('DMSans-Bold.ttf','DMSans','bold'); doc.setFont('DMSans'); }
+  function N(){ doc.setFont(FN,'normal'); } function Bd(){ doc.setFont(FN,'bold'); }
+  function chk(n){ if(y+n>278){ doc.addPage(); y=20; } }
+  var k=SERVIS.klient, c=compute(), adv=currentAdvisor;
+  var meno=k.meno||'Klient', dnes=new Date().toLocaleDateString('sk-SK');
+  doc.setFillColor(0,48,73); doc.rect(0,0,pageW,40,'F'); doc.setFillColor(171,5,52); doc.rect(0,40,pageW,1.5,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(20); Bd(); doc.text('Servisný prehľad', margin, 18);
+  doc.setFontSize(10); N(); doc.text('Ročný prehľad portfólia a revízia cieľov', margin, 27);
+  doc.setFontSize(9); doc.text('Klient: '+meno, pageW-margin, 15, {align:'right'}); doc.text('Dátum: '+dnes, pageW-margin, 21, {align:'right'}); doc.text('Vypracoval: '+adv.name, pageW-margin, 27, {align:'right'});
+  y=50; doc.setTextColor(0,48,73);
+  chk(26); doc.setFillColor(0,48,73); doc.roundedRect(margin,y,contentW,22,2,2,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(9); N(); doc.text('Hodnota portfólia dnes', margin+6, y+7);
+  doc.setFontSize(20); Bd(); doc.text(fmtEUR(c.totalValue), margin+6, y+16);
+  N(); doc.setFontSize(10);
+  var gtxt=(c.growthYTD>0?('+'+fmtEUR(c.growthYTD)+' tento rok'):'')+(c.wPa!=null?('   '+fmtPct(c.wPa)+' p.a.'):'');
+  doc.text(gtxt, pageW-margin-4, y+15, {align:'right'});
+  y+=28; doc.setTextColor(0,48,73);
+  function sect(t){ chk(12); doc.setFillColor(0,48,73); doc.roundedRect(margin,y-5,contentW,9,1.5,1.5,'F'); doc.setTextColor(255,255,255); doc.setFontSize(10); Bd(); doc.text(t,margin+4,y+1); doc.setTextColor(0,48,73); N(); y+=9; }
+  function line(l,v,bold){ chk(7); N(); doc.setFontSize(9); doc.text(String(l),margin+3,y); if(bold){ Bd(); doc.setTextColor(171,5,52); } doc.text(String(v),pageW-margin,y,{align:'right'}); doc.setTextColor(0,48,73); N(); y+=5.5; }
+  function note(t){ chk(10); doc.setFontSize(8); doc.setTextColor(110,110,110); var ls=doc.splitTextToSize(String(t),contentW-6); doc.text(ls,margin+3,y); y+=ls.length*3.6+2; doc.setTextColor(0,48,73); doc.setFontSize(9); }
+  sect('Portfólio a produkty');
+  SERVIS.zmluvy.filter(function(z){return z.stav!=='Zrušená';}).forEach(function(z){
+    var isInv=INVEST_TYPY.indexOf(z.typ)>-1, v;
+    if(isInv) v=fmtEUR(parseNum(z.hodnota))+(z.vykonnostPA!=null&&z.vykonnostPA!==''?(' · '+fmtPct(parseNum(z.vykonnostPA))+' p.a.'):'');
+    else if(z.typ==='Hypotéka') v='zostatok '+fmtEUR(parseNum(z.zostatokIstiny))+(z.urok?(' · '+fmtDec(z.urok)+' %'):'');
+    else v=(z.rocnePoistne?fmtEUR(parseNum(z.rocnePoistne))+'/rok':(z.mesacne?fmtEUR(parseNum(z.mesacne))+'/mes':'aktívna'));
+    line((z.nazov||z.typ||'')+' ('+(z.stav||'')+')', v);
+  });
+  y+=2;
+  var ciele=(SERVIS.ciele||[]).filter(function(g){return (parseNum(g.cielovaSuma)||0)>0;});
+  if(ciele.length){ sect('Napredovanie k cieľom');
+    ciele.forEach(function(g){ var p=goalProjection(g); var st=p.status==='ok'?'na ceste':(p.status==='warn'?'pozor':'zaostáva');
+      line((g.nazov||'Cieľ')+' — cieľ '+fmtEUR(p.C), 'dnes '+fmtEUR(p.A)+' ('+p.pctNow+' %) · '+st, true);
+      if(p.roky!=null) note('Projekcia o '+fmtDec(p.roky)+' r.: '+fmtEUR(p.FV)+' ('+p.pctProj+' % cieľa). '+(p.shortfall>0&&p.addMonthly>0?('Odporúčanie: odkladať +'+fmtEUR(p.addMonthly)+'/mes.'):osl('Pri súčasnom tempe cieľ splníte.','Pri súčasnom tempe cieľ splníš.')));
+    }); y+=2;
+  }
+  var al=alerts(); if(al.length){ sect('Na čo dať pozor'); al.forEach(function(a){ note('• '+a.t); }); y+=2; }
+  var chDone=CHECK_ITEMS.filter(function(it){ var v=SERVIS.checklist[it.k]||{}; return v.on||v.note; });
+  if(chDone.length){ sect('Revízia — zmeny'); chDone.forEach(function(it){ var v=SERVIS.checklist[it.k]||{}; line(it.l, v.note||(v.on?'áno':'')); }); y+=2; }
+  if(SERVIS.odporucania||SERVIS.akcneBody||SERVIS.dalsiTermin){ sect('Odporúčania a ďalšie kroky');
+    if(SERVIS.odporucania){ chk(6); Bd(); doc.setFontSize(9); doc.text('Odporúčania:',margin+3,y); N(); y+=5; note(SERVIS.odporucania); }
+    if(SERVIS.akcneBody){ chk(6); Bd(); doc.text('Akčné body:',margin+3,y); N(); y+=5; note(SERVIS.akcneBody); }
+    if(SERVIS.dalsiTermin) line('Ďalší servisný termín', fmtDate(SERVIS.dalsiTermin), true);
+  }
+  var tp=doc.internal.getNumberOfPages();
+  for(var pg=1;pg<=tp;pg++){ doc.setPage(pg); var py=doc.internal.pageSize.getHeight()-12; doc.setFillColor(0,48,73); doc.rect(0,py,pageW,12,'F'); doc.setTextColor(255,255,255); doc.setFontSize(7.5); N();
+    doc.text(adv.name+' · '+adv.title+' · '+adv.company, margin, py+5);
+    var ct=[adv.email,adv.phone,adv.web].filter(Boolean).join(' · '); if(ct) doc.text(ct, margin, py+8.5);
+    doc.text('Strana '+pg+'/'+tp, pageW-margin, py+7, {align:'right'});
+  }
+  var d0=new Date(), isoDnes=d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0');
+  doc.save('Servis_'+meno.replace(/\s+/g,'_')+'_'+isoDnes+'.pdf');
+}
+
+function doLogout(){ if(typeof vipLogout==='function') vipLogout(); }
+</script>
+</body>
+</html>
